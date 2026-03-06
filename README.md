@@ -166,11 +166,7 @@ Load any JSON report from `reports/` and explore:
 
 ## Documentation
 
-Full documentation is available at:
-
-**[https://skaliber.github.io/apiTestsCoverageAnalyzer/](https://skaliber.github.io/apiTestsCoverageAnalyzer/)**
-
-Serve locally:
+Full documentation is available in the [`docs/`](docs/) directory and can be served locally:
 
 ```bash
 npm run docs:dev    # http://localhost:5174
@@ -180,23 +176,23 @@ Documentation sections:
 
 | Section | Description |
 |---------|-------------|
-| [Getting Started](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/getting-started) | First-run walkthrough |
-| [Installation](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/installation) | Detailed setup steps |
-| [CLI Reference](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/cli) | All commands and options |
-| [Multi-Language Support](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/multi-language) | Java, Kotlin, Python, Ruby, Cucumber test suites |
-| [Architecture](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/architecture) | Module design and data flow |
-| [CI/CD Integration](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/ci-cd) | GitHub Actions & Jenkins |
-| [Interpreting Reports](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/interpreting-reports) | Reading each report type |
-| [Writing Effective Tests](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/writing-tests) | Test best practices |
-| [Extending via Plugins](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/plugins) | Custom coverage types |
-| [Configuration Schema](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/configuration) | `coverage.config.json` reference |
-| [Troubleshooting](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/troubleshooting) | Common issues & FAQ |
-| [Glossary](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/glossary) | Key terms |
-| [Contributing](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/contributing) | How to contribute |
+| [Getting Started](docs/guide/getting-started.md) | First-run walkthrough |
+| [Installation](docs/guide/installation.md) | Detailed setup steps |
+| [CLI Reference](docs/reference/cli.md) | All commands and options |
+| [Multi-Language Support](docs/guide/multi-language.md) | Java, Kotlin, Python, Ruby, Cucumber test suites |
+| [Architecture](docs/reference/architecture.md) | Module design and data flow |
+| [CI/CD Integration](docs/guide/ci-cd.md) | GitHub Actions & Jenkins |
+| [Interpreting Reports](docs/guide/interpreting-reports.md) | Reading each report type |
+| [Writing Effective Tests](docs/guide/writing-tests.md) | Test best practices |
+| [Extending via Plugins](docs/guide/plugins.md) | Custom coverage types |
+| [Configuration Schema](docs/reference/configuration.md) | `coverage.config.json` reference |
+| [Troubleshooting](docs/guide/troubleshooting.md) | Common issues & FAQ |
+| [Glossary](docs/guide/glossary.md) | Key terms |
+| [Contributing](docs/reference/contributing.md) | How to contribute |
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and the [full contributing guide](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/contributing).
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [full contributing guide](docs/reference/contributing.md).
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 

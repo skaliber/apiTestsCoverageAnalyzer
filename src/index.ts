@@ -5,8 +5,8 @@ import { Command } from 'commander';
 const program = new Command();
 
 program
-  .name('api-test-coverage')
-  .description('Analyze API test coverage')
+  .name('api-tests-coverage-analyzer')
+  .description('Analyze API test coverage based on OpenAPI specs')
   .version('0.1.0')
   .option('-s, --spec <path>', 'Path to the API spec file')
   .option('-t, --tests <pattern>', 'Glob pattern for test files');

@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2024-01-15T12:00:00.000Z",
+  "summary": [
+    { "type": "endpoint", "totalItems": 10, "coveredItems": 8, "coveragePercent": 80 },
+    { "type": "parameter", "totalItems": 20, "coveredItems": 14, "coveragePercent": 70 },
+    { "type": "business", "totalItems": 5, "coveredItems": 3, "coveragePercent": 60 },
+    { "type": "integration", "totalItems": 8, "coveredItems": 4, "coveragePercent": 50 },
+    { "type": "security", "totalItems": 6, "coveredItems": 4, "coveragePercent": 67 },
+    { "type": "error", "totalItems": 12, "coveredItems": 6, "coveragePercent": 50 },
+    { "type": "performance", "totalItems": 4, "coveredItems": 3, "coveragePercent": 75 },
+    { "type": "resilience", "totalItems": 4, "coveredItems": 2, "coveragePercent": 50 }
+  ],
+  "details": {
+    "endpoint": {
+      "items": [
+        { "id": "GET /api/users", "covered": true, "tests": ["test_get_users", "test_get_users_empty"] },
+        { "id": "POST /api/users", "covered": true, "tests": ["test_create_user"] },
+        { "id": "GET /api/users/:id", "covered": true, "tests": ["test_get_user_by_id"] },
+        { "id": "PUT /api/users/:id", "covered": true, "tests": ["test_update_user"] },
+        { "id": "DELETE /api/users/:id", "covered": true, "tests": ["test_delete_user"] },
+        { "id": "GET /api/products", "covered": true, "tests": ["test_get_products"] },
+        { "id": "POST /api/products", "covered": true, "tests": ["test_create_product"] },
+        { "id": "GET /api/orders", "covered": true, "tests": ["test_get_orders"] },
+        { "id": "POST /api/orders", "covered": false, "tests": [] },
+        { "id": "DELETE /api/products/:id", "covered": false, "tests": [] }
+      ]
+    },
+    "parameter": {
+      "items": [
+        { "id": "GET /api/users - page", "covered": true, "tests": ["test_pagination"] },
+        { "id": "GET /api/users - limit", "covered": true, "tests": ["test_pagination"] },
+        { "id": "GET /api/users - sort", "covered": true, "tests": ["test_sort"] },
+        { "id": "GET /api/users - filter", "covered": false, "tests": [] },
+        { "id": "POST /api/users - name", "covered": true, "tests": ["test_create_user"] },
+        { "id": "POST /api/users - email", "covered": true, "tests": ["test_create_user"] },
+        { "id": "POST /api/users - role", "covered": false, "tests": [] },
+        { "id": "GET /api/products - category", "covered": true, "tests": ["test_filter_products"] },
+        { "id": "GET /api/products - minPrice", "covered": true, "tests": ["test_price_filter"] },
+        { "id": "GET /api/products - maxPrice", "covered": true, "tests": ["test_price_filter"] },
+        { "id": "GET /api/products - inStock", "covered": false, "tests": [] },
+        { "id": "POST /api/orders - userId", "covered": true, "tests": ["test_create_order"] },
+        { "id": "POST /api/orders - items", "covered": true, "tests": ["test_create_order"] },
+        { "id": "POST /api/orders - shippingAddress", "covered": false, "tests": [] },
+        { "id": "PUT /api/users/:id - name", "covered": true, "tests": ["test_update_user"] },
+        { "id": "PUT /api/users/:id - email", "covered": true, "tests": ["test_update_user"] },
+        { "id": "PUT /api/users/:id - role", "covered": false, "tests": [] },
+        { "id": "GET /api/orders - status", "covered": true, "tests": ["test_filter_orders"] },
+        { "id": "GET /api/orders - userId", "covered": true, "tests": ["test_filter_orders"] },
+        { "id": "GET /api/orders - dateRange", "covered": false, "tests": [] }
+      ]
+    },
+    "business": {
+      "items": [
+        { "id": "User must have unique email", "covered": true, "tests": ["test_duplicate_email"] },
+        { "id": "Order total must match item sum", "covered": true, "tests": ["test_order_total"] },
+        { "id": "Product stock must not go negative", "covered": true, "tests": ["test_stock_validation"] },
+        { "id": "User role permissions enforced", "covered": false, "tests": [] },
+        { "id": "Order cancellation window 24h", "covered": false, "tests": [] }
+      ]
+    },
+    "integration": {
+      "items": [
+        { "id": "User→Order flow", "covered": true, "steps": 3, "coveredSteps": 3 },
+        { "id": "Product→Order→Inventory flow", "covered": true, "steps": 4, "coveredSteps": 4 },
+        { "id": "User registration→email verification flow", "covered": false, "steps": 3, "coveredSteps": 0 },
+        { "id": "Order→Payment→Fulfillment flow", "covered": true, "steps": 5, "coveredSteps": 5 },
+        { "id": "Return→Refund flow", "covered": false, "steps": 4, "coveredSteps": 0 },
+        { "id": "Cart→Checkout→Order flow", "covered": false, "steps": 4, "coveredSteps": 0 },
+        { "id": "Vendor→Product→Catalog flow", "covered": false, "steps": 3, "coveredSteps": 0 },
+        { "id": "Notification dispatch flow", "covered": false, "steps": 2, "coveredSteps": 0 }
+      ]
+    },
+    "security": {
+      "items": [
+        { "id": "Authentication - JWT validation", "covered": true, "tests": ["test_auth_jwt"] },
+        { "id": "Authorization - role-based access", "covered": true, "tests": ["test_rbac"] },
+        { "id": "Rate limiting enforced", "covered": true, "tests": ["test_rate_limit"] },
+        { "id": "SQL injection prevention", "covered": true, "tests": ["test_sql_injection"] },
+        { "id": "XSS prevention", "covered": false, "tests": [] },
+        { "id": "CSRF protection", "covered": false, "tests": [] }
+      ]
+    },
+    "error": {
+      "items": [
+        { "id": "400 Bad Request - missing required fields", "covered": true, "tests": ["test_bad_request"] },
+        { "id": "401 Unauthorized - missing token", "covered": true, "tests": ["test_unauthorized"] },
+        { "id": "403 Forbidden - insufficient permissions", "covered": true, "tests": ["test_forbidden"] },
+        { "id": "404 Not Found - resource missing", "covered": true, "tests": ["test_not_found"] },
+        { "id": "409 Conflict - duplicate resource", "covered": true, "tests": ["test_conflict"] },
+        { "id": "422 Unprocessable Entity - validation error", "covered": true, "tests": ["test_validation"] },
+        { "id": "429 Too Many Requests", "covered": false, "tests": [] },
+        { "id": "500 Internal Server Error handling", "covered": false, "tests": [] },
+        { "id": "503 Service Unavailable", "covered": false, "tests": [] },
+        { "id": "Network timeout handling", "covered": false, "tests": [] },
+        { "id": "Partial failure - bulk operations", "covered": false, "tests": [] },
+        { "id": "Database connection failure", "covered": false, "tests": [] }
+      ]
+    },
+    "performance": {
+      "items": [
+        { "id": "GET /api/users - response < 200ms", "covered": true, "threshold": "200ms", "tests": ["perf_users_list"] },
+        { "id": "POST /api/users - response < 500ms", "covered": true, "threshold": "500ms", "tests": ["perf_create_user"] },
+        { "id": "GET /api/products - response < 200ms", "covered": true, "threshold": "200ms", "tests": ["perf_products_list"] },
+        { "id": "Bulk operations - throughput > 100 rps", "covered": false, "threshold": "100rps", "tests": [] }
+      ]
+    },
+    "resilience": {
+      "items": [
+        { "id": "Retry on 503", "covered": true, "tests": ["test_retry_503"] },
+        { "id": "Circuit breaker activation", "covered": true, "tests": ["test_circuit_breaker"] },
+        { "id": "Graceful degradation", "covered": false, "tests": [] },
+        { "id": "Failover to backup service", "covered": false, "tests": [] }
+      ]
+    }
+  }
+}

@@ -2,3 +2,5 @@ node_modules/
 dist/
 reports/*.json
 reports/*.html
+dashboard/node_modules/
+dashboard/dist/

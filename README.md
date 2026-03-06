@@ -71,6 +71,64 @@ node -r ts-node/register src/index.ts integration-coverage \
   --threshold-integration 50
 ```
 
+### `error-coverage`
+
+Analyses how thoroughly tests cover the **negative/error scenarios** (4xx and 5xx responses) documented in an OpenAPI spec.
+
+```sh
+node -r ts-node/register src/index.ts error-coverage \
+  --spec sample/openapi-errors.yaml \
+  --tests "sample/tests/**/*.ts" \
+  --format json,html,csv,junit \
+  --threshold-error 70
+```
+
+Each documented non-2xx response becomes an *error scenario* that is classified into one or more categories:
+
+| Category | Status codes typically involved |
+|----------|--------------------------------|
+| `missing-parameter` | 400 (with "missing"/"required" description) |
+| `invalid-value` | 400 (with "invalid"/"format" description), 422 |
+| `unauthorized` | 401 |
+| `forbidden` | 403 |
+| `not-found` | 404 |
+| `conflict` | 409 |
+| `server-error` | 500, 502, 503, 504 |
+
+#### How the heuristic works
+
+The analyzer scans each `test()` / `it()` block for evidence that it exercises an error scenario. A test is considered to **cover** a scenario when:
+
+1. **It calls the same endpoint** – the test description or code contains the HTTP method and path base  
+   (e.g. `POST /users`, `GET /users/`).
+
+2. **AND one of the following is true:**
+
+   | Evidence type | Examples |
+   |---------------|----------|
+   | Direct status-code assertion | `expect(res.status).toBe(400)` · `status === 401` |
+   | Category keyword in description | `"missing name"` → `missing-parameter` · `"not found"` → `not-found` |
+   | Error-body assertion with keyword | `expect(res.body.message).toContain('required')` |
+   | Code patterns | empty `Authorization` header → `unauthorized` · large fake ID → `not-found` · `null` value → `invalid-value` |
+
+#### Writing tests that the analyzer can recognize
+
+Follow these conventions so the analyzer reliably maps your tests to error scenarios:
+
+- **Start the test description with `METHOD /path`** when possible:  
+  `test('POST /users - missing name returns 400', ...)` ✅  
+  `test('should return 400', ...)` ❌ (no endpoint context)
+
+- **Include a category keyword** in the description or use a status-code assertion:  
+  `"missing"`, `"invalid"`, `"unauthorized"`, `"forbidden"`, `"not found"`, `"duplicate"`, `"server error"`
+
+- **Assert the status code directly** when possible:  
+  `expect(response.status).toBe(404)` is always recognized.
+
+- **Fake resource IDs** with 6+ digits (e.g. `999999`) are recognized as not-found probes.
+
+- **Empty or bare `Authorization` / `Bearer `** headers are recognized as unauthorized probes.
+
 ---
 
 ## Output formats

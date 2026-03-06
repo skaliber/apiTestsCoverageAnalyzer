@@ -27,6 +27,12 @@ import {
   generateIntegrationReports,
 } from './integrationCoverage';
 import {
+  parseErrorScenarios,
+  analyzeErrorCoverage,
+  buildErrorCoverageReport,
+  generateErrorReports,
+} from './errorCoverage';
+import {
   parseFormats,
   generateMultiFormatReports,
   checkThresholds,
@@ -295,6 +301,85 @@ program
     }
     console.log(`Reports written to: ${reportsDir}`);
 
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
+  });
+
+program
+  .command('error-coverage')
+  .description('Analyze how thoroughly tests cover error handling and negative scenarios defined in the API spec')
+  .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi-errors.yaml')
+  .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-error <percent>',
+    'Minimum required error handling coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
+  .action(async (options) => {
+    const specPath = path.resolve(options.spec);
+    const testsGlob = options.tests as string;
+    const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdError = options.thresholdError as number;
+
+    console.log(`Parsing spec: ${specPath}`);
+    const scenarios = await parseErrorScenarios(specPath);
+    console.log(`Found ${scenarios.length} error scenarios`);
+
+    console.log(`Analyzing tests matching: ${testsGlob}`);
+    const coverages = await analyzeErrorCoverage(scenarios, testsGlob);
+
+    const report = buildErrorCoverageReport(coverages);
+
+    generateErrorReports(report, reportsDir);
+
+    const result: CoverageResult = {
+      type: 'error',
+      totalItems: report.total,
+      coveredItems: report.covered,
+      coveragePercent: report.percentage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdError > 0) thresholds['error'] = thresholdError;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+
+    console.log(
+      `Error coverage: ${report.covered}/${report.total} error scenarios covered (${report.percentage}%)`,
+    );
+
+    // Print category summary
+    for (const [cat, summary] of Object.entries(report.categorySummary)) {
+      if (summary.total > 0) {
+        const pct = Math.round((summary.covered / summary.total) * 100);
+        console.log(`  ${cat}: ${summary.covered}/${summary.total} (${pct}%)`);
+      }
+    }
+
+    const uncovered = coverages.filter((c) => !c.covered);
+    if (uncovered.length > 0) {
+      console.log('Uncovered error scenarios:');
+      for (const c of uncovered) {
+        console.log(`  - ${c.scenario.id}: ${c.scenario.description}`);
+      }
+    }
+
+    console.log(`Reports written to: ${reportsDir}`);
+
+    // Threshold check
     const failures = checkThresholds([result], thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {

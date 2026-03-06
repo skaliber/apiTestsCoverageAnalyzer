@@ -71,6 +71,92 @@ node -r ts-node/register src/index.ts integration-coverage \
   --threshold-integration 50
 ```
 
+### `perf-resilience-coverage`
+
+Analyses how well tests cover **performance under load** and **resilience to failure conditions** for each API endpoint. It integrates insights from popular load-testing tools (JMeter, k6) and resilience testing frameworks (Chaos Monkey patterns).
+
+```sh
+node -r ts-node/register src/index.ts perf-resilience-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/**/*.ts" \
+  --load-results "sample/load-results-jmeter.csv,sample/load-results-k6.json" \
+  --threshold-response-ms 500 \
+  --threshold-error-rate 0.05 \
+  --format json,html,csv,junit \
+  --threshold-performance 80 \
+  --threshold-resilience 70
+```
+
+#### Performance coverage
+
+- Each endpoint in the spec becomes a *performance item* to be measured.
+- `--load-results` accepts a comma-separated list of load-test result files:
+  - **JMeter `.jtl` / `.csv`** – standard JMeter CSV format with columns `timeStamp,elapsed,label,responseCode,success,...`. Samples are grouped by the `label` column (set your sampler label to `METHOD /path`, e.g. `GET /users`).
+  - **k6 JSON summary** – output of `k6 run --summary-export=results.json`. Top-level metrics populate an `"overall"` entry; per-scenario breakdowns (when the `scenarios` key is present) are indexed by scenario name.
+- Coverage percentage = `(endpoints with load-test data) / (total endpoints)`.
+- Each endpoint with data is evaluated against:
+  - `--threshold-response-ms` (default 500 ms) – median response time threshold.
+  - `--threshold-error-rate` (default 0.05) – error rate threshold (0–1).
+
+**Generating compatible load-test results:**
+
+```sh
+# JMeter (command-line)
+jmeter -n -t my-test-plan.jmx \
+  -l sample/load-results-jmeter.csv \
+  -Jjmeter.save.saveservice.default_delimiter=,
+
+# k6
+k6 run --summary-export=sample/load-results-k6.json k6-script.js
+```
+
+#### Resilience coverage
+
+The analyzer generates six resilience scenarios **per endpoint** and checks whether at least one test addresses each:
+
+| Category | What to test |
+|----------|-------------|
+| `timeout` | Slow/unresponsive upstream causes a proper timeout error |
+| `retry` | Transient failures trigger retries with back-off |
+| `circuit-breaker` | Repeated failures open the circuit, stopping cascading failures |
+| `fallback` | Unavailable dependency returns a graceful degraded response |
+| `rate-limiting` | Excessive requests return HTTP 429 with `Retry-After` |
+| `bulkhead` | Resource isolation prevents one endpoint from starving others |
+
+#### Writing resilience tests the analyzer can recognize
+
+Use **category keywords** in your test descriptions:
+
+| Category | Keywords (partial list) |
+|----------|------------------------|
+| `timeout` | `timeout`, `timed out`, `deadline exceeded`, `response time` |
+| `retry` | `retry`, `retries`, `backoff`, `exponential backoff` |
+| `circuit-breaker` | `circuit breaker`, `circuit open`, `tripped` |
+| `fallback` | `fallback`, `graceful degradation`, `503`, `service unavailable` |
+| `rate-limiting` | `rate limit`, `429`, `too many requests`, `throttle` |
+| `bulkhead` | `bulkhead`, `isolation`, `concurrency limit`, `overload` |
+
+For **precise, endpoint-specific** coverage use the `@resilience <scenarioId>` annotation:
+
+```ts
+test('@resilience timeout:GET /users - upstream timeout returns 504', () => { ... });
+test('@resilience circuit-breaker:POST /orders - opens after 5 failures', () => { ... });
+```
+
+#### Understanding performance metrics
+
+| Metric | Description | Recommended threshold |
+|--------|-------------|----------------------|
+| **Median (P50)** | Half of requests are faster than this | < 500 ms |
+| **P95** | 95% of requests are faster than this | < 1 000 ms |
+| **P99** | 99% of requests are faster than this | < 2 000 ms |
+| **Error rate** | Fraction of failed requests (non-2xx) | < 5% (0.05) |
+| **Throughput** | Requests per second sustained | depends on SLA |
+
+Industry benchmarks: API calls responding in **< 200 ms** feel instant; **< 1 s** is acceptable; P95 < 500 ms is a common production SLA.
+
+---
+
 ### `error-coverage`
 
 Analyses how thoroughly tests cover the **negative/error scenarios** (4xx and 5xx responses) documented in an OpenAPI spec.

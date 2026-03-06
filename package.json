@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "echo \"No tests yet\""
+    "test": "jest"
   },
   "keywords": [
     "api",

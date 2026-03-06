@@ -1,0 +1,79 @@
+name: API Coverage Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-coverage:
+    name: Run API Test Coverage Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Run coverage commands ──────────────────────────────────────────────
+
+      - name: Analyze endpoint coverage
+        run: |
+          node -r ts-node/register src/index.ts endpoint-coverage \
+            --spec sample/openapi.yaml \
+            --tests "sample/tests/**/*.ts" \
+            --format json,html,csv,junit \
+            --threshold-endpoint 80
+
+      - name: Analyze parameter coverage
+        run: |
+          node -r ts-node/register src/index.ts parameter-coverage \
+            --spec sample/openapi-parameters.yaml \
+            --tests "sample/tests/**/*.ts" \
+            --format json,html,csv,junit \
+            --threshold-parameter 70
+
+      - name: Analyze business logic coverage
+        run: |
+          node -r ts-node/register src/index.ts business-coverage \
+            --rules sample/business-rules.yaml \
+            --tests "sample/tests/**/*.ts" \
+            --format json,html,csv,junit \
+            --threshold-business 60
+
+      - name: Analyze integration flow coverage
+        run: |
+          node -r ts-node/register src/index.ts integration-coverage \
+            --flows sample/integration-flows.yaml \
+            --tests "sample/tests/**/*.ts" \
+            --format json,html,csv,junit \
+            --threshold-integration 50
+
+      # ── Upload reports as artifacts ────────────────────────────────────────
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: reports/
+          retention-days: 30
+
+      # ── Publish JUnit test results ─────────────────────────────────────────
+      # Requires the 'EnricoMi/publish-unit-test-result-action' action.
+      # Remove or replace this step if you use a different JUnit reporter.
+      - name: Publish JUnit coverage results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          junit_files: 'reports/coverage-summary-junit.xml'
+          check_name: 'API Coverage Thresholds'

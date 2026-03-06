@@ -26,6 +26,12 @@ import {
   buildIntegrationCoverageReport,
   generateIntegrationReports,
 } from './integrationCoverage';
+import {
+  parseFormats,
+  generateMultiFormatReports,
+  checkThresholds,
+  CoverageResult,
+} from './reporting';
 
 const program = new Command();
 
@@ -39,10 +45,23 @@ program
   .description('Analyze which API endpoints are covered by integration tests')
   .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'tests/**/*.ts')
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-endpoint <percent>',
+    'Minimum required endpoint coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
   .action(async (options) => {
     const specPath = path.resolve(options.spec);
     const testsGlob = options.tests as string;
     const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdEndpoint = options.thresholdEndpoint as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseOpenApiSpec(specPath);
@@ -52,16 +71,36 @@ program
 
     const report = buildCoverageReport(coverageMap);
 
+    // Write per-command legacy reports (JSON + HTML files named endpoint-coverage.*)
     generateReports(report, reportsDir);
 
-    const jsonReport = path.join(reportsDir, 'endpoint-coverage.json');
-    const htmlReport = path.join(reportsDir, 'endpoint-coverage.html');
+    // Build standardised result and write multi-format summary reports
+    const result: CoverageResult = {
+      type: 'endpoint',
+      totalItems: report.total,
+      coveredItems: report.covered,
+      coveragePercent: report.percentage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdEndpoint > 0) thresholds['endpoint'] = thresholdEndpoint;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
 
     console.log(
       `Endpoint coverage: ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`,
     );
-    console.log(`JSON report: ${jsonReport}`);
-    console.log(`HTML report: ${htmlReport}`);
+    console.log(`Reports written to: ${reportsDir}`);
+
+    // Threshold check
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
   });
 
 program
@@ -69,10 +108,23 @@ program
   .description('Analyze how thoroughly each API parameter is tested (valid, boundary, missing, invalid)')
   .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi-parameters.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-parameter <percent>',
+    'Minimum required parameter coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
   .action(async (options) => {
     const specPath = path.resolve(options.spec);
     const testsGlob = options.tests as string;
     const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdParameter = options.thresholdParameter as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const parameters = await parseParameters(specPath);
@@ -84,14 +136,31 @@ program
 
     generateParameterReports(report, reportsDir);
 
-    const jsonReport = path.join(reportsDir, 'parameter-coverage.json');
-    const htmlReport = path.join(reportsDir, 'parameter-coverage.html');
+    const result: CoverageResult = {
+      type: 'parameter',
+      totalItems: report.totalParameters,
+      coveredItems: coverages.filter((c) => c.ratio > 0).length,
+      coveragePercent: report.averageCoverage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdParameter > 0) thresholds['parameter'] = thresholdParameter;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
 
     console.log(
       `Parameter coverage: ${report.totalParameters} parameters analysed, average coverage ${report.averageCoverage}%`,
     );
-    console.log(`JSON report: ${jsonReport}`);
-    console.log(`HTML report: ${htmlReport}`);
+    console.log(`Reports written to: ${reportsDir}`);
+
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
   });
 
 program
@@ -99,10 +168,23 @@ program
   .description('Analyze how well tests cover defined business rules and scenarios')
   .option('--rules <file>', 'Path to the business rules definition file (YAML or JSON)', 'sample/business-rules.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-business <percent>',
+    'Minimum required business logic coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
   .action(async (options) => {
     const rulesPath = path.resolve(options.rules);
     const testsGlob = options.tests as string;
     const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdBusiness = options.thresholdBusiness as number;
 
     console.log(`Parsing business rules: ${rulesPath}`);
     const rules = parseBusinessRules(rulesPath);
@@ -114,8 +196,18 @@ program
 
     generateBusinessReports(report, reportsDir);
 
-    const jsonReport = path.join(reportsDir, 'business-coverage.json');
-    const htmlReport = path.join(reportsDir, 'business-coverage.html');
+    const result: CoverageResult = {
+      type: 'business',
+      totalItems: report.total,
+      coveredItems: report.covered,
+      coveragePercent: report.percentage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdBusiness > 0) thresholds['business'] = thresholdBusiness;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
 
     console.log(
       `Business coverage: ${report.covered}/${report.total} rules covered (${report.percentage}%)`,
@@ -126,8 +218,15 @@ program
         console.log(`  - ${rule.id}: ${rule.description}`);
       }
     }
-    console.log(`JSON report: ${jsonReport}`);
-    console.log(`HTML report: ${htmlReport}`);
+    console.log(`Reports written to: ${reportsDir}`);
+
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
   });
 
 program
@@ -135,10 +234,23 @@ program
   .description('Analyze how well integration tests exercise defined end-to-end flows')
   .option('--flows <file>', 'Path to the integration flows definition file (YAML or JSON)', 'sample/integration-flows.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-integration <percent>',
+    'Minimum required integration flow coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
   .action(async (options) => {
     const flowsPath = path.resolve(options.flows);
     const testsGlob = options.tests as string;
     const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdIntegration = options.thresholdIntegration as number;
 
     console.log(`Parsing integration flows: ${flowsPath}`);
     const flows = parseIntegrationFlows(flowsPath);
@@ -150,8 +262,18 @@ program
 
     generateIntegrationReports(report, reportsDir);
 
-    const jsonReport = path.join(reportsDir, 'integration-coverage.json');
-    const htmlReport = path.join(reportsDir, 'integration-coverage.html');
+    const result: CoverageResult = {
+      type: 'integration',
+      totalItems: report.total,
+      coveredItems: report.complete,
+      coveragePercent: report.percentage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdIntegration > 0) thresholds['integration'] = thresholdIntegration;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
 
     console.log(
       `Integration coverage: ${report.complete}/${report.total} flows complete, ${report.partial} partial, ${report.missing} missing (${report.percentage}%)`,
@@ -171,8 +293,15 @@ program
         console.log(`  - ${fc.flow.id}: ${fc.flow.name}`);
       }
     }
-    console.log(`JSON report: ${jsonReport}`);
-    console.log(`HTML report: ${htmlReport}`);
+    console.log(`Reports written to: ${reportsDir}`);
+
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
   });
 
 // Parse the command-line arguments

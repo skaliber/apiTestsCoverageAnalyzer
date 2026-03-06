@@ -1,589 +1,204 @@
-# apiTestsCoverageAnalyzer
+# API Test Coverage Analyzer
 
-A CLI tool that analyses API test coverage against OpenAPI specifications, business rules, and integration flows – and generates multi-format reports with configurable pass/fail thresholds for CI pipelines.
+[![Build](https://github.com/skaliber/apiTestsCoverageAnalyzer/actions/workflows/api-coverage.yaml/badge.svg)](https://github.com/skaliber/apiTestsCoverageAnalyzer/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
+
+A CLI tool that measures how thoroughly your test suite exercises your API surface area. Rather than simply counting passing tests, it asks:
+
+- Are all **endpoints** reachable via at least one test?
+- Are **parameters** tested with valid, boundary, missing, and invalid values?
+- Are **business rules** (discount logic, rate limiting, etc.) explicitly validated?
+- Do **integration flows** (multi-step user journeys) run end-to-end?
+- Are **security scenarios** (auth bypass, injection, IDOR) covered?
+- Are **error paths** (4xx/5xx) handled correctly?
+- Is there **performance and resilience** evidence (JMeter/k6 data)?
+- Does the API **remain compatible** between versions?
+
+The answers appear in rich **HTML**, **JSON**, **CSV**, and **JUnit** reports that can be enforced as pass/fail gates in any CI pipeline.
 
 ---
 
-## Getting started
+## Table of Contents
 
-```sh
-npm install
-npm run build        # compile TypeScript → dist/
-npm test             # run all Jest tests
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Quickstart](#quickstart)
+- [Commands overview](#commands-overview)
+- [Configuration](#configuration)
+- [UI Dashboard](#ui-dashboard)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Prerequisites
+
+- **Node.js** ≥ 18 LTS
+- **npm** ≥ 9
+
+```bash
+node --version   # v20.x
+npm --version    # 10.x
 ```
 
----
+## Installation
 
-## Commands
+```bash
+# Clone the repository
+git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+cd apiTestsCoverageAnalyzer
 
-All commands share two common options in addition to their specific inputs:
+# Install dependencies
+npm install
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--format <formats>` | Comma-separated output formats: `json`, `html`, `csv`, `junit` | `json,html` |
-| `--threshold-*` | Minimum coverage % – see below | `0` (disabled) |
+# Compile TypeScript
+npm run build
 
-### `endpoint-coverage`
+# Verify
+node dist/index.js --help
+```
 
-Analyses which API endpoints defined in an OpenAPI spec are exercised by tests.
+Alternatively, use `ts-node` to skip the build step:
 
-```sh
-node -r ts-node/register src/index.ts endpoint-coverage \
+```bash
+node -r ts-node/register src/index.ts --help
+```
+
+## Quickstart
+
+Run all coverage types against the included sample project:
+
+```bash
+# Endpoint coverage
+node dist/index.js endpoint-coverage \
   --spec sample/openapi.yaml \
   --tests "sample/tests/**/*.ts" \
-  --format json,html,csv,junit \
+  --format json,html \
   --threshold-endpoint 80
-```
 
-### `parameter-coverage`
-
-Analyses how thoroughly each parameter is tested across four categories: valid value, boundary value, missing value, and invalid value.
-
-```sh
-node -r ts-node/register src/index.ts parameter-coverage \
-  --spec sample/openapi-parameters.yaml \
-  --tests "sample/tests/**/*.ts" \
-  --format json,html,csv,junit \
-  --threshold-parameter 70
-```
-
-### `business-coverage`
-
-Analyses which business rules and their scenarios are covered by tests.
-
-```sh
-node -r ts-node/register src/index.ts business-coverage \
+# Business rule coverage
+node dist/index.js business-coverage \
   --rules sample/business-rules.yaml \
   --tests "sample/tests/**/*.ts" \
-  --format json,html,csv,junit \
-  --threshold-business 60
-```
+  --format json,html
 
-### `integration-coverage`
-
-Analyses which end-to-end integration flows are fully exercised by tests.
-
-```sh
-node -r ts-node/register src/index.ts integration-coverage \
+# Integration flow coverage
+node dist/index.js integration-coverage \
   --flows sample/integration-flows.yaml \
   --tests "sample/tests/**/*.ts" \
-  --format json,html,csv,junit \
-  --threshold-integration 50
-```
+  --format json,html
 
-### `perf-resilience-coverage`
-
-Analyses how well tests cover **performance under load** and **resilience to failure conditions** for each API endpoint. It integrates insights from popular load-testing tools (JMeter, k6) and resilience testing frameworks (Chaos Monkey patterns).
-
-```sh
-node -r ts-node/register src/index.ts perf-resilience-coverage \
-  --spec sample/openapi.yaml \
+# Security coverage
+node dist/index.js security-coverage \
+  --spec sample/openapi-security.yaml \
   --tests "sample/tests/**/*.ts" \
-  --load-results "sample/load-results-jmeter.csv,sample/load-results-k6.json" \
-  --threshold-response-ms 500 \
-  --threshold-error-rate 0.05 \
-  --format json,html,csv,junit \
-  --threshold-performance 80 \
-  --threshold-resilience 70
+  --format json,html
+
+# Compatibility check (breaking changes between v1 and v2)
+node dist/index.js compatibility-check \
+  --old-spec sample/v1.yaml \
+  --new-spec sample/v2.yaml \
+  --contracts "sample/contracts/**/*.json" \
+  --format json,html
 ```
 
-#### Performance coverage
-
-- Each endpoint in the spec becomes a *performance item* to be measured.
-- `--load-results` accepts a comma-separated list of load-test result files:
-  - **JMeter `.jtl` / `.csv`** – standard JMeter CSV format with columns `timeStamp,elapsed,label,responseCode,success,...`. Samples are grouped by the `label` column (set your sampler label to `METHOD /path`, e.g. `GET /users`).
-  - **k6 JSON summary** – output of `k6 run --summary-export=results.json`. Top-level metrics populate an `"overall"` entry; per-scenario breakdowns (when the `scenarios` key is present) are indexed by scenario name.
-- Coverage percentage = `(endpoints with load-test data) / (total endpoints)`.
-- Each endpoint with data is evaluated against:
-  - `--threshold-response-ms` (default 500 ms) – median response time threshold.
-  - `--threshold-error-rate` (default 0.05) – error rate threshold (0–1).
-
-**Generating compatible load-test results:**
-
-```sh
-# JMeter (command-line)
-jmeter -n -t my-test-plan.jmx \
-  -l sample/load-results-jmeter.csv \
-  -Jjmeter.save.saveservice.default_delimiter=,
-
-# k6
-k6 run --summary-export=sample/load-results-k6.json k6-script.js
-```
-
-#### Resilience coverage
-
-The analyzer generates six resilience scenarios **per endpoint** and checks whether at least one test addresses each:
-
-| Category | What to test |
-|----------|-------------|
-| `timeout` | Slow/unresponsive upstream causes a proper timeout error |
-| `retry` | Transient failures trigger retries with back-off |
-| `circuit-breaker` | Repeated failures open the circuit, stopping cascading failures |
-| `fallback` | Unavailable dependency returns a graceful degraded response |
-| `rate-limiting` | Excessive requests return HTTP 429 with `Retry-After` |
-| `bulkhead` | Resource isolation prevents one endpoint from starving others |
-
-#### Writing resilience tests the analyzer can recognize
-
-Use **category keywords** in your test descriptions:
-
-| Category | Keywords (partial list) |
-|----------|------------------------|
-| `timeout` | `timeout`, `timed out`, `deadline exceeded`, `response time` |
-| `retry` | `retry`, `retries`, `backoff`, `exponential backoff` |
-| `circuit-breaker` | `circuit breaker`, `circuit open`, `tripped` |
-| `fallback` | `fallback`, `graceful degradation`, `503`, `service unavailable` |
-| `rate-limiting` | `rate limit`, `429`, `too many requests`, `throttle` |
-| `bulkhead` | `bulkhead`, `isolation`, `concurrency limit`, `overload` |
-
-For **precise, endpoint-specific** coverage use the `@resilience <scenarioId>` annotation:
-
-```ts
-test('@resilience timeout:GET /users - upstream timeout returns 504', () => { ... });
-test('@resilience circuit-breaker:POST /orders - opens after 5 failures', () => { ... });
-```
-
-#### Understanding performance metrics
-
-| Metric | Description | Recommended threshold |
-|--------|-------------|----------------------|
-| **Median (P50)** | Half of requests are faster than this | < 500 ms |
-| **P95** | 95% of requests are faster than this | < 1 000 ms |
-| **P99** | 99% of requests are faster than this | < 2 000 ms |
-| **Error rate** | Fraction of failed requests (non-2xx) | < 5% (0.05) |
-| **Throughput** | Requests per second sustained | depends on SLA |
-
-Industry benchmarks: API calls responding in **< 200 ms** feel instant; **< 1 s** is acceptable; P95 < 500 ms is a common production SLA.
-
----
-
-### `error-coverage`
-
-Analyses how thoroughly tests cover the **negative/error scenarios** (4xx and 5xx responses) documented in an OpenAPI spec.
-
-```sh
-node -r ts-node/register src/index.ts error-coverage \
-  --spec sample/openapi-errors.yaml \
-  --tests "sample/tests/**/*.ts" \
-  --format json,html,csv,junit \
-  --threshold-error 70
-```
-
-Each documented non-2xx response becomes an *error scenario* that is classified into one or more categories:
-
-| Category | Status codes typically involved |
-|----------|--------------------------------|
-| `missing-parameter` | 400 (with "missing"/"required" description) |
-| `invalid-value` | 400 (with "invalid"/"format" description), 422 |
-| `unauthorized` | 401 |
-| `forbidden` | 403 |
-| `not-found` | 404 |
-| `conflict` | 409 |
-| `server-error` | 500, 502, 503, 504 |
-
-#### How the heuristic works
-
-The analyzer scans each `test()` / `it()` block for evidence that it exercises an error scenario. A test is considered to **cover** a scenario when:
-
-1. **It calls the same endpoint** – the test description or code contains the HTTP method and path base  
-   (e.g. `POST /users`, `GET /users/`).
-
-2. **AND one of the following is true:**
-
-   | Evidence type | Examples |
-   |---------------|----------|
-   | Direct status-code assertion | `expect(res.status).toBe(400)` · `status === 401` |
-   | Category keyword in description | `"missing name"` → `missing-parameter` · `"not found"` → `not-found` |
-   | Error-body assertion with keyword | `expect(res.body.message).toContain('required')` |
-   | Code patterns | empty `Authorization` header → `unauthorized` · large fake ID → `not-found` · `null` value → `invalid-value` |
-
-#### Writing tests that the analyzer can recognize
-
-Follow these conventions so the analyzer reliably maps your tests to error scenarios:
-
-- **Start the test description with `METHOD /path`** when possible:  
-  `test('POST /users - missing name returns 400', ...)` ✅  
-  `test('should return 400', ...)` ❌ (no endpoint context)
-
-- **Include a category keyword** in the description or use a status-code assertion:  
-  `"missing"`, `"invalid"`, `"unauthorized"`, `"forbidden"`, `"not found"`, `"duplicate"`, `"server error"`
-
-- **Assert the status code directly** when possible:  
-  `expect(response.status).toBe(404)` is always recognized.
-
-- **Fake resource IDs** with 6+ digits (e.g. `999999`) are recognized as not-found probes.
-
-- **Empty or bare `Authorization` / `Bearer `** headers are recognized as unauthorized probes.
-
----
-
-## Output formats
-
-Reports are written to the `reports/` directory. See [`reports/README.md`](reports/README.md) for a full description of each file.
-
-| Flag value | Files generated |
-|------------|-----------------|
-| `json` | `coverage-summary.json` |
-| `html` | `coverage-summary.html` |
-| `csv` | `coverage-summary.csv` |
-| `junit` | `coverage-summary-junit.xml` |
-
-Each command also writes its own detailed report (`endpoint-coverage.json`, `endpoint-coverage.html`, etc.).
-
----
-
-## Coverage thresholds
-
-Pass one or more `--threshold-*` options to enforce minimum coverage levels:
-
-```sh
-node -r ts-node/register src/index.ts endpoint-coverage \
-  --threshold-endpoint 80
-```
-
-- If coverage is **below** the threshold the CLI prints `THRESHOLD FAILURE: …` to stderr and exits with **code 1**.
-- If coverage meets or exceeds the threshold the CLI exits with **code 0**.
-
-CI systems use this exit code to pass or fail the build step automatically.
-
----
-
-## CI integration
-
-### GitHub Actions
-
-See [`ci/examples/github-actions.yaml`](ci/examples/github-actions.yaml) for a complete workflow that:
-
-- Sets up Node.js with npm caching.
-- Runs all four coverage commands with threshold options.
-- Uploads the `reports/` directory as a build artifact.
-- Publishes the JUnit XML as a check result.
-
-### Jenkins
-
-See [`ci/examples/jenkins-pipeline.groovy`](ci/examples/jenkins-pipeline.groovy) for a declarative pipeline that:
-
-- Runs all four coverage commands in parallel stages.
-- Publishes the HTML report with the HTML Publisher plugin.
-- Publishes the JUnit XML with the built-in JUnit plugin.
-- Archives all reports as build artifacts.
-
-### GitLab CI
-
-Add a job similar to the following in your `.gitlab-ci.yml`:
-
-```yaml
-api-coverage:
-  image: node:20
-  cache:
-    key: $CI_COMMIT_REF_SLUG
-    paths:
-      - node_modules/
-  script:
-    - npm ci
-    - node -r ts-node/register src/index.ts endpoint-coverage --format junit --threshold-endpoint 80
-    - node -r ts-node/register src/index.ts business-coverage  --format junit --threshold-business 60
-  artifacts:
-    when: always
-    paths:
-      - reports/
-    reports:
-      junit: reports/coverage-summary-junit.xml
-```
-
-### Azure Pipelines
-
-```yaml
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-
-- script: npm ci
-  displayName: Install dependencies
-
-- script: |
-    node -r ts-node/register src/index.ts endpoint-coverage \
-      --format json,html,csv,junit --threshold-endpoint 80
-  displayName: API endpoint coverage
-
-- task: PublishTestResults@2
-  condition: always()
-  inputs:
-    testResultsFormat: JUnit
-    testResultsFiles: 'reports/coverage-summary-junit.xml'
-    testRunTitle: 'API Coverage Thresholds'
-
-- task: PublishPipelineArtifact@1
-  condition: always()
-  inputs:
-    targetPath: reports
-    artifact: coverage-reports
-```
-
----
-
-## Exit codes
-
-| Code | Meaning |
-|------|---------|
-| `0` | All configured thresholds met (or no thresholds configured) |
-| `1` | One or more coverage types are below their configured threshold |
-
----
-
-## Observability and monitoring
-
-The analyzer emits **structured JSON logs**, **Prometheus metrics**, and optional **OpenTelemetry traces** so you can monitor coverage over time and act on regressions.
-
-### Global observability options
-
-These options are available on every command:
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--log-level <level>` | Log verbosity: `trace`, `debug`, `info`, `warn`, `error`, `silent` | `info` |
-| `--metrics-port <port>` | Start a Prometheus `/metrics` HTTP server on this port | off |
-| `--service-name <name>` | Service label added to all Prometheus metrics | `api-coverage-analyzer` |
-| `--trace` | Enable OpenTelemetry tracing | off |
-| `--trace-endpoint <url>` | OTLP HTTP endpoint for trace export | none (in-memory) |
-
-### Structured logging
-
-Every command emits JSON log lines to stdout via [pino](https://getpino.io/). Each line includes:
-
-```json
-{
-  "level": "info",
-  "time": "2024-01-15T12:00:00.000Z",
-  "event": "analysis_complete",
-  "coverageType": "endpoint",
-  "totalItems": 10,
-  "coveredItems": 8,
-  "coveragePercent": 80,
-  "threshold": 80,
-  "status": "pass"
-}
-```
-
-Control verbosity with `--log-level debug` (shows span events) or `--log-level silent` (suppresses all logs).
-
-### Prometheus metrics
-
-Start the metrics server by adding `--metrics-port <port>` to any command:
-
-```sh
-node -r ts-node/register src/index.ts endpoint-coverage \
-  --spec sample/openapi.yaml \
-  --tests "sample/tests/**/*.ts" \
-  --metrics-port 9091 \
-  --service-name my-api
-```
-
-The server exposes `http://localhost:9091/metrics` in Prometheus text format.
-
-#### Metric names and labels
-
-| Metric | Type | Description |
-|--------|------|-------------|
-| `api_coverage_total{service, coverage_type}` | Gauge | Total number of items analysed |
-| `api_coverage_covered{service, coverage_type}` | Gauge | Number of covered items |
-| `api_coverage_ratio{service, coverage_type}` | Gauge | Coverage ratio (0–1) |
-| `api_coverage_threshold_failure{service, coverage_type}` | Gauge | `1` if below threshold, `0` otherwise |
-
-`coverage_type` is one of: `endpoint`, `parameter`, `business`, `integration`, `error`, `security`, `performance`, `resilience`, `compatibility`, `contract-coverage`.
-
-#### Configuring Prometheus to scrape the metrics
-
-Add the following snippet to your `prometheus.yml` scrape config (see [`observability/prometheus.yml`](observability/prometheus.yml)):
-
-```yaml
-scrape_configs:
-  - job_name: api_coverage_analyzer
-    static_configs:
-      - targets:
-          - localhost:9091
-    scrape_interval: 30s
-```
-
-#### Grafana dashboard
-
-Import [`observability/grafana-dashboard.json`](observability/grafana-dashboard.json) into Grafana to get:
-
-- Gauge panels showing current coverage ratios for each coverage type.
-- A time-series panel showing coverage trends over time.
-- A table summarising totals, covered items, ratios, and threshold failures.
-
-#### Local experimentation with Docker Compose
-
-Run the full stack (Prometheus + Grafana) locally:
-
-```sh
-docker-compose -f observability/docker-compose.yml up -d
-# Then run the analyzer with --metrics-port 9091
-# Open Grafana at http://localhost:3000 (admin/admin)
-# Import observability/grafana-dashboard.json
-```
-
-### OpenTelemetry tracing
-
-Enable tracing with `--trace`. Spans are created for each analysis stage:
-`parse-spec`, `scan-tests`, `compute-coverage`, `write-reports`.
-
-Export to an OTLP-compatible backend (Jaeger, Grafana Tempo, etc.):
-
-```sh
-node -r ts-node/register src/index.ts endpoint-coverage \
-  --spec sample/openapi.yaml \
-  --tests "sample/tests/**/*.ts" \
-  --trace \
-  --trace-endpoint http://localhost:4318
-```
-
-Without `--trace-endpoint`, spans are collected in memory and logged at `debug` level.
-
-Visualise traces in [Jaeger](https://www.jaegertracing.io/) or [Grafana Tempo](https://grafana.com/oss/tempo/).
-
-### Alerting
-
-Alert rules in [`alerts/prometheus-rules.yml`](alerts/prometheus-rules.yml) cover:
-
-- **`ApiCoverageRatioLow`** – any coverage type drops below 80%.
-- **`ApiCoverageThresholdBreached`** – a threshold configured via `--threshold-*` is breached.
-- **`ApiErrorCoverageZero`** – error-scenario coverage reaches zero.
-- **`ApiSecurityCoverageZero`** – security-control coverage reaches zero.
-- **`ApiCoverageDropped`** – any coverage type drops more than 10 percentage points in an hour.
-
-Load the rules into Prometheus:
-
-```yaml
-# prometheus.yml
-rule_files:
-  - "alerts/prometheus-rules.yml"
-```
-
-Configure Alertmanager to forward alerts to Slack, email, PagerDuty, etc.:
-
-```yaml
-# alertmanager.yml (Slack example)
-receivers:
-  - name: slack
-    slack_configs:
-      - api_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-        channel: '#api-coverage-alerts'
-        title: '{{ .GroupLabels.alertname }}'
-        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
-```
-
----
-
-## Configuration file
-
-You can provide a `coverage.config.json` file in your project root (or use `--config <path>` to point to a custom location) to centralise thresholds, exclusions, test patterns, and plugins.
-
-### Schema
+Reports are written to the `reports/` directory.
+
+## Commands overview
+
+| Command | What it measures | Key flag |
+|---------|-----------------|---------|
+| `endpoint-coverage` | % of spec endpoints hit by tests | `--spec`, `--tests` |
+| `parameter-coverage` | valid/boundary/missing/invalid param testing | `--spec`, `--tests` |
+| `business-coverage` | % of business rules covered (`@businessRule`) | `--rules`, `--tests` |
+| `integration-coverage` | % of integration flows covered (`@flow`) | `--flows`, `--tests` |
+| `error-coverage` | 4xx/5xx/validation/timeout scenarios | `--spec`, `--tests` |
+| `security-coverage` | OWASP Top-10 security scenarios | `--spec`, `--tests` |
+| `perf-resilience-coverage` | Load-test SLA + resilience patterns | `--spec`, `--load-results` |
+| `compatibility-check` | Breaking changes + Pact contract violations | `--old-spec`, `--new-spec` |
+| `generate-md-report` | Markdown summary from JSON reports | `--reports`, `--output` |
+
+All commands accept `--format json,html,csv,junit` and `--threshold-*` flags.
+
+## Configuration
+
+Create a `coverage.config.json` in your project root:
 
 ```json
 {
   "thresholds": {
-    "endpoint": 80,
-    "parameter": 70,
-    "business": 60,
+    "endpoint":    80,
+    "parameter":   70,
+    "business":    60,
     "integration": 50,
-    "security": 60,
-    "error": 50,
+    "security":    60,
+    "error":       50,
     "performance": 75,
-    "resilience": 50
+    "resilience":  50
   },
   "exclude": {
-    "paths": ["/internal/*"],
+    "paths":   ["/internal/*"],
     "methods": ["OPTIONS"]
   },
-  "testPatterns": ["sample/tests/**/*.ts"],
-  "plugins": ["./plugins/graphql-coverage.js"]
+  "testPatterns": ["tests/**/*.ts"],
+  "plugins":    ["./plugins/graphql-coverage.js"]
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `thresholds` | `object` | Per-coverage-type minimum percentages. Keys are coverage-type names; values are numbers 0–100. |
-| `exclude.paths` | `string[]` | Path patterns whose endpoints are excluded from analysis. Supports `*` (single segment) and `**` (any path suffix). |
-| `exclude.methods` | `string[]` | HTTP methods to exclude (case-insensitive). |
-| `testPatterns` | `string[]` | Glob patterns for test files. When set, overrides the `--tests` CLI default. |
-| `plugins` | `string[]` | Paths to plugin modules to run after built-in analysis. Relative paths are resolved from the project root. |
+CLI flags override config file values.
 
-### Priority
+## UI Dashboard
 
-CLI flags always take precedence over config-file values. For example, `--threshold-endpoint 90` overrides the `endpoint` threshold in the file.
+A Vite + React dashboard is included for visualising reports:
 
-### `--config` option
-
-Pass `--config <path>` **before** a subcommand to load a specific config file:
-
-```sh
-node dist/index.js --config my-config.json endpoint-coverage --spec sample/openapi.yaml
+```bash
+cd dashboard
+npm install
+npm run dev    # http://localhost:5173
 ```
 
----
+Load any JSON report from `reports/` and explore:
 
-## Plugins
+- Overview, Endpoints, Parameters, Business Rules, Integration Flows
+- Security, Errors, Performance/Resilience, Trends
 
-Plugins let you add custom analysis steps that run after the built-in coverage checks and include their results in the report.
+## Documentation
 
-### Plugin interface
+Full documentation is available at:
 
-A plugin module must export an async `analyze` function:
+**[https://skaliber.github.io/apiTestsCoverageAnalyzer/](https://skaliber.github.io/apiTestsCoverageAnalyzer/)**
 
-```js
-// plugins/my-plugin.js
-module.exports.analyze = async function ({ spec, testPatterns, results, config }) {
-  // Perform custom analysis …
-  return {
-    type: 'my-custom',      // unique type identifier shown in the report
-    totalItems: 10,
-    coveredItems: 7,
-    coveragePercent: 70,
-    details: { /* arbitrary JSON-serialisable data */ },
-  };
-};
+Serve locally:
+
+```bash
+npm run docs:dev    # http://localhost:5174
 ```
 
-The function can also return an **array** of results if the plugin covers multiple aspects.
+Documentation sections:
 
-### Context object
+| Section | Description |
+|---------|-------------|
+| [Getting Started](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/getting-started) | First-run walkthrough |
+| [Installation](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/installation) | Detailed setup steps |
+| [CLI Reference](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/cli) | All commands and options |
+| [Architecture](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/architecture) | Module design and data flow |
+| [CI/CD Integration](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/ci-cd) | GitHub Actions & Jenkins |
+| [Interpreting Reports](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/interpreting-reports) | Reading each report type |
+| [Writing Effective Tests](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/writing-tests) | Test best practices |
+| [Extending via Plugins](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/plugins) | Custom coverage types |
+| [Configuration Schema](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/configuration) | `coverage.config.json` reference |
+| [Troubleshooting](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/troubleshooting) | Common issues & FAQ |
+| [Glossary](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/glossary) | Key terms |
+| [Contributing](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/contributing) | How to contribute |
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `spec` | `unknown` | Parsed OpenAPI spec (may be `undefined` for some commands) |
-| `testPatterns` | `string[]` | Glob patterns used to locate test files |
-| `results` | `CoverageResult[]` | Coverage results from the built-in analysers |
-| `config` | `CoverageConfig` | The fully-resolved configuration |
+## Contributing
 
-### Error handling
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [full contributing guide](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/contributing).
 
-If a plugin fails to load or throws during `analyze`, a warning is printed to stderr and analysis continues with the remaining plugins.
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
-### Sample plugin: GraphQL coverage
+## License
 
-`plugins/graphql-coverage.js` is a ready-to-use plugin that measures GraphQL field coverage:
-
-1. It reads `schema.graphql` from the project root.
-2. It scans test files for GraphQL query strings.
-3. It returns a `"graphql"` result with `coveredItems` / `totalItems` and lists untested fields.
-
-Enable it by adding it to `coverage.config.json`:
-
-```json
-{
-  "plugins": ["./plugins/graphql-coverage.js"]
-}
-```
-
-### Writing your own plugin
-
-1. Create a file in `plugins/` (or anywhere accessible).
-2. Export an async `analyze(context)` function.
-3. Return a `CoverageResult` (or an array of them).
-4. Register the plugin path in `coverage.config.json` under `"plugins"`.
-
-
-CI systems interpret a non-zero exit code as a build failure, so setting thresholds is all that is needed to block merges when coverage drops.
+MIT © [skaliber](https://github.com/skaliber)

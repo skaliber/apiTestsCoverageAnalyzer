@@ -4,3 +4,5 @@ reports/*.json
 reports/*.html
 dashboard/node_modules/
 dashboard/dist/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

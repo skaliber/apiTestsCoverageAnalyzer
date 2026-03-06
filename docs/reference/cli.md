@@ -26,7 +26,7 @@ Analyses which API endpoints defined in an OpenAPI spec are exercised by tests.
 
 ### How it works
 
-The analyzer parses the OpenAPI spec and extracts all `METHOD /path` pairs. It then scans test file descriptions for matching strings (e.g. a test named `GET /users returns list` covers `GET /users`).
+The analyzer parses the OpenAPI spec and extracts all `METHOD /path` pairs. It then scans test files for matching HTTP calls. The scanner uses language-aware extractors (see `--language` below) to detect API calls in TypeScript, JavaScript, Java, Kotlin, Python, Ruby, and Cucumber test suites.
 
 ### Options
 
@@ -34,16 +34,90 @@ The analyzer parses the OpenAPI spec and extracts all `METHOD /path` pairs. It t
 |------|-------------|---------|
 | `--spec <path>` | Path to OpenAPI YAML/JSON spec | **required** |
 | `--tests <glob>` | Glob pattern for test files | **required** |
+| `--language <lang>` | Test language(s) to analyse. See [Supported languages](#supported-languages). Comma-separated or repeated. | `auto` |
 | `--threshold-endpoint <n>` | Minimum coverage % to pass | `0` |
 | `--format <formats>` | Output formats | `json,html` |
+
+### Supported languages
+
+| Value | Language / ecosystem | Auto-detected from |
+|-------|---------------------|-------------------|
+| `auto` | Infer from file extensions (default) | n/a |
+| `typescript` | TypeScript (Jest, Mocha, Vitest, Supertest) | `.ts`, `.tsx` |
+| `javascript` | JavaScript (Jest, Mocha, Vitest, Supertest) | `.js`, `.jsx` |
+| `java` | Java (JUnit 4/5, TestNG, RestAssured, Spring MockMvc / WebTestClient) | `.java` |
+| `kotlin` | Kotlin (Kotest, Ktor client, RestAssured) | `.kt`, `.kts` |
+| `python` | Python (pytest, unittest, requests, httpx, Flask/Django test client) | `.py` |
+| `ruby` | Ruby (RSpec, Minitest, HTTParty, Faraday, Rails integration tests) | `.rb` |
+| `cucumber` | Gherkin `.feature` files + step definitions in any supported language | `.feature` |
+
+Pass a comma-separated list or repeat the flag for multi-language projects:
+
+```bash
+--language java,kotlin
+--language java --language kotlin
+```
+
+### Default test glob per language
+
+When a single language is given and `--tests` is not specified, the analyzer uses a sensible default glob:
+
+| Language | Default glob |
+|----------|-------------|
+| `java` | `**/*Test.java` |
+| `kotlin` | `**/*Test.kt` |
+| `python` | `**/test_*.py` |
+| `ruby` | `**/*_spec.rb` |
+| `cucumber` | `**/*.feature` |
+| `typescript` | `**/*.test.ts` |
+| `javascript` | `**/*.test.js` |
 
 ### Example
 
 ```bash
+# TypeScript / JavaScript (default)
 node dist/index.js endpoint-coverage \
   --spec sample/openapi.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html,csv,junit \
+  --threshold-endpoint 80
+
+# Java – RestAssured / JUnit 5
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "src/test/**/*.java" \
+  --language java \
+  --threshold-endpoint 80
+
+# Kotlin – Kotest + Ktor client
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "src/test/**/*.kt" \
+  --language kotlin
+
+# Python – pytest + requests
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "tests/**/*.py" \
+  --language python
+
+# Ruby – RSpec request specs
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "spec/**/*.rb" \
+  --language ruby
+
+# Cucumber – feature files
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "features/**/*.feature" \
+  --language cucumber
+
+# Multi-language project
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "{src/test/**/*.java,spec/**/*.rb}" \
+  --language java,ruby \
   --threshold-endpoint 80
 ```
 
@@ -51,10 +125,26 @@ node dist/index.js endpoint-coverage \
 
 | File | Description |
 |------|-------------|
-| `reports/endpoint-coverage.json` | Machine-readable coverage result |
-| `reports/endpoint-coverage.html` | Interactive HTML report |
+| `reports/endpoint-coverage.json` | Machine-readable coverage result (includes `languages` array per endpoint) |
+| `reports/endpoint-coverage.html` | Interactive HTML report (includes Languages column) |
 | `reports/endpoint-coverage.csv` | CSV with one row per endpoint |
 | `reports/coverage-summary-junit.xml` | JUnit XML with pass/fail result |
+
+The JSON report includes a `languages` field for each endpoint listing which language(s) have tests that cover it:
+
+```json
+{
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/users",
+      "covered": true,
+      "testFiles": ["sample/tests/java/UserApiTest.java"],
+      "languages": ["java"]
+    }
+  ]
+}
+```
 
 ---
 

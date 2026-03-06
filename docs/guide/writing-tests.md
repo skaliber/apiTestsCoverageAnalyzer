@@ -214,7 +214,122 @@ describe('Resilience @resilience', () => {
 | `@errorScenario` | Error | `@errorScenario scenario-keyword` |
 | `@resilience` | Resilience | `@resilience category` |
 
+## Endpoint coverage in other languages
+
+The analyzer detects API calls in TypeScript, JavaScript, Java, Kotlin, Python, Ruby, and Cucumber test files — either automatically (via file-extension detection) or via the explicit `--language` flag.
+
+### Java (RestAssured / JUnit 5)
+
+```java
+@Test
+void listUsers_returnsOk() {
+    given()
+        .when()
+        .get("/users")          // ← analyzer detects GET /users
+        .then()
+        .statusCode(200);
+}
+
+@Test
+void createUser_returns201() {
+    given()
+        .contentType("application/json")
+        .body("{\"name\":\"Alice\"}")
+        .when()
+        .post("/users")         // ← analyzer detects POST /users
+        .then()
+        .statusCode(201);
+}
+```
+
+### Java (Spring MockMvc)
+
+```java
+mockMvc.perform(get("/users"))       // ← GET /users
+       .andExpect(status().isOk());
+
+mockMvc.perform(post("/users")       // ← POST /users
+       .contentType(APPLICATION_JSON)
+       .content("{\"name\":\"Bob\"}"))
+       .andExpect(status().isCreated());
+```
+
+### Kotlin (Kotest + Ktor client)
+
+```kotlin
+describe("GET /users") {
+    it("returns 200") {
+        val response = client.get("$baseUrl/users")  // ← GET /users
+        response.status shouldBe HttpStatusCode.OK
+    }
+}
+```
+
+### Python (pytest + requests)
+
+```python
+def test_list_users_returns_200():
+    response = requests.get(f"{BASE_URL}/users")   # ← GET /users
+    assert response.status_code == 200
+
+def test_create_user_returns_201():
+    response = requests.post(                       # ← POST /users
+        f"{BASE_URL}/users",
+        json={"name": "Alice"},
+    )
+    assert response.status_code == 201
+```
+
+### Ruby (RSpec request spec)
+
+```ruby
+describe 'GET /users' do
+  it 'returns 200' do
+    get '/users'                   # ← GET /users
+    expect(response.status).to eq(200)
+  end
+end
+
+describe 'POST /users' do
+  it 'creates a user' do
+    post '/users', params: {name: 'Alice'}.to_json,
+         headers: {'Content-Type' => 'application/json'}
+    expect(response.status).to eq(201)
+  end
+end
+```
+
+### Cucumber (Gherkin + Ruby step definitions)
+
+```gherkin
+# features/users.feature
+Scenario: List all users
+  When I send a GET request to /users       # ← GET /users
+  Then the response status should be 200
+
+Scenario: Create a user
+  Given I have a JSON body '{"name":"Alice"}'
+  When I send a POST request to /users      # ← POST /users
+  Then the response status should be 201
+```
+
+```ruby
+# step_definitions/users_steps.rb
+When('I send a GET request to {word}') do |path|
+  @response = HTTParty.get("#{BASE_URL}#{path}")
+end
+
+When('I send a POST request to {word}') do |path|
+  @response = HTTParty.post("#{BASE_URL}#{path}",
+    body: @request_body,
+    headers: {'Content-Type' => 'application/json'})
+end
+```
+
+See [Multi-Language Support →](/guide/multi-language) for the full list of supported frameworks and detection patterns.
+
 ## Next steps
 
+- [Multi-Language Support →](/guide/multi-language)
 - [Extending via Plugins →](/guide/plugins)
 - [Interpreting Reports →](/guide/interpreting-reports)

@@ -32,29 +32,59 @@ sample/
 │   ├── user-service-client.json
 │   └── product-service-client.json
 └── tests/                        # sample test suites
-    ├── sample.test.ts            # endpoint-level tests
+    ├── sample.test.ts            # endpoint-level tests (TypeScript)
     ├── parameter.test.ts         # parameter scenario tests
     ├── business.test.ts          # business-rule annotated tests
     ├── integration.test.ts       # integration flow annotated tests
     ├── error.test.ts             # error scenario tests
     ├── security.test.ts          # security scenario tests
-    └── perf-resilience.test.ts   # performance and resilience tests
+    ├── perf-resilience.test.ts   # performance and resilience tests
+    ├── java/
+    │   └── UserApiTest.java      # JUnit 5 + RestAssured
+    ├── kotlin/
+    │   └── UserApiSpec.kt        # Kotest + Ktor client
+    ├── python/
+    │   └── test_users.py         # pytest + requests
+    ├── ruby/
+    │   └── users_spec.rb         # RSpec request specs
+    └── cucumber/
+        ├── features/
+        │   └── users.feature     # Gherkin scenarios
+        └── step_definitions/
+            └── users_steps.rb    # Ruby step definitions
 ```
 
 ## 3. Run endpoint coverage
 
 ```bash
+# TypeScript tests (default)
 node dist/index.js endpoint-coverage \
   --spec sample/openapi.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html \
   --threshold-endpoint 80
+
+# Java tests
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/java/**/*.java" \
+  --language java \
+  --format json,html
+
+# Python tests
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/python/**/*.py" \
+  --language python \
+  --format json,html
 ```
 
 Reports are written to the `reports/` directory:
 
-- `reports/endpoint-coverage.json` – machine-readable results
-- `reports/endpoint-coverage.html` – interactive HTML report
+- `reports/endpoint-coverage.json` – machine-readable results (includes `languages` per endpoint)
+- `reports/endpoint-coverage.html` – interactive HTML report with Languages column
+
+See [Multi-Language Support →](/guide/multi-language) for all supported languages and frameworks.
 
 ## 4. Run all coverage types
 
@@ -161,6 +191,7 @@ The analyzer automatically reads this file. Pass `--config path/to/config.json` 
 ## Next steps
 
 - [CLI Reference →](/reference/cli) – all commands and options
+- [Multi-Language Support →](/guide/multi-language) – Java, Kotlin, Python, Ruby, Cucumber
 - [CI/CD Integration →](/guide/ci-cd) – automate coverage checks in GitHub Actions / Jenkins
 - [Interpreting Reports →](/guide/interpreting-reports) – how to read each report type
 - [Writing Effective Tests →](/guide/writing-tests) – best practices for good coverage

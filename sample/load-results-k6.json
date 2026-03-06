@@ -1,0 +1,155 @@
+{
+  "metrics": {
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 245.8,
+        "min": 98.2,
+        "med": 235.4,
+        "max": 1450.6,
+        "p(90)": 420.1,
+        "p(95)": 580.3,
+        "p(99)": 1200.7
+      },
+      "thresholds": {
+        "p(95)<500": {
+          "ok": false
+        }
+      }
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.02,
+        "passes": 98,
+        "fails": 2
+      }
+    },
+    "http_reqs": {
+      "type": "counter",
+      "values": {
+        "count": 100,
+        "rate": 12.5
+      }
+    },
+    "http_req_waiting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 230.1,
+        "min": 90.5,
+        "med": 220.3,
+        "max": 1400.2,
+        "p(90)": 400.0,
+        "p(95)": 560.1,
+        "p(99)": 1150.4
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "values": {
+        "count": 100,
+        "rate": 12.5
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 10,
+        "min": 1,
+        "max": 10
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 10,
+        "min": 10,
+        "max": 10
+      }
+    }
+  },
+  "scenarios": {
+    "GET /users": {
+      "metrics": {
+        "http_req_duration": {
+          "values": {
+            "avg": 128.5,
+            "med": 125.0,
+            "p(95)": 210.3,
+            "p(99)": 280.0
+          }
+        },
+        "http_req_failed": {
+          "values": {
+            "rate": 0.01
+          }
+        },
+        "http_reqs": {
+          "count": 40,
+          "rate": 8.0
+        }
+      }
+    },
+    "POST /users": {
+      "metrics": {
+        "http_req_duration": {
+          "values": {
+            "avg": 205.2,
+            "med": 200.0,
+            "p(95)": 350.5,
+            "p(99)": 480.0
+          }
+        },
+        "http_req_failed": {
+          "values": {
+            "rate": 0.0
+          }
+        },
+        "http_reqs": {
+          "count": 20,
+          "rate": 4.0
+        }
+      }
+    },
+    "GET /users/{id}": {
+      "metrics": {
+        "http_req_duration": {
+          "values": {
+            "avg": 185.3,
+            "med": 180.0,
+            "p(95)": 290.1,
+            "p(99)": 400.0
+          }
+        },
+        "http_req_failed": {
+          "values": {
+            "rate": 0.02
+          }
+        },
+        "http_reqs": {
+          "count": 40,
+          "rate": 8.0
+        }
+      }
+    }
+  },
+  "root_group": {
+    "name": "root",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+      {
+        "name": "status is 200",
+        "id": "a",
+        "passes": 95,
+        "fails": 5
+      }
+    ]
+  }
+}

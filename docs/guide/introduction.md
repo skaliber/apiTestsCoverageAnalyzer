@@ -26,6 +26,7 @@ The answers appear in rich HTML, JSON, CSV, and JUnit reports that can be enforc
 
 ## Key features
 
+- **Multi-language test suites** – analyse tests written in TypeScript, JavaScript, Java, Kotlin, Python, Ruby, and Cucumber/Gherkin.
 - **Zero test-framework lock-in** – reads plain `.test.ts` / `.test.js` files; works with Jest, Mocha, Vitest, and any other runner.
 - **OpenAPI 3.x and Swagger 2.x** support via `@apidevtools/swagger-parser`.
 - **Multiple output formats** – JSON, HTML (interactive), CSV, JUnit XML for CI.

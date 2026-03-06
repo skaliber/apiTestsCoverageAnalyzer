@@ -78,6 +78,12 @@ import {
   getLogger,
   LogLevel,
 } from './observability';
+import {
+  SupportedLanguage,
+  parseLanguageOption,
+  getDefaultGlobsForLanguage,
+  SUPPORTED_LANGUAGES,
+} from './languageDetection';
 
 const program = new Command();
 
@@ -184,6 +190,17 @@ program
   .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'tests/**/*.ts')
   .option(
+    '--language <lang>',
+    `Test language(s) to analyse. Accepted values: ${SUPPORTED_LANGUAGES.join(', ')}. ` +
+      'Use a comma-separated list or repeat the flag for multiple languages. ' +
+      "Default: 'auto' (inferred from file extensions).",
+    (val: string, prev: SupportedLanguage[]) => {
+      const parsed = parseLanguageOption(val);
+      return prev ? [...prev, ...parsed] : parsed;
+    },
+    [] as SupportedLanguage[],
+  )
+  .option(
     '--format <formats>',
     'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
     'json,html',
@@ -204,20 +221,36 @@ program
     });
 
     const specPath = path.resolve(options.spec);
-    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
-      ? config.testPatterns[0]
-      : (options.tests as string);
+    const languages: SupportedLanguage[] = (options.language as SupportedLanguage[]).length > 0
+      ? (options.language as SupportedLanguage[])
+      : ['auto'];
+
+    // Determine the test glob: config overrides CLI, and language overrides the default
+    let testsGlob: string;
+    if (config.testPatterns && config.testPatterns.length > 0) {
+      testsGlob = config.testPatterns[0];
+    } else if (options.tests !== 'tests/**/*.ts') {
+      // User explicitly passed --tests
+      testsGlob = options.tests as string;
+    } else if (!languages.includes('auto') && languages.length === 1) {
+      // Use language-specific default glob when a single language is specified
+      const langGlobs = getDefaultGlobsForLanguage(languages[0]);
+      testsGlob = langGlobs[0];
+    } else {
+      testsGlob = options.tests as string;
+    }
+
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
     const span = startSpan('endpoint-coverage', { specPath, testsGlob });
 
-    logger.info({ event: 'analysis_start', coverageType: 'endpoint', specPath, testsGlob }, `Parsing spec: ${specPath}`);
+    logger.info({ event: 'analysis_start', coverageType: 'endpoint', specPath, testsGlob, languages }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseOpenApiSpec(specPath);
 
-    console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob);
+    console.log(`Analyzing tests matching: ${testsGlob} (language: ${languages.join(', ')})`);
+    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, languages);
 
     const report = buildCoverageReport(coverageMap);
 

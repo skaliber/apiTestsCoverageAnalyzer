@@ -3,6 +3,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fg from 'fast-glob';
 import { OpenAPI } from 'openapi-types';
+import {
+  SupportedLanguage,
+  detectLanguageFromExtension,
+  extractHttpCalls,
+  extractHttpCallsFromJs,
+} from './languageDetection';
 
 export interface Endpoint {
   method: string;
@@ -14,6 +20,8 @@ export interface Endpoint {
 export interface EndpointCoverage extends Endpoint {
   covered: boolean;
   testFiles: string[];
+  /** Languages from which this endpoint is covered (populated when --language is used). */
+  languages?: string[];
 }
 
 export interface CoverageReport {
@@ -67,25 +75,29 @@ export async function parseOpenApiSpec(specPath: string): Promise<Endpoint[]> {
 /**
  * Search a file's contents for HTTP calls matching any of the given endpoints.
  * Returns an array of matched endpoint indices.
+ *
+ * When `language` is provided the appropriate language-specific extractor is
+ * used; otherwise the JavaScript/TypeScript extractor is used as a fallback.
  */
-function findCoveredEndpoints(fileContents: string, endpoints: Endpoint[]): Set<number> {
+function findCoveredEndpoints(
+  fileContents: string,
+  endpoints: Endpoint[],
+  language?: SupportedLanguage,
+): Set<number> {
   const covered = new Set<number>();
 
-  // Pattern: METHOD /path  (e.g. GET /users, POST /orders, GET /users/123)
-  // Matches strings like 'GET /users', "POST /orders/456", `DELETE /users/789`
-  const callPattern = /\b(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|TRACE)\s+(\/[^\s'"`,)]*)/gi;
-  let match: RegExpExecArray | null;
+  // Choose extractor based on language hint
+  const httpCalls =
+    language && language !== 'auto'
+      ? extractHttpCalls(fileContents, language)
+      : extractHttpCallsFromJs(fileContents);
 
-  while ((match = callPattern.exec(fileContents)) !== null) {
-    const method = match[1].toUpperCase();
-    const calledPath = match[2];
-
-    // Skip OpenAPI path templates (e.g. /users/{id}) — these appear in test titles
-    // or comments describing the spec but do not represent actual HTTP calls.
-    if (calledPath.includes('{')) continue;
+  for (const call of httpCalls) {
+    // Skip OpenAPI path templates that appear in comments/descriptions
+    if (call.path.includes('{')) continue;
 
     endpoints.forEach((endpoint, idx) => {
-      if (endpoint.method === method && endpoint.pathRegex.test(calledPath)) {
+      if (endpoint.method === call.method && endpoint.pathRegex.test(call.path)) {
         covered.add(idx);
       }
     });
@@ -97,10 +109,15 @@ function findCoveredEndpoints(fileContents: string, endpoints: Endpoint[]): Set<
 /**
  * Analyse test files matching the given glob pattern and determine which
  * endpoints from the spec are covered.
+ *
+ * When `languages` is supplied the appropriate language-specific HTTP-call
+ * extractor is used for each file (based on its extension when `languages`
+ * contains `'auto'`, or the first matching language otherwise).
  */
 export async function analyzeTestCoverage(
   endpoints: Endpoint[],
   testGlob: string,
+  languages?: SupportedLanguage[],
 ): Promise<EndpointCoverage[]> {
   const testFiles = await fg(testGlob, { onlyFiles: true });
 
@@ -108,14 +125,31 @@ export async function analyzeTestCoverage(
     ...ep,
     covered: false,
     testFiles: [],
+    languages: [],
   }));
 
   for (const filePath of testFiles) {
     const contents = fs.readFileSync(filePath, 'utf-8');
-    const coveredIndices = findCoveredEndpoints(contents, endpoints);
+
+    // Determine the language for this file
+    let lang: SupportedLanguage | undefined;
+    if (languages && languages.length > 0 && !languages.includes('auto')) {
+      // Use the first explicitly provided language
+      lang = languages[0];
+    } else {
+      // Auto-detect from extension
+      lang = detectLanguageFromExtension(filePath) ?? undefined;
+    }
+
+    const coveredIndices = findCoveredEndpoints(contents, endpoints, lang);
+    const fileLanguage = lang ?? 'javascript';
+
     for (const idx of coveredIndices) {
       coverageMap[idx].covered = true;
       coverageMap[idx].testFiles.push(filePath);
+      if (!coverageMap[idx].languages!.includes(fileLanguage)) {
+        coverageMap[idx].languages!.push(fileLanguage);
+      }
     }
   }
 
@@ -146,11 +180,12 @@ export function generateReports(report: CoverageReport, reportsDir: string): voi
     total: report.total,
     covered: report.covered,
     percentage: report.percentage,
-    endpoints: report.endpoints.map(({ method, path: p, covered, testFiles }) => ({
+    endpoints: report.endpoints.map(({ method, path: p, covered, testFiles, languages }) => ({
       method,
       path: p,
       covered,
       testFiles,
+      ...(languages && languages.length > 0 ? { languages } : {}),
     })),
   };
   fs.writeFileSync(jsonPath, JSON.stringify(jsonReport, null, 2), 'utf-8');
@@ -158,15 +193,17 @@ export function generateReports(report: CoverageReport, reportsDir: string): voi
   // HTML report
   const htmlPath = path.join(reportsDir, 'endpoint-coverage.html');
   const rows = report.endpoints
-    .map(({ method, path: p, covered, testFiles }) => {
+    .map(({ method, path: p, covered, testFiles, languages }) => {
       const rowClass = covered ? 'covered' : 'uncovered';
       const status = covered ? '✅ Covered' : '❌ Not covered';
       const files = testFiles.length > 0 ? testFiles.join('<br>') : '—';
+      const langs = languages && languages.length > 0 ? languages.join(', ') : '—';
       return `    <tr class="${rowClass}">
       <td>${method}</td>
       <td>${p}</td>
       <td>${status}</td>
       <td>${files}</td>
+      <td>${langs}</td>
     </tr>`;
     })
     .join('\n');
@@ -200,6 +237,7 @@ export function generateReports(report: CoverageReport, reportsDir: string): voi
         <th>Path</th>
         <th>Status</th>
         <th>Test Files</th>
+        <th>Languages</th>
       </tr>
     </thead>
     <tbody>

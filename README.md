@@ -183,6 +183,7 @@ Documentation sections:
 | [Getting Started](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/getting-started) | First-run walkthrough |
 | [Installation](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/installation) | Detailed setup steps |
 | [CLI Reference](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/cli) | All commands and options |
+| [Multi-Language Support](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/multi-language) | Java, Kotlin, Python, Ruby, Cucumber test suites |
 | [Architecture](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/architecture) | Module design and data flow |
 | [CI/CD Integration](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/ci-cd) | GitHub Actions & Jenkins |
 | [Interpreting Reports](https://skaliber.github.io/apiTestsCoverageAnalyzer/guide/interpreting-reports) | Reading each report type |

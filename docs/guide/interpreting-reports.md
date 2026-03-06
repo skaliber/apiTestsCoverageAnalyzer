@@ -2,6 +2,10 @@
 
 Each coverage command writes one or more output files to the `reports/` directory. This guide explains what each report contains and how to act on it.
 
+**Dashboard view:**
+
+![Coverage overview dashboard showing all coverage percentages](../assets/screenshots/overview-dashboard.png)
+
 ## Report formats
 
 | Format | File | Best for |

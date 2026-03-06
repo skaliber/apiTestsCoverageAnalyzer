@@ -293,6 +293,92 @@ describe('generateMultiFormatReports', () => {
     generateMultiFormatReports(sampleResults, [], tmpDir);
     expect(fs.readdirSync(tmpDir)).toHaveLength(0);
   });
+
+  // ── Observability section ─────────────────────────────────────────────────
+
+  describe('observability section in reports', () => {
+    const observabilityWithMetrics = {
+      metricsUrl: 'http://localhost:9090/metrics',
+      tracingEnabled: false,
+      otlpEndpoint: null,
+      metricNames: {
+        total: 'api_coverage_total',
+        covered: 'api_coverage_covered',
+        ratio: 'api_coverage_ratio',
+        thresholdFailure: 'api_coverage_threshold_failure',
+      },
+    };
+
+    const observabilityWithTracing = {
+      metricsUrl: null,
+      tracingEnabled: true,
+      otlpEndpoint: 'http://jaeger:4318',
+      metricNames: {
+        total: 'api_coverage_total',
+        covered: 'api_coverage_covered',
+        ratio: 'api_coverage_ratio',
+        thresholdFailure: 'api_coverage_threshold_failure',
+      },
+    };
+
+    it('JSON report includes observability section when provided', () => {
+      generateMultiFormatReports(sampleResults, ['json'], tmpDir, {}, observabilityWithMetrics);
+      const data = JSON.parse(fs.readFileSync(path.join(tmpDir, 'coverage-summary.json'), 'utf-8'));
+      expect(data).toHaveProperty('observability');
+      expect(data.observability.metricsUrl).toBe('http://localhost:9090/metrics');
+    });
+
+    it('JSON report observability section contains metrics note', () => {
+      generateMultiFormatReports(sampleResults, ['json'], tmpDir, {}, observabilityWithMetrics);
+      const data = JSON.parse(fs.readFileSync(path.join(tmpDir, 'coverage-summary.json'), 'utf-8'));
+      expect(data.observability.note).toContain('http://localhost:9090/metrics');
+    });
+
+    it('JSON report observability section contains metric names', () => {
+      generateMultiFormatReports(sampleResults, ['json'], tmpDir, {}, observabilityWithMetrics);
+      const data = JSON.parse(fs.readFileSync(path.join(tmpDir, 'coverage-summary.json'), 'utf-8'));
+      expect(data.observability.metricNames.total).toContain('api_coverage_total');
+    });
+
+    it('JSON report tracing section reflects enabled state', () => {
+      generateMultiFormatReports(sampleResults, ['json'], tmpDir, {}, observabilityWithTracing);
+      const data = JSON.parse(fs.readFileSync(path.join(tmpDir, 'coverage-summary.json'), 'utf-8'));
+      expect(data.observability.tracing.enabled).toBe(true);
+      expect(data.observability.tracing.otlpEndpoint).toBe('http://jaeger:4318');
+    });
+
+    it('JSON report without observability has no observability key', () => {
+      generateMultiFormatReports(sampleResults, ['json'], tmpDir);
+      const data = JSON.parse(fs.readFileSync(path.join(tmpDir, 'coverage-summary.json'), 'utf-8'));
+      expect(data).not.toHaveProperty('observability');
+    });
+
+    it('HTML report includes observability section with metrics URL', () => {
+      generateMultiFormatReports(sampleResults, ['html'], tmpDir, {}, observabilityWithMetrics);
+      const html = fs.readFileSync(path.join(tmpDir, 'coverage-summary.html'), 'utf-8');
+      expect(html).toContain('http://localhost:9090/metrics');
+      expect(html).toContain('Observability');
+    });
+
+    it('HTML report includes metrics disabled note when no port', () => {
+      const obs = { ...observabilityWithMetrics, metricsUrl: null };
+      generateMultiFormatReports(sampleResults, ['html'], tmpDir, {}, obs);
+      const html = fs.readFileSync(path.join(tmpDir, 'coverage-summary.html'), 'utf-8');
+      expect(html).toContain('--metrics-port');
+    });
+
+    it('HTML report includes tracing note when tracing enabled', () => {
+      generateMultiFormatReports(sampleResults, ['html'], tmpDir, {}, observabilityWithTracing);
+      const html = fs.readFileSync(path.join(tmpDir, 'coverage-summary.html'), 'utf-8');
+      expect(html).toContain('http://jaeger:4318');
+    });
+
+    it('HTML report without observability has no observability section', () => {
+      generateMultiFormatReports(sampleResults, ['html'], tmpDir);
+      const html = fs.readFileSync(path.join(tmpDir, 'coverage-summary.html'), 'utf-8');
+      expect(html).not.toContain('Observability');
+    });
+  });
 });
 
 // ─── Threshold exit code behaviour (via process.exitCode) ─────────────────────

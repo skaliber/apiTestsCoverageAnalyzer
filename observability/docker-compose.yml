@@ -1,0 +1,51 @@
+version: '3.8'
+
+# Local experimentation stack for the API Tests Coverage Analyzer observability.
+#
+# Usage:
+#   # 1. Start Prometheus + Grafana
+#   docker-compose -f observability/docker-compose.yml up -d
+#
+#   # 2. Run the analyser with --metrics-port
+#   node -r ts-node/register src/index.ts endpoint-coverage \
+#     --spec sample/openapi.yaml \
+#     --tests "sample/tests/**/*.ts" \
+#     --metrics-port 9091 \
+#     --service-name my-api
+#
+#   # 3. Open Grafana at http://localhost:3000 (admin/admin)
+#   #    Import observability/grafana-dashboard.json
+#
+#   # 4. Open Prometheus at http://localhost:9090
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    restart: unless-stopped
+    extra_hosts:
+      # Allow Prometheus to reach the analyser running on the host machine
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  grafana-data:

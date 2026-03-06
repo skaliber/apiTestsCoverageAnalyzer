@@ -1,0 +1,92 @@
+# Prometheus alert rules for API Tests Coverage Analyzer.
+#
+# Import into Alertmanager or Prometheus rule files.
+# Reference: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+#
+# Example prometheus.yml integration:
+#
+#   rule_files:
+#     - "alerts/prometheus-rules.yml"
+#
+# Notification channels (Alertmanager):
+#   - Slack:  configure a slack_configs receiver in alertmanager.yml
+#   - Email:  configure an email_configs receiver in alertmanager.yml
+#   - PagerDuty, OpsGenie, etc.: supported natively by Alertmanager
+
+groups:
+  - name: api_coverage
+    interval: 1m
+    rules:
+      # ── Generic low-coverage alert ──────────────────────────────────────────
+      - alert: ApiCoverageRatioLow
+        expr: api_coverage_ratio < 0.8
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API coverage ratio below 80% for {{ $labels.coverage_type }} ({{ $labels.service }})"
+          description: |
+            The {{ $labels.coverage_type }} coverage ratio for service {{ $labels.service }}
+            is {{ $value | humanizePercentage }}, which is below the 80% threshold.
+            Check the coverage reports and add missing tests.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+
+      # ── Threshold breach alert (set by --threshold-* flags) ─────────────────
+      - alert: ApiCoverageThresholdBreached
+        expr: api_coverage_threshold_failure == 1
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API coverage threshold breached for {{ $labels.coverage_type }} ({{ $labels.service }})"
+          description: |
+            The {{ $labels.coverage_type }} coverage for service {{ $labels.service }}
+            has dropped below the configured threshold.
+            Current ratio: {{ with query "api_coverage_ratio{coverage_type=\"" }}{{ . }}{{ end }}.
+            Investigate recent test changes and restore coverage immediately.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+
+      # ── Zero error coverage alert ────────────────────────────────────────────
+      - alert: ApiErrorCoverageZero
+        expr: api_coverage_ratio{coverage_type="error"} == 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Zero error-scenario coverage for {{ $labels.service }}"
+          description: |
+            No error scenarios are covered by tests for service {{ $labels.service }}.
+            Error-handling tests are essential for production-grade APIs.
+            Add tests for HTTP 4xx/5xx responses and edge cases.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+
+      # ── Zero security coverage alert ─────────────────────────────────────────
+      - alert: ApiSecurityCoverageZero
+        expr: api_coverage_ratio{coverage_type="security"} == 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Zero security-control coverage for {{ $labels.service }}"
+          description: |
+            No security controls are covered by tests for service {{ $labels.service }}.
+            Add authentication, authorisation, and input-validation tests.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+
+      # ── Coverage regression alert (significant drop) ─────────────────────────
+      - alert: ApiCoverageDropped
+        expr: |
+          (
+            api_coverage_ratio
+            - api_coverage_ratio offset 1h
+          ) < -0.1
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API coverage for {{ $labels.coverage_type }} dropped >10% in the last hour ({{ $labels.service }})"
+          description: |
+            The {{ $labels.coverage_type }} coverage ratio for service {{ $labels.service }}
+            dropped by more than 10 percentage points compared to 1 hour ago.
+            This may indicate recently deleted or disabled tests.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"

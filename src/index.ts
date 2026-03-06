@@ -33,6 +33,12 @@ import {
   generateErrorReports,
 } from './errorCoverage';
 import {
+  parseSecurityControls,
+  analyzeSecurityCoverage,
+  buildSecurityCoverageReport,
+  generateSecurityReports,
+} from './securityCoverage';
+import {
   parseFormats,
   generateMultiFormatReports,
   checkThresholds,
@@ -380,6 +386,96 @@ program
     console.log(`Reports written to: ${reportsDir}`);
 
     // Threshold check
+    const failures = checkThresholds([result], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
+  });
+
+program
+  .command('security-coverage')
+  .description('Analyze how comprehensively tests cover security controls defined in the API spec')
+  .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi-security.yaml')
+  .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .option(
+    '--scan-report <file>',
+    'Path to an external security scanner report (ZAP JSON/XML or generic JSON) for enrichment',
+  )
+  .option(
+    '--format <formats>',
+    'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
+    'json,html',
+  )
+  .option(
+    '--threshold-security <percent>',
+    'Minimum required security coverage percentage (0-100)',
+    parseFloat,
+    0,
+  )
+  .action(async (options) => {
+    const specPath = path.resolve(options.spec);
+    const testsGlob = options.tests as string;
+    const scanReportPath = options.scanReport ? path.resolve(options.scanReport as string) : undefined;
+    const reportsDir = path.resolve('reports');
+    const formats = parseFormats(options.format as string);
+    const thresholdSecurity = options.thresholdSecurity as number;
+
+    console.log(`Parsing spec: ${specPath}`);
+    const controls = await parseSecurityControls(specPath);
+    console.log(`Found ${controls.length} security controls`);
+
+    console.log(`Analyzing tests matching: ${testsGlob}`);
+    const coverages = await analyzeSecurityCoverage(controls, testsGlob, scanReportPath);
+
+    const report = buildSecurityCoverageReport(
+      coverages,
+      scanReportPath ? coverages.filter((c) => c.coveredByScanReport).length : 0,
+    );
+
+    generateSecurityReports(report, reportsDir);
+
+    const result: CoverageResult = {
+      type: 'security',
+      totalItems: report.total,
+      coveredItems: report.covered,
+      coveragePercent: report.percentage,
+      details: report,
+    };
+
+    const thresholds: Record<string, number> = {};
+    if (thresholdSecurity > 0) thresholds['security'] = thresholdSecurity;
+
+    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+
+    console.log(
+      `Security coverage: ${report.covered}/${report.total} controls covered (${report.percentage}%)`,
+    );
+
+    // Print per-category summary
+    for (const [cat, summary] of Object.entries(report.categorySummary)) {
+      if (summary.total > 0) {
+        const pct = Math.round((summary.covered / summary.total) * 100);
+        console.log(`  ${cat}: ${summary.covered}/${summary.total} (${pct}%)`);
+      }
+    }
+
+    if (report.scanFindings > 0) {
+      console.log(`  External scan findings credited: ${report.scanFindings}`);
+    }
+
+    const uncovered = coverages.filter((c) => !c.covered);
+    if (uncovered.length > 0) {
+      console.log('Uncovered security controls:');
+      for (const c of uncovered) {
+        console.log(`  - ${c.control.id}: ${c.control.description}`);
+      }
+    }
+
+    console.log(`Reports written to: ${reportsDir}`);
+
     const failures = checkThresholds([result], thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {

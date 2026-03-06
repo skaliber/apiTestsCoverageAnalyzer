@@ -80,6 +80,10 @@ function findCoveredEndpoints(fileContents: string, endpoints: Endpoint[]): Set<
     const method = match[1].toUpperCase();
     const calledPath = match[2];
 
+    // Skip OpenAPI path templates (e.g. /users/{id}) — these appear in test titles
+    // or comments describing the spec but do not represent actual HTTP calls.
+    if (calledPath.includes('{')) continue;
+
     endpoints.forEach((endpoint, idx) => {
       if (endpoint.method === method && endpoint.pathRegex.test(calledPath)) {
         covered.add(idx);

@@ -49,6 +49,14 @@ import {
   PerformanceThresholds,
 } from './perfResilienceCoverage';
 import {
+  loadSpec,
+  compareSpecs,
+  parseContractFiles,
+  verifyContracts,
+  buildCompatibilityReport,
+  generateCompatibilityReports,
+} from './compatibilityCoverage';
+import {
   parseFormats,
   generateMultiFormatReports,
   checkThresholds,
@@ -648,6 +656,143 @@ program
 
     // Threshold check
     const failures = checkThresholds([perfResult, resilienceResult], thresholds);
+    if (failures.length > 0) {
+      for (const msg of failures) {
+        console.error(`THRESHOLD FAILURE: ${msg}`);
+      }
+      process.exitCode = 1;
+    }
+  });
+
+program
+  .command('compatibility-check')
+  .description(
+    'Compare two API spec versions for breaking/non-breaking changes and verify consumer-driven contracts against the new spec',
+  )
+  .option('--old-spec <path>', 'Path to the previous (published) OpenAPI/Swagger spec')
+  .option('--new-spec <path>', 'Path to the current spec to be published')
+  .option(
+    '--contracts <glob>',
+    'Glob pattern or directory for consumer contract files (e.g. Pact JSON files)',
+  )
+  .option(
+    '--threshold-compat <percent>',
+    'Minimum required compatibility percentage (0-100). Exits non-zero if not met.',
+    parseFloat,
+    0,
+  )
+  .action(async (options) => {
+    const oldSpecPath = options.oldSpec ? path.resolve(options.oldSpec as string) : undefined;
+    const newSpecPath = options.newSpec ? path.resolve(options.newSpec as string) : undefined;
+    const contractsGlob = options.contracts as string | undefined;
+    const thresholdCompat = options.thresholdCompat as number;
+    const reportsDir = path.resolve('reports');
+
+    if (!oldSpecPath || !newSpecPath) {
+      console.error('ERROR: --old-spec and --new-spec are required.');
+      process.exitCode = 1;
+      return;
+    }
+
+    console.log(`Loading old spec: ${oldSpecPath}`);
+    const oldApi = await loadSpec(oldSpecPath);
+
+    console.log(`Loading new spec: ${newSpecPath}`);
+    const newApi = await loadSpec(newSpecPath);
+
+    // Compare specs
+    const changes = compareSpecs(oldApi, newApi);
+    const breakingChanges = changes.filter((c) => c.breaking);
+    const nonBreakingChanges = changes.filter((c) => !c.breaking);
+
+    // Load and verify contracts
+    const contracts = contractsGlob ? await parseContractFiles(contractsGlob) : [];
+    if (contracts.length > 0) {
+      console.log(`Loaded ${contracts.length} consumer contract(s)`);
+    }
+    const verificationResults = verifyContracts(contracts, newApi);
+
+    // Build and write reports
+    const report = buildCompatibilityReport(
+      oldApi,
+      newApi,
+      changes,
+      verificationResults,
+      oldSpecPath,
+      newSpecPath,
+    );
+
+    generateCompatibilityReports(report, reportsDir);
+
+    // Also write multi-format summary reports via the shared reporting module
+    const formats = parseFormats('json,html');
+    const uniqueAffectedEndpoints = new Set(
+      breakingChanges.filter((c) => c.changeType !== 'added').map((c) => `${c.method}:${c.path}`),
+    ).size;
+    const endpointsUnaffectedByBreakingChanges = report.totalOldEndpoints - uniqueAffectedEndpoints;
+    const compatResult: CoverageResult = {
+      type: 'compatibility',
+      totalItems: report.totalOldEndpoints,
+      coveredItems: endpointsUnaffectedByBreakingChanges,
+      coveragePercent: report.compatibilityPercent,
+      details: report,
+    };
+    const contractResult: CoverageResult = {
+      type: 'contract-coverage',
+      totalItems: report.totalNewEndpoints,
+      coveredItems: report.contractCoveredEndpoints,
+      coveragePercent: report.contractCoveragePercent,
+      details: report,
+    };
+    const thresholds: Record<string, number> = {};
+    if (thresholdCompat > 0) {
+      thresholds['compatibility'] = thresholdCompat;
+      thresholds['contract-coverage'] = thresholdCompat;
+    }
+    generateMultiFormatReports([compatResult, contractResult], formats, reportsDir, thresholds);
+
+    // Console summary
+    console.log(
+      `\nCompatibility: ${report.compatibilityPercent}% (${breakingChanges.length} breaking change${breakingChanges.length !== 1 ? 's' : ''}, ${nonBreakingChanges.length} non-breaking)`,
+    );
+    if (breakingChanges.length > 0) {
+      console.log('Breaking changes:');
+      for (const c of breakingChanges) {
+        console.log(`  ❌ ${c.description}`);
+      }
+    }
+    if (nonBreakingChanges.length > 0) {
+      console.log('Non-breaking changes:');
+      for (const c of nonBreakingChanges) {
+        console.log(`  ✅ ${c.description}`);
+      }
+    }
+
+    if (verificationResults.length > 0) {
+      const passedContracts = verificationResults.filter((r) => r.passed).length;
+      console.log(
+        `\nContract verification: ${passedContracts}/${verificationResults.length} contracts passed`,
+      );
+      console.log(
+        `Contract coverage: ${report.contractCoveredEndpoints}/${report.totalNewEndpoints} endpoints covered (${report.contractCoveragePercent}%)`,
+      );
+      for (const result of verificationResults) {
+        const failedInteractions = result.interactionResults.filter((ir) => !ir.passed);
+        if (failedInteractions.length > 0) {
+          console.log(
+            `  Contract [${result.contract.consumer} → ${result.contract.provider}] failed:`,
+          );
+          for (const ir of failedInteractions) {
+            console.log(`    ❌ ${ir.interaction.description}: ${ir.reason}`);
+          }
+        }
+      }
+    }
+
+    console.log(`\nReports written to: ${reportsDir}`);
+
+    // Threshold enforcement
+    const failures = checkThresholds([compatResult, contractResult], thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);

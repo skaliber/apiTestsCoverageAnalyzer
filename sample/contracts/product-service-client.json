@@ -1,0 +1,21 @@
+{
+  "consumer": { "name": "ProductServiceClient" },
+  "provider": { "name": "UserService" },
+  "interactions": [
+    {
+      "description": "a request to list products",
+      "request": {
+        "method": "GET",
+        "path": "/products"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": []
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": { "version": "2.0.0" }
+  }
+}

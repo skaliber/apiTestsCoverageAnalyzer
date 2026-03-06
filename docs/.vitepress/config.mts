@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'API Test Coverage Analyzer',
   description: 'Comprehensive documentation for the API Test Coverage Analyzer – analyse endpoint, parameter, business-logic, security, and more against your OpenAPI specs.',
   base: '/apiTestsCoverageAnalyzer/',
+  cleanUrls: true,
 
   ignoreDeadLinks: [
     /^http:\/\/localhost/,

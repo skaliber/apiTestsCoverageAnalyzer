@@ -20,6 +20,12 @@ import {
   buildBusinessCoverageReport,
   generateBusinessReports,
 } from './businessCoverage';
+import {
+  parseIntegrationFlows,
+  analyzeIntegrationCoverage,
+  buildIntegrationCoverageReport,
+  generateIntegrationReports,
+} from './integrationCoverage';
 
 const program = new Command();
 
@@ -118,6 +124,51 @@ program
       console.log('Uncovered rules:');
       for (const rule of report.uncoveredRules) {
         console.log(`  - ${rule.id}: ${rule.description}`);
+      }
+    }
+    console.log(`JSON report: ${jsonReport}`);
+    console.log(`HTML report: ${htmlReport}`);
+  });
+
+program
+  .command('integration-coverage')
+  .description('Analyze how well integration tests exercise defined end-to-end flows')
+  .option('--flows <file>', 'Path to the integration flows definition file (YAML or JSON)', 'sample/integration-flows.yaml')
+  .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .action(async (options) => {
+    const flowsPath = path.resolve(options.flows);
+    const testsGlob = options.tests as string;
+    const reportsDir = path.resolve('reports');
+
+    console.log(`Parsing integration flows: ${flowsPath}`);
+    const flows = parseIntegrationFlows(flowsPath);
+
+    console.log(`Analyzing tests matching: ${testsGlob}`);
+    const coverages = await analyzeIntegrationCoverage(flows, testsGlob);
+
+    const report = buildIntegrationCoverageReport(coverages);
+
+    generateIntegrationReports(report, reportsDir);
+
+    const jsonReport = path.join(reportsDir, 'integration-coverage.json');
+    const htmlReport = path.join(reportsDir, 'integration-coverage.html');
+
+    console.log(
+      `Integration coverage: ${report.complete}/${report.total} flows complete, ${report.partial} partial, ${report.missing} missing (${report.percentage}%)`,
+    );
+    const partialFlows = coverages.filter((c) => c.status === 'partial');
+    if (partialFlows.length > 0) {
+      console.log('Partially covered flows:');
+      for (const fc of partialFlows) {
+        const uncoveredSteps = fc.steps.filter((s) => !s.covered).map((s) => s.step.id);
+        console.log(`  - ${fc.flow.id}: ${fc.flow.name} (missing steps: ${uncoveredSteps.join(', ')})`);
+      }
+    }
+    const missingFlows = coverages.filter((c) => c.status === 'missing');
+    if (missingFlows.length > 0) {
+      console.log('Missing flows:');
+      for (const fc of missingFlows) {
+        console.log(`  - ${fc.flow.id}: ${fc.flow.name}`);
       }
     }
     console.log(`JSON report: ${jsonReport}`);

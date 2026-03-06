@@ -1,0 +1,109 @@
+# Sample integration flows definition for the API coverage analyzer.
+# Each flow describes a multi-step sequence of API calls or events that
+# must occur in a specific order to achieve a business outcome.
+# Steps are matched against test traces using keywords.
+
+flows:
+  - id: FLOW001
+    name: "User Registration and First Order"
+    description: "A new user registers and immediately places their first order"
+    steps:
+      - id: FLOW001-step1
+        description: "Create a new user account"
+        type: api
+        method: POST
+        path: /users
+        keywords:
+          - "POST /users"
+          - "create user"
+          - "register user"
+      - id: FLOW001-step2
+        description: "Verify user exists"
+        type: api
+        method: GET
+        path: /users/{id}
+        keywords:
+          - "GET /users"
+          - "get user"
+          - "fetch user"
+      - id: FLOW001-step3
+        description: "Place first order for the new user"
+        type: api
+        method: POST
+        path: /orders
+        keywords:
+          - "POST /orders"
+          - "place order"
+          - "create order"
+
+  - id: FLOW002
+    name: "View User Order History"
+    description: "Retrieve a user's complete order history"
+    steps:
+      - id: FLOW002-step1
+        description: "Look up the user by ID"
+        type: api
+        method: GET
+        path: /users/{id}
+        keywords:
+          - "GET /users"
+          - "get user"
+          - "fetch user"
+      - id: FLOW002-step2
+        description: "Retrieve all orders belonging to the user"
+        type: api
+        method: GET
+        path: /users/{id}/orders
+        keywords:
+          - "GET /users"
+          - "user orders"
+          - "list orders"
+          - "orders for user"
+
+  - id: FLOW003
+    name: "Failed Order Due to Missing User"
+    description: "Attempt to place an order for a non-existent user and receive a 404"
+    steps:
+      - id: FLOW003-step1
+        description: "Attempt to get a non-existent user"
+        type: api
+        method: GET
+        path: /users/{id}
+        keywords:
+          - "user not found"
+          - "nonexistent user"
+          - "missing user"
+          - "404"
+      - id: FLOW003-step2
+        description: "Attempt to create an order for the missing user, which fails"
+        type: api
+        method: POST
+        path: /orders
+        keywords:
+          - "POST /orders"
+          - "nonexistent user"
+          - "unknown user"
+          - "create order"
+
+  - id: FLOW004
+    name: "List All Users and Their Orders"
+    description: "Retrieve the full user list and then fetch orders for each user"
+    steps:
+      - id: FLOW004-step1
+        description: "Retrieve the list of all users"
+        type: api
+        method: GET
+        path: /users
+        keywords:
+          - "GET /users"
+          - "list users"
+          - "all users"
+      - id: FLOW004-step2
+        description: "Retrieve orders for a specific user"
+        type: api
+        method: GET
+        path: /users/{id}/orders
+        keywords:
+          - "all users orders"
+          - "orders per user"
+          - "fetch orders for each user"

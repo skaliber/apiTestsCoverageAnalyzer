@@ -14,6 +14,12 @@ import {
   buildParameterCoverageReport,
   generateParameterReports,
 } from './parameterCoverage';
+import {
+  parseBusinessRules,
+  analyzeBusinessCoverage,
+  buildBusinessCoverageReport,
+  generateBusinessReports,
+} from './businessCoverage';
 
 const program = new Command();
 
@@ -78,6 +84,42 @@ program
     console.log(
       `Parameter coverage: ${report.totalParameters} parameters analysed, average coverage ${report.averageCoverage}%`,
     );
+    console.log(`JSON report: ${jsonReport}`);
+    console.log(`HTML report: ${htmlReport}`);
+  });
+
+program
+  .command('business-coverage')
+  .description('Analyze how well tests cover defined business rules and scenarios')
+  .option('--rules <file>', 'Path to the business rules definition file (YAML or JSON)', 'sample/business-rules.yaml')
+  .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .action(async (options) => {
+    const rulesPath = path.resolve(options.rules);
+    const testsGlob = options.tests as string;
+    const reportsDir = path.resolve('reports');
+
+    console.log(`Parsing business rules: ${rulesPath}`);
+    const rules = parseBusinessRules(rulesPath);
+
+    console.log(`Analyzing tests matching: ${testsGlob}`);
+    const coverages = await analyzeBusinessCoverage(rules, testsGlob);
+
+    const report = buildBusinessCoverageReport(coverages);
+
+    generateBusinessReports(report, reportsDir);
+
+    const jsonReport = path.join(reportsDir, 'business-coverage.json');
+    const htmlReport = path.join(reportsDir, 'business-coverage.html');
+
+    console.log(
+      `Business coverage: ${report.covered}/${report.total} rules covered (${report.percentage}%)`,
+    );
+    if (report.uncoveredRules.length > 0) {
+      console.log('Uncovered rules:');
+      for (const rule of report.uncoveredRules) {
+        console.log(`  - ${rule.id}: ${rule.description}`);
+      }
+    }
     console.log(`JSON report: ${jsonReport}`);
     console.log(`HTML report: ${htmlReport}`);
   });

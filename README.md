@@ -329,4 +329,116 @@ api-coverage:
 | `0` | All configured thresholds met (or no thresholds configured) |
 | `1` | One or more coverage types are below their configured threshold |
 
+---
+
+## Configuration file
+
+You can provide a `coverage.config.json` file in your project root (or use `--config <path>` to point to a custom location) to centralise thresholds, exclusions, test patterns, and plugins.
+
+### Schema
+
+```json
+{
+  "thresholds": {
+    "endpoint": 80,
+    "parameter": 70,
+    "business": 60,
+    "integration": 50,
+    "security": 60,
+    "error": 50,
+    "performance": 75,
+    "resilience": 50
+  },
+  "exclude": {
+    "paths": ["/internal/*"],
+    "methods": ["OPTIONS"]
+  },
+  "testPatterns": ["sample/tests/**/*.ts"],
+  "plugins": ["./plugins/graphql-coverage.js"]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `thresholds` | `object` | Per-coverage-type minimum percentages. Keys are coverage-type names; values are numbers 0–100. |
+| `exclude.paths` | `string[]` | Path patterns whose endpoints are excluded from analysis. Supports `*` (single segment) and `**` (any path suffix). |
+| `exclude.methods` | `string[]` | HTTP methods to exclude (case-insensitive). |
+| `testPatterns` | `string[]` | Glob patterns for test files. When set, overrides the `--tests` CLI default. |
+| `plugins` | `string[]` | Paths to plugin modules to run after built-in analysis. Relative paths are resolved from the project root. |
+
+### Priority
+
+CLI flags always take precedence over config-file values. For example, `--threshold-endpoint 90` overrides the `endpoint` threshold in the file.
+
+### `--config` option
+
+Pass `--config <path>` **before** a subcommand to load a specific config file:
+
+```sh
+node dist/index.js --config my-config.json endpoint-coverage --spec sample/openapi.yaml
+```
+
+---
+
+## Plugins
+
+Plugins let you add custom analysis steps that run after the built-in coverage checks and include their results in the report.
+
+### Plugin interface
+
+A plugin module must export an async `analyze` function:
+
+```js
+// plugins/my-plugin.js
+module.exports.analyze = async function ({ spec, testPatterns, results, config }) {
+  // Perform custom analysis …
+  return {
+    type: 'my-custom',      // unique type identifier shown in the report
+    totalItems: 10,
+    coveredItems: 7,
+    coveragePercent: 70,
+    details: { /* arbitrary JSON-serialisable data */ },
+  };
+};
+```
+
+The function can also return an **array** of results if the plugin covers multiple aspects.
+
+### Context object
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `spec` | `unknown` | Parsed OpenAPI spec (may be `undefined` for some commands) |
+| `testPatterns` | `string[]` | Glob patterns used to locate test files |
+| `results` | `CoverageResult[]` | Coverage results from the built-in analysers |
+| `config` | `CoverageConfig` | The fully-resolved configuration |
+
+### Error handling
+
+If a plugin fails to load or throws during `analyze`, a warning is printed to stderr and analysis continues with the remaining plugins.
+
+### Sample plugin: GraphQL coverage
+
+`plugins/graphql-coverage.js` is a ready-to-use plugin that measures GraphQL field coverage:
+
+1. It reads `schema.graphql` from the project root.
+2. It scans test files for GraphQL query strings.
+3. It returns a `"graphql"` result with `coveredItems` / `totalItems` and lists untested fields.
+
+Enable it by adding it to `coverage.config.json`:
+
+```json
+{
+  "plugins": ["./plugins/graphql-coverage.js"]
+}
+```
+
+### Writing your own plugin
+
+1. Create a file in `plugins/` (or anywhere accessible).
+2. Export an async `analyze(context)` function.
+3. Return a `CoverageResult` (or an array of them).
+4. Register the plugin path in `coverage.config.json` under `"plugins"`.
+
+
 CI systems interpret a non-zero exit code as a build failure, so setting thresholds is all that is needed to block merges when coverage drops.

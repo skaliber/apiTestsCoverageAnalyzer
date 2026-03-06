@@ -62,13 +62,39 @@ import {
   checkThresholds,
   CoverageResult,
 } from './reporting';
+import { resolveConfig, mergeConfig, CoverageConfig } from './config';
+import { runPlugins, PluginContext } from './pluginLoader';
 
 const program = new Command();
 
 program
   .name('api-tests-coverage-analyzer')
   .description('Analyze API test coverage based on OpenAPI specs')
-  .version('0.1.0');
+  .version('0.1.0')
+  .option('--config <file>', 'Path to a coverage configuration file (default: coverage.config.json)');
+
+// ─── Config helper ─────────────────────────────────────────────────────────────
+
+/**
+ * Load and return the resolved CoverageConfig for a command invocation.
+ * CLI threshold flags (non-zero values) take precedence over config-file values.
+ */
+function loadCoverageConfig(
+  configPath: string | undefined,
+  cliThresholds: Record<string, number>,
+): CoverageConfig {
+  const fileConfig = resolveConfig(configPath);
+  const cliOverrides: Partial<CoverageConfig> = {};
+  // Only apply CLI thresholds that were explicitly set (non-zero)
+  const activeThresholds: Record<string, number> = {};
+  for (const [key, value] of Object.entries(cliThresholds)) {
+    if (value > 0) activeThresholds[key] = value;
+  }
+  if (Object.keys(activeThresholds).length > 0) {
+    cliOverrides.thresholds = activeThresholds;
+  }
+  return mergeConfig(fileConfig, cliOverrides);
+}
 
 program
   .command('endpoint-coverage')
@@ -87,11 +113,17 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      endpoint: options.thresholdEndpoint as number,
+    });
+
     const specPath = path.resolve(options.spec);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdEndpoint = options.thresholdEndpoint as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseOpenApiSpec(specPath);
@@ -113,10 +145,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdEndpoint > 0) thresholds['endpoint'] = thresholdEndpoint;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Endpoint coverage: ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`,
@@ -124,7 +164,7 @@ program
     console.log(`Reports written to: ${reportsDir}`);
 
     // Threshold check
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -150,11 +190,17 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      parameter: options.thresholdParameter as number,
+    });
+
     const specPath = path.resolve(options.spec);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdParameter = options.thresholdParameter as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const parameters = await parseParameters(specPath);
@@ -174,17 +220,25 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdParameter > 0) thresholds['parameter'] = thresholdParameter;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Parameter coverage: ${report.totalParameters} parameters analysed, average coverage ${report.averageCoverage}%`,
     );
     console.log(`Reports written to: ${reportsDir}`);
 
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -210,11 +264,17 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      business: options.thresholdBusiness as number,
+    });
+
     const rulesPath = path.resolve(options.rules);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdBusiness = options.thresholdBusiness as number;
 
     console.log(`Parsing business rules: ${rulesPath}`);
     const rules = parseBusinessRules(rulesPath);
@@ -234,10 +294,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdBusiness > 0) thresholds['business'] = thresholdBusiness;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Business coverage: ${report.covered}/${report.total} rules covered (${report.percentage}%)`,
@@ -250,7 +318,7 @@ program
     }
     console.log(`Reports written to: ${reportsDir}`);
 
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -276,11 +344,17 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      integration: options.thresholdIntegration as number,
+    });
+
     const flowsPath = path.resolve(options.flows);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdIntegration = options.thresholdIntegration as number;
 
     console.log(`Parsing integration flows: ${flowsPath}`);
     const flows = parseIntegrationFlows(flowsPath);
@@ -300,10 +374,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdIntegration > 0) thresholds['integration'] = thresholdIntegration;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Integration coverage: ${report.complete}/${report.total} flows complete, ${report.partial} partial, ${report.missing} missing (${report.percentage}%)`,
@@ -325,7 +407,7 @@ program
     }
     console.log(`Reports written to: ${reportsDir}`);
 
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -351,11 +433,17 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      error: options.thresholdError as number,
+    });
+
     const specPath = path.resolve(options.spec);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdError = options.thresholdError as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const scenarios = await parseErrorScenarios(specPath);
@@ -376,10 +464,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdError > 0) thresholds['error'] = thresholdError;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Error coverage: ${report.covered}/${report.total} error scenarios covered (${report.percentage}%)`,
@@ -404,7 +500,7 @@ program
     console.log(`Reports written to: ${reportsDir}`);
 
     // Threshold check
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -434,12 +530,18 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      security: options.thresholdSecurity as number,
+    });
+
     const specPath = path.resolve(options.spec);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const scanReportPath = options.scanReport ? path.resolve(options.scanReport as string) : undefined;
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
-    const thresholdSecurity = options.thresholdSecurity as number;
 
     console.log(`Parsing spec: ${specPath}`);
     const controls = await parseSecurityControls(specPath);
@@ -463,10 +565,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdSecurity > 0) thresholds['security'] = thresholdSecurity;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([result], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [result],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [result, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Security coverage: ${report.covered}/${report.total} controls covered (${report.percentage}%)`,
@@ -494,7 +604,7 @@ program
 
     console.log(`Reports written to: ${reportsDir}`);
 
-    const failures = checkThresholds([result], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
@@ -548,14 +658,20 @@ program
     0,
   )
   .action(async (options) => {
+    const parentOpts = program.opts();
+    const config = loadCoverageConfig(parentOpts.config as string | undefined, {
+      performance: options.thresholdPerformance as number,
+      resilience: options.thresholdResilience as number,
+    });
+
     const specPath = path.resolve(options.spec);
-    const testsGlob = options.tests as string;
+    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
+      ? config.testPatterns[0]
+      : (options.tests as string);
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
     const thresholdResponseMs = options.thresholdResponseMs as number;
     const thresholdErrorRate = options.thresholdErrorRate as number;
-    const thresholdPerformance = options.thresholdPerformance as number;
-    const thresholdResilience = options.thresholdResilience as number;
 
     const perfThresholds: PerformanceThresholds = {
       responseMs: thresholdResponseMs,
@@ -609,11 +725,18 @@ program
       details: report,
     };
 
-    const thresholds: Record<string, number> = {};
-    if (thresholdPerformance > 0) thresholds['performance'] = thresholdPerformance;
-    if (thresholdResilience > 0) thresholds['resilience'] = thresholdResilience;
+    const thresholds: Record<string, number> = { ...(config.thresholds ?? {}) } as Record<string, number>;
 
-    generateMultiFormatReports([perfResult, resilienceResult], formats, reportsDir, thresholds);
+    // Run plugins
+    const pluginContext: PluginContext = {
+      testPatterns: config.testPatterns ?? [],
+      results: [perfResult, resilienceResult],
+      config,
+    };
+    const pluginResults = await runPlugins(config, pluginContext);
+    const allResults = [perfResult, resilienceResult, ...pluginResults];
+
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
 
     console.log(
       `Performance coverage: ${report.endpointsWithLoadData}/${report.totalEndpoints} endpoints with load-test data (${report.performanceCoveragePercent}%)`,
@@ -655,7 +778,7 @@ program
     console.log(`Reports written to: ${reportsDir}`);
 
     // Threshold check
-    const failures = checkThresholds([perfResult, resilienceResult], thresholds);
+    const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);

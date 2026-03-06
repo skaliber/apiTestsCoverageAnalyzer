@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Endpoint Coverage Report</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    h1 { margin-bottom: 0.5rem; }
+    .summary { margin-bottom: 1.5rem; font-size: 1.1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 1rem; text-align: left; }
+    th { background: #f0f0f0; }
+    tr.covered { background: #e6ffe6; }
+    tr.uncovered { background: #ffe6e6; }
+  </style>
+</head>
+<body>
+  <h1>Endpoint Coverage Report</h1>
+  <div class="summary">
+    Covered: <strong>5/9</strong> endpoints
+    (<strong>55.56%</strong>)
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Status</th>
+        <th>Test Files</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr class="covered">
+      <td>GET</td>
+      <td>/users</td>
+      <td>✅ Covered</td>
+      <td>sample/tests/sample.test.ts</td>
+    </tr>
+    <tr class="covered">
+      <td>POST</td>
+      <td>/users</td>
+      <td>✅ Covered</td>
+      <td>sample/tests/sample.test.ts</td>
+    </tr>
+    <tr class="covered">
+      <td>GET</td>
+      <td>/users/{id}</td>
+      <td>✅ Covered</td>
+      <td>sample/tests/sample.test.ts</td>
+    </tr>
+    <tr class="uncovered">
+      <td>PUT</td>
+      <td>/users/{id}</td>
+      <td>❌ Not covered</td>
+      <td>—</td>
+    </tr>
+    <tr class="uncovered">
+      <td>DELETE</td>
+      <td>/users/{id}</td>
+      <td>❌ Not covered</td>
+      <td>—</td>
+    </tr>
+    <tr class="covered">
+      <td>GET</td>
+      <td>/orders</td>
+      <td>✅ Covered</td>
+      <td>sample/tests/sample.test.ts</td>
+    </tr>
+    <tr class="covered">
+      <td>POST</td>
+      <td>/orders</td>
+      <td>✅ Covered</td>
+      <td>sample/tests/sample.test.ts</td>
+    </tr>
+    <tr class="uncovered">
+      <td>GET</td>
+      <td>/orders/{id}</td>
+      <td>❌ Not covered</td>
+      <td>—</td>
+    </tr>
+    <tr class="uncovered">
+      <td>GET</td>
+      <td>/users/{id}/orders</td>
+      <td>❌ Not covered</td>
+      <td>—</td>
+    </tr>
+    </tbody>
+  </table>
+</body>
+</html>

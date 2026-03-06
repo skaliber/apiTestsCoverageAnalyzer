@@ -1,0 +1,47 @@
+{
+  "consumer": { "name": "UserServiceClient" },
+  "provider": { "name": "UserService" },
+  "interactions": [
+    {
+      "description": "a request to list users",
+      "request": {
+        "method": "GET",
+        "path": "/users"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": []
+      }
+    },
+    {
+      "description": "a request to create a user",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": { "Content-Type": "application/json" },
+        "body": { "name": "Alice" }
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": { "id": 1, "name": "Alice" }
+      }
+    },
+    {
+      "description": "a request to get a user by ID",
+      "request": {
+        "method": "GET",
+        "path": "/users/1"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": { "id": 1, "name": "Alice" }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": { "version": "2.0.0" }
+  }
+}

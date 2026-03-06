@@ -1,0 +1,45 @@
+"""
+Sample GraphQL schema for demonstrating the graphql-coverage plugin.
+Place this file in your project root as `schema.graphql`.
+"""
+
+type Query {
+  users: [User]
+  user(id: ID!): User
+  orders: [Order]
+  order(id: ID!): Order
+}
+
+type Mutation {
+  createUser(name: String!, email: String!): User
+  updateUser(id: ID!, name: String, email: String): User
+  deleteUser(id: ID!): Boolean
+  createOrder(userId: ID!, items: [OrderItemInput!]!): Order
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  orders: [Order]
+}
+
+type Order {
+  id: ID!
+  userId: ID!
+  status: String!
+  items: [OrderItem]
+  total: Float
+}
+
+type OrderItem {
+  id: ID!
+  productId: ID!
+  quantity: Int!
+  price: Float!
+}
+
+input OrderItemInput {
+  productId: ID!
+  quantity: Int!
+}

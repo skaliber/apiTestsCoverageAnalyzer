@@ -1,0 +1,18 @@
+{
+  "thresholds": {
+    "endpoint": 80,
+    "parameter": 70,
+    "business": 60,
+    "integration": 50,
+    "security": 60,
+    "error": 50,
+    "performance": 75,
+    "resilience": 50
+  },
+  "exclude": {
+    "paths": ["/internal/*"],
+    "methods": ["OPTIONS"]
+  },
+  "testPatterns": ["sample/tests/**/*.ts"],
+  "plugins": ["./plugins/graphql-coverage.js"]
+}

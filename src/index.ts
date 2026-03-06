@@ -64,6 +64,20 @@ import {
 } from './reporting';
 import { resolveConfig, mergeConfig, CoverageConfig } from './config';
 import { runPlugins, PluginContext } from './pluginLoader';
+import {
+  initLogger,
+  initMetrics,
+  recordCoverageMetrics,
+  startMetricsServer,
+  stopMetricsServer,
+  initTracing,
+  startSpan,
+  buildObservabilityInfo,
+  logCoverageResult,
+  logThresholdBreach,
+  getLogger,
+  LogLevel,
+} from './observability';
 
 const program = new Command();
 
@@ -71,7 +85,12 @@ program
   .name('api-tests-coverage-analyzer')
   .description('Analyze API test coverage based on OpenAPI specs')
   .version('0.1.0')
-  .option('--config <file>', 'Path to a coverage configuration file (default: coverage.config.json)');
+  .option('--config <file>', 'Path to a coverage configuration file (default: coverage.config.json)')
+  .option('--log-level <level>', 'Log verbosity level: trace|debug|info|warn|error|silent', 'info')
+  .option('--metrics-port <port>', 'Start a Prometheus /metrics HTTP server on this port after analysis', parseInt)
+  .option('--service-name <name>', 'Service name label added to all Prometheus metrics', 'api-coverage-analyzer')
+  .option('--trace', 'Enable OpenTelemetry tracing (spans recorded in memory or exported via OTLP)')
+  .option('--trace-endpoint <url>', 'OTLP HTTP endpoint for trace export (e.g. http://localhost:4318)');
 
 // ─── Config helper ─────────────────────────────────────────────────────────────
 
@@ -96,6 +115,69 @@ function loadCoverageConfig(
   return mergeConfig(fileConfig, cliOverrides);
 }
 
+/**
+ * Initialise all observability subsystems from the parent program options.
+ * Safe to call multiple times; subsequent calls are no-ops if already set up.
+ */
+function setupObservability(): { metricsPort?: number; serviceName: string } {
+  const opts = program.opts();
+  const logLevel = (opts.logLevel as LogLevel) || 'info';
+  const metricsPort = opts.metricsPort as number | undefined;
+  const serviceName = (opts.serviceName as string) || 'api-coverage-analyzer';
+  const traceEnabled = Boolean(opts.trace);
+  const traceEndpoint = opts.traceEndpoint as string | undefined;
+
+  initLogger(logLevel);
+  initMetrics(serviceName);
+  initTracing(traceEnabled, traceEndpoint);
+
+  return { metricsPort, serviceName };
+}
+
+/**
+ * After each command completes, record metrics, start the server (if requested),
+ * log results, and check thresholds.
+ */
+async function finaliseObservability(
+  allResults: CoverageResult[],
+  thresholds: Record<string, number>,
+  metricsPort: number | undefined,
+  serviceName: string,
+): Promise<void> {
+  const logger = getLogger();
+
+  // Record into Prometheus gauges
+  recordCoverageMetrics(allResults, thresholds, serviceName);
+
+  // Structured log each result
+  for (const r of allResults) {
+    logCoverageResult(logger, r, thresholds[r.type]);
+  }
+
+  // Log threshold breaches
+  for (const r of allResults) {
+    const t = thresholds[r.type];
+    if (t !== undefined && r.coveragePercent < t) {
+      logThresholdBreach(logger, r.type, r.coveragePercent, t);
+    }
+  }
+
+  // Start metrics HTTP server if requested
+  if (metricsPort) {
+    await startMetricsServer(metricsPort);
+    logger.info({ event: 'metrics_server_start', port: metricsPort }, `Prometheus metrics available at http://localhost:${metricsPort}/metrics`);
+    console.log(`Prometheus metrics available at http://localhost:${metricsPort}/metrics`);
+
+    // Keep the server alive until the process is signalled; handle graceful shutdown
+    process.once('SIGINT', () => {
+      void stopMetricsServer().then(() => process.exit(0));
+    });
+    process.once('SIGTERM', () => {
+      void stopMetricsServer().then(() => process.exit(0));
+    });
+  }
+}
+
 program
   .command('endpoint-coverage')
   .description('Analyze which API endpoints are covered by integration tests')
@@ -113,6 +195,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       endpoint: options.thresholdEndpoint as number,
@@ -125,6 +210,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('endpoint-coverage', { specPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'endpoint', specPath, testsGlob }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseOpenApiSpec(specPath);
 
@@ -156,12 +244,18 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Endpoint coverage: ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`,
     );
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.total, coveredItems: report.covered, coveragePercent: report.percentage });
+    logger.info({ event: 'analysis_complete', coverageType: 'endpoint' }, 'Endpoint coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     // Threshold check
     const failures = checkThresholds(allResults, thresholds);
@@ -190,6 +284,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       parameter: options.thresholdParameter as number,
@@ -202,6 +299,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('parameter-coverage', { specPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'parameter', specPath }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const parameters = await parseParameters(specPath);
 
@@ -231,12 +331,18 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Parameter coverage: ${report.totalParameters} parameters analysed, average coverage ${report.averageCoverage}%`,
     );
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.totalParameters, coveragePercent: report.averageCoverage });
+    logger.info({ event: 'analysis_complete', coverageType: 'parameter' }, 'Parameter coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
@@ -264,6 +370,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       business: options.thresholdBusiness as number,
@@ -276,6 +385,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('business-coverage', { rulesPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'business', rulesPath }, `Parsing business rules: ${rulesPath}`);
     console.log(`Parsing business rules: ${rulesPath}`);
     const rules = parseBusinessRules(rulesPath);
 
@@ -305,7 +417,8 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Business coverage: ${report.covered}/${report.total} rules covered (${report.percentage}%)`,
@@ -317,6 +430,11 @@ program
       }
     }
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.total, coveredItems: report.covered, coveragePercent: report.percentage });
+    logger.info({ event: 'analysis_complete', coverageType: 'business' }, 'Business coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
@@ -344,6 +462,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       integration: options.thresholdIntegration as number,
@@ -356,6 +477,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('integration-coverage', { flowsPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'integration', flowsPath }, `Parsing integration flows: ${flowsPath}`);
     console.log(`Parsing integration flows: ${flowsPath}`);
     const flows = parseIntegrationFlows(flowsPath);
 
@@ -385,7 +509,8 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Integration coverage: ${report.complete}/${report.total} flows complete, ${report.partial} partial, ${report.missing} missing (${report.percentage}%)`,
@@ -406,6 +531,11 @@ program
       }
     }
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.total, coveredItems: report.complete, coveragePercent: report.percentage });
+    logger.info({ event: 'analysis_complete', coverageType: 'integration' }, 'Integration coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
@@ -433,6 +563,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       error: options.thresholdError as number,
@@ -445,6 +578,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('error-coverage', { specPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'error', specPath }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const scenarios = await parseErrorScenarios(specPath);
     console.log(`Found ${scenarios.length} error scenarios`);
@@ -475,7 +611,8 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Error coverage: ${report.covered}/${report.total} error scenarios covered (${report.percentage}%)`,
@@ -498,6 +635,11 @@ program
     }
 
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.total, coveredItems: report.covered, coveragePercent: report.percentage });
+    logger.info({ event: 'analysis_complete', coverageType: 'error' }, 'Error coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     // Threshold check
     const failures = checkThresholds(allResults, thresholds);
@@ -530,6 +672,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       security: options.thresholdSecurity as number,
@@ -543,6 +688,9 @@ program
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
+    const span = startSpan('security-coverage', { specPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'security', specPath }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const controls = await parseSecurityControls(specPath);
     console.log(`Found ${controls.length} security controls`);
@@ -576,7 +724,8 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [result, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Security coverage: ${report.covered}/${report.total} controls covered (${report.percentage}%)`,
@@ -603,6 +752,11 @@ program
     }
 
     console.log(`Reports written to: ${reportsDir}`);
+
+    span.end({ totalItems: report.total, coveredItems: report.covered, coveragePercent: report.percentage });
+    logger.info({ event: 'analysis_complete', coverageType: 'security' }, 'Security coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
 
     const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
@@ -658,6 +812,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const parentOpts = program.opts();
     const config = loadCoverageConfig(parentOpts.config as string | undefined, {
       performance: options.thresholdPerformance as number,
@@ -678,6 +835,9 @@ program
       errorRate: thresholdErrorRate,
     };
 
+    const span = startSpan('perf-resilience-coverage', { specPath, testsGlob });
+
+    logger.info({ event: 'analysis_start', coverageType: 'perf-resilience', specPath }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseEndpointsFromSpec(specPath);
     console.log(`Found ${endpoints.length} endpoints`);
@@ -736,7 +896,8 @@ program
     const pluginResults = await runPlugins(config, pluginContext);
     const allResults = [perfResult, resilienceResult, ...pluginResults];
 
-    generateMultiFormatReports(allResults, formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports(allResults, formats, reportsDir, thresholds, observabilityInfo);
 
     console.log(
       `Performance coverage: ${report.endpointsWithLoadData}/${report.totalEndpoints} endpoints with load-test data (${report.performanceCoveragePercent}%)`,
@@ -777,6 +938,11 @@ program
 
     console.log(`Reports written to: ${reportsDir}`);
 
+    span.end({ coveragePercent: report.performanceCoveragePercent });
+    logger.info({ event: 'analysis_complete', coverageType: 'perf-resilience' }, 'Perf/resilience coverage analysis complete');
+
+    await finaliseObservability(allResults, thresholds, metricsPort, serviceName);
+
     // Threshold check
     const failures = checkThresholds(allResults, thresholds);
     if (failures.length > 0) {
@@ -805,6 +971,9 @@ program
     0,
   )
   .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
     const oldSpecPath = options.oldSpec ? path.resolve(options.oldSpec as string) : undefined;
     const newSpecPath = options.newSpec ? path.resolve(options.newSpec as string) : undefined;
     const contractsGlob = options.contracts as string | undefined;
@@ -817,6 +986,9 @@ program
       return;
     }
 
+    const span = startSpan('compatibility-check', { oldSpecPath, newSpecPath });
+
+    logger.info({ event: 'analysis_start', coverageType: 'compatibility', oldSpecPath, newSpecPath }, `Loading old spec: ${oldSpecPath}`);
     console.log(`Loading old spec: ${oldSpecPath}`);
     const oldApi = await loadSpec(oldSpecPath);
 
@@ -872,7 +1044,8 @@ program
       thresholds['compatibility'] = thresholdCompat;
       thresholds['contract-coverage'] = thresholdCompat;
     }
-    generateMultiFormatReports([compatResult, contractResult], formats, reportsDir, thresholds);
+    const observabilityInfo = buildObservabilityInfo(metricsPort);
+    generateMultiFormatReports([compatResult, contractResult], formats, reportsDir, thresholds, observabilityInfo);
 
     // Console summary
     console.log(
@@ -913,6 +1086,11 @@ program
     }
 
     console.log(`\nReports written to: ${reportsDir}`);
+
+    span.end({ coveragePercent: report.compatibilityPercent });
+    logger.info({ event: 'analysis_complete', coverageType: 'compatibility' }, 'Compatibility check complete');
+
+    await finaliseObservability([compatResult, contractResult], thresholds, metricsPort, serviceName);
 
     // Threshold enforcement
     const failures = checkThresholds([compatResult, contractResult], thresholds);

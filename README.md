@@ -331,6 +331,151 @@ api-coverage:
 
 ---
 
+## Observability and monitoring
+
+The analyzer emits **structured JSON logs**, **Prometheus metrics**, and optional **OpenTelemetry traces** so you can monitor coverage over time and act on regressions.
+
+### Global observability options
+
+These options are available on every command:
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--log-level <level>` | Log verbosity: `trace`, `debug`, `info`, `warn`, `error`, `silent` | `info` |
+| `--metrics-port <port>` | Start a Prometheus `/metrics` HTTP server on this port | off |
+| `--service-name <name>` | Service label added to all Prometheus metrics | `api-coverage-analyzer` |
+| `--trace` | Enable OpenTelemetry tracing | off |
+| `--trace-endpoint <url>` | OTLP HTTP endpoint for trace export | none (in-memory) |
+
+### Structured logging
+
+Every command emits JSON log lines to stdout via [pino](https://getpino.io/). Each line includes:
+
+```json
+{
+  "level": "info",
+  "time": "2024-01-15T12:00:00.000Z",
+  "event": "analysis_complete",
+  "coverageType": "endpoint",
+  "totalItems": 10,
+  "coveredItems": 8,
+  "coveragePercent": 80,
+  "threshold": 80,
+  "status": "pass"
+}
+```
+
+Control verbosity with `--log-level debug` (shows span events) or `--log-level silent` (suppresses all logs).
+
+### Prometheus metrics
+
+Start the metrics server by adding `--metrics-port <port>` to any command:
+
+```sh
+node -r ts-node/register src/index.ts endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/**/*.ts" \
+  --metrics-port 9091 \
+  --service-name my-api
+```
+
+The server exposes `http://localhost:9091/metrics` in Prometheus text format.
+
+#### Metric names and labels
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `api_coverage_total{service, coverage_type}` | Gauge | Total number of items analysed |
+| `api_coverage_covered{service, coverage_type}` | Gauge | Number of covered items |
+| `api_coverage_ratio{service, coverage_type}` | Gauge | Coverage ratio (0–1) |
+| `api_coverage_threshold_failure{service, coverage_type}` | Gauge | `1` if below threshold, `0` otherwise |
+
+`coverage_type` is one of: `endpoint`, `parameter`, `business`, `integration`, `error`, `security`, `performance`, `resilience`, `compatibility`, `contract-coverage`.
+
+#### Configuring Prometheus to scrape the metrics
+
+Add the following snippet to your `prometheus.yml` scrape config (see [`observability/prometheus.yml`](observability/prometheus.yml)):
+
+```yaml
+scrape_configs:
+  - job_name: api_coverage_analyzer
+    static_configs:
+      - targets:
+          - localhost:9091
+    scrape_interval: 30s
+```
+
+#### Grafana dashboard
+
+Import [`observability/grafana-dashboard.json`](observability/grafana-dashboard.json) into Grafana to get:
+
+- Gauge panels showing current coverage ratios for each coverage type.
+- A time-series panel showing coverage trends over time.
+- A table summarising totals, covered items, ratios, and threshold failures.
+
+#### Local experimentation with Docker Compose
+
+Run the full stack (Prometheus + Grafana) locally:
+
+```sh
+docker-compose -f observability/docker-compose.yml up -d
+# Then run the analyzer with --metrics-port 9091
+# Open Grafana at http://localhost:3000 (admin/admin)
+# Import observability/grafana-dashboard.json
+```
+
+### OpenTelemetry tracing
+
+Enable tracing with `--trace`. Spans are created for each analysis stage:
+`parse-spec`, `scan-tests`, `compute-coverage`, `write-reports`.
+
+Export to an OTLP-compatible backend (Jaeger, Grafana Tempo, etc.):
+
+```sh
+node -r ts-node/register src/index.ts endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/**/*.ts" \
+  --trace \
+  --trace-endpoint http://localhost:4318
+```
+
+Without `--trace-endpoint`, spans are collected in memory and logged at `debug` level.
+
+Visualise traces in [Jaeger](https://www.jaegertracing.io/) or [Grafana Tempo](https://grafana.com/oss/tempo/).
+
+### Alerting
+
+Alert rules in [`alerts/prometheus-rules.yml`](alerts/prometheus-rules.yml) cover:
+
+- **`ApiCoverageRatioLow`** – any coverage type drops below 80%.
+- **`ApiCoverageThresholdBreached`** – a threshold configured via `--threshold-*` is breached.
+- **`ApiErrorCoverageZero`** – error-scenario coverage reaches zero.
+- **`ApiSecurityCoverageZero`** – security-control coverage reaches zero.
+- **`ApiCoverageDropped`** – any coverage type drops more than 10 percentage points in an hour.
+
+Load the rules into Prometheus:
+
+```yaml
+# prometheus.yml
+rule_files:
+  - "alerts/prometheus-rules.yml"
+```
+
+Configure Alertmanager to forward alerts to Slack, email, PagerDuty, etc.:
+
+```yaml
+# alertmanager.yml (Slack example)
+receivers:
+  - name: slack
+    slack_configs:
+      - api_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+        channel: '#api-coverage-alerts'
+        title: '{{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+```
+
+---
+
 ## Configuration file
 
 You can provide a `coverage.config.json` file in your project root (or use `--config <path>` to point to a custom location) to centralise thresholds, exclusions, test patterns, and plugins.

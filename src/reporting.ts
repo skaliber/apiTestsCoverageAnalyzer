@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import type { ObservabilityInfo } from './observability';
 
 // ─── Standardized result interface ───────────────────────────────────────────
 
@@ -40,7 +41,11 @@ export function parseFormats(raw: string): ReportFormat[] {
 // ─── Report writers ───────────────────────────────────────────────────────────
 
 /** Write `reports/coverage-summary.json` */
-function writeJson(results: CoverageResult[], reportsDir: string): void {
+function writeJson(
+  results: CoverageResult[],
+  reportsDir: string,
+  observability?: ObservabilityInfo,
+): void {
   const summary = results.map((r) => ({
     type: r.type,
     totalItems: r.totalItems,
@@ -48,7 +53,7 @@ function writeJson(results: CoverageResult[], reportsDir: string): void {
     coveragePercent: r.coveragePercent,
   }));
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     generatedAt: new Date().toISOString(),
     summary,
     details: results.reduce<Record<string, unknown>>((acc, r) => {
@@ -57,12 +62,34 @@ function writeJson(results: CoverageResult[], reportsDir: string): void {
     }, {}),
   };
 
+  if (observability) {
+    payload.observability = {
+      metricsUrl: observability.metricsUrl,
+      note: observability.metricsUrl
+        ? `Prometheus metrics available at ${observability.metricsUrl}`
+        : 'Prometheus metrics export not enabled (use --metrics-port to enable)',
+      metricNames: observability.metricNames,
+      tracing: {
+        enabled: observability.tracingEnabled,
+        otlpEndpoint: observability.otlpEndpoint,
+        note: observability.tracingEnabled
+          ? `Traces are exported to ${observability.otlpEndpoint ?? 'in-memory (no OTLP endpoint configured)'}`
+          : 'Tracing not enabled (use --trace to enable)',
+      },
+    };
+  }
+
   const outPath = path.join(reportsDir, 'coverage-summary.json');
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2), 'utf-8');
 }
 
 /** Write `reports/coverage-summary.html` */
-function writeHtml(results: CoverageResult[], reportsDir: string, thresholds: Record<string, number> = {}): void {
+function writeHtml(
+  results: CoverageResult[],
+  reportsDir: string,
+  thresholds: Record<string, number> = {},
+  observability?: ObservabilityInfo,
+): void {
   const rows = results
     .map((r) => {
       const threshold = thresholds[r.type] ?? 0;
@@ -79,6 +106,29 @@ function writeHtml(results: CoverageResult[], reportsDir: string, thresholds: Re
     </tr>`;
     })
     .join('\n');
+
+  const observabilitySection = observability
+    ? `
+  <hr>
+  <h2>Observability</h2>
+  ${
+    observability.metricsUrl
+      ? `<p>📊 Prometheus metrics available at <a href="${observability.metricsUrl}">${observability.metricsUrl}</a></p>
+  <p>Metric names (replace <code>&lt;type&gt;</code> with the coverage type, e.g. <code>endpoint</code>):</p>
+  <ul>
+    <li><code>api_coverage_total{coverage_type="&lt;type&gt;"}</code> — total items</li>
+    <li><code>api_coverage_covered{coverage_type="&lt;type&gt;"}</code> — covered items</li>
+    <li><code>api_coverage_ratio{coverage_type="&lt;type&gt;"}</code> — coverage ratio (0–1)</li>
+    <li><code>api_coverage_threshold_failure{coverage_type="&lt;type&gt;"}</code> — 1 if below threshold</li>
+  </ul>`
+      : '<p>Prometheus metrics export not enabled. Use <code>--metrics-port &lt;port&gt;</code> to enable.</p>'
+  }
+  ${
+    observability.tracingEnabled
+      ? `<p>🔭 OpenTelemetry tracing enabled${observability.otlpEndpoint ? ` → <code>${observability.otlpEndpoint}</code>` : ' (in-memory only)'}. View traces in Jaeger or Grafana Tempo.</p>`
+      : '<p>OpenTelemetry tracing not enabled. Use <code>--trace</code> to enable.</p>'
+  }`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -114,7 +164,7 @@ function writeHtml(results: CoverageResult[], reportsDir: string, thresholds: Re
     <tbody>
 ${rows}
     </tbody>
-  </table>
+  </table>${observabilitySection}
 </body>
 </html>`;
 
@@ -177,16 +227,18 @@ ${testCases}
  * Write coverage reports in the requested formats to `reportsDir`.
  * The directory is created if it does not exist.
  *
- * @param results   Array of standardised coverage results
- * @param formats   Which output formats to generate
- * @param reportsDir Absolute path to the output directory
- * @param thresholds Optional per-type threshold percentages (used in HTML and JUnit outputs)
+ * @param results       Array of standardised coverage results
+ * @param formats       Which output formats to generate
+ * @param reportsDir    Absolute path to the output directory
+ * @param thresholds    Optional per-type threshold percentages (used in HTML and JUnit outputs)
+ * @param observability Optional observability metadata embedded in JSON and HTML outputs
  */
 export function generateMultiFormatReports(
   results: CoverageResult[],
   formats: ReportFormat[],
   reportsDir: string,
   thresholds: Record<string, number> = {},
+  observability?: ObservabilityInfo,
 ): void {
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
@@ -195,10 +247,10 @@ export function generateMultiFormatReports(
   for (const fmt of formats) {
     switch (fmt) {
       case 'json':
-        writeJson(results, reportsDir);
+        writeJson(results, reportsDir, observability);
         break;
       case 'html':
-        writeHtml(results, reportsDir, thresholds);
+        writeHtml(results, reportsDir, thresholds, observability);
         break;
       case 'csv':
         writeCsv(results, reportsDir);

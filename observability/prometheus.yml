@@ -1,0 +1,24 @@
+# Sample Prometheus scrape configuration for the API Tests Coverage Analyzer.
+#
+# Add this snippet to your prometheus.yml (under the `scrape_configs:` key)
+# and restart Prometheus. The analyzer must be started with --metrics-port 9091
+# (or whichever port you choose).
+#
+# Usage:
+#   node -r ts-node/register src/index.ts endpoint-coverage \
+#     --spec sample/openapi.yaml \
+#     --tests "sample/tests/**/*.ts" \
+#     --metrics-port 9091 \
+#     --service-name my-api
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: api_coverage_analyzer
+    static_configs:
+      - targets:
+          - localhost:9091   # adjust host:port if running remotely
+    metrics_path: /metrics
+    scrape_interval: 30s    # scrape every 30 s — adjust to your run frequency

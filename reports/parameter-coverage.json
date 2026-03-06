@@ -1,0 +1,96 @@
+{
+  "totalParameters": 8,
+  "averageCoverage": 100,
+  "fullyCoveredPercentage": 100,
+  "uncoveredParameters": [],
+  "parameters": [
+    {
+      "endpoint": "POST /users",
+      "name": "name",
+      "location": "body",
+      "required": true,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "POST /users",
+      "name": "email",
+      "location": "body",
+      "required": true,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "POST /users",
+      "name": "age",
+      "location": "body",
+      "required": false,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "GET /users/{id}",
+      "name": "id",
+      "location": "path",
+      "required": true,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "GET /users/{id}",
+      "name": "fields",
+      "location": "query",
+      "required": false,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "GET /items",
+      "name": "q",
+      "location": "query",
+      "required": false,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "GET /items",
+      "name": "limit",
+      "location": "query",
+      "required": false,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    },
+    {
+      "endpoint": "GET /items",
+      "name": "X-Api-Key",
+      "location": "header",
+      "required": true,
+      "validValue": true,
+      "boundaryValue": true,
+      "missing": true,
+      "invalidValue": true,
+      "coveragePercent": 100
+    }
+  ]
+}

@@ -8,6 +8,12 @@ import {
   buildCoverageReport,
   generateReports,
 } from './endpointCoverage';
+import {
+  parseParameters,
+  analyzeParameterCoverage,
+  buildParameterCoverageReport,
+  generateParameterReports,
+} from './parameterCoverage';
 
 const program = new Command();
 
@@ -41,6 +47,36 @@ program
 
     console.log(
       `Endpoint coverage: ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`,
+    );
+    console.log(`JSON report: ${jsonReport}`);
+    console.log(`HTML report: ${htmlReport}`);
+  });
+
+program
+  .command('parameter-coverage')
+  .description('Analyze how thoroughly each API parameter is tested (valid, boundary, missing, invalid)')
+  .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi-parameters.yaml')
+  .option('--tests <glob>', 'Glob pattern for test files', 'sample/tests/**/*.ts')
+  .action(async (options) => {
+    const specPath = path.resolve(options.spec);
+    const testsGlob = options.tests as string;
+    const reportsDir = path.resolve('reports');
+
+    console.log(`Parsing spec: ${specPath}`);
+    const parameters = await parseParameters(specPath);
+
+    console.log(`Analyzing tests matching: ${testsGlob}`);
+    const coverages = await analyzeParameterCoverage(parameters, testsGlob);
+
+    const report = buildParameterCoverageReport(coverages);
+
+    generateParameterReports(report, reportsDir);
+
+    const jsonReport = path.join(reportsDir, 'parameter-coverage.json');
+    const htmlReport = path.join(reportsDir, 'parameter-coverage.html');
+
+    console.log(
+      `Parameter coverage: ${report.totalParameters} parameters analysed, average coverage ${report.averageCoverage}%`,
     );
     console.log(`JSON report: ${jsonReport}`);
     console.log(`HTML report: ${htmlReport}`);

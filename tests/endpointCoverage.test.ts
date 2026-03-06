@@ -214,10 +214,11 @@ describe('end-to-end: sample spec + sample tests', () => {
     const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
     const report = buildCoverageReport(coverageMap);
 
-    // Sample tests cover: GET /users, POST /users, GET /users/{id}, GET /orders, POST /orders
-    // Uncovered: PUT /users/{id}, DELETE /users/{id}, GET /orders/{id}, GET /users/{id}/orders
+    // Sample tests cover: GET /users, POST /users, GET /users/{id}, GET /orders, POST /orders,
+    // GET /users/{id}/orders (covered by business.test.ts)
+    // Uncovered: PUT /users/{id}, DELETE /users/{id}, GET /orders/{id}
     expect(report.total).toBe(9);
-    expect(report.covered).toBe(5);
-    expect(report.percentage).toBeCloseTo(55.56, 1);
+    expect(report.covered).toBe(6);
+    expect(report.percentage).toBeCloseTo(66.67, 1);
   });
 });

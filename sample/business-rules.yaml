@@ -1,0 +1,107 @@
+# Sample business rules definition for the API coverage analyzer.
+# Each rule has a unique ID, description, relevant endpoints, and keywords
+# used to detect matching tests. Optionally each rule defines scenarios
+# (e.g. success path vs. failure path) for finer-grained tracking.
+
+rules:
+  - id: BL001
+    description: "A new user can only be created when a unique email address is provided"
+    endpoints:
+      - "POST /users"
+    keywords:
+      - "unique email"
+      - "duplicate email"
+      - "email already exists"
+      - "email taken"
+      - "register user"
+      - "create user"
+    scenarios:
+      - id: BL001-success
+        description: "User created successfully with a valid unique email"
+        keywords:
+          - "success"
+          - "creates user"
+          - "201"
+          - "valid"
+      - id: BL001-duplicate
+        description: "Registration rejected when email is already in use"
+        keywords:
+          - "duplicate"
+          - "already exists"
+          - "409"
+          - "conflict"
+          - "taken"
+
+  - id: BL002
+    description: "An order can only be placed by an existing user"
+    endpoints:
+      - "POST /orders"
+      - "GET /users/{id}/orders"
+    keywords:
+      - "place order"
+      - "create order"
+      - "order for user"
+      - "nonexistent user"
+      - "unknown user"
+    scenarios:
+      - id: BL002-success
+        description: "Order placed successfully for a valid existing user"
+        keywords:
+          - "success"
+          - "creates order"
+          - "201"
+          - "valid user"
+      - id: BL002-invalid-user
+        description: "Order creation fails when the referenced user does not exist"
+        keywords:
+          - "nonexistent user"
+          - "unknown user"
+
+  - id: BL003
+    description: "Fetching a user by ID returns 404 when the user does not exist"
+    endpoints:
+      - "GET /users/{id}"
+    keywords:
+      - "user not found"
+      - "missing user"
+      - "nonexistent id"
+      - "get user"
+    scenarios:
+      - id: BL003-found
+        description: "User returned successfully when the ID exists"
+        keywords:
+          - "existing user"
+          - "returns 200"
+          - "200"
+          - "success"
+          - "exists"
+      - id: BL003-not-found
+        description: "404 returned when the user ID does not match any record"
+        keywords:
+          - "not found"
+          - "404"
+          - "missing"
+          - "nonexistent"
+
+  - id: BL004
+    description: "Users can retrieve the list of their own orders"
+    endpoints:
+      - "GET /users/{id}/orders"
+    keywords:
+      - "user orders"
+      - "list orders for user"
+      - "orders by user"
+      - "user's orders"
+    scenarios:
+      - id: BL004-success
+        description: "Orders returned successfully for a valid user"
+        keywords:
+          - "success"
+          - "200"
+          - "valid user"
+      - id: BL004-empty
+        description: "Empty list returned when the user has no orders"
+        keywords:
+          - "empty"
+          - "no orders"
+          - "zero orders"

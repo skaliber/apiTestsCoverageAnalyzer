@@ -87,18 +87,20 @@ describe('analyzeTestCoverage', () => {
     expect(getUserById!.covered).toBe(true);
   });
 
-  it('marks uncovered endpoints as not covered', async () => {
+  it('marks covered endpoints correctly for PUT and DELETE', async () => {
     const endpoints = await parseOpenApiSpec(SAMPLE_SPEC);
     const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
 
-    // DELETE /users/{id} and PUT /users/{id} are not in the sample tests
+    // PUT /users/{id} and DELETE /users/{id} are covered by the sample tests:
+    // sample/tests/sample.test.ts includes 'PUT /users/1' and 'DELETE /users/1'
+    // which match the /users/{id} path template regex.
     const deleteUser = coverageMap.find((e) => e.method === 'DELETE' && e.path === '/users/{id}');
     expect(deleteUser).toBeDefined();
-    expect(deleteUser!.covered).toBe(false);
+    expect(deleteUser!.covered).toBe(true);
 
     const putUser = coverageMap.find((e) => e.method === 'PUT' && e.path === '/users/{id}');
     expect(putUser).toBeDefined();
-    expect(putUser!.covered).toBe(false);
+    expect(putUser!.covered).toBe(true);
   });
 
   it('returns empty coverage when no test files match the glob', async () => {
@@ -214,11 +216,9 @@ describe('end-to-end: sample spec + sample tests', () => {
     const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
     const report = buildCoverageReport(coverageMap);
 
-    // Sample tests cover: GET /users, POST /users, GET /users/{id}, GET /orders, POST /orders,
-    // GET /users/{id}/orders (covered by business.test.ts)
-    // Uncovered: PUT /users/{id}, DELETE /users/{id}, GET /orders/{id}
+    // Sample tests cover all 9 endpoints
     expect(report.total).toBe(9);
-    expect(report.covered).toBe(6);
-    expect(report.percentage).toBeCloseTo(66.67, 1);
+    expect(report.covered).toBe(9);
+    expect(report.percentage).toBeCloseTo(100, 1);
   });
 });

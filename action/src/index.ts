@@ -8,9 +8,10 @@ import {
   analyzeIntegrationFlows,
   analyzeErrorHandling,
   analyzeSecurityControls,
-  checkThresholds,
+  runAnalysisAndEnforceQualityGate,
   CoverageResult,
 } from '../../src/lib/index';
+import { resolveConfig, mergeConfig } from '../../src/config';
 
 async function run(): Promise<void> {
   try {
@@ -20,8 +21,24 @@ async function run(): Promise<void> {
     const coverageTypesRaw = core.getInput('coverage-types') || 'endpoint';
     const language = core.getInput('language') || 'auto';
     const reportsDirInput = core.getInput('reports-dir') || 'reports';
+    const configInput = core.getInput('config') || '';
+    const publishPages = core.getInput('publish-pages') === 'true';
+    const siteDirInput = core.getInput('site-dir') || 'site';
+    const pagesBasePath = core.getInput('pages-base-path') || '/';
+    const qualityGateEnabled = core.getInput('quality-gate') !== 'false';
+    const qualityGateMode = core.getInput('quality-gate-mode') || 'strict';
+    const writeGitHubSummary = core.getInput('write-step-summary') !== 'false';
 
-    const thresholds: Record<string, number> = {
+    // Load config file if specified, merging with CLI inputs
+    const fileConfig = configInput
+      ? resolveConfig(configInput)
+      : resolveConfig();
+
+    const globalThreshold = parseFloat(core.getInput('threshold-global') || '0');
+    const cliThresholds: Record<string, number> = {};
+    if (globalThreshold > 0) cliThresholds['global'] = globalThreshold;
+
+    const perCategoryThresholds: Record<string, number> = {
       endpoint: parseFloat(core.getInput('threshold-endpoint') || '0'),
       parameter: parseFloat(core.getInput('threshold-parameter') || '0'),
       business: parseFloat(core.getInput('threshold-business') || '0'),
@@ -29,11 +46,22 @@ async function run(): Promise<void> {
       error: parseFloat(core.getInput('threshold-error') || '0'),
       security: parseFloat(core.getInput('threshold-security') || '0'),
     };
+    // Only include non-zero per-category thresholds
+    for (const [key, value] of Object.entries(perCategoryThresholds)) {
+      if (value > 0) cliThresholds[key] = value;
+    }
+
+    const mergedConfig = mergeConfig(fileConfig, {
+      thresholds: Object.keys(cliThresholds).length > 0 ? cliThresholds : fileConfig.thresholds,
+    });
 
     const workspace = process.env['GITHUB_WORKSPACE'] ?? process.cwd();
     const reportsDir = path.isAbsolute(reportsDirInput)
       ? reportsDirInput
       : path.join(workspace, reportsDirInput);
+    const siteDir = path.isAbsolute(siteDirInput)
+      ? siteDirInput
+      : path.join(workspace, siteDirInput);
 
     const coverageTypes = coverageTypesRaw
       .split(',')
@@ -59,7 +87,6 @@ async function run(): Promise<void> {
             format,
             language,
             reportsDir,
-            thresholdEndpoint: thresholds['endpoint'],
           });
           allResults.push(result);
           core.setOutput('endpoint-coverage', String(result.coveragePercent));
@@ -74,7 +101,6 @@ async function run(): Promise<void> {
             tests,
             format,
             reportsDir,
-            thresholdParameter: thresholds['parameter'],
           });
           allResults.push(result);
           core.setOutput('parameter-coverage', String(result.coveragePercent));
@@ -94,7 +120,6 @@ async function run(): Promise<void> {
             tests,
             format,
             reportsDir,
-            thresholdBusiness: thresholds['business'],
           });
           allResults.push(result);
           core.setOutput('business-coverage', String(result.coveragePercent));
@@ -114,7 +139,6 @@ async function run(): Promise<void> {
             tests,
             format,
             reportsDir,
-            thresholdIntegration: thresholds['integration'],
           });
           allResults.push(result);
           core.setOutput('integration-coverage', String(result.coveragePercent));
@@ -129,7 +153,6 @@ async function run(): Promise<void> {
             tests,
             format,
             reportsDir,
-            thresholdError: thresholds['error'],
           });
           allResults.push(result);
           core.setOutput('error-coverage', String(result.coveragePercent));
@@ -144,7 +167,6 @@ async function run(): Promise<void> {
             tests,
             format,
             reportsDir,
-            thresholdSecurity: thresholds['security'],
           });
           allResults.push(result);
           core.setOutput('security-coverage', String(result.coveragePercent));
@@ -159,20 +181,57 @@ async function run(): Promise<void> {
 
     core.setOutput('reports-dir', reportsDir);
 
-    // Check thresholds across all results
-    const activeThresholds: Record<string, number> = {};
-    for (const [key, value] of Object.entries(thresholds)) {
-      if (value > 0) activeThresholds[key] = value;
+    // Build the effective config for quality gate + publishing
+    const effectiveConfig = {
+      ...mergedConfig,
+      publishing: {
+        enabled: publishPages,
+        outputDir: siteDir,
+        buildId: 'run-number',
+        githubPages: {
+          enabled: publishPages,
+          basePath: pagesBasePath,
+        },
+        ...(mergedConfig.publishing ?? {}),
+      },
+      qualityGate: {
+        enabled: qualityGateEnabled,
+        failBuildOnThresholdMiss: qualityGateEnabled,
+        mode: (qualityGateMode === 'warn' ? 'warn' : 'strict') as 'strict' | 'warn',
+        ...(mergedConfig.qualityGate ?? {}),
+      },
+    };
+
+    const repoOwner = process.env['GITHUB_REPOSITORY_OWNER'] ?? '';
+    const repoName = process.env['GITHUB_REPOSITORY']?.split('/')[1] ?? '';
+    const pagesUrl = publishPages && repoOwner && repoName
+      ? `https://${repoOwner}.github.io/${repoName}${pagesBasePath}`
+      : undefined;
+
+    // Run quality gate + publishing (always generates reports, even on failure)
+    const { reports, qualityGate, exitCode } = await runAnalysisAndEnforceQualityGate({
+      results: allResults,
+      config: effectiveConfig,
+      branch: process.env['GITHUB_REF_NAME'],
+      reportsDir,
+      writeGitHubSummary,
+      pagesUrl,
+    });
+
+    if (reports) {
+      core.setOutput('site-dir', reports.siteDir);
+      core.info(`Static site written to: ${reports.siteDir}`);
     }
 
-    if (Object.keys(activeThresholds).length > 0) {
-      const failures = checkThresholds(allResults, activeThresholds);
-      if (failures.length > 0) {
-        const msg = failures.join('\n');
-        core.setFailed(`Coverage thresholds not met:\n${msg}`);
-      } else {
-        core.info('All coverage thresholds passed.');
-      }
+    core.setOutput('quality-gate-passed', String(qualityGate.passed));
+
+    if (exitCode !== 0) {
+      const failureMessages = qualityGate.failures.map(
+        (f) => `${f.category}: expected ≥ ${f.expected}%, actual ${f.actual}%, gap ${f.gap}%`,
+      );
+      core.setFailed(`Coverage thresholds not met:\n${failureMessages.join('\n')}`);
+    } else {
+      core.info('All coverage thresholds passed.');
     }
 
     core.info(`Reports written to: ${reportsDir}`);

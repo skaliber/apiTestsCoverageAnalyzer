@@ -45,3 +45,18 @@ features:
     title: Plugin Architecture
     details: Extend the analyzer with custom coverage types (e.g. GraphQL schema coverage) via a simple plugin interface.
 ---
+
+<!-- This file is the VitePress home page. The hero/features above are rendered by the docs site. Browse the docs below or visit the deployed site. -->
+
+## Browse the docs
+
+- [Introduction](./guide/introduction.md) — What the analyzer does and why
+- [Installation](./guide/installation.md) — npm install, GitHub Action, or Docker
+- [Getting Started](./guide/getting-started.md) — Your first coverage run in minutes
+- [CLI Reference](./reference/cli.md) — All commands and options
+- [CI/CD Integration](./guide/ci-cd.md) — GitHub Actions and Jenkins workflows
+- [Security Scanning](./guide/security-scanning.md) — Semgrep, Trivy, and ZAP integration
+- [Multi-Language Support](./guide/multi-language.md) — Java, Kotlin, Python, Ruby, Cucumber
+- [MCP Integration](./guide/mcp-integration.md) — AI-assisted analysis via Model Context Protocol
+- [Architecture](./reference/architecture.md) — Module overview and data flow
+- [Contributing](./reference/contributing.md) — How to add docs pages or extend the tool

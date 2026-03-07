@@ -88,10 +88,13 @@ describe('analyzeTestCoverage', () => {
   });
 
   it('marks uncovered endpoints as not covered', async () => {
+    // Use only integration.test.ts which contains no PUT or DELETE operations,
+    // so those endpoints are genuinely uncovered by that test file.
+    const integrationOnlyGlob = path.resolve(__dirname, '../sample/tests/integration.test.ts');
     const endpoints = await parseOpenApiSpec(SAMPLE_SPEC);
-    const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
+    const coverageMap = await analyzeTestCoverage(endpoints, integrationOnlyGlob);
 
-    // DELETE /users/{id} and PUT /users/{id} are not in the sample tests
+    // DELETE /users/{id} and PUT /users/{id} are not exercised in integration.test.ts
     const deleteUser = coverageMap.find((e) => e.method === 'DELETE' && e.path === '/users/{id}');
     expect(deleteUser).toBeDefined();
     expect(deleteUser!.covered).toBe(false);
@@ -214,11 +217,11 @@ describe('end-to-end: sample spec + sample tests', () => {
     const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
     const report = buildCoverageReport(coverageMap);
 
-    // Sample tests cover: GET /users, POST /users, GET /users/{id}, GET /orders, POST /orders,
-    // GET /users/{id}/orders (covered by business.test.ts)
-    // Uncovered: PUT /users/{id}, DELETE /users/{id}, GET /orders/{id}
+    // The full sample test suite (sample/tests/**/*.ts) covers all 9 endpoints:
+    // GET /users, POST /users, GET /users/{id}, PUT /users/{id}, DELETE /users/{id},
+    // GET /orders, POST /orders, GET /orders/{id}, GET /users/{id}/orders
     expect(report.total).toBe(9);
-    expect(report.covered).toBe(6);
-    expect(report.percentage).toBeCloseTo(66.67, 1);
+    expect(report.covered).toBe(9);
+    expect(report.percentage).toBeCloseTo(100, 1);
   });
 });

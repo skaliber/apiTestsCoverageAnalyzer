@@ -326,6 +326,59 @@ Documentation sections:
 | [Glossary](docs/guide/glossary.md) | Key terms |
 | [Contributing](docs/reference/contributing.md) | How to contribute |
 
+## Coverage Analysis (Self-Analysis)
+
+The analyzer can run against its own sample spec and test suite to produce coverage reports. This
+is the recommended way to validate that the analyzer itself remains well-tested on every build.
+
+### Running locally
+
+```bash
+# Build the library first, then run the coverage script
+npm run build
+npm run coverage
+```
+
+Reports are written to the `reports/` directory:
+
+| File | Contents |
+|------|----------|
+| `reports/coverage-summary.json` | Combined summary across all coverage types |
+| `reports/endpoint-coverage*.json/html` | Endpoint coverage details |
+| `reports/parameter-coverage*.json/html` | Parameter coverage details |
+| `reports/business-coverage*.json/html` | Business rule coverage details |
+| `reports/integration-coverage*.json/html` | Integration flow coverage details |
+| `reports/error-coverage*.json/html` | Error handling coverage details |
+| `reports/security-coverage*.json/html` | Security coverage details |
+| `reports/perf-resilience-coverage*.json/html` | Performance & resilience coverage details |
+
+### CI integration
+
+The `build` job in `.github/workflows/test-action.yml` automatically runs `npm run coverage` after
+unit tests and uploads the resulting `reports/` directory as the `coverage-reports` artifact.
+
+### Adjusting thresholds
+
+Pass `--threshold-*` flags via the CLI or set thresholds in `coverage.config.json`:
+
+```json
+{
+  "thresholds": {
+    "endpoint":    80,
+    "parameter":   70,
+    "business":    60,
+    "integration": 50,
+    "security":    60,
+    "error":       50,
+    "performance": 75,
+    "resilience":  50
+  }
+}
+```
+
+The `npm run coverage` script respects threshold values supplied via environment variables
+(e.g. `THRESHOLD_ENDPOINT=80 npm run coverage`); the CI job will fail when any threshold is not met.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the [full contributing guide](docs/reference/contributing.md).

@@ -1,0 +1,263 @@
+openapi: 3.0.3
+info:
+  title: Wallets & Payments API
+  version: 1.0.0
+  description: A realistic Wallets and Payments API with fraud checks and risk rules
+servers:
+  - url: http://localhost:3001
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Currency:
+      type: string
+      enum: [USD, EUR, GBP]
+    WalletStatus:
+      type: string
+      enum: [active, frozen, closed]
+    PaymentStatus:
+      type: string
+      enum: [pending, completed, failed, refunded]
+    Wallet:
+      type: object
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        currency: { $ref: '#/components/schemas/Currency' }
+        balance: { type: number }
+        status: { $ref: '#/components/schemas/WalletStatus' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Payment:
+      type: object
+      properties:
+        id: { type: string }
+        walletId: { type: string }
+        amount: { type: number }
+        currency: { $ref: '#/components/schemas/Currency' }
+        status: { $ref: '#/components/schemas/PaymentStatus' }
+        idempotencyKey: { type: string }
+        processorReference: { type: string }
+        failureReason: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+    Transaction:
+      type: object
+      properties:
+        id: { type: string }
+        walletId: { type: string }
+        type: { type: string, enum: [fund, debit, transfer_in, transfer_out, payment] }
+        amount: { type: number }
+        currency: { $ref: '#/components/schemas/Currency' }
+        reference: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        code: { type: string }
+security:
+  - bearerAuth: []
+paths:
+  /wallets:
+    post:
+      summary: Create a wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currency]
+              properties:
+                currency: { $ref: '#/components/schemas/Currency' }
+      responses:
+        '201': { description: Wallet created, content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } } }
+        '400': { description: Invalid input }
+        '401': { description: Unauthorized }
+    get:
+      summary: List wallets
+      responses:
+        '200': { description: List of wallets, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Wallet' } } } } }
+        '401': { description: Unauthorized }
+  /wallets/{id}:
+    get:
+      summary: Get wallet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Wallet, content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } } }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+    delete:
+      summary: Close wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Wallet closed }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+  /wallets/{id}/freeze:
+    patch:
+      summary: Freeze wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Wallet frozen }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Unprocessable, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /wallets/{id}/unfreeze:
+    patch:
+      summary: Unfreeze wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Wallet unfrozen }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Unprocessable }
+  /wallets/{id}/fund:
+    post:
+      summary: Fund a wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: number }
+                description: { type: string }
+      responses:
+        '200': { description: Wallet funded }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Business rule violation }
+  /wallets/{id}/debit:
+    post:
+      summary: Debit a wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: number }
+                description: { type: string }
+      responses:
+        '200': { description: Wallet debited }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Business rule violation }
+  /wallets/{id}/transfer:
+    post:
+      summary: Transfer between wallets
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toWalletId, amount]
+              properties:
+                toWalletId: { type: string }
+                amount: { type: number }
+                description: { type: string }
+      responses:
+        '200': { description: Transfer completed }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Business rule violation }
+  /payments:
+    post:
+      summary: Create a payment
+      parameters:
+        - name: x-idempotency-key
+          in: header
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [walletId, amount, currency]
+              properties:
+                walletId: { type: string }
+                amount: { type: number }
+                currency: { $ref: '#/components/schemas/Currency' }
+      responses:
+        '201': { description: Payment created, content: { application/json: { schema: { $ref: '#/components/schemas/Payment' } } } }
+        '401': { description: Unauthorized }
+        '422': { description: Business rule violation }
+  /payments/{id}:
+    get:
+      summary: Get payment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Payment, content: { application/json: { schema: { $ref: '#/components/schemas/Payment' } } } }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+  /payments/{id}/refund:
+    post:
+      summary: Refund a payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Payment refunded }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
+        '422': { description: Cannot refund }
+  /transactions:
+    get:
+      summary: Get transaction history
+      parameters:
+        - name: walletId
+          in: query
+          schema: { type: string }
+      responses:
+        '200': { description: Transactions, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Transaction' } } } } }
+        '401': { description: Unauthorized }

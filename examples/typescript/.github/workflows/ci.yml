@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test-and-analyze:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/typescript
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: examples/typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Run blackbox tests
+        run: npm run test:blackbox
+
+      - name: Run wiremock tests
+        run: npm run test:wiremock
+
+      - name: Install analyzer
+        run: npm install -g api-test-coverage-analyzer || true
+        working-directory: ${{ github.workspace }}
+
+      - name: Run coverage analysis
+        run: bash scripts/run-analyzer.sh
+        continue-on-error: true
+
+      - name: Install Playwright
+        run: npx playwright install chromium
+        continue-on-error: true
+
+      - name: Generate screenshots
+        run: node scripts/generate-screenshots.js
+        continue-on-error: true
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage
+          path: examples/typescript/coverage/
+
+      - name: Upload analysis reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analysis-reports
+          path: examples/typescript/reports/
+
+      - name: Publish job summary
+        if: always()
+        run: |
+          echo "## Coverage Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f reports/intelligence-report.json ]; then
+            echo "### Intelligence Report" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat reports/intelligence-report.json | head -50 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No intelligence report generated." >> $GITHUB_STEP_SUMMARY
+          fi

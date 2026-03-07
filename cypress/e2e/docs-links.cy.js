@@ -18,6 +18,7 @@ const DOC_PAGES = [
   '/guide/installation',
   '/guide/ci-cd',
   '/guide/multi-language',
+  '/guide/security-scanning',
   '/guide/interpreting-reports',
   '/guide/writing-tests',
   '/guide/plugins',
@@ -36,8 +37,9 @@ describe('Documentation pages load without errors', () => {
   DOC_PAGES.forEach((route) => {
     it(`loads ${route}`, () => {
       cy.visit(route)
-      // VitePress renders a <main> element; its presence confirms a real page
-      cy.get('main').should('exist')
+      // VitePress renders either #VPContent (all layouts) or <main> (doc layout).
+      // The home page uses layout: home which renders <div id="VPContent"> not <main>.
+      cy.get('#VPContent, main').should('exist')
       // The title should not contain "404"
       cy.title().should('not.include', '404')
     })
@@ -48,12 +50,17 @@ describe('Documentation internal links are not broken', () => {
   DOC_PAGES.forEach((route) => {
     it(`all internal links on ${route} resolve correctly`, () => {
       cy.visit(route)
-      cy.get('main').should('exist')
+      cy.get('#VPContent, main').should('exist')
 
       // Collect all unique internal hrefs from the page.
       // Strip fragment identifiers so we test the page itself, not just an anchor.
       cy.get('a[href]').then(($anchors) => {
         const base = Cypress.config('baseUrl')
+        // Use server origin (protocol + host + port) for cy.request URL resolution.
+        // This ensures hrefs like /apiTestsCoverageAnalyzer/ are resolved to
+        // http://localhost:4173/apiTestsCoverageAnalyzer/ rather than being
+        // concatenated onto the full baseUrl path.
+        const origin = new URL(base).origin
         const seen = new Set()
         const hrefs = []
 
@@ -77,7 +84,11 @@ describe('Documentation internal links are not broken', () => {
         })
 
         hrefs.forEach((href) => {
-          cy.request({ url: href, failOnStatusCode: false }).then((res) => {
+          // Resolve to a full URL using the server origin so that
+          // base-path-prefixed hrefs (e.g. /apiTestsCoverageAnalyzer/) are
+          // requested correctly instead of being doubled onto the baseUrl.
+          const fullUrl = href.startsWith('http') ? href : origin + href
+          cy.request({ url: fullUrl, failOnStatusCode: false }).then((res) => {
             expect(
               res.status,
               `Expected link "${href}" found on "${route}" to return 2xx, got ${res.status}`

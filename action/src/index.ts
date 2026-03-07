@@ -202,8 +202,10 @@ async function run(): Promise<void> {
       },
     };
 
-    const pagesUrl = publishPages
-      ? `https://${process.env['GITHUB_REPOSITORY_OWNER']}.github.io/${process.env['GITHUB_REPOSITORY']?.split('/')[1]}${pagesBasePath}`
+    const repoOwner = process.env['GITHUB_REPOSITORY_OWNER'] ?? '';
+    const repoName = process.env['GITHUB_REPOSITORY']?.split('/')[1] ?? '';
+    const pagesUrl = publishPages && repoOwner && repoName
+      ? `https://${repoOwner}.github.io/${repoName}${pagesBasePath}`
       : undefined;
 
     // Run quality gate + publishing (always generates reports, even on failure)

@@ -91,7 +91,9 @@ describe('analyzeTestCoverage', () => {
     const endpoints = await parseOpenApiSpec(SAMPLE_SPEC);
     const coverageMap = await analyzeTestCoverage(endpoints, SAMPLE_TESTS_GLOB);
 
-    // PUT /users/{id} and DELETE /users/{id} are covered by sample tests
+    // PUT /users/{id} and DELETE /users/{id} are covered by the sample tests:
+    // sample/tests/sample.test.ts includes 'PUT /users/1' and 'DELETE /users/1'
+    // which match the /users/{id} path template regex.
     const deleteUser = coverageMap.find((e) => e.method === 'DELETE' && e.path === '/users/{id}');
     expect(deleteUser).toBeDefined();
     expect(deleteUser!.covered).toBe(true);

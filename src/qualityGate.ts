@@ -146,7 +146,7 @@ export function evaluateQualityGate(
           category,
           expected: threshold,
           actual: result.coveragePercent,
-          gap: Math.round((threshold - result.coveragePercent) * 100) / 100,
+          gap: Number((threshold - result.coveragePercent).toFixed(2)),
         });
       }
     }

@@ -165,7 +165,9 @@ describe('analyzeIntegrationCoverage', () => {
     const coverages = await analyzeIntegrationCoverage(flows, SAMPLE_TESTS_GLOB);
     const flow004 = coverages.find((c) => c.flow.id === 'FLOW004');
     expect(flow004).toBeDefined();
-    // FLOW004 step2 has "orders per user" keyword which matches the sample integration test
+    // FLOW004 step2 has the keyword "orders per user" which now matches
+    // the integration test annotated with "@flow FLOW004":
+    //   "Step 2: GET /users/{id}/orders – orders per user"
     expect(flow004!.status).toBe('complete');
   });
 

@@ -58,7 +58,7 @@ inputs:
     required: false
     default: '0'
   threshold-global:
-    description: 'Global minimum coverage percentage applied to all categories (0-100). Overrides per-category defaults.'
+    description: 'Global minimum coverage percentage applied to all categories (0-100) when no per-category threshold is defined.'
     required: false
     default: '0'
   reports-dir:

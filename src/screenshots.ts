@@ -89,19 +89,34 @@ export async function captureScreenshots(
   return results;
 }
 
+// ─── Internal types ────────────────────────────────────────────────────────────
+
+interface PlaywrightBrowser {
+  newPage(): Promise<{
+    goto(url: string, opts: object): Promise<void>;
+    screenshot(opts: object): Promise<void>;
+  }>;
+  close(): Promise<void>;
+}
+
+interface PlaywrightModule {
+  chromium: {
+    launch(opts: { headless: boolean }): Promise<PlaywrightBrowser>;
+  };
+}
+
 /**
  * Attempt to capture a single page screenshot.
  * Tries Playwright first, then falls back to a clear "unavailable" error.
  */
 async function captureOnePage(url: string, outputPath: string): Promise<void> {
   // Try Playwright (chromium) — it is an optional peer dependency
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let playwright: any;
+  let playwright: PlaywrightModule;
 
   try {
     // Dynamic require to avoid hard dependency
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    playwright = require('playwright') as { chromium: { launch: (opts: { headless: boolean }) => Promise<{ newPage: () => Promise<{ goto: (url: string, opts: object) => Promise<void>; screenshot: (opts: object) => Promise<void> }>; close: () => Promise<void> }> } };
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    playwright = require('playwright') as PlaywrightModule;
   } catch {
     throw new Error(
       'Playwright is not installed. Install it with: npm install --save-dev playwright',

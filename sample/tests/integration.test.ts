@@ -55,3 +55,15 @@ test('list all users returns array - partial FLOW004', () => {
   const listResponse = { status: 200, body: [{ id: 1, name: 'Alice' }] };
   expect(Array.isArray(listResponse.body)).toBe(true);
 });
+
+test('list all users and fetch orders per user - @flow FLOW004', () => {
+  // Step 1: GET /users – all users
+  const listResponse = { status: 200, body: [{ id: 1, name: 'Alice' }] };
+  expect(Array.isArray(listResponse.body)).toBe(true);
+
+  // Step 2: GET /users/{id}/orders – orders per user
+  for (const user of listResponse.body) {
+    const ordersResponse = { status: 200, body: [{ id: 10, item: 'Widget' }] };
+    expect(ordersResponse.status).toBe(200);
+  }
+});

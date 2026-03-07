@@ -42,7 +42,11 @@ function toSummaryEntry(result) {
   const endpointResult = await analyzeEndpoints({ spec, tests: testPattern, reportsDir });
   console.log(`  endpoint   : ${endpointResult.coveragePercent.toFixed(1)}%`);
 
-  const parameterResult = await analyzeParameters({ spec, tests: testPattern, reportsDir });
+  const parameterResult = await analyzeParameters({
+    spec: 'sample/openapi-parameters.yaml',
+    tests: testPattern,
+    reportsDir,
+  });
   console.log(`  parameter  : ${parameterResult.coveragePercent.toFixed(1)}%`);
 
   const businessResult = await analyzeBusinessRules({
@@ -59,13 +63,22 @@ function toSummaryEntry(result) {
   });
   console.log(`  integration: ${integrationResult.coveragePercent.toFixed(1)}%`);
 
-  const errorResult = await analyzeErrorHandling({ spec, tests: testPattern, reportsDir });
+  const errorResult = await analyzeErrorHandling({
+    spec: 'sample/openapi-errors.yaml',
+    tests: testPattern,
+    reportsDir,
+  });
   console.log(`  error      : ${errorResult.coveragePercent.toFixed(1)}%`);
 
   const securityResult = await analyzeSecurityControls({ spec, tests: testPattern, reportsDir });
   console.log(`  security   : ${securityResult.coveragePercent.toFixed(1)}%`);
 
-  const [perfResult, resilienceResult] = await analyzePerfResilience({ spec, tests: testPattern, reportsDir });
+  const [perfResult, resilienceResult] = await analyzePerfResilience({
+    spec,
+    tests: testPattern,
+    reportsDir,
+    loadResults: 'sample/load-results-jmeter.csv',
+  });
   console.log(`  performance: ${perfResult.coveragePercent.toFixed(1)}%`);
   console.log(`  resilience : ${resilienceResult.coveragePercent.toFixed(1)}%`);
 

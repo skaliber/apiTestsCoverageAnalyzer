@@ -2,8 +2,8 @@ const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:4173/apiTestsCoverageAnalyzer',
-    specPattern: 'cypress/e2e/docs-links.cy.js',
+    baseUrl: 'http://localhost:4173',
+    specPattern: 'cypress/e2e/dashboard.cy.js',
     supportFile: false,
     video: false,
     screenshotOnRunFailure: false,

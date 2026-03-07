@@ -12,7 +12,9 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:test": "cypress run --config-file cypress.config.js",
-    "docs:test:open": "cypress open --config-file cypress.config.js"
+    "docs:test:open": "cypress open --config-file cypress.config.js",
+    "dashboard:test": "cypress run --config-file cypress.dashboard.config.js",
+    "dashboard:test:open": "cypress open --config-file cypress.dashboard.config.js"
   },
   "keywords": [
     "api",

@@ -13,6 +13,8 @@ import {
   runSecurityAnalysis,
 } from '../../src/lib/index';
 import { resolveConfig, mergeConfig } from '../../src/config';
+import { generatePrComment } from '../../src/buildSummary';
+import { postPrComment, isPrContext } from './prComment';
 
 async function run(): Promise<void> {
   try {
@@ -29,6 +31,8 @@ async function run(): Promise<void> {
     const qualityGateEnabled = core.getInput('quality-gate') !== 'false';
     const qualityGateMode = core.getInput('quality-gate-mode') || 'strict';
     const writeGitHubSummary = core.getInput('write-step-summary') !== 'false';
+    const githubToken = core.getInput('github-token') || '';
+    const postComment = core.getInput('post-pr-comment') !== 'false';
 
     // Load config file if specified, merging with CLI inputs
     const fileConfig = configInput
@@ -309,6 +313,29 @@ async function run(): Promise<void> {
       core.setFailed(`Coverage thresholds not met:\n${failureMessages.join('\n')}`);
     } else {
       core.info('All coverage thresholds passed.');
+    }
+
+    // Post a PR comment with the coverage summary when running on a PR
+    if (postComment && isPrContext()) {
+      if (!githubToken) {
+        core.warning(
+          'post-pr-comment is enabled but github-token is empty. ' +
+          'Add `github-token: ${{ secrets.GITHUB_TOKEN }}` to your workflow step to enable PR comments.',
+        );
+      } else {
+        // Re-use the pr-summary.md that runAnalysisAndEnforceQualityGate already wrote
+        const prSummaryPath = path.join(reportsDir, 'pr-summary.md');
+        let commentBody: string;
+        if (fs.existsSync(prSummaryPath)) {
+          commentBody = fs.readFileSync(prSummaryPath, 'utf-8');
+        } else {
+          // Fallback: generate an inline comment from the results we have
+          const { buildBuildMetadata } = await import('../../src/publishing');
+          const meta = buildBuildMetadata(allResults, qualityGate, {}, 'action', {});
+          commentBody = generatePrComment(allResults, qualityGate, meta, pagesUrl);
+        }
+        await postPrComment(githubToken, commentBody);
+      }
     }
 
     core.info(`Reports written to: ${reportsDir}`);

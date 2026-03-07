@@ -125,6 +125,14 @@ inputs:
     description: 'Write a Markdown summary to the GitHub Actions step summary'
     required: false
     default: 'true'
+  github-token:
+    description: 'GitHub token used to post a coverage summary comment on the pull request. Requires pull-requests: write permission. Leave empty to disable PR comments.'
+    required: false
+    default: ''
+  post-pr-comment:
+    description: 'Post (or update) a coverage summary comment on the pull request when running in a PR context. Set to false to disable.'
+    required: false
+    default: 'true'
 
 outputs:
   endpoint-coverage:

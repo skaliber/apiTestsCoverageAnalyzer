@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -185,6 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,6 +216,7 @@ jobs:
           coverage-types: 'endpoint,error,security'
           quality-gate: 'false'
           write-step-summary: 'false'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print endpoint coverage
         run: echo "Endpoint coverage ${{ steps.coverage.outputs.endpoint-coverage }}%"

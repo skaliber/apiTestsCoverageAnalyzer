@@ -36,6 +36,7 @@ export default defineConfig({
           items: [
             { text: 'CI/CD Integration', link: '/guide/ci-cd' },
             { text: 'Multi-Language Support', link: '/guide/multi-language' },
+            { text: 'Security Scanning', link: '/guide/security-scanning' },
             { text: 'Interpreting Reports', link: '/guide/interpreting-reports' },
             { text: 'Writing Effective Tests', link: '/guide/writing-tests' },
             { text: 'Extending via Plugins', link: '/guide/plugins' },

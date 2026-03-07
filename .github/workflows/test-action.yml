@@ -62,6 +62,81 @@ jobs:
           path: dist/
           retention-days: 1
 
+  security-scan:
+    name: Security scan – Trivy + Semgrep (import mode)
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update -qq && sudo apt-get install -y trivy
+
+      - name: Run Trivy filesystem scan
+        run: |
+          mkdir -p reports
+          trivy fs --format json --scanners vuln,secret --output reports/trivy.json . || true
+
+      - name: Install Semgrep
+        run: pip install semgrep --quiet
+
+      - name: Run Semgrep SAST scan
+        run: |
+          semgrep scan --json --config p/default src/ > reports/semgrep.json || true
+
+      - name: Enforce security gate via action
+        id: security-gate
+        uses: ./action
+        with:
+          coverage-types: 'security-scan'
+          semgrep-report: 'reports/semgrep.json'
+          trivy-report: 'reports/trivy.json'
+          fail-on-critical: 'true'
+          max-secrets: '0'
+
+      - name: Print gate result
+        if: always()
+        run: |
+          echo "Security gate passed: ${{ steps.security-gate.outputs.security-gate-passed }}"
+          echo "Total findings: ${{ steps.security-gate.outputs.security-scan-findings }}"
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-reports
+          path: |
+            reports/security-scan-summary.json
+            reports/security-scan-summary.html
+            reports/security-sast.json
+            reports/security-dependencies.json
+            reports/security-secrets.json
+            reports/security-misconfig.json
+            reports/security-ai-summary.md
+          retention-days: 14
+
   test-action-endpoint:
     name: Test action – endpoint coverage
     needs: build

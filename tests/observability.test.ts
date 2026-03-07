@@ -8,6 +8,7 @@ import {
   initMetrics,
   getRegistry,
   recordCoverageMetrics,
+  recordSecurityScanMetrics,
   startMetricsServer,
   stopMetricsServer,
   initTracing,
@@ -15,6 +16,7 @@ import {
   getCollectedSpans,
   clearCollectedSpans,
   buildObservabilityInfo,
+  SecurityScanMetricsSummary,
 } from '../src/observability';
 import type { CoverageResult } from '../src/reporting';
 
@@ -380,5 +382,75 @@ describe('buildObservabilityInfo', () => {
     expect(info.metricNames.covered).toContain('api_coverage_covered');
     expect(info.metricNames.ratio).toContain('api_coverage_ratio');
     expect(info.metricNames.thresholdFailure).toContain('api_coverage_threshold_failure');
+  });
+
+  it('includes security metric name templates', () => {
+    const info = buildObservabilityInfo();
+    expect(info.securityMetricNames?.findings).toContain('api_security_findings_total');
+    expect(info.securityMetricNames?.gatePassed).toContain('api_security_gate_passed');
+    expect(info.securityMetricNames?.scanTimestamp).toContain('api_security_scan_timestamp_seconds');
+  });
+});
+
+// ─── recordSecurityScanMetrics ────────────────────────────────────────────────
+
+const makeSecuritySummary = (
+  overrides: Partial<SecurityScanMetricsSummary> = {},
+): SecurityScanMetricsSummary => ({
+  totalFindings: 5,
+  bySeverity: { LOW: 1, MEDIUM: 2, HIGH: 1, CRITICAL: 1 },
+  byCategory: { sast: 2, sca: 1, secret: 1, misconfig: 1, dast: 0, auth: 0, injection: 0, 'data-exposure': 0, crypto: 0, unknown: 0 },
+  byScanner: { semgrep: 2, trivy: 3, zap: 0, gitleaks: 0, other: 0 },
+  scannersRun: ['semgrep', 'trivy'],
+  gateResult: { passed: false, reasons: ['1 CRITICAL finding(s) found'] },
+  ...overrides,
+});
+
+describe('recordSecurityScanMetrics', () => {
+  beforeEach(() => {
+    initMetrics('sec-test');
+  });
+
+  it('records gate_passed = 0 when gate failed', async () => {
+    recordSecurityScanMetrics(makeSecuritySummary({ gateResult: { passed: false, reasons: ['fail'] } }), 'sec-test');
+    const text = await getRegistry()!.metrics();
+    expect(text).toMatch(/api_security_gate_passed\{[^}]*service="sec-test"[^}]*\}\s+0/);
+  });
+
+  it('records gate_passed = 1 when gate passed', async () => {
+    recordSecurityScanMetrics(makeSecuritySummary({ gateResult: { passed: true, reasons: [] } }), 'sec-test');
+    const text = await getRegistry()!.metrics();
+    expect(text).toMatch(/api_security_gate_passed\{[^}]*service="sec-test"[^}]*\}\s+1/);
+  });
+
+  it('records gate_passed = -1 when gate is not configured', async () => {
+    recordSecurityScanMetrics(makeSecuritySummary({ gateResult: undefined }), 'sec-test');
+    const text = await getRegistry()!.metrics();
+    expect(text).toMatch(/api_security_gate_passed\{[^}]*service="sec-test"[^}]*\}\s+-1/);
+  });
+
+  it('records scan timestamp as a positive integer', async () => {
+    const before = Math.floor(Date.now() / 1000);
+    recordSecurityScanMetrics(makeSecuritySummary(), 'sec-test');
+    const text = await getRegistry()!.metrics();
+    const match = text.match(/api_security_scan_timestamp_seconds\{[^}]*service="sec-test"[^}]*\}\s+(\d+)/);
+    expect(match).not.toBeNull();
+    const ts = parseInt(match![1], 10);
+    expect(ts).toBeGreaterThanOrEqual(before);
+    expect(ts).toBeLessThanOrEqual(before + 5);
+  });
+
+  it('exposes api_security_findings_total metric name', async () => {
+    recordSecurityScanMetrics(makeSecuritySummary(), 'sec-test');
+    const text = await getRegistry()!.metrics();
+    expect(text).toContain('api_security_findings_total');
+  });
+
+  it('is a no-op when registry has not been initialised', () => {
+    // We cannot reset the private _registry, so test that it does not throw
+    // even when called with a service name that has no matching registry.
+    expect(() =>
+      recordSecurityScanMetrics(makeSecuritySummary(), 'no-registry'),
+    ).not.toThrow();
   });
 });

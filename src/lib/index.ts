@@ -7,7 +7,47 @@
  *   const results = await analyzeEndpoints({ spec: 'openapi.yaml', tests: 'tests/**\/*.ts' });
  */
 
+// Re-export security scanning types and functions
+export type {
+  SecurityFinding,
+  SecurityGateConfig,
+  SecurityGateResult,
+  SecurityScanConfig,
+  SecurityScanSummary,
+  ScannerResult,
+} from '../security/index';
+export {
+  runSecurityScan,
+  buildSecurityScanSummary,
+  generateSecurityScanReports,
+  evaluateSecurityGate,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
+} from '../security/index';
+export type { SecurityScanMetricsSummary } from '../observability';
+export { recordSecurityScanMetrics } from '../observability';
+
 import * as path from 'path';
+import {
+  runSecurityScan,
+  buildSecurityScanSummary,
+  generateSecurityScanReports,
+  evaluateSecurityGate,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
+  SecurityScanConfig,
+  SecurityFinding,
+  SecurityGateConfig,
+  SecurityGateResult,
+  SecurityScanSummary,
+  ScannerResult,
+} from '../security/index';
+import {
+  recordSecurityScanMetrics,
+  SecurityScanMetricsSummary,
+} from '../observability';
 import {
   parseOpenApiSpec,
   analyzeTestCoverage,
@@ -467,6 +507,41 @@ export async function analyzePerfResilience(
 
   generateMultiFormatReports([perfResult, resilienceResult], formats, reportsDir, thresholds);
   return [perfResult, resilienceResult];
+}
+
+// ─── Security scanning API ────────────────────────────────────────────────────
+
+/**
+ * Options for running the integrated security scanner.
+ */
+export interface SecurityScanOptions {
+  /** Security scanning configuration */
+  config: SecurityScanConfig;
+  /** Directory to write reports into. Default: reports/ */
+  reportsDir?: string;
+}
+
+/**
+ * Run the integrated security scanning workflow.
+ * Executes configured scanners (Semgrep, Trivy, ZAP), normalizes findings,
+ * evaluates the security gate, and generates reports.
+ *
+ * @example
+ * const { runSecurityAnalysis } = require('api-test-coverage-analyzer');
+ * const summary = await runSecurityAnalysis({
+ *   config: {
+ *     enabled: true,
+ *     workspace: '.',
+ *     scanners: { trivy: { enabled: true, mode: 'import', reportPath: 'trivy.json' } },
+ *     gate: { failOnCritical: true, maxSecrets: 0 }
+ *   }
+ * });
+ */
+export async function runSecurityAnalysis(
+  options: SecurityScanOptions,
+): Promise<SecurityScanSummary> {
+  const reportsDir = path.resolve(options.reportsDir ?? 'reports');
+  return runSecurityScan(options.config, reportsDir);
 }
 
 /**

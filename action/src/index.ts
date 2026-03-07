@@ -10,6 +10,7 @@ import {
   analyzeSecurityControls,
   runAnalysisAndEnforceQualityGate,
   CoverageResult,
+  runSecurityAnalysis,
 } from '../../src/lib/index';
 import { resolveConfig, mergeConfig } from '../../src/config';
 
@@ -171,6 +172,69 @@ async function run(): Promise<void> {
           allResults.push(result);
           core.setOutput('security-coverage', String(result.coveragePercent));
           core.info(`Security coverage: ${result.coveredItems}/${result.totalItems} (${result.coveragePercent}%)`);
+          break;
+        }
+
+        case 'security-scan': {
+          core.info('Running integrated security scan (Semgrep / Trivy / ZAP)...');
+
+          const semgrepReport = core.getInput('semgrep-report') || undefined;
+          const trivyReport = core.getInput('trivy-report') || undefined;
+          const zapReport = core.getInput('zap-report') || undefined;
+          const failOnCritical = core.getInput('fail-on-critical') === 'true';
+          const failOnHigh = core.getInput('fail-on-high') === 'true';
+          const maxSecretsRaw = core.getInput('max-secrets');
+          const maxMediumRaw = core.getInput('max-medium');
+          const maxMisconfigHighRaw = core.getInput('max-misconfig-high');
+          const maxCriticalVulnsRaw = core.getInput('max-critical-vulns');
+          const maxHighVulnsRaw = core.getInput('max-high-vulns');
+
+          const gateConfig: Record<string, unknown> = {};
+          if (failOnCritical) gateConfig['failOnCritical'] = true;
+          if (failOnHigh) gateConfig['failOnHigh'] = true;
+          if (maxSecretsRaw !== '') gateConfig['maxSecrets'] = parseInt(maxSecretsRaw, 10);
+          if (maxMediumRaw !== '') gateConfig['maxMedium'] = parseInt(maxMediumRaw, 10);
+          if (maxMisconfigHighRaw !== '') gateConfig['maxMisconfigHigh'] = parseInt(maxMisconfigHighRaw, 10);
+          if (maxCriticalVulnsRaw !== '') gateConfig['maxCriticalVulns'] = parseInt(maxCriticalVulnsRaw, 10);
+          if (maxHighVulnsRaw !== '') gateConfig['maxHighVulns'] = parseInt(maxHighVulnsRaw, 10);
+
+          const scanners: Record<string, unknown> = {};
+          if (semgrepReport) {
+            scanners['semgrep'] = { enabled: true, mode: 'import', reportPath: semgrepReport };
+          }
+          if (trivyReport) {
+            scanners['trivy'] = { enabled: true, mode: 'import', reportPath: trivyReport };
+          }
+          if (zapReport) {
+            scanners['zap'] = { enabled: true, mode: 'import', reportPath: zapReport };
+          }
+
+          const summary = await runSecurityAnalysis({
+            config: {
+              enabled: true,
+              workspace,
+              scanners: scanners as Parameters<typeof runSecurityAnalysis>[0]['config']['scanners'],
+              gate: Object.keys(gateConfig).length > 0
+                ? gateConfig as Parameters<typeof runSecurityAnalysis>[0]['config']['gate']
+                : undefined,
+            },
+            reportsDir,
+          });
+
+          core.setOutput('security-scan-findings', String(summary.totalFindings));
+          core.setOutput('security-gate-passed', String(summary.gateResult?.passed ?? true));
+
+          core.info(`Security scan complete: ${summary.totalFindings} findings`);
+          core.info(`  CRITICAL: ${summary.bySeverity.CRITICAL}`);
+          core.info(`  HIGH: ${summary.bySeverity.HIGH}`);
+          core.info(`  MEDIUM: ${summary.bySeverity.MEDIUM}`);
+          core.info(`  LOW: ${summary.bySeverity.LOW}`);
+
+          if (summary.gateResult && !summary.gateResult.passed) {
+            const msg = summary.gateResult.reasons.join('\n');
+            core.setFailed(`Security gate failed:\n${msg}`);
+            return; // exit early – gate already failed the action
+          }
           break;
         }
 

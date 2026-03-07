@@ -63,11 +63,16 @@ import {
   CoverageResult,
 } from './reporting';
 import { resolveConfig, mergeConfig, CoverageConfig } from './config';
+import {
+  runSecurityScan,
+  SecurityScanConfig,
+} from './security/index';
 import { runPlugins, PluginContext } from './pluginLoader';
 import {
   initLogger,
   initMetrics,
   recordCoverageMetrics,
+  recordSecurityScanMetrics,
   startMetricsServer,
   stopMetricsServer,
   initTracing,
@@ -1131,6 +1136,157 @@ program
       for (const msg of failures) {
         console.error(`THRESHOLD FAILURE: ${msg}`);
       }
+      process.exitCode = 1;
+    }
+  });
+
+program
+  .command('security-scan')
+  .description(
+    'Run integrated security scanners (Semgrep, Trivy, ZAP) and evaluate a security gate',
+  )
+  .option(
+    '--workspace <path>',
+    'Root directory to scan (default: current working directory)',
+    '.',
+  )
+  .option(
+    '--semgrep',
+    'Enable Semgrep SAST scanning (requires semgrep binary or --semgrep-report)',
+  )
+  .option('--semgrep-config <config>', 'Semgrep config/ruleset (e.g. p/default, p/security-audit)', 'p/default')
+  .option('--semgrep-report <file>', 'Import pre-generated Semgrep JSON report instead of running binary')
+  .option(
+    '--trivy',
+    'Enable Trivy vulnerability/secret/misconfig scanning (requires trivy binary or --trivy-report)',
+  )
+  .option(
+    '--trivy-scanners <list>',
+    'Comma-separated Trivy scanners: vuln,secret,misconfig',
+    'vuln,secret',
+  )
+  .option('--trivy-report <file>', 'Import pre-generated Trivy JSON report instead of running binary')
+  .option('--zap-report <file>', 'Import pre-generated ZAP JSON report (enables ZAP findings)')
+  .option(
+    '--fail-on-critical',
+    'Fail the gate if any CRITICAL finding exists',
+  )
+  .option(
+    '--fail-on-high',
+    'Fail the gate if any HIGH finding exists',
+  )
+  .option('--max-medium <n>', 'Maximum allowed MEDIUM findings', parseInt)
+  .option('--max-secrets <n>', 'Maximum allowed secrets (any severity)', parseInt)
+  .option('--max-misconfig-high <n>', 'Maximum allowed HIGH/CRITICAL misconfigurations', parseInt)
+  .option('--max-critical-vulns <n>', 'Maximum allowed CRITICAL vulnerabilities', parseInt)
+  .option('--max-high-vulns <n>', 'Maximum allowed HIGH vulnerabilities', parseInt)
+  .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
+    const workspace = path.resolve(options.workspace as string ?? '.');
+    const reportsDir = path.resolve('reports');
+
+    // Build scanner configuration from CLI flags
+    const scanConfig: SecurityScanConfig = {
+      enabled: true,
+      workspace,
+      scanners: {},
+      gate: {},
+    };
+
+    // Semgrep
+    if (options.semgrep || options.semgrepReport) {
+      const mode = options.semgrepReport ? 'import' : 'embedded';
+      scanConfig.scanners!.semgrep = {
+        enabled: true,
+        mode,
+        config: options.semgrepConfig as string,
+        reportPath: options.semgrepReport as string | undefined,
+      };
+    }
+
+    // Trivy
+    if (options.trivy || options.trivyReport) {
+      const mode = options.trivyReport ? 'import' : 'embedded';
+      const trivyScanners = ((options.trivyScanners as string) ?? 'vuln,secret')
+        .split(',')
+        .map((s: string) => s.trim())
+        .filter((s: string) => ['vuln', 'misconfig', 'secret'].includes(s)) as Array<'vuln' | 'misconfig' | 'secret'>;
+      scanConfig.scanners!.trivy = {
+        enabled: true,
+        mode,
+        scanners: trivyScanners,
+        reportPath: options.trivyReport as string | undefined,
+      };
+    }
+
+    // ZAP
+    if (options.zapReport) {
+      scanConfig.scanners!.zap = {
+        enabled: true,
+        mode: 'import',
+        reportPath: options.zapReport as string,
+      };
+    }
+
+    // Gate configuration
+    if (options.failOnCritical) scanConfig.gate!.failOnCritical = true;
+    if (options.failOnHigh) scanConfig.gate!.failOnHigh = true;
+    if (options.maxMedium !== undefined) scanConfig.gate!.maxMedium = options.maxMedium as number;
+    if (options.maxSecrets !== undefined) scanConfig.gate!.maxSecrets = options.maxSecrets as number;
+    if (options.maxMisconfigHigh !== undefined) scanConfig.gate!.maxMisconfigHigh = options.maxMisconfigHigh as number;
+    if (options.maxCriticalVulns !== undefined) scanConfig.gate!.maxCriticalVulns = options.maxCriticalVulns as number;
+    if (options.maxHighVulns !== undefined) scanConfig.gate!.maxHighVulns = options.maxHighVulns as number;
+
+    // Remove empty gate/scanners objects if nothing was configured
+    if (Object.keys(scanConfig.gate!).length === 0) delete scanConfig.gate;
+    if (Object.keys(scanConfig.scanners!).length === 0) delete scanConfig.scanners;
+
+    const span = startSpan('security-scan', { workspace });
+    logger.info({ event: 'analysis_start', coverageType: 'security-scan', workspace }, 'Starting security scan');
+    console.log(`Running security scan in workspace: ${workspace}`);
+
+    const summary = await runSecurityScan(scanConfig, reportsDir);
+
+    // Console summary
+    console.log(`\nSecurity Scan Results:`);
+    console.log(`  Scanners run: ${summary.scannersRun.join(', ') || 'none'}`);
+    console.log(`  Total findings: ${summary.totalFindings}`);
+    console.log(`  CRITICAL: ${summary.bySeverity.CRITICAL}`);
+    console.log(`  HIGH: ${summary.bySeverity.HIGH}`);
+    console.log(`  MEDIUM: ${summary.bySeverity.MEDIUM}`);
+    console.log(`  LOW: ${summary.bySeverity.LOW}`);
+
+    if (summary.gateResult) {
+      const gateStatus = summary.gateResult.passed ? '✅ PASSED' : '❌ FAILED';
+      console.log(`\nSecurity Gate: ${gateStatus}`);
+      if (!summary.gateResult.passed) {
+        for (const reason of summary.gateResult.reasons) {
+          console.error(`  GATE FAILURE: ${reason}`);
+        }
+      }
+    }
+
+    console.log(`\nReports written to: ${reportsDir}`);
+
+    span.end({ totalFindings: summary.totalFindings });
+    logger.info({ event: 'analysis_complete', coverageType: 'security-scan' }, 'Security scan complete');
+
+    const result: CoverageResult = {
+      type: 'security-scan',
+      totalItems: summary.totalFindings,
+      coveredItems: summary.totalFindings,
+      coveragePercent: 100,
+      details: summary,
+    };
+
+    // Record security-specific Prometheus metrics (by severity/category/scanner + gate status)
+    recordSecurityScanMetrics(summary, serviceName);
+
+    await finaliseObservability([result], {}, metricsPort, serviceName);
+
+    if (summary.gateResult && !summary.gateResult.passed) {
       process.exitCode = 1;
     }
   });

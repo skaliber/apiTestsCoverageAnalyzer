@@ -108,6 +108,11 @@ import {
 } from '../buildSummary';
 import type { CoverageConfig, PublishingConfig } from '../config';
 
+// Re-export shared types so consumers can use them without diving into sub-modules
+export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };
+export { parseFormats, checkThresholds, evaluateQualityGate };
+export { generateStepSummary, writeStepSummary, generatePrComment, printCiSummary };
+
 // Re-export security scanning types and functions
 export type {
   SecurityFinding,
@@ -128,11 +133,6 @@ export {
   normalizeZapOutput,
   recordSecurityScanMetrics,
 };
-
-// Re-export shared types so consumers can use them without diving into sub-modules
-export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };
-export { parseFormats, checkThresholds, evaluateQualityGate };
-export { generateStepSummary, writeStepSummary, generatePrComment, printCiSummary };
 
 // ─── Shared option types ──────────────────────────────────────────────────────
 

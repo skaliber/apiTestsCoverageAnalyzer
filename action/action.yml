@@ -139,12 +139,12 @@ outputs:
     description: 'Error handling coverage percentage'
   security-coverage:
     description: 'Security coverage percentage'
-  reports-dir:
-    description: 'Path to the generated reports directory'
   site-dir:
     description: 'Path to the generated static site directory'
   quality-gate-passed:
     description: 'Whether the quality gate passed (true/false)'
+  reports-dir:
+    description: 'Path to the generated reports directory'
   security-scan-findings:
     description: 'Total number of security scan findings (security-scan only)'
   security-gate-passed:

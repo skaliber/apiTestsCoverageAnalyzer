@@ -9,7 +9,6 @@ import {
   analyzeErrorHandling,
   analyzeSecurityControls,
   runAnalysisAndEnforceQualityGate,
-  checkThresholds,
   CoverageResult,
   runSecurityAnalysis,
 } from '../../src/lib/index';

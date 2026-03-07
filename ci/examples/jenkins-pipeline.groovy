@@ -5,6 +5,13 @@
 //   - HTML Publisher plugin  (for publishing the HTML summary report)
 //   - JUnit plugin           (built-in; for publishing threshold results as test results)
 //
+// This pipeline uses the built-in summary engine from the library.
+// No custom fail logic or summary parsing is needed – the library generates:
+//   reports/build-summary.md   – CI summary (Markdown)
+//   reports/pr-summary.md      – PR comment summary (Markdown)
+//   reports/summary.json       – Machine-readable summary
+//   reports/ai-summary.md      – AI-friendly summary
+//
 // Adjust threshold values in the "Coverage thresholds" environment block below.
 
 pipeline {
@@ -86,13 +93,28 @@ pipeline {
                 }
             }
         }
+
+        // Generate built-in summaries (build-summary.md, pr-summary.md, summary.json,
+        // ai-summary.md).  No custom scripting is needed – the library owns this step.
+        stage('Generate Summaries') {
+            steps {
+                sh """
+                    node -r ts-node/register src/index.ts generate-summary \\
+                      --reports-dir reports \\
+                      --threshold-endpoint ${THRESHOLD_ENDPOINT} \\
+                      --threshold-parameter ${THRESHOLD_PARAMETER} \\
+                      --threshold-business ${THRESHOLD_BUSINESS} \\
+                      --threshold-integration ${THRESHOLD_INTEGRATION}
+                """
+            }
+        }
     }
 
     post {
         always {
             // Publish HTML coverage report (requires HTML Publisher plugin)
             publishHTML(target: [
-                allowMissing         : false,
+                allowMissing         : true,
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 reportDir            : 'reports',
@@ -100,11 +122,28 @@ pipeline {
                 reportName           : 'API Coverage Report'
             ])
 
+            // Publish the built-in build summary as an HTML page
+            publishHTML(target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : 'reports',
+                reportFiles          : 'build-summary.md',
+                reportName           : 'Build Summary'
+            ])
+
             // Publish JUnit threshold results (built-in JUnit plugin)
             junit allowEmptyResults: true, testResults: 'reports/coverage-summary-junit.xml'
 
-            // Archive all reports as build artifacts
+            // Archive all reports as build artifacts (includes built-in summaries)
             archiveArtifacts artifacts: 'reports/**', fingerprint: true
+
+            // Print the build summary to the Jenkins console for quick inspection
+            script {
+                if (fileExists('reports/build-summary.md')) {
+                    echo readFile('reports/build-summary.md')
+                }
+            }
         }
     }
 }

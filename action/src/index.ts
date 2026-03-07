@@ -289,6 +289,19 @@ async function run(): Promise<void> {
 
     core.setOutput('quality-gate-passed', String(qualityGate.passed));
 
+    // New top-level outputs for consumers
+    const overallCoverage =
+      allResults.length > 0
+        ? (allResults.reduce((sum, r) => sum + r.coveragePercent, 0) / allResults.length).toFixed(2)
+        : '0.00';
+    const failedGates = qualityGate.failures.map((f) => f.category).join(',');
+    const summaryPath = path.join(reportsDir, 'build-summary.md');
+
+    core.setOutput('overallStatus', qualityGate.passed ? 'passed' : 'failed');
+    core.setOutput('overallCoverage', overallCoverage);
+    core.setOutput('failedGates', failedGates);
+    core.setOutput('summaryPath', summaryPath);
+
     if (exitCode !== 0) {
       const failureMessages = qualityGate.failures.map(
         (f) => `${f.category}: expected ≥ ${f.expected}%, actual ${f.actual}%, gap ${f.gap}%`,

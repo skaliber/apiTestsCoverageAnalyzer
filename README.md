@@ -239,8 +239,13 @@ steps:
 | `error-coverage` | Error handling coverage percentage |
 | `security-coverage` | Security coverage percentage |
 | `reports-dir` | Absolute path to the generated reports directory |
+| `overallStatus` | `"passed"` or `"failed"` |
+| `overallCoverage` | Average coverage % across all analyzed categories |
+| `failedGates` | Comma-separated list of failed category names (empty when all pass) |
+| `summaryPath` | Path to the generated `build-summary.md` |
 
 The action fails (non-zero exit code) when any coverage threshold is not met.
+Summary files are always generated – even when the gate fails.
 
 ## Commands overview
 
@@ -274,6 +279,16 @@ Create a `coverage.config.json` in your project root:
     "performance": 75,
     "resilience":  50
   },
+  "summary": {
+    "enabled": true,
+    "generatePrSummary": true,
+    "generateBuildSummary": true,
+    "generateAiSummary": true,
+    "includeOnlyEvaluatedSections": false,
+    "publishPrComment": true,
+    "publishGithubStepSummary": true,
+    "publishJenkinsSummary": true
+  },
   "exclude": {
     "paths":   ["/internal/*"],
     "methods": ["OPTIONS"]
@@ -284,6 +299,69 @@ Create a `coverage.config.json` in your project root:
 ```
 
 CLI flags override config file values.
+
+## Built-in Summary Engine
+
+The library owns summary generation. No custom scripting is needed.
+
+### Generated files
+
+When reports are generated (via CLI or GitHub Action), the following summary files
+are automatically written to the configured `--reports-dir`:
+
+| File | Description |
+|------|-------------|
+| `reports/build-summary.md` | Full CI/build summary (Markdown) |
+| `reports/pr-summary.md` | Concise PR comment summary (Markdown) |
+| `reports/summary.json` | Machine-readable summary data |
+| `reports/ai-summary.md` | AI-optimized Markdown for agents |
+| `reports/ai-summary.json` | AI-optimized JSON for agents |
+
+### Gate-aware inclusion
+
+Sections are included only when the analyzer ran or a threshold was configured.
+Analyzers that did not run are silently omitted – no empty sections appear.
+
+Set `includeOnlyEvaluatedSections: true` in `coverage.config.json` to omit even
+analyzers that ran but have no threshold configured.
+
+### Public API
+
+```ts
+import { generateBuildSummary, generatePrSummary } from 'api-test-coverage-analyzer';
+
+const { markdown, sections, json } = await generateBuildSummary({
+  results,          // CoverageResult[] from any analyze* call
+  qualityGate,      // QualityGateResult (optional)
+  thresholds,       // Record<string, number> (optional)
+  projectName: 'my-api',
+  branch: 'main',
+}, 'reports');      // optional output directory
+```
+
+```ts
+type SummaryResult = {
+  markdown: string;
+  sections: Array<{
+    id: string;       // e.g. "endpoint", "security-scan"
+    title: string;    // human-readable heading
+    included: boolean;
+    gateEvaluated: boolean;
+    passed?: boolean;
+    markdown: string;
+  }>;
+  json: unknown;      // machine-readable summary object
+};
+```
+
+### GitHub Action outputs
+
+| Output | Description |
+|--------|-------------|
+| `overallStatus` | `"passed"` or `"failed"` |
+| `overallCoverage` | Average coverage % across all analyzed categories |
+| `failedGates` | Comma-separated list of failed category names |
+| `summaryPath` | Path to `build-summary.md` |
 
 ## UI Dashboard
 

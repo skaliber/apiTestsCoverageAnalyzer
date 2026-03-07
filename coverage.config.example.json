@@ -15,6 +15,16 @@
     "release/*": { "global": 100 },
     "feature/*": { "global": 80 }
   },
+  "summary": {
+    "enabled": true,
+    "generatePrSummary": true,
+    "generateBuildSummary": true,
+    "generateAiSummary": true,
+    "includeOnlyEvaluatedSections": false,
+    "publishPrComment": true,
+    "publishGithubStepSummary": true,
+    "publishJenkinsSummary": true
+  },
   "publishing": {
     "enabled": true,
     "outputDir": "site",

@@ -149,6 +149,14 @@ outputs:
     description: 'Path to the generated static site directory'
   quality-gate-passed:
     description: 'Whether the quality gate passed (true/false)'
+  overallStatus:
+    description: 'Overall status: "passed" or "failed"'
+  overallCoverage:
+    description: 'Average coverage percentage across all analyzed categories'
+  failedGates:
+    description: 'Comma-separated list of categories whose gates failed (empty when all pass)'
+  summaryPath:
+    description: 'Path to the generated build-summary.md file'
 
 runs:
   using: 'node20'

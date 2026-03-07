@@ -74,3 +74,67 @@ Open an issue at https://github.com/skaliber/apiTestsCoverageAnalyzer/issues wit
 ## Requesting features
 
 Open an issue with the **enhancement** label and describe the use case.
+
+## Publishing
+
+### Releasing a new version
+
+1. Bump the version in `package.json` following [semver](https://semver.org/):
+   ```bash
+   npm version patch   # 1.0.0 → 1.0.1
+   npm version minor   # 1.0.0 → 1.1.0
+   npm version major   # 1.0.0 → 2.0.0
+   ```
+2. Push the commit and the auto-created tag:
+   ```bash
+   git push && git push --tags
+   ```
+3. The `.github/workflows/publish.yml` workflow triggers automatically on the new tag and:
+   - Runs tests (`npm test`)
+   - Builds the library and action (`npm run build`)
+   - Publishes the package to npm (`npm publish`)
+   - Creates a GitHub Release with the compiled `dist/` archive attached
+
+### Setting up npm publishing
+
+The publish workflow requires an `NPM_TOKEN` repository secret. To configure it:
+
+1. Create an npm automation token at [npmjs.com → Access Tokens](https://www.npmjs.com/settings/~/tokens).
+2. Add it as a repository secret named `NPM_TOKEN` in **Settings → Secrets and variables → Actions**.
+
+### Updating the GitHub Action
+
+The GitHub Action lives in `action/src/index.ts` and is compiled into `dist/action/src/index.js` by the root TypeScript build (`npm run build`).
+
+To add new inputs or outputs:
+1. Add the input/output definition to `action/action.yml`.
+2. Read the new input with `core.getInput('my-input')` in `action/src/index.ts`.
+3. Set a new output with `core.setOutput('my-output', value)`.
+4. Update `README.md` action inputs/outputs tables.
+5. Add a test case in `.github/workflows/test-action.yml`.
+
+### Testing changes locally
+
+Use [act](https://github.com/nektos/act) to simulate GitHub Actions locally:
+
+```bash
+# Install act
+brew install act   # macOS
+# or follow https://nektosact.com/installation/index.html
+
+# Run the test-action workflow locally
+act push -W .github/workflows/test-action.yml
+
+# Run only the endpoint coverage job
+act push -W .github/workflows/test-action.yml -j test-action-endpoint
+```
+
+### Adding new coverage types
+
+1. Implement the analysis logic in `src/<type>Coverage.ts`.
+2. Export a wrapper function from `src/lib/index.ts` (e.g. `analyzeMyType`).
+3. Add a CLI command in `src/index.ts`.
+4. Add the coverage type to the `coverage-types` input handling in `action/src/index.ts`.
+5. Expose new threshold input/output in `action/action.yml`.
+6. Write unit tests in `tests/<type>Coverage.test.ts`.
+7. Update the CLI reference and action documentation in the README and `docs/`.

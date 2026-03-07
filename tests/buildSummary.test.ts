@@ -149,8 +149,42 @@ describe('generatePrComment', () => {
 // ─── printCiSummary ───────────────────────────────────────────────────────────
 
 describe('printCiSummary', () => {
-  it('prints without throwing', () => {
+  let consoleSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
+  });
+
+  it('prints without throwing for a passed gate', () => {
     expect(() => printCiSummary(sampleResults, passedGate)).not.toThrow();
+    expect(consoleSpy).toHaveBeenCalled();
+  });
+
+  it('prints without throwing for a failed gate', () => {
     expect(() => printCiSummary(sampleResults, failedGate)).not.toThrow();
+    expect(consoleSpy).toHaveBeenCalled();
+  });
+
+  it('shows PASSED in output when gate passes', () => {
+    printCiSummary(sampleResults, passedGate);
+    const allOutput = consoleSpy.mock.calls.flat().join(' ');
+    expect(allOutput).toContain('PASSED');
+  });
+
+  it('shows FAILED in output when gate fails', () => {
+    printCiSummary(sampleResults, failedGate);
+    const allOutput = consoleSpy.mock.calls.flat().join(' ');
+    expect(allOutput).toContain('FAILED');
+  });
+
+  it('shows threshold failure details when gate fails', () => {
+    printCiSummary(sampleResults, failedGate);
+    const allOutput = consoleSpy.mock.calls.flat().join(' ');
+    expect(allOutput).toContain('Threshold failures');
+    expect(allOutput).toContain('endpoint');
   });
 });

@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useCoverage } from '../context/CoverageContext';
+import { useSettings } from '../context/SettingsContext';
 import CoveragePieChart from '../components/CoveragePieChart';
+import AiSummaryPanel from '../components/AiSummaryPanel';
 import type { DetailItem } from '../types';
+import { generateBusinessRulesSummary } from '../utils/markdownSummaries';
 
 export default function BusinessRulesPage() {
   const { report } = useCoverage();
+  const { showAiSummaries } = useSettings();
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -26,6 +30,9 @@ export default function BusinessRulesPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Business Rules</h1>
+      {showAiSummaries && report && (
+        <AiSummaryPanel markdown={generateBusinessRulesSummary(report)} />
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <input

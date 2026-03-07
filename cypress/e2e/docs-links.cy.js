@@ -53,47 +53,46 @@ describe('Documentation internal links are not broken', () => {
       cy.visit(route)
       cy.get('#VPContent, main').should('exist')
 
-      // Collect all unique internal hrefs from the page.
-      // Strip fragment identifiers so we test the page itself, not just an anchor.
-      cy.get('a[href]').then(($anchors) => {
-        const base = Cypress.config('baseUrl')
-        // Use server origin (protocol + host + port) for cy.request URL resolution.
-        // This ensures hrefs like /apiTestsCoverageAnalyzer/ are resolved to
-        // http://localhost:4173/apiTestsCoverageAnalyzer/ rather than being
-        // concatenated onto the full baseUrl path.
-        const origin = new URL(base).origin
-        const seen = new Set()
-        const hrefs = []
+      // cy.url() always returns a fully-qualified http://... URL after cy.visit(),
+      // making it reliable for resolving relative hrefs and determining same-origin.
+      cy.url().then((pageUrl) => {
+        const serverOrigin = new URL(pageUrl).origin  // e.g. http://localhost:4173
 
-        $anchors.each((_i, el) => {
-          const href = el.getAttribute('href')
-          // Skip missing, external, or fragment-only links
-          if (!href || href.startsWith('#')) return
-          // Keep links that are same-origin / relative (skip external URLs)
-          if (
-            href.startsWith('/') ||
-            href.startsWith('./') ||
-            href.startsWith('../') ||
-            href.startsWith(base)
-          ) {
-            const withoutFragment = href.split('#')[0]
-            if (withoutFragment && !seen.has(withoutFragment)) {
-              seen.add(withoutFragment)
-              hrefs.push(withoutFragment)
+        cy.get('a[href]').then(($anchors) => {
+          const seen = new Set()
+          const hrefs = []
+
+          $anchors.each((_i, el) => {
+            const rawHref = el.getAttribute('href')
+            // Skip missing or fragment-only links
+            if (!rawHref || rawHref.startsWith('#')) return
+
+            // Resolve the href to a fully-qualified URL using the current page URL
+            // as the base. new URL() handles absolute (/path), relative (./path,
+            // ../path), and already-qualified (http://…) hrefs correctly.
+            let resolved
+            try {
+              resolved = new URL(rawHref, pageUrl).href.split('#')[0]
+            } catch {
+              return  // skip unparseable hrefs
             }
-          }
-        })
 
-        hrefs.forEach((href) => {
-          // Resolve to a full URL using the server origin so that
-          // base-path-prefixed hrefs (e.g. /apiTestsCoverageAnalyzer/) are
-          // requested correctly instead of being doubled onto the baseUrl.
-          const fullUrl = href.startsWith('http') ? href : origin + href
-          cy.request({ url: fullUrl, failOnStatusCode: false }).then((res) => {
-            expect(
-              res.status,
-              `Expected link "${href}" found on "${route}" to return 2xx, got ${res.status}`
-            ).to.be.lessThan(400)
+            // Only test same-origin links (skip external URLs)
+            if (!resolved.startsWith(serverOrigin)) return
+
+            if (resolved && !seen.has(resolved)) {
+              seen.add(resolved)
+              hrefs.push(resolved)
+            }
+          })
+
+          hrefs.forEach((url) => {
+            cy.request({ url, failOnStatusCode: false }).then((res) => {
+              expect(
+                res.status,
+                `Expected link "${url}" found on "${route}" to return 2xx, got ${res.status}`
+              ).to.be.lessThan(400)
+            })
           })
         })
       })

@@ -89,6 +89,8 @@ import {
   getDefaultGlobsForLanguage,
   SUPPORTED_LANGUAGES,
 } from './languageDetection';
+import { runIntelligenceEngine } from './intelligence/index';
+import { recordIntelligenceMetrics } from './observability';
 
 const program = new Command();
 
@@ -1289,6 +1291,109 @@ program
     if (summary.gateResult && !summary.gateResult.passed) {
       process.exitCode = 1;
     }
+  });
+
+// ─── coverage-intelligence command ──────────────────────────────────────────
+
+program
+  .command('coverage-intelligence')
+  .description('Run the coverage intelligence engine to identify functional findings and missing tests')
+  .option('--reports-dir <dir>', 'Directory containing existing coverage reports to analyse', 'reports')
+  .option('--out-dir <dir>', 'Output directory for intelligence reports', 'reports')
+  .option('--project-name <name>', 'Project / service name', 'unknown')
+  .option('--languages <langs>', 'Comma-separated list of languages (e.g. typescript,java)')
+  .option('--frameworks <fws>', 'Comma-separated list of test frameworks (e.g. jest,rest-assured)')
+  .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
+    const reportsDir = path.resolve(options.reportsDir as string);
+    const outDir = path.resolve(options.outDir as string);
+    const projectName = options.projectName as string;
+    const languages = options.languages
+      ? (options.languages as string).split(',').map((l: string) => l.trim())
+      : [];
+    const frameworks = options.frameworks
+      ? (options.frameworks as string).split(',').map((f: string) => f.trim())
+      : [];
+
+    // Attempt to load existing coverage-summary.json from reportsDir
+    let coverageResults: Array<{
+      type: string;
+      totalItems: number;
+      coveredItems: number;
+      coveragePercent: number;
+      details: unknown;
+    }> = [];
+
+    const summaryPath = path.join(reportsDir, 'coverage-summary.json');
+    try {
+      if (require('fs').existsSync(summaryPath)) {
+        const raw = require('fs').readFileSync(summaryPath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.summary)) {
+          coverageResults = parsed.summary.map((s: Record<string, unknown>) => ({
+            type: s.type as string,
+            totalItems: (s.totalItems as number) ?? 0,
+            coveredItems: (s.coveredItems as number) ?? 0,
+            coveragePercent: (s.coveragePercent as number) ?? 0,
+            details: (parsed.details as Record<string, unknown>)?.[s.type as string] ?? [],
+          }));
+        }
+      }
+    } catch (err) {
+      logger.warn({ event: 'intelligence_load_warning', error: String(err) }, 'Could not load coverage-summary.json');
+    }
+
+    const report = runIntelligenceEngine({
+      coverageResults,
+      languages,
+      frameworks,
+      projectName,
+      outDir,
+    });
+
+    // Record intelligence metrics
+    recordIntelligenceMetrics({
+      projectName,
+      totalFindings: report.summary.totalFindings,
+      totalRecommendations: report.summary.totalRecommendations,
+      recommendationsByPriority: report.summary.recommendationsByPriority,
+      maxRiskScore: report.summary.maxRiskScore,
+      avgRiskScore: report.summary.avgRiskScore,
+      criticalUncoveredItems: report.summary.criticalUncoveredItems,
+      unprotectedSecurityFindings: report.summary.unprotectedSecurityFindings,
+      languages,
+      frameworks,
+    }, projectName);
+
+    console.log(`\n=== Coverage Intelligence Results ===`);
+    console.log(`  Project: ${projectName}`);
+    console.log(`  Functional Findings: ${report.summary.totalFindings}`);
+    console.log(`  Missing Test Recommendations: ${report.summary.totalRecommendations}`);
+    console.log(`  Max Risk Score: ${report.summary.maxRiskScore}`);
+    console.log(`  Avg Risk Score: ${report.summary.avgRiskScore}`);
+    console.log(`  Critical Uncovered Items: ${report.summary.criticalUncoveredItems}`);
+    console.log(`  Unprotected Security Findings: ${report.summary.unprotectedSecurityFindings}`);
+    if (report.summary.recommendationsByPriority.P0 > 0) {
+      console.log(`\n⚠️  P0 Recommendations: ${report.summary.recommendationsByPriority.P0} — immediate action required`);
+    }
+    console.log(`\nIntelligence reports written to: ${outDir}`);
+
+    logger.info({ event: 'analysis_complete', coverageType: 'intelligence' }, 'Coverage intelligence analysis complete');
+
+    await finaliseObservability(
+      [{
+        type: 'intelligence',
+        totalItems: report.summary.totalRecommendations,
+        coveredItems: 0,
+        coveragePercent: 0,
+        details: report.summary,
+      }],
+      {},
+      metricsPort,
+      serviceName,
+    );
   });
 
 // Parse the command-line arguments

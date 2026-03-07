@@ -12,6 +12,7 @@ import SecurityPage from './pages/SecurityPage';
 import ErrorHandlingPage from './pages/ErrorHandlingPage';
 import PerformancePage from './pages/PerformancePage';
 import TrendsPage from './pages/TrendsPage';
+import CoverageIntelligencePage from './pages/CoverageIntelligencePage';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
                   <Route path="/error-handling" element={<ErrorHandlingPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/trends" element={<TrendsPage />} />
+                  <Route path="/intelligence" element={<CoverageIntelligencePage />} />
                 </Routes>
               </main>
             </div>

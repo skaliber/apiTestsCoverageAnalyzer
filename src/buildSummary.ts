@@ -37,7 +37,7 @@ export function generateStepSummary(
   for (const r of results) {
     const pct = r.coveragePercent.toFixed(2);
     const failed = qualityGate.failures.some((f) => f.category === r.type);
-    const status = failed ? '❌ Below threshold' : '✅ Pass';
+    const status = failed ? '❌ Below threshold' : r.coveragePercent === 0 ? '⚠️ No coverage' : '✅ Pass';
     lines.push(`| ${r.type} | ${r.totalItems} | ${r.coveredItems} | ${pct}% | ${status} |`);
   }
 
@@ -135,7 +135,8 @@ export function generatePrComment(
   const tableRows = results.map((r) => {
     const pct = r.coveragePercent.toFixed(2);
     const failed = qualityGate.failures.some((f) => f.category === r.type);
-    return `| ${r.type} | ${pct}% | ${failed ? '❌' : '✅'} |`;
+    const icon = failed ? '❌' : r.coveragePercent === 0 ? '⚠️' : '✅';
+    return `| ${r.type} | ${pct}% | ${icon} |`;
   });
 
   const lines = [

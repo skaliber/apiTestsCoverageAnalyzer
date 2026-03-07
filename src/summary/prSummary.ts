@@ -59,7 +59,14 @@ export async function generatePrSummary(
       const threshold = input.thresholds?.[r.type];
       const gateEvaluated = threshold !== undefined;
       const failed = input.qualityGate?.failures.some((f) => f.category === r.type) ?? false;
-      const status = !gateEvaluated ? '—' : failed ? '❌ FAIL' : '✅ PASS';
+      const zeroCoverage = r.coveragePercent === 0;
+      const status = !gateEvaluated
+        ? '—'
+        : failed
+          ? '❌ FAIL'
+          : zeroCoverage
+            ? '⚠️ PASS'
+            : '✅ PASS';
       lines.push(`| ${r.type} | ${pct(r.coveragePercent)} | ${status} |`);
     }
     lines.push('');

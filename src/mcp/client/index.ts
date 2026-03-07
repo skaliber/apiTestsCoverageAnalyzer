@@ -14,6 +14,7 @@
 
 import * as http from 'http';
 import * as https from 'https';
+import * as childProcess from 'child_process';
 import { URL } from 'url';
 import type { McpConfig, McpPromptRequest, McpRawResponse } from '../types';
 import {
@@ -27,10 +28,25 @@ import {
   MCP_DEFAULT_RETRY_DELAY_MS,
 } from '../config';
 
+/** Spawn function type – injectable for testing */
+export type SpawnFn = typeof childProcess.spawn;
+
 // ─── MCP Client ───────────────────────────────────────────────────────────────
 
 export class McpClient {
-  constructor(private readonly globalConfig: McpConfig) {}
+  private readonly spawnFn: SpawnFn;
+
+  /**
+   * @param globalConfig  MCP configuration block
+   * @param spawnFn       Optional spawn override (useful in unit tests to avoid
+   *                      spawning real child processes)
+   */
+  constructor(
+    private readonly globalConfig: McpConfig,
+    spawnFn?: SpawnFn,
+  ) {
+    this.spawnFn = spawnFn ?? childProcess.spawn;
+  }
 
   /**
    * Send a prompt to the named MCP server and return the raw response.
@@ -170,11 +186,6 @@ export class McpClient {
     payload: string,
     timeoutMs: number,
   ): Promise<McpRawResponse> {
-    // Use dynamic require so the module can be tested without spawning real
-    // child processes (test mocks override require('child_process')).
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { spawn } = require('child_process') as typeof import('child_process');
-
     return new Promise((resolve) => {
       const start = Date.now();
       let resolved = false;
@@ -187,7 +198,7 @@ export class McpClient {
         }
       }, timeoutMs);
 
-      const child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+      const child = this.spawnFn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
       const chunks: Buffer[] = [];
       const errChunks: Buffer[] = [];
 

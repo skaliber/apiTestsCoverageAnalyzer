@@ -22,8 +22,10 @@ if (behaviour === 'error') {
 }
 
 if (behaviour === 'timeout') {
-  // Never write anything – wait for the client to time out
-  setTimeout(() => {}, 60_000 * 60);
+  // Wait indefinitely — rely on the client's configured timeout to terminate the request.
+  // 24 hours is effectively infinite for any test scenario.
+  const WAIT_INDEFINITELY_MS = 24 * 60 * 60 * 1000;
+  setTimeout(() => {}, WAIT_INDEFINITELY_MS);
   process.stdin.resume();
   return;
 }

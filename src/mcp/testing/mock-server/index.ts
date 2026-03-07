@@ -56,6 +56,10 @@ export function buildMockAnalysisResponse(
 
 // ─── HTTP mock server ─────────────────────────────────────────────────────────
 
+// Wait effectively indefinitely — rely on the client's configured timeout.
+// 24 hours ensures the server never resolves before the client times out.
+const WAIT_INDEFINITELY_MS = 24 * 60 * 60 * 1000;
+
 export interface MockServerOptions {
   port?: number;
   behaviour?: MockBehaviour;
@@ -123,7 +127,7 @@ export async function startMockMcpServer(
       };
 
       if (behaviour === 'timeout' || delayMs > 0) {
-        setTimeout(respond, delayMs || 60_000);
+        setTimeout(respond, delayMs || WAIT_INDEFINITELY_MS);
       } else {
         respond();
       }

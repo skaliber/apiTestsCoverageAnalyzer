@@ -94,7 +94,8 @@ jobs:
           tests: 'sample/tests/**/*.ts'
           format: 'json,html,csv,junit'
           coverage-types: 'endpoint'
-          threshold-endpoint: '0'
+          quality-gate: 'false'
+          write-step-summary: 'false'
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -136,6 +137,8 @@ jobs:
           tests: 'sample/tests/**/*.ts'
           format: 'json,html'
           coverage-types: 'endpoint,error,security'
+          quality-gate: 'false'
+          write-step-summary: 'false'
 
       - name: Print endpoint coverage
         run: echo "Endpoint coverage ${{ steps.coverage.outputs.endpoint-coverage }}%"
@@ -178,9 +181,12 @@ jobs:
         uses: ./action
         with:
           spec: 'sample/openapi.yaml'
-          tests: 'sample/tests/**/*.ts'
+          tests: 'sample/tests/integration.test.ts'
           coverage-types: 'endpoint'
           threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'strict'
+          write-step-summary: 'false'
 
       - name: Assert action failed as expected
         if: steps.coverage-fail.outcome == 'success'
@@ -191,3 +197,146 @@ jobs:
       - name: Confirm failure was detected
         if: steps.coverage-fail.outcome == 'failure'
         run: echo "Threshold failure correctly detected (exit code was non-zero)"
+
+  test-action-quality-gate-pass:
+    name: Test action – quality gate passes
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage with quality gate (all tests cover 100% endpoints)
+        id: coverage-pass
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/**/*.ts'
+          coverage-types: 'endpoint'
+          threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'strict'
+          write-step-summary: 'false'
+
+      - name: Assert quality gate passed
+        run: |
+          echo "Quality gate passed: ${{ steps.coverage-pass.outputs.quality-gate-passed }}"
+          if [ "${{ steps.coverage-pass.outputs.quality-gate-passed }}" != "true" ]; then
+            echo "ERROR: Quality gate should have passed"
+            exit 1
+          fi
+
+  test-action-quality-gate-warn:
+    name: Test action – quality gate warn mode
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage below threshold in warn mode (should not fail)
+        id: coverage-warn
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/integration.test.ts'
+          coverage-types: 'endpoint'
+          threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'warn'
+          write-step-summary: 'false'
+
+      - name: Assert warn mode did not fail the build
+        run: echo "Warn mode correctly did not fail the build"
+
+  test-action-publishing:
+    name: Test action – static site publishing
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage with static site generation
+        id: coverage-site
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/**/*.ts'
+          format: 'json,html,csv,junit'
+          coverage-types: 'endpoint'
+          publish-pages: 'true'
+          site-dir: 'site'
+          quality-gate: 'false'
+          write-step-summary: 'false'
+
+      - name: Assert static site was generated
+        run: |
+          if [ ! -f "site/index.html" ]; then
+            echo "ERROR: site/index.html was not generated"
+            exit 1
+          fi
+          if [ ! -f "site/ai-summary.md" ]; then
+            echo "ERROR: site/ai-summary.md was not generated"
+            exit 1
+          fi
+          echo "Static site generated successfully"
+          echo "Site dir: ${{ steps.coverage-site.outputs.site-dir }}"
+
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: site/
+          retention-days: 7

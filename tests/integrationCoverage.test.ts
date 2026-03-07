@@ -160,14 +160,13 @@ describe('analyzeIntegrationCoverage', () => {
     }
   });
 
-  it('marks FLOW004 as partial when only some steps are covered', async () => {
+  it('marks FLOW004 as complete when all steps are covered', async () => {
     const flows = parseIntegrationFlows(SAMPLE_FLOWS);
     const coverages = await analyzeIntegrationCoverage(flows, SAMPLE_TESTS_GLOB);
     const flow004 = coverages.find((c) => c.flow.id === 'FLOW004');
     expect(flow004).toBeDefined();
-    // FLOW004 step2 requires "user orders" / "list orders" / "orders for user"
-    // The sample test only covers step1 ("list all users")
-    expect(flow004!.status).toBe('partial');
+    // FLOW004 step2 has "orders per user" keyword which matches the sample integration test
+    expect(flow004!.status).toBe('complete');
   });
 
   it('returns per-step coverage details', async () => {
@@ -423,11 +422,11 @@ describe('end-to-end: sample integration flows + sample tests', () => {
     expect(flow001!.steps.every((s) => s.covered)).toBe(true);
   });
 
-  it('reports FLOW004 as partial (step 2 not covered by sample tests)', async () => {
+  it('reports FLOW004 as complete (both steps now covered by sample tests)', async () => {
     const flows = parseIntegrationFlows(SAMPLE_FLOWS);
     const coverages = await analyzeIntegrationCoverage(flows, SAMPLE_TESTS_GLOB);
     const flow004 = coverages.find((c) => c.flow.id === 'FLOW004');
-    expect(flow004!.status).toBe('partial');
+    expect(flow004!.status).toBe('complete');
     expect(flow004!.steps[0].covered).toBe(true);
   });
 

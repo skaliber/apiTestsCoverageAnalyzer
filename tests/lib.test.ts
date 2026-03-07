@@ -175,3 +175,93 @@ describe('Library API – checkThresholds', () => {
     expect(failures).toHaveLength(0);
   });
 });
+
+// ─── runAnalysisAndEnforceQualityGate ─────────────────────────────────────────
+
+import { runAnalysisAndEnforceQualityGate } from '../src/lib/index';
+
+describe('Library API – runAnalysisAndEnforceQualityGate', () => {
+  const passing: CoverageResult = {
+    type: 'endpoint',
+    totalItems: 10,
+    coveredItems: 10,
+    coveragePercent: 100,
+    details: {},
+  };
+  const failing: CoverageResult = {
+    type: 'endpoint',
+    totalItems: 10,
+    coveredItems: 7,
+    coveragePercent: 70,
+    details: {},
+  };
+
+  it('returns exitCode 0 when all coverage meets threshold', async () => {
+    const reportsDir = makeTempDir();
+    const { exitCode, qualityGate } = await runAnalysisAndEnforceQualityGate({
+      results: [passing],
+      config: { thresholds: { global: 100 }, publishing: { enabled: false } },
+      reportsDir,
+    });
+    expect(exitCode).toBe(0);
+    expect(qualityGate.passed).toBe(true);
+  });
+
+  it('returns exitCode 1 when coverage is below threshold', async () => {
+    const reportsDir = makeTempDir();
+    const { exitCode, qualityGate } = await runAnalysisAndEnforceQualityGate({
+      results: [failing],
+      config: {
+        thresholds: { global: 100 },
+        qualityGate: { failBuildOnThresholdMiss: true },
+        publishing: { enabled: false },
+      },
+      reportsDir,
+    });
+    expect(exitCode).toBe(1);
+    expect(qualityGate.passed).toBe(false);
+    expect(qualityGate.failures).toHaveLength(1);
+  });
+
+  it('returns exitCode 0 in warn mode even with failures', async () => {
+    const reportsDir = makeTempDir();
+    const { exitCode, qualityGate } = await runAnalysisAndEnforceQualityGate({
+      results: [failing],
+      config: {
+        thresholds: { global: 100 },
+        qualityGate: { mode: 'warn' },
+        publishing: { enabled: false },
+      },
+      reportsDir,
+    });
+    expect(exitCode).toBe(0);
+    expect(qualityGate.passed).toBe(true); // warn mode
+    expect(qualityGate.failures.length).toBeGreaterThan(0); // but failures tracked
+  });
+
+  it('generates a build bundle when publishing is enabled', async () => {
+    const reportsDir = makeTempDir();
+    const siteDir = path.join(reportsDir, 'site');
+    const { reports } = await runAnalysisAndEnforceQualityGate({
+      results: [passing],
+      config: {
+        thresholds: { global: 100 },
+        publishing: { enabled: true, outputDir: siteDir, buildId: 'test-123' },
+      },
+      reportsDir,
+    });
+    expect(reports).not.toBeNull();
+    expect(fs.existsSync(path.join(siteDir, 'index.html'))).toBe(true);
+    expect(fs.existsSync(path.join(siteDir, 'ai-summary.md'))).toBe(true);
+  });
+
+  it('reports is null when publishing is disabled', async () => {
+    const reportsDir = makeTempDir();
+    const { reports } = await runAnalysisAndEnforceQualityGate({
+      results: [passing],
+      config: { publishing: { enabled: false } },
+      reportsDir,
+    });
+    expect(reports).toBeNull();
+  });
+});

@@ -214,3 +214,53 @@ describe('isExcluded', () => {
     expect(isExcluded('OPTIONS', '/users', { paths: ['/internal/*'], methods: ['OPTIONS'] })).toBe(true);
   });
 });
+
+// ─── CoverageConfig – new fields (Spec 15) ────────────────────────────────────
+
+describe('CoverageConfig – publishing and qualityGate fields', () => {
+  it('accepts a publishing config block', () => {
+    const config: import('../src/config').CoverageConfig = {
+      publishing: {
+        enabled: true,
+        outputDir: 'site',
+        buildId: 'timestamp',
+        githubPages: { enabled: true, basePath: '/myrepo/' },
+        artifacts: { includeJson: true, includeCsv: false },
+        screenshots: { enabled: false, strict: false },
+      },
+    };
+    expect(config.publishing?.outputDir).toBe('site');
+    expect(config.publishing?.githubPages?.basePath).toBe('/myrepo/');
+  });
+
+  it('accepts a qualityGate config block', () => {
+    const config: import('../src/config').CoverageConfig = {
+      qualityGate: {
+        enabled: true,
+        failBuildOnThresholdMiss: true,
+        mode: 'strict',
+      },
+    };
+    expect(config.qualityGate?.mode).toBe('strict');
+  });
+
+  it('accepts thresholdsByBranch config', () => {
+    const config: import('../src/config').CoverageConfig = {
+      thresholds: { global: 100 },
+      thresholdsByBranch: {
+        'main': { global: 100 },
+        'feature/*': { global: 80 },
+      },
+    };
+    expect(config.thresholdsByBranch?.['main']?.global).toBe(100);
+    expect(config.thresholdsByBranch?.['feature/*']?.global).toBe(80);
+  });
+
+  it('accepts a global threshold key', () => {
+    const config: import('../src/config').CoverageConfig = {
+      thresholds: { global: 100, performance: 90 },
+    };
+    expect(config.thresholds?.global).toBe(100);
+    expect(config.thresholds?.performance).toBe(90);
+  });
+});

@@ -24,6 +24,8 @@ The answers appear in rich **HTML**, **JSON**, **CSV**, and **JUnit** reports th
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Quickstart](#quickstart)
+- [Using as a Library](#using-as-a-library)
+- [GitHub Action](#github-action)
 - [Commands overview](#commands-overview)
 - [Configuration](#configuration)
 - [UI Dashboard](#ui-dashboard)
@@ -45,8 +47,24 @@ npm --version    # 10.x
 
 ## Installation
 
+### Option 1 – Install globally from npm (recommended)
+
 ```bash
-# Clone the repository
+npm install -g api-test-coverage-analyzer
+api-coverage --help
+```
+
+### Option 2 – Run without installing (npx)
+
+```bash
+npx api-test-coverage-analyzer endpoint-coverage \
+  --spec openapi.yaml \
+  --tests 'tests/**/*.ts'
+```
+
+### Option 3 – Clone the repository (development)
+
+```bash
 git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 
@@ -57,7 +75,7 @@ npm install
 npm run build
 
 # Verify
-node dist/index.js --help
+node dist/src/index.js --help
 ```
 
 Alternatively, use `ts-node` to skip the build step:
@@ -71,33 +89,33 @@ node -r ts-node/register src/index.ts --help
 Run all coverage types against the included sample project:
 
 ```bash
-# Endpoint coverage
-node dist/index.js endpoint-coverage \
+# Endpoint coverage (using globally installed CLI)
+api-coverage endpoint-coverage \
   --spec sample/openapi.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html \
   --threshold-endpoint 80
 
 # Business rule coverage
-node dist/index.js business-coverage \
+api-coverage business-coverage \
   --rules sample/business-rules.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html
 
 # Integration flow coverage
-node dist/index.js integration-coverage \
+api-coverage integration-coverage \
   --flows sample/integration-flows.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html
 
 # Security coverage
-node dist/index.js security-coverage \
+api-coverage security-coverage \
   --spec sample/openapi-security.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html
 
 # Compatibility check (breaking changes between v1 and v2)
-node dist/index.js compatibility-check \
+api-coverage compatibility-check \
   --old-spec sample/v1.yaml \
   --new-spec sample/v2.yaml \
   --contracts "sample/contracts/**/*.json" \
@@ -105,6 +123,124 @@ node dist/index.js compatibility-check \
 ```
 
 Reports are written to the `reports/` directory.
+
+## Using as a Library
+
+Install as a project dependency:
+
+```bash
+npm install api-test-coverage-analyzer
+```
+
+Then import the analysis functions in your own scripts:
+
+```js
+const {
+  analyzeEndpoints,
+  analyzeParameters,
+  analyzeBusinessRules,
+  analyzeIntegrationFlows,
+  analyzeErrorHandling,
+  analyzeSecurityControls,
+  analyzePerfResilience,
+  analyzeCompatibility,
+  checkThresholds,
+} = require('api-test-coverage-analyzer');
+
+async function runCoverage() {
+  // Endpoint coverage
+  const endpointResult = await analyzeEndpoints({
+    spec: 'openapi.yaml',
+    tests: 'tests/**/*.ts',
+    format: 'json,html',
+    thresholdEndpoint: 80,
+  });
+  console.log(`Endpoint coverage: ${endpointResult.coveragePercent}%`);
+
+  // Business rule coverage
+  const businessResult = await analyzeBusinessRules({
+    rules: 'business-rules.yaml',
+    tests: 'tests/**/*.ts',
+  });
+  console.log(`Business coverage: ${businessResult.coveragePercent}%`);
+
+  // Check thresholds
+  const failures = checkThresholds(
+    [endpointResult, businessResult],
+    { endpoint: 80, business: 60 }
+  );
+  if (failures.length > 0) {
+    console.error('Threshold failures:', failures);
+    process.exitCode = 1;
+  }
+}
+
+runCoverage();
+```
+
+TypeScript users get full type definitions out of the box.
+
+## GitHub Action
+
+Add API coverage analysis to your CI/CD pipeline with zero setup:
+
+```yaml
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Run API coverage analysis
+    id: coverage
+    uses: skaliber/apiTestsCoverageAnalyzer/action@v1
+    with:
+      spec: 'sample/openapi.yaml'
+      tests: 'tests/**/*.ts'
+      format: 'json,html'
+      coverage-types: 'endpoint,error,security'
+      threshold-endpoint: '80'
+
+  - name: Print endpoint coverage
+    run: echo "Endpoint coverage ${{ steps.coverage.outputs.endpoint-coverage }}%"
+
+  - name: Upload reports
+    uses: actions/upload-artifact@v4
+    with:
+      name: coverage-reports
+      path: reports/
+```
+
+### Action inputs
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `spec` | Path to OpenAPI/Swagger spec file | `sample/openapi.yaml` |
+| `tests` | Glob pattern for test files | `tests/**/*.ts` |
+| `format` | Comma-separated report formats (`json,html,csv,junit`) | `json,html` |
+| `coverage-types` | Coverage types to run (`endpoint,parameter,business,integration,error,security`) | `endpoint` |
+| `rules` | Path to business rules YAML (required for `business` type) | — |
+| `flows` | Path to integration flows YAML (required for `integration` type) | — |
+| `language` | Test language(s) (`auto,typescript,javascript,java,python,ruby,cucumber`) | `auto` |
+| `threshold-endpoint` | Minimum required endpoint coverage % | `0` |
+| `threshold-parameter` | Minimum required parameter coverage % | `0` |
+| `threshold-business` | Minimum required business rule coverage % | `0` |
+| `threshold-integration` | Minimum required integration flow coverage % | `0` |
+| `threshold-error` | Minimum required error handling coverage % | `0` |
+| `threshold-security` | Minimum required security coverage % | `0` |
+| `reports-dir` | Directory to write reports into | `reports` |
+
+### Action outputs
+
+| Output | Description |
+|--------|-------------|
+| `endpoint-coverage` | Endpoint coverage percentage |
+| `parameter-coverage` | Parameter coverage percentage |
+| `business-coverage` | Business rule coverage percentage |
+| `integration-coverage` | Integration flow coverage percentage |
+| `error-coverage` | Error handling coverage percentage |
+| `security-coverage` | Security coverage percentage |
+| `reports-dir` | Absolute path to the generated reports directory |
+
+The action fails (non-zero exit code) when any coverage threshold is not met.
 
 ## Commands overview
 

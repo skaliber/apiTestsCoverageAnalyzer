@@ -1,0 +1,83 @@
+name: 'API Test Coverage Analyzer'
+description: 'Analyze API test coverage based on OpenAPI specs and generate reports'
+author: 'skaliber'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  spec:
+    description: 'Path to OpenAPI/Swagger spec file'
+    required: false
+    default: 'sample/openapi.yaml'
+  tests:
+    description: 'Glob pattern for test files'
+    required: false
+    default: 'tests/**/*.ts'
+  format:
+    description: 'Comma-separated report formats: json,html,csv,junit'
+    required: false
+    default: 'json,html'
+  coverage-types:
+    description: 'Comma-separated coverage types to run: endpoint,parameter,business,integration,error,security (default: endpoint)'
+    required: false
+    default: 'endpoint'
+  rules:
+    description: 'Path to business rules YAML/JSON file (required for business coverage)'
+    required: false
+  flows:
+    description: 'Path to integration flows YAML/JSON file (required for integration coverage)'
+    required: false
+  language:
+    description: 'Test language(s) to analyse (auto,typescript,javascript,java,python,ruby,cucumber). Default: auto'
+    required: false
+    default: 'auto'
+  threshold-endpoint:
+    description: 'Minimum required endpoint coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-parameter:
+    description: 'Minimum required parameter coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-business:
+    description: 'Minimum required business rule coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-integration:
+    description: 'Minimum required integration flow coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-error:
+    description: 'Minimum required error handling coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-security:
+    description: 'Minimum required security coverage percentage (0-100)'
+    required: false
+    default: '0'
+  reports-dir:
+    description: 'Directory to write reports into'
+    required: false
+    default: 'reports'
+
+outputs:
+  endpoint-coverage:
+    description: 'Endpoint coverage percentage'
+  parameter-coverage:
+    description: 'Parameter coverage percentage'
+  business-coverage:
+    description: 'Business rule coverage percentage'
+  integration-coverage:
+    description: 'Integration flow coverage percentage'
+  error-coverage:
+    description: 'Error handling coverage percentage'
+  security-coverage:
+    description: 'Security coverage percentage'
+  reports-dir:
+    description: 'Path to the generated reports directory'
+
+runs:
+  using: 'node20'
+  main: '../dist/action/src/index.js'

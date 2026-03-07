@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import type { DetailSection } from '../types';
 import CoveragePieChart from '../components/CoveragePieChart';
+import AiSummaryPanel from '../components/AiSummaryPanel';
+import { useSettings } from '../context/SettingsContext';
 
 interface Props {
   title: string;
   section: DetailSection | undefined;
   columns?: { key: string; label: string }[];
   renderRow?: (item: Record<string, unknown>, i: number) => React.ReactNode;
+  aiSummary?: string;
 }
 
 const defaultColumns = [
@@ -14,8 +17,9 @@ const defaultColumns = [
   { key: 'covered', label: 'Covered' },
 ];
 
-export default function DetailPage({ title, section, columns = defaultColumns, renderRow }: Props) {
+export default function DetailPage({ title, section, columns = defaultColumns, renderRow, aiSummary }: Props) {
   const [search, setSearch] = useState('');
+  const { showAiSummaries } = useSettings();
 
   if (!section) {
     return (
@@ -35,6 +39,10 @@ export default function DetailPage({ title, section, columns = defaultColumns, r
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{title}</h1>
+
+      {showAiSummaries && aiSummary && (
+        <AiSummaryPanel markdown={aiSummary} />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">

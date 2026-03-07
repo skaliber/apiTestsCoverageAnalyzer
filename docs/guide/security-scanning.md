@@ -461,7 +461,7 @@ Add security scanning to your workflow with a few lines:
   run: trivy fs --format json --scanners vuln,secret . > reports/trivy.json
 
 - name: Enforce security gate
-  uses: skaliber/apiTestsCoverageAnalyzer@main
+  uses: q-intel/apiTestsCoverageAnalyzer@main
   with:
     coverage-types: 'security-scan'
     semgrep-report: 'reports/semgrep.json'

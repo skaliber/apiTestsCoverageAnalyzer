@@ -4,11 +4,11 @@ Thank you for your interest in contributing to the API Test Coverage Analyzer! T
 
 ## Code of Conduct
 
-Please read our [Code of Conduct](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/CODE_OF_CONDUCT.md) before participating. We are committed to fostering a welcoming and inclusive community.
+Please read our [Code of Conduct](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/CODE_OF_CONDUCT.md) before participating. We are committed to fostering a welcoming and inclusive community.
 
 ## Ways to contribute
 
-- **Report bugs** – open a [GitHub issue](https://github.com/skaliber/apiTestsCoverageAnalyzer/issues/new?template=bug_report.md).
+- **Report bugs** – open a [GitHub issue](https://github.com/q-intel/apiTestsCoverageAnalyzer/issues/new?template=bug_report.md).
 - **Request features** – open an issue with the `enhancement` label.
 - **Fix bugs / implement features** – fork the repo, make changes, and open a pull request.
 - **Improve documentation** – edit files in `docs/` and submit a PR.

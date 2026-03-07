@@ -14,7 +14,7 @@ hero:
       link: /reference/cli
     - theme: alt
       text: View on GitHub
-      link: https://github.com/skaliber/apiTestsCoverageAnalyzer
+      link: https://github.com/q-intel/apiTestsCoverageAnalyzer
 
 features:
   - icon: 🔍

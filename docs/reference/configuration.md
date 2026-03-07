@@ -94,4 +94,4 @@ For example, `--threshold-endpoint 90` overrides `thresholds.endpoint: 80` in th
 
 ## Sample project configuration
 
-See [`coverage.config.json`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/coverage.config.json) for the configuration used by the sample project.
+See [`coverage.config.json`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/coverage.config.json) for the configuration used by the sample project.

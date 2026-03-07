@@ -7,7 +7,7 @@ This guide walks you through running your first coverage analysis in under five 
 If you haven't already, follow the [Installation guide](/guide/installation). The quickest path:
 
 ```bash
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 npm install
 npm run build

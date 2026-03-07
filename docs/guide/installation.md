@@ -21,7 +21,7 @@ npm --version    # e.g. 10.5.0
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 
 # 2. Install dependencies

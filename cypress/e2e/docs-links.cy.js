@@ -19,6 +19,7 @@ const DOC_PAGES = [
   '/guide/ci-cd',
   '/guide/multi-language',
   '/guide/security-scanning',
+  '/guide/mcp-integration',
   '/guide/interpreting-reports',
   '/guide/writing-tests',
   '/guide/plugins',

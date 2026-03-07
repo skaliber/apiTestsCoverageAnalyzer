@@ -383,7 +383,11 @@ Load any JSON report from `reports/` and explore:
 Full documentation is available in the [`docs/`](docs/) directory and can be served locally:
 
 ```bash
-npm run docs:dev    # http://localhost:5174
+npm run docs:dev      # start dev server at http://localhost:5174
+npm run docs:build    # build static site → docs/.vitepress/dist/
+npm run docs:check    # validate sidebar, links, and assets, then build
+npm run docs:preview  # serve the built site (production preview)
+npm run docs:test     # run Cypress navigation/link tests
 ```
 
 Documentation sections:

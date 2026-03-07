@@ -67,6 +67,15 @@ npm test       # Vitest unit tests
 ```bash
 npm run docs:dev    # VitePress dev server on http://localhost:5174
 npm run docs:build  # build static site → docs/.vitepress/dist/
+npm run docs:check  # validate links, sidebar, and assets, then build
+npm run docs:preview  # serve the built static site (production preview)
+npm run docs:test   # run Cypress navigation/link tests (requires docs:preview running)
+```
+
+Run the full docs validation locally before opening a PR:
+
+```bash
+npm run docs:check
 ```
 
 ## Project structure
@@ -125,6 +134,7 @@ test(security-coverage): add injection scenario tests
 - [ ] Build succeeds (`npm run build`).
 - [ ] New functionality has corresponding tests.
 - [ ] Documentation updated if needed (`docs/`).
+- [ ] Docs check passes (`npm run docs:check`).
 - [ ] Commit messages follow Conventional Commits.
 - [ ] PR description explains the motivation and approach.
 
@@ -148,3 +158,78 @@ git push --follow-tags
 ```
 
 The CI pipeline publishes the new version to npm automatically.
+
+## Documentation contributor guide
+
+### How docs routing works
+
+The documentation site is built with [VitePress](https://vitepress.dev). All source
+files live under `docs/`. VitePress uses **cleanUrls mode**: a file at
+`docs/guide/getting-started.md` is served at `/guide/getting-started` (no `.md`
+extension in the URL).
+
+The sidebar and navigation links are declared in `docs/.vitepress/config.mts`.
+
+### How to write internal links
+
+Always use **absolute VitePress paths** (starting with `/`) for links between docs pages:
+
+```markdown
+<!-- ✅ Correct – absolute path, no .md extension -->
+See [CLI Reference](/reference/cli) for all options.
+
+<!-- ✅ Correct – absolute path with fragment -->
+See [--language flag](/reference/cli#supported-languages).
+
+<!-- ❌ Avoid – relative paths are fragile and break when pages are moved -->
+See [CLI Reference](../reference/cli.md) for all options.
+```
+
+### How to reference image assets
+
+Place screenshots and images in `docs/assets/screenshots/` and reference them
+using **relative paths** from the page that uses them:
+
+```markdown
+<!-- from docs/guide/interpreting-reports.md -->
+![Overview dashboard](../assets/screenshots/overview-dashboard.png)
+```
+
+Do **not** place documentation assets in `docs/public/`. The `public/` directory
+is reserved for root-level site assets (e.g. `logo.svg`, `favicon.ico`) that must
+be served at the site root path.
+
+### How to add a new page
+
+1. Create `docs/<section>/<page-name>.md`.
+2. Add a sidebar entry in `docs/.vitepress/config.mts`:
+   ```ts
+   { text: 'My Page', link: '/<section>/<page-name>' }
+   ```
+3. Add the route to the Cypress test list in `cypress/e2e/docs-links.cy.js`.
+4. Run `npm run docs:check` to validate everything.
+
+### How to run docs validation locally
+
+```bash
+# 1. Validate sidebar, internal links, and assets (fast, no server needed)
+npm run docs:check
+
+# 2. Start the dev server and browse interactively
+npm run docs:dev
+
+# 3. Build and run E2E browser tests
+npm run docs:build
+npm run docs:preview &
+npm run docs:test
+```
+
+### How to troubleshoot broken links
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| `docs:check` fails with "broken absolute link" | A `/guide/...` or `/reference/...` link in a `.md` file points to a page that doesn't exist | Check the target path in `docs/` and fix the link or create the missing page |
+| `docs:check` fails with "Sidebar link … no matching .md file" | A `link:` entry in `config.mts` points to a page that hasn't been created yet | Create the page or remove the sidebar entry |
+| Cypress test fails with `expected link … to return 2xx` | A page that was referenced and rendered in HTML no longer exists | Fix the broken link in the source `.md` file |
+| VitePress build prints dead-link warning | An internal `[text](/path)` link is broken | Run `npm run docs:check` to identify the exact file and link |
+| Logo missing in site header | `docs/public/logo.svg` was deleted | Restore the file (see `docs/public/logo.svg`) |

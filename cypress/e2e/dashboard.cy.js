@@ -135,7 +135,9 @@ describe('Endpoints page', () => {
   it('shows no rows when search matches nothing', () => {
     cy.get('table', { timeout: 10000 })
     cy.get('input[type="text"]').type('zzz-nonexistent-zzz')
-    cy.get('table tbody tr').should('have.length', 0)
+    // The table renders a single placeholder row with "No results found." text
+    cy.contains('No results found.').should('be.visible')
+    cy.get('table tbody tr').should('have.length', 1)
   })
 })
 
@@ -266,15 +268,17 @@ describe('Business Rules page', () => {
   })
 
   it('expands a rule on click and shows status details', () => {
-    cy.get('button').first().click()
+    // Target rule accordion buttons by their ✅/❌ prefix to avoid matching
+    // the AiSummaryPanel toggle button that renders before the rule list
+    cy.get('button').contains(/✅|❌/).first().click()
     cy.contains('Status').should('be.visible')
     cy.contains(/Covered|Not covered/i).should('be.visible')
   })
 
   it('collapses the expanded rule on second click', () => {
-    cy.get('button').first().click()
+    cy.get('button').contains(/✅|❌/).first().click()
     cy.contains('Status').should('be.visible')
-    cy.get('button').first().click()
+    cy.get('button').contains(/✅|❌/).first().click()
     cy.contains('Status').should('not.exist')
   })
 

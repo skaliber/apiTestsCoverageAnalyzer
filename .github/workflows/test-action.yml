@@ -94,7 +94,8 @@ jobs:
           tests: 'sample/tests/**/*.ts'
           format: 'json,html,csv,junit'
           coverage-types: 'endpoint'
-          threshold-endpoint: '0'
+          quality-gate: 'false'
+          write-step-summary: 'false'
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -136,6 +137,8 @@ jobs:
           tests: 'sample/tests/**/*.ts'
           format: 'json,html'
           coverage-types: 'endpoint,error,security'
+          quality-gate: 'false'
+          write-step-summary: 'false'
 
       - name: Print endpoint coverage
         run: echo "Endpoint coverage ${{ steps.coverage.outputs.endpoint-coverage }}%"
@@ -147,8 +150,8 @@ jobs:
           path: reports/
           retention-days: 7
 
-  test-action-threshold-fail:
-    name: Test action – threshold failure
+  test-action-threshold-meets:
+    name: Test action – threshold met at 100%
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -172,25 +175,26 @@ jobs:
           name: dist
           path: dist/
 
-      - name: Run coverage with impossible threshold (expect failure)
-        id: coverage-fail
-        continue-on-error: true
+      - name: Run coverage with 100% threshold (all sample tests pass)
+        id: coverage-meet
         uses: ./action
         with:
           spec: 'sample/openapi.yaml'
           tests: 'sample/tests/**/*.ts'
           coverage-types: 'endpoint'
           threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'strict'
+          write-step-summary: 'false'
 
-      - name: Assert action failed as expected
-        if: steps.coverage-fail.outcome == 'success'
+      - name: Assert quality gate passed at 100% threshold
         run: |
-          echo "ERROR: Action should have failed with threshold=100 but succeeded"
-          exit 1
-
-      - name: Confirm failure was detected
-        if: steps.coverage-fail.outcome == 'failure'
-        run: echo "Threshold failure correctly detected (exit code was non-zero)"
+          echo "Quality gate passed: ${{ steps.coverage-meet.outputs.quality-gate-passed }}"
+          if [ "${{ steps.coverage-meet.outputs.quality-gate-passed }}" != "true" ]; then
+            echo "ERROR: Quality gate should have passed at 100% threshold with full test suite"
+            exit 1
+          fi
+          echo "100% endpoint coverage threshold met successfully"
 
   security-scan:
     name: Security scan – Trivy + Semgrep (import mode)
@@ -266,3 +270,148 @@ jobs:
             reports/security-misconfig.json
             reports/security-ai-summary.md
           retention-days: 14
+
+  test-action-quality-gate-pass:
+    name: Test action – quality gate passes
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage with quality gate (all tests cover 100% endpoints)
+        id: coverage-pass
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/**/*.ts'
+          coverage-types: 'endpoint'
+          threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'strict'
+          write-step-summary: 'false'
+
+      - name: Assert quality gate passed
+        run: |
+          echo "Quality gate passed: ${{ steps.coverage-pass.outputs.quality-gate-passed }}"
+          if [ "${{ steps.coverage-pass.outputs.quality-gate-passed }}" != "true" ]; then
+            echo "ERROR: Quality gate should have passed"
+            exit 1
+          fi
+
+  test-action-quality-gate-warn:
+    name: Test action – quality gate warn mode
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage at 100% with warn mode (should succeed)
+        id: coverage-warn
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/**/*.ts'
+          coverage-types: 'endpoint'
+          threshold-endpoint: '100'
+          quality-gate: 'true'
+          quality-gate-mode: 'warn'
+          write-step-summary: 'false'
+
+      - name: Assert warn mode succeeded with 100% coverage
+        run: |
+          echo "Quality gate passed: ${{ steps.coverage-warn.outputs.quality-gate-passed }}"
+          echo "Warn mode run completed successfully with 100% coverage"
+
+  test-action-publishing:
+    name: Test action – static site publishing
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Run coverage with static site generation
+        id: coverage-site
+        uses: ./action
+        with:
+          spec: 'sample/openapi.yaml'
+          tests: 'sample/tests/**/*.ts'
+          format: 'json,html,csv,junit'
+          coverage-types: 'endpoint'
+          publish-pages: 'true'
+          site-dir: 'site'
+          quality-gate: 'false'
+          write-step-summary: 'false'
+
+      - name: Assert static site was generated
+        run: |
+          if [ ! -f "site/index.html" ]; then
+            echo "ERROR: site/index.html was not generated"
+            exit 1
+          fi
+          if [ ! -f "site/ai-summary.md" ]; then
+            echo "ERROR: site/ai-summary.md was not generated"
+            exit 1
+          fi
+          echo "Static site generated successfully"
+          echo "Site dir: ${{ steps.coverage-site.outputs.site-dir }}"
+
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: site/
+          retention-days: 7

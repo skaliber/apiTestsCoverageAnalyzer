@@ -1,0 +1,50 @@
+{
+  "thresholds": {
+    "global": 100,
+    "endpoint": 100,
+    "parameter": 100,
+    "business": 100,
+    "integration": 100,
+    "security": 100,
+    "error": 100,
+    "performance": 90,
+    "compatibility": 100
+  },
+  "thresholdsByBranch": {
+    "main": { "global": 100 },
+    "release/*": { "global": 100 },
+    "feature/*": { "global": 80 }
+  },
+  "publishing": {
+    "enabled": true,
+    "outputDir": "site",
+    "buildId": "run-number",
+    "githubPages": {
+      "enabled": true,
+      "basePath": "/apiTestsCoverageAnalyzer/"
+    },
+    "artifacts": {
+      "includeJson": true,
+      "includeHtml": true,
+      "includeCsv": true,
+      "includeJunit": true,
+      "includeMarkdown": true,
+      "includeScreenshots": true
+    },
+    "screenshots": {
+      "enabled": false,
+      "strict": false
+    }
+  },
+  "qualityGate": {
+    "enabled": true,
+    "failBuildOnThresholdMiss": true,
+    "mode": "strict"
+  },
+  "exclude": {
+    "paths": ["/internal/*", "/health"],
+    "methods": ["OPTIONS", "HEAD"]
+  },
+  "testPatterns": ["tests/**/*.ts"],
+  "plugins": []
+}

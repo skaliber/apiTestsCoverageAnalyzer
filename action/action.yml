@@ -57,10 +57,41 @@ inputs:
     description: 'Minimum required security coverage percentage (0-100)'
     required: false
     default: '0'
+  threshold-global:
+    description: 'Global minimum coverage percentage applied to all categories (0-100) when no per-category threshold is defined.'
+    required: false
+    default: '0'
   reports-dir:
     description: 'Directory to write reports into'
     required: false
     default: 'reports'
+  config:
+    description: 'Path to a coverage.config.json configuration file'
+    required: false
+  publish-pages:
+    description: 'Generate a static site bundle suitable for GitHub Pages deployment'
+    required: false
+    default: 'false'
+  site-dir:
+    description: 'Output directory for the static site (default: site)'
+    required: false
+    default: 'site'
+  pages-base-path:
+    description: 'Base path for GitHub Pages (e.g. /apiTestsCoverageAnalyzer/)'
+    required: false
+    default: '/'
+  quality-gate:
+    description: 'Enable quality gate enforcement. Build fails when coverage is below threshold.'
+    required: false
+    default: 'true'
+  quality-gate-mode:
+    description: 'Quality gate mode: strict (fail build) or warn (log only)'
+    required: false
+    default: 'strict'
+  write-step-summary:
+    description: 'Write a Markdown summary to the GitHub Actions step summary'
+    required: false
+    default: 'true'
   # ── Security scanning inputs ──────────────────────────────────────────────
   semgrep-report:
     description: 'Path to a pre-generated Semgrep JSON report (enables Semgrep findings in security-scan)'
@@ -114,6 +145,10 @@ outputs:
     description: 'Whether the security gate passed: "true" or "false" (security-scan only)'
   reports-dir:
     description: 'Path to the generated reports directory'
+  site-dir:
+    description: 'Path to the generated static site directory'
+  quality-gate-passed:
+    description: 'Whether the quality gate passed (true/false)'
 
 runs:
   using: 'node20'

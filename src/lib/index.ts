@@ -89,10 +89,29 @@ import {
   recordSecurityScanMetrics,
   SecurityScanMetricsSummary,
 } from '../observability';
+import {
+  evaluateQualityGate,
+  QualityGateResult,
+  QualityGateConfig,
+} from '../qualityGate';
+import {
+  generateBuildBundle,
+  copyReportFilesToBundle,
+  GeneratedReports,
+  BuildMetadata,
+} from '../publishing';
+import {
+  generateStepSummary,
+  writeStepSummary,
+  generatePrComment,
+  printCiSummary,
+} from '../buildSummary';
+import type { CoverageConfig, PublishingConfig } from '../config';
 
 // Re-export shared types so consumers can use them without diving into sub-modules
-export type { CoverageResult, ReportFormat };
-export { parseFormats, checkThresholds };
+export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };
+export { parseFormats, checkThresholds, evaluateQualityGate };
+export { generateStepSummary, writeStepSummary, generatePrComment, printCiSummary };
 
 // Re-export security scanning types and functions
 export type {
@@ -577,4 +596,88 @@ export async function runSecurityAnalysis(
 ): Promise<SecurityScanSummary> {
   const reportsDir = path.resolve(options.reportsDir ?? 'reports');
   return runSecurityScan(options.config, reportsDir);
+}
+
+// ─── Quality Gate + Publishing API ───────────────────────────────────────────
+
+/**
+ * Options for the all-in-one quality gate + publishing runner.
+ */
+export interface RunAnalysisOptions {
+  /** Pre-computed coverage results (from one or more analyze* calls) */
+  results: CoverageResult[];
+  /** Quality gate + threshold configuration */
+  config: CoverageConfig & QualityGateConfig;
+  /** Current git branch name (for branch-aware thresholds) */
+  branch?: string;
+  /** Directory where individual reports have been written */
+  reportsDir?: string;
+  /** If true, generate and write the GitHub Actions step summary */
+  writeGitHubSummary?: boolean;
+  /** GitHub Pages URL (included in step summary) */
+  pagesUrl?: string;
+}
+
+/**
+ * Evaluate a quality gate against pre-computed coverage results, generate a
+ * publishable build bundle, write the GitHub Actions step summary (if requested),
+ * and return the exit code.
+ *
+ * This is the **canonical entry-point** for consuming teams. They should not
+ * need to implement any threshold comparison or exit-code logic themselves.
+ *
+ * @example
+ * const { runAnalysisAndEnforceQualityGate } = require('api-test-coverage-analyzer');
+ * const { qualityGate, exitCode } = await runAnalysisAndEnforceQualityGate({
+ *   results,
+ *   config: { thresholds: { global: 100 } },
+ * });
+ * process.exitCode = exitCode;
+ */
+export async function runAnalysisAndEnforceQualityGate(options: RunAnalysisOptions): Promise<{
+  reports: GeneratedReports | null;
+  qualityGate: QualityGateResult;
+  exitCode: number;
+}> {
+  const { results, config, branch, reportsDir, writeGitHubSummary, pagesUrl } = options;
+
+  // 1. Evaluate quality gate
+  const gateConfig: QualityGateConfig = {
+    thresholds: config.thresholds as Record<string, number | undefined>,
+    thresholdsByBranch: config.thresholdsByBranch as Record<string, Record<string, number | undefined>> | undefined,
+    qualityGate: config.qualityGate,
+  };
+  const qualityGate = evaluateQualityGate(results, gateConfig, branch);
+
+  // 2. Generate the publishable build bundle (always – even on failure)
+  let reports: GeneratedReports | null = null;
+  const publishingConfig: PublishingConfig = config.publishing ?? {};
+
+  if (publishingConfig.enabled !== false) {
+    const thresholds: Record<string, number | undefined> = {
+      ...(config.thresholds ?? {}),
+    };
+    reports = generateBuildBundle(results, qualityGate, publishingConfig, thresholds);
+
+    // Copy report files into the bundle
+    if (reportsDir) {
+      const artifactsCfg = publishingConfig.artifacts ?? {};
+      copyReportFilesToBundle(reportsDir, reports.bundleDir, reports.siteDir, artifactsCfg);
+    }
+  }
+
+  // 3. Print CI summary
+  printCiSummary(results, qualityGate);
+
+  // 4. Write GitHub Actions step summary if requested
+  if (writeGitHubSummary && reports) {
+    const summary = generateStepSummary(results, qualityGate, reports.metadata, pagesUrl);
+    writeStepSummary(summary);
+  }
+
+  // 5. Compute exit code
+  const failBuild = config.qualityGate?.failBuildOnThresholdMiss !== false;
+  const exitCode = failBuild && !qualityGate.passed ? 1 : 0;
+
+  return { reports, qualityGate, exitCode };
 }

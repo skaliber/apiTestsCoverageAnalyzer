@@ -104,6 +104,6 @@ flows:
         method: GET
         path: /users/{id}/orders
         keywords:
-          - "user-specific order retrieval"
-          - "account order history"
-          - "orders-by-user listing"
+          - "all users orders"
+          - "orders per user"
+          - "fetch orders for each user"

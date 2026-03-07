@@ -165,8 +165,8 @@ describe('analyzeIntegrationCoverage', () => {
     const coverages = await analyzeIntegrationCoverage(flows, SAMPLE_TESTS_GLOB);
     const flow004 = coverages.find((c) => c.flow.id === 'FLOW004');
     expect(flow004).toBeDefined();
-    // FLOW004 step2 requires "user orders" / "list orders" / "orders for user"
-    // The sample test only covers step1 ("list all users")
+    // FLOW004 step2 requires "user-specific order retrieval" / "account order history" / "orders-by-user listing"
+    // None of those phrases appear in any sample test, so only step1 ("all users") is covered
     expect(flow004!.status).toBe('partial');
   });
 

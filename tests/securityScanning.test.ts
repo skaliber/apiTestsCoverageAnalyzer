@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import {
-  normaliseSemgrepOutput,
+  normalizeSemgrepOutput,
 } from '../src/security/normalizers/semgrep';
 import {
-  normaliseTrivyOutput,
+  normalizeTrivyOutput,
 } from '../src/security/normalizers/trivy';
 import {
-  normaliseZapOutput,
+  normalizeZapOutput,
 } from '../src/security/normalizers/zap';
 import {
   evaluateSecurityGate,
@@ -25,11 +25,11 @@ import {
   ScannerResult,
 } from '../src/security/types';
 
-// ─── normaliseSemgrepOutput ───────────────────────────────────────────────────
+// ─── normalizeSemgrepOutput ───────────────────────────────────────────────────
 
-describe('normaliseSemgrepOutput', () => {
+describe('normalizeSemgrepOutput', () => {
   it('returns empty array for empty results', () => {
-    expect(normaliseSemgrepOutput({ results: [] })).toEqual([]);
+    expect(normalizeSemgrepOutput({ results: [] })).toEqual([]);
   });
 
   it('normalises a Semgrep finding with security metadata', () => {
@@ -52,7 +52,7 @@ describe('normaliseSemgrepOutput', () => {
         },
       ],
     };
-    const findings = normaliseSemgrepOutput(raw);
+    const findings = normalizeSemgrepOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].scanner).toBe('semgrep');
     expect(findings[0].severity).toBe('HIGH');
@@ -76,7 +76,7 @@ describe('normaliseSemgrepOutput', () => {
         },
       ],
     };
-    const findings = normaliseSemgrepOutput(raw);
+    const findings = normalizeSemgrepOutput(raw);
     expect(findings[0].severity).toBe('MEDIUM');
   });
 
@@ -92,7 +92,7 @@ describe('normaliseSemgrepOutput', () => {
         },
       ],
     };
-    const findings = normaliseSemgrepOutput(raw);
+    const findings = normalizeSemgrepOutput(raw);
     expect(findings[0].severity).toBe('LOW');
   });
 
@@ -108,7 +108,7 @@ describe('normaliseSemgrepOutput', () => {
         },
       ],
     };
-    const findings = normaliseSemgrepOutput(raw);
+    const findings = normalizeSemgrepOutput(raw);
     expect(findings[0].category).toBe('secret');
   });
 
@@ -131,16 +131,16 @@ describe('normaliseSemgrepOutput', () => {
         },
       ],
     };
-    const findings = normaliseSemgrepOutput(raw);
+    const findings = normalizeSemgrepOutput(raw);
     expect(findings).toHaveLength(2);
   });
 });
 
-// ─── normaliseTrivyOutput ─────────────────────────────────────────────────────
+// ─── normalizeTrivyOutput ─────────────────────────────────────────────────────
 
-describe('normaliseTrivyOutput', () => {
+describe('normalizeTrivyOutput', () => {
   it('returns empty array for empty results', () => {
-    expect(normaliseTrivyOutput({ Results: [] })).toEqual([]);
+    expect(normalizeTrivyOutput({ Results: [] })).toEqual([]);
   });
 
   it('normalises vulnerability findings', () => {
@@ -165,7 +165,7 @@ describe('normaliseTrivyOutput', () => {
         },
       ],
     };
-    const findings = normaliseTrivyOutput(raw);
+    const findings = normalizeTrivyOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].scanner).toBe('trivy');
     expect(findings[0].category).toBe('sca');
@@ -196,7 +196,7 @@ describe('normaliseTrivyOutput', () => {
         },
       ],
     };
-    const findings = normaliseTrivyOutput(raw);
+    const findings = normalizeTrivyOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].scanner).toBe('trivy');
     expect(findings[0].category).toBe('secret');
@@ -223,7 +223,7 @@ describe('normaliseTrivyOutput', () => {
         },
       ],
     };
-    const findings = normaliseTrivyOutput(raw);
+    const findings = normalizeTrivyOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].scanner).toBe('trivy');
     expect(findings[0].category).toBe('misconfig');
@@ -259,7 +259,7 @@ describe('normaliseTrivyOutput', () => {
         },
       ],
     };
-    const findings = normaliseTrivyOutput(raw);
+    const findings = normalizeTrivyOutput(raw);
     expect(findings).toHaveLength(2);
     expect(findings[0].category).toBe('sca');
     expect(findings[1].category).toBe('misconfig');
@@ -281,16 +281,16 @@ describe('normaliseTrivyOutput', () => {
         },
       ],
     };
-    const findings = normaliseTrivyOutput(raw);
+    const findings = normalizeTrivyOutput(raw);
     expect(findings[0].severity).toBe('LOW');
   });
 });
 
-// ─── normaliseZapOutput ───────────────────────────────────────────────────────
+// ─── normalizeZapOutput ───────────────────────────────────────────────────────
 
-describe('normaliseZapOutput', () => {
+describe('normalizeZapOutput', () => {
   it('returns empty array for empty alerts', () => {
-    expect(normaliseZapOutput({ site: [{ alerts: [] }] })).toEqual([]);
+    expect(normalizeZapOutput({ site: [{ alerts: [] }] })).toEqual([]);
   });
 
   it('normalises ZAP alerts from site.alerts format', () => {
@@ -312,7 +312,7 @@ describe('normaliseZapOutput', () => {
         },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].scanner).toBe('zap');
     expect(findings[0].severity).toBe('HIGH');
@@ -333,7 +333,7 @@ describe('normaliseZapOutput', () => {
         },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings).toHaveLength(1);
     expect(findings[0].category).toBe('injection');
     expect(findings[0].title).toBe('Cross Site Scripting (XSS)');
@@ -348,7 +348,7 @@ describe('normaliseZapOutput', () => {
         },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings[0].severity).toBe('MEDIUM');
   });
 
@@ -361,7 +361,7 @@ describe('normaliseZapOutput', () => {
         },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings[0].severity).toBe('LOW');
   });
 
@@ -371,7 +371,7 @@ describe('normaliseZapOutput', () => {
         { alert: 'Authentication bypass via parameter tampering', riskdesc: 'High (High)' },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings[0].category).toBe('auth');
   });
 
@@ -379,7 +379,7 @@ describe('normaliseZapOutput', () => {
     const raw = {
       alerts: [{ alert: 'SSL Certificate Expired', riskdesc: 'High (High)' }],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings[0].category).toBe('crypto');
   });
 
@@ -397,7 +397,7 @@ describe('normaliseZapOutput', () => {
         },
       ],
     };
-    const findings = normaliseZapOutput(raw);
+    const findings = normalizeZapOutput(raw);
     expect(findings).toHaveLength(3);
   });
 });

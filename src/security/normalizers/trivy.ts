@@ -94,7 +94,7 @@ function mapTrivySeverity(severity: string): FindingSeverity {
 /**
  * Parse Trivy JSON output and return normalized SecurityFindings.
  */
-export function normaliseTrivyOutput(raw: unknown): SecurityFinding[] {
+export function normalizeTrivyOutput(raw: unknown): SecurityFinding[] {
   const data = raw as TrivyOutput;
   const results = data.Results ?? [];
   const findings: SecurityFinding[] = [];

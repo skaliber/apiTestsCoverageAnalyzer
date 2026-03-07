@@ -7,7 +7,7 @@ import * as path from 'path';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { ZapScannerConfig, SecurityFinding, ScannerResult } from '../types';
-import { normaliseZapOutput } from '../normalizers/zap';
+import { normalizeZapOutput } from '../normalizers/zap';
 
 const execFileAsync = promisify(execFile);
 
@@ -64,7 +64,7 @@ async function runEmbedded(config: ZapScannerConfig): Promise<SecurityFinding[]>
   } catch {
     throw new Error(`Failed to parse ZAP JSON output from ${reportFile}`);
   }
-  return normaliseZapOutput(raw);
+  return normalizeZapOutput(raw);
 }
 
 /**
@@ -82,7 +82,7 @@ function importFromFile(reportPath: string): SecurityFinding[] {
   } catch {
     throw new Error(`Failed to parse ZAP report file: ${resolved}`);
   }
-  return normaliseZapOutput(raw);
+  return normalizeZapOutput(raw);
 }
 
 /**

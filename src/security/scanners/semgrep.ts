@@ -7,7 +7,7 @@ import * as path from 'path';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { SemgrepScannerConfig, SecurityFinding, ScannerResult } from '../types';
-import { normaliseSemgrepOutput } from '../normalizers/semgrep';
+import { normalizeSemgrepOutput } from '../normalizers/semgrep';
 
 const execFileAsync = promisify(execFile);
 
@@ -51,7 +51,7 @@ async function runEmbedded(
     throw new Error(`Failed to parse Semgrep JSON output: ${stdout.slice(0, 500)}`);
   }
 
-  return normaliseSemgrepOutput(raw);
+  return normalizeSemgrepOutput(raw);
 }
 
 /**
@@ -69,7 +69,7 @@ function importFromFile(reportPath: string): SecurityFinding[] {
   } catch {
     throw new Error(`Failed to parse Semgrep report file: ${resolved}`);
   }
-  return normaliseSemgrepOutput(raw);
+  return normalizeSemgrepOutput(raw);
 }
 
 /**

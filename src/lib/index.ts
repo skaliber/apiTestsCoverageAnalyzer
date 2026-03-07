@@ -75,9 +75,9 @@ import {
   buildSecurityScanSummary,
   generateSecurityScanReports,
   evaluateSecurityGate,
-  normaliseSemgrepOutput,
-  normaliseTrivyOutput,
-  normaliseZapOutput,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
   SecurityScanConfig,
   SecurityFinding,
   SecurityGateConfig,
@@ -104,9 +104,9 @@ export {
   buildSecurityScanSummary,
   generateSecurityScanReports,
   evaluateSecurityGate,
-  normaliseSemgrepOutput,
-  normaliseTrivyOutput,
-  normaliseZapOutput,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
 };
 
 // ─── Shared option types ──────────────────────────────────────────────────────

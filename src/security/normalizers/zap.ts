@@ -132,7 +132,7 @@ function extractAlerts(data: ZapOutput): ZapAlert[] {
 /**
  * Parse ZAP JSON output and return normalized SecurityFindings.
  */
-export function normaliseZapOutput(raw: unknown): SecurityFinding[] {
+export function normalizeZapOutput(raw: unknown): SecurityFinding[] {
   const data = raw as ZapOutput;
   const alerts = extractAlerts(data);
 

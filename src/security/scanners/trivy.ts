@@ -7,7 +7,7 @@ import * as path from 'path';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { TrivyScannerConfig, SecurityFinding, ScannerResult } from '../types';
-import { normaliseTrivyOutput } from '../normalizers/trivy';
+import { normalizeTrivyOutput } from '../normalizers/trivy';
 
 const execFileAsync = promisify(execFile);
 
@@ -40,7 +40,7 @@ async function runEmbedded(
     throw new Error(`Failed to parse Trivy JSON output: ${stdout.slice(0, 500)}`);
   }
 
-  return normaliseTrivyOutput(raw);
+  return normalizeTrivyOutput(raw);
 }
 
 /**
@@ -58,7 +58,7 @@ function importFromFile(reportPath: string): SecurityFinding[] {
   } catch {
     throw new Error(`Failed to parse Trivy report file: ${resolved}`);
   }
-  return normaliseTrivyOutput(raw);
+  return normalizeTrivyOutput(raw);
 }
 
 /**

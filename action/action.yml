@@ -20,7 +20,7 @@ inputs:
     required: false
     default: 'json,html'
   coverage-types:
-    description: 'Comma-separated coverage types to run: endpoint,parameter,business,integration,error,security (default: endpoint)'
+    description: 'Comma-separated coverage types to run: endpoint,parameter,business,integration,error,security,security-scan (default: endpoint)'
     required: false
     default: 'endpoint'
   rules:
@@ -61,6 +61,39 @@ inputs:
     description: 'Directory to write reports into'
     required: false
     default: 'reports'
+  # ── Security scanning inputs ──────────────────────────────────────────────
+  semgrep-report:
+    description: 'Path to a pre-generated Semgrep JSON report (enables Semgrep findings in security-scan)'
+    required: false
+  trivy-report:
+    description: 'Path to a pre-generated Trivy JSON report (enables Trivy findings in security-scan)'
+    required: false
+  zap-report:
+    description: 'Path to a pre-generated ZAP JSON report (enables ZAP findings in security-scan)'
+    required: false
+  fail-on-critical:
+    description: 'Fail the security gate if any CRITICAL finding exists (security-scan only)'
+    required: false
+    default: 'false'
+  fail-on-high:
+    description: 'Fail the security gate if any HIGH finding exists (security-scan only)'
+    required: false
+    default: 'false'
+  max-secrets:
+    description: 'Maximum allowed secrets (any severity). Empty = no limit. (security-scan only)'
+    required: false
+  max-medium:
+    description: 'Maximum allowed MEDIUM findings. Empty = no limit. (security-scan only)'
+    required: false
+  max-misconfig-high:
+    description: 'Maximum allowed HIGH/CRITICAL misconfigurations. Empty = no limit. (security-scan only)'
+    required: false
+  max-critical-vulns:
+    description: 'Maximum allowed CRITICAL dependency vulnerabilities. Empty = no limit. (security-scan only)'
+    required: false
+  max-high-vulns:
+    description: 'Maximum allowed HIGH dependency vulnerabilities. Empty = no limit. (security-scan only)'
+    required: false
 
 outputs:
   endpoint-coverage:
@@ -75,6 +108,10 @@ outputs:
     description: 'Error handling coverage percentage'
   security-coverage:
     description: 'Security coverage percentage'
+  security-scan-findings:
+    description: 'Total number of security scan findings (security-scan only)'
+  security-gate-passed:
+    description: 'Whether the security gate passed: "true" or "false" (security-scan only)'
   reports-dir:
     description: 'Path to the generated reports directory'
 

@@ -126,7 +126,7 @@ function normaliseTags(value: string | string[] | undefined): string[] {
 /**
  * Parse a Semgrep JSON output buffer and return normalized SecurityFindings.
  */
-export function normaliseSemgrepOutput(raw: unknown): SecurityFinding[] {
+export function normalizeSemgrepOutput(raw: unknown): SecurityFinding[] {
   const data = raw as SemgrepOutput;
   const results = data.results ?? [];
 

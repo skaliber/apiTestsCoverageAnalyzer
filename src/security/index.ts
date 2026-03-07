@@ -22,9 +22,9 @@ import { evaluateSecurityGate } from './gate/index';
 // ─── Re-exports ───────────────────────────────────────────────────────────────
 
 export * from './types';
-export { normaliseSemgrepOutput } from './normalizers/semgrep';
-export { normaliseTrivyOutput } from './normalizers/trivy';
-export { normaliseZapOutput } from './normalizers/zap';
+export { normalizeSemgrepOutput } from './normalizers/semgrep';
+export { normalizeTrivyOutput } from './normalizers/trivy';
+export { normalizeZapOutput } from './normalizers/zap';
 export { evaluateSecurityGate } from './gate/index';
 
 // ─── Scanner orchestration ────────────────────────────────────────────────────

@@ -16,7 +16,7 @@ By default (`--language auto`) the analyzer inspects each test file's extension 
 | `.rb` | Ruby | Rails request specs, HTTParty, Faraday |
 | `.feature` | Cucumber | Gherkin steps + step-definition files |
 
-You can also declare languages explicitly with `--language <lang>` (see [CLI Reference](/reference/cli#supported-languages)).
+You can also declare languages explicitly with `--language <lang>` (see [CLI Reference](../reference/cli.md#supported-languages)).
 
 ## Supported frameworks
 
@@ -267,6 +267,6 @@ end
 
 ## Next steps
 
-- [CLI Reference: --language option →](/reference/cli#supported-languages)
-- [Extending via Plugins →](/guide/plugins)
-- [Writing Effective Tests →](/guide/writing-tests)
+- [CLI Reference: --language option →](../reference/cli.md#supported-languages)
+- [Extending via Plugins →](./plugins.md)
+- [Writing Effective Tests →](./writing-tests.md)

@@ -66,6 +66,6 @@ flowchart LR
 
 ## Next steps
 
-- [Install the tool →](/guide/installation)
-- [Run your first analysis →](/guide/getting-started)
-- [Explore the CLI reference →](/reference/cli)
+- [Install the tool →](./installation.md)
+- [Run your first analysis →](./getting-started.md)
+- [Explore the CLI reference →](../reference/cli.md)

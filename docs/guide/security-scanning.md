@@ -461,7 +461,7 @@ Add security scanning to your workflow with a few lines:
   run: trivy fs --format json --scanners vuln,secret . > reports/trivy.json
 
 - name: Enforce security gate
-  uses: skaliber/apiTestsCoverageAnalyzer@main
+  uses: q-intel/apiTestsCoverageAnalyzer@main
   with:
     coverage-types: 'security-scan'
     semgrep-report: 'reports/semgrep.json'
@@ -471,7 +471,7 @@ Add security scanning to your workflow with a few lines:
     max-medium: '10'
 ```
 
-See [CI/CD Integration →](/guide/ci-cd) for a full workflow example.
+See [CI/CD Integration →](./ci-cd.md) for a full workflow example.
 
 ## Configuration reference
 
@@ -664,6 +664,6 @@ rule_files:
 
 ## Next steps
 
-- [CLI Reference → `security-scan`](/reference/cli#security-scan)
-- [CI/CD Integration →](/guide/ci-cd)
-- [Architecture →](/reference/architecture)
+- [CLI Reference → `security-scan`](../reference/cli.md#security-scan)
+- [CI/CD Integration →](./ci-cd.md)
+- [Architecture →](../reference/architecture.md)

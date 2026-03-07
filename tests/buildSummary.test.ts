@@ -85,6 +85,15 @@ describe('generateStepSummary', () => {
     const summary = generateStepSummary(sampleResults, failedGate, failMeta);
     expect(summary).toContain('Recommended');
   });
+
+  it('shows ⚠️ No coverage for 0% categories that did not fail threshold', () => {
+    const zeroResults = [makeResult('error', 0), makeResult('endpoint', 100)];
+    const zeroGate = makeGate(true);
+    const zeroMeta = buildBuildMetadata(zeroResults, zeroGate, {}, 'zero-step', {});
+    const summary = generateStepSummary(zeroResults, zeroGate, zeroMeta);
+    expect(summary).toContain('⚠️ No coverage');
+    expect(summary).not.toMatch(/error.*✅ Pass/);
+  });
 });
 
 // ─── writeStepSummary ─────────────────────────────────────────────────────────
@@ -143,6 +152,15 @@ describe('generatePrComment', () => {
     const comment = generatePrComment(sampleResults, failedGate, failMeta);
     expect(comment).toContain('Failures');
     expect(comment).toContain('endpoint');
+  });
+
+  it('shows ⚠️ icon for 0% coverage that did not fail threshold', () => {
+    const zeroResults = [makeResult('error', 0), makeResult('endpoint', 100)];
+    const zeroGate = makeGate(true);
+    const zeroMeta = buildBuildMetadata(zeroResults, zeroGate, {}, 'zero-test', {});
+    const comment = generatePrComment(zeroResults, zeroGate, zeroMeta);
+    expect(comment).toContain('⚠️');
+    expect(comment).not.toMatch(/\| error \| 0\.00% \| ✅/);
   });
 });
 

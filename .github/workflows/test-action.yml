@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -115,6 +116,7 @@ jobs:
           trivy-report: 'reports/trivy.json'
           fail-on-critical: 'true'
           max-secrets: '0'
+          post-pr-comment: 'false'
 
       - name: Print gate result
         if: always()
@@ -171,6 +173,7 @@ jobs:
           coverage-types: 'endpoint'
           quality-gate: 'false'
           write-step-summary: 'false'
+          post-pr-comment: 'false'
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -185,6 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,6 +218,7 @@ jobs:
           coverage-types: 'endpoint,error,security'
           quality-gate: 'false'
           write-step-summary: 'false'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print endpoint coverage
         run: echo "Endpoint coverage ${{ steps.coverage.outputs.endpoint-coverage }}%"
@@ -261,6 +266,7 @@ jobs:
           quality-gate: 'true'
           quality-gate-mode: 'strict'
           write-step-summary: 'false'
+          post-pr-comment: 'false'
 
       - name: Assert quality gate passed at 100% threshold
         run: |
@@ -307,6 +313,7 @@ jobs:
           quality-gate: 'true'
           quality-gate-mode: 'strict'
           write-step-summary: 'false'
+          post-pr-comment: 'false'
 
       - name: Assert quality gate passed
         run: |
@@ -352,6 +359,7 @@ jobs:
           quality-gate: 'true'
           quality-gate-mode: 'warn'
           write-step-summary: 'false'
+          post-pr-comment: 'false'
 
       - name: Assert warn mode succeeded with 100% coverage
         run: |
@@ -395,6 +403,7 @@ jobs:
           site-dir: 'site'
           quality-gate: 'false'
           write-step-summary: 'false'
+          post-pr-comment: 'false'
 
       - name: Assert static site was generated
         run: |

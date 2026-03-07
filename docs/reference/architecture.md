@@ -231,7 +231,7 @@ sequenceDiagram
 
 ## Configuration schema
 
-See [Configuration Schema →](/reference/configuration) for the full JSON schema.
+See [Configuration Schema →](./configuration.md) for the full JSON schema.
 
 ## Versioning
 

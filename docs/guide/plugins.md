@@ -91,7 +91,7 @@ Plugins are loaded and run automatically for every coverage command. Their resul
 
 ## GraphQL plugin example
 
-A fully worked example is included at [`plugins/graphql-coverage.js`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/plugins/graphql-coverage.js). It:
+A fully worked example is included at [`plugins/graphql-coverage.js`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/plugins/graphql-coverage.js). It:
 
 1. Reads a `schema.graphql` file from the project root.
 2. Parses all types and fields using a lightweight regex-based SDL parser (no `graphql` package dependency).
@@ -137,5 +137,5 @@ Users install it and reference it by module name in `coverage.config.json`:
 
 ## Next steps
 
-- [Configuration Schema →](/reference/configuration)
-- [Plugin API →](/reference/plugin-api)
+- [Configuration Schema →](../reference/configuration.md)
+- [Plugin API →](../reference/plugin-api.md)

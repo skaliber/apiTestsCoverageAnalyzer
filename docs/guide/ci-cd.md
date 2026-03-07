@@ -4,7 +4,7 @@ The analyzer is designed to slot into any CI pipeline. This guide covers GitHub 
 
 ## GitHub Actions
 
-An example workflow is provided at [`ci/examples/github-actions.yaml`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/ci/examples/github-actions.yaml). Copy it to `.github/workflows/api-coverage.yaml` in your project.
+An example workflow is provided at [`ci/examples/github-actions.yaml`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/ci/examples/github-actions.yaml). Copy it to `.github/workflows/api-coverage.yaml` in your project.
 
 ```yaml
 name: API Coverage Analysis
@@ -111,7 +111,7 @@ Add a separate job to build and publish the documentation site:
 
 ## Jenkins Pipeline
 
-An example `Jenkinsfile` is at [`ci/examples/jenkins-pipeline.groovy`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/ci/examples/jenkins-pipeline.groovy). Key stages:
+An example `Jenkinsfile` is at [`ci/examples/jenkins-pipeline.groovy`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/ci/examples/jenkins-pipeline.groovy). Key stages:
 
 ```groovy
 pipeline {
@@ -219,7 +219,7 @@ For ZAP dynamic scanning, run ZAP in a separate job (or Docker container) and im
         --fail-on-critical
 ```
 
-See the [Security Scanning guide →](/guide/security-scanning) for full configuration options.
+See the [Security Scanning guide →](./security-scanning.md) for full configuration options.
 
 ## Integration flow
 
@@ -248,6 +248,6 @@ netlify deploy --prod --dir reports/
 
 ## Next steps
 
-- [Security Scanning →](/guide/security-scanning)
-- [Interpreting Reports →](/guide/interpreting-reports)
-- [CLI Reference →](/reference/cli)
+- [Security Scanning →](./security-scanning.md)
+- [Interpreting Reports →](./interpreting-reports.md)
+- [CLI Reference →](../reference/cli.md)

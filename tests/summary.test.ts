@@ -535,6 +535,28 @@ describe('generatePrSummary – content', () => {
     expect(result.markdown).toContain('business');
   });
 
+  it('shows ⚠️ PASS for 0% coverage when threshold is met', async () => {
+    const zeroResult = makeResult('error', 0);
+    const input: SummaryInput = {
+      ...sampleInput,
+      results: [zeroResult],
+      thresholds: { error: 0 },
+      qualityGate: makeGate(true),
+    };
+    const result = await generatePrSummary(input);
+    expect(result.markdown).toContain('⚠️ PASS');
+    expect(result.markdown).not.toContain('✅ PASS');
+  });
+
+  it('shows — for categories with no threshold configured', async () => {
+    const input: SummaryInput = {
+      ...sampleInput,
+      thresholds: {},
+    };
+    const result = await generatePrSummary(input);
+    expect(result.markdown).toContain('—');
+  });
+
   it('returns sections array', async () => {
     const result = await generatePrSummary(sampleInput);
     expect(Array.isArray(result.sections)).toBe(true);

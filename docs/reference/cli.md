@@ -294,7 +294,7 @@ node dist/index.js security-coverage \
 
 Runs integrated open-source security scanners (Semgrep, Trivy, ZAP), normalizes findings into a unified model, and enforces a security gate. Unlike `security-coverage`, this command uses real scanner tooling rather than test heuristics.
 
-See the full [Security Scanning guide →](/guide/security-scanning) for detailed setup instructions.
+See the full [Security Scanning guide →](../guide/security-scanning.md) for detailed setup instructions.
 
 ### Options
 

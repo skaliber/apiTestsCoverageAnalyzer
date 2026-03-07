@@ -1,6 +1,6 @@
 # API Test Coverage Analyzer
 
-[![Build](https://github.com/skaliber/apiTestsCoverageAnalyzer/actions/workflows/api-coverage.yaml/badge.svg)](https://github.com/skaliber/apiTestsCoverageAnalyzer/actions)
+[![Build](https://github.com/q-intel/apiTestsCoverageAnalyzer/actions/workflows/api-coverage.yaml/badge.svg)](https://github.com/q-intel/apiTestsCoverageAnalyzer/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 
@@ -65,7 +65,7 @@ npx api-test-coverage-analyzer endpoint-coverage \
 ### Option 3 – Clone the repository (development)
 
 ```bash
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 
 # Install dependencies
@@ -191,7 +191,7 @@ steps:
 
   - name: Run API coverage analysis
     id: coverage
-    uses: skaliber/apiTestsCoverageAnalyzer/action@v1
+    uses: q-intel/apiTestsCoverageAnalyzer/action@v1
     with:
       spec: 'sample/openapi.yaml'
       tests: 'tests/**/*.ts'
@@ -383,7 +383,11 @@ Load any JSON report from `reports/` and explore:
 Full documentation is available in the [`docs/`](docs/) directory and can be served locally:
 
 ```bash
-npm run docs:dev    # http://localhost:5174
+npm run docs:dev      # start dev server at http://localhost:5174
+npm run docs:build    # build static site → docs/.vitepress/dist/
+npm run docs:check    # validate sidebar, links, and assets, then build
+npm run docs:preview  # serve the built site (production preview)
+npm run docs:test     # run Cypress navigation/link tests
 ```
 
 Documentation sections:
@@ -465,4 +469,4 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
 ## License
 
-MIT © [skaliber](https://github.com/skaliber)
+MIT © [q-intel](https://github.com/q-intel)

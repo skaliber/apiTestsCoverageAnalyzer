@@ -36,6 +36,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "docs:check": "node scripts/docs-check.js && npm run docs:build",
     "docs:test": "cypress run --config-file cypress.config.js",
     "docs:test:open": "cypress open --config-file cypress.config.js",
     "dashboard:test": "cypress run --config-file cypress.dashboard.config.js",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
     "@apidevtools/swagger-parser": "^10.0.2",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.213.0",

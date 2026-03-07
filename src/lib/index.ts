@@ -7,6 +7,27 @@
  *   const results = await analyzeEndpoints({ spec: 'openapi.yaml', tests: 'tests/**\/*.ts' });
  */
 
+// Re-export security scanning types and functions
+export type {
+  SecurityFinding,
+  SecurityGateConfig,
+  SecurityGateResult,
+  SecurityScanConfig,
+  SecurityScanSummary,
+  ScannerResult,
+} from '../security/index';
+export {
+  runSecurityScan,
+  buildSecurityScanSummary,
+  generateSecurityScanReports,
+  evaluateSecurityGate,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
+} from '../security/index';
+export type { SecurityScanMetricsSummary } from '../observability';
+export { recordSecurityScanMetrics } from '../observability';
+
 import * as path from 'path';
 import {
   runSecurityScan,
@@ -107,27 +128,6 @@ import {
   printCiSummary,
 } from '../buildSummary';
 import type { CoverageConfig, PublishingConfig } from '../config';
-
-// Re-export security scanning types and functions
-export type {
-  SecurityFinding,
-  SecurityGateConfig,
-  SecurityGateResult,
-  SecurityScanConfig,
-  SecurityScanSummary,
-  ScannerResult,
-  SecurityScanMetricsSummary,
-};
-export {
-  runSecurityScan,
-  buildSecurityScanSummary,
-  generateSecurityScanReports,
-  evaluateSecurityGate,
-  normalizeSemgrepOutput,
-  normalizeTrivyOutput,
-  normalizeZapOutput,
-  recordSecurityScanMetrics,
-};
 
 // Re-export shared types so consumers can use them without diving into sub-modules
 export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };

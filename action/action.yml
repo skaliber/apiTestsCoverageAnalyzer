@@ -137,6 +137,10 @@ outputs:
     description: 'Integration flow coverage percentage'
   error-coverage:
     description: 'Error handling coverage percentage'
+  security-scan-findings:
+    description: 'Total number of security scan findings (security-scan only)'
+  security-gate-passed:
+    description: 'Whether the security gate passed: "true" or "false" (security-scan only)'
   security-coverage:
     description: 'Security coverage percentage'
   reports-dir:
@@ -145,10 +149,6 @@ outputs:
     description: 'Path to the generated static site directory'
   quality-gate-passed:
     description: 'Whether the quality gate passed (true/false)'
-  security-scan-findings:
-    description: 'Total number of security scan findings (security-scan only)'
-  security-gate-passed:
-    description: 'Whether the security gate passed: "true" or "false" (security-scan only)'
 
 runs:
   using: 'node20'

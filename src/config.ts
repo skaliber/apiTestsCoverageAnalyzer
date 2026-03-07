@@ -83,6 +83,26 @@ export interface QualityGateConfig {
   mode?: 'strict' | 'warn';
 }
 
+/** Summary engine configuration block */
+export interface SummaryConfig {
+  /** Whether to generate summaries at all (default: true) */
+  enabled?: boolean;
+  /** Generate a PR comment summary (default: true) */
+  generatePrSummary?: boolean;
+  /** Generate a build/CI summary (default: true) */
+  generateBuildSummary?: boolean;
+  /** Generate AI-friendly summary files (default: true) */
+  generateAiSummary?: boolean;
+  /** When true, omit sections for analyzers that did not run (default: false) */
+  includeOnlyEvaluatedSections?: boolean;
+  /** Post/update a PR comment when running in GitHub Actions PR context */
+  publishPrComment?: boolean;
+  /** Write step summary to $GITHUB_STEP_SUMMARY (default: true) */
+  publishGithubStepSummary?: boolean;
+  /** Generate Jenkins-compatible summary artifacts (default: true) */
+  publishJenkinsSummary?: boolean;
+}
+
 /**
  * Top-level configuration object that can be provided via `coverage.config.json`.
  */
@@ -101,6 +121,8 @@ export interface CoverageConfig {
   publishing?: PublishingConfig;
   /** Quality gate / threshold enforcement settings */
   qualityGate?: QualityGateConfig;
+  /** Summary engine configuration */
+  summary?: SummaryConfig;
 }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────

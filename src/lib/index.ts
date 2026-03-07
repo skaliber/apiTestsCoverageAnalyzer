@@ -28,6 +28,16 @@ export {
 export type { SecurityScanMetricsSummary } from '../observability';
 export { recordSecurityScanMetrics } from '../observability';
 
+// Re-export summary engine
+export { generateBuildSummary, generatePrSummary } from '../summary/index';
+export type {
+  SummaryInput,
+  SummaryResult,
+  SummarySection,
+  SummaryConfig,
+} from '../summary/index';
+
+
 import * as path from 'path';
 import {
   runSecurityScan,
@@ -127,6 +137,7 @@ import {
   generatePrComment,
   printCiSummary,
 } from '../buildSummary';
+import { generateBuildSummary, generatePrSummary } from '../summary/index';
 import type { CoverageConfig, PublishingConfig } from '../config';
 
 // Re-export shared types so consumers can use them without diving into sub-modules
@@ -675,7 +686,24 @@ export async function runAnalysisAndEnforceQualityGate(options: RunAnalysisOptio
     writeStepSummary(summary);
   }
 
-  // 5. Compute exit code
+  // 5. Generate built-in summary files (always – even on failure)
+  const summaryConfig = config.summary;
+  const summaryEnabled = summaryConfig?.enabled !== false;
+  if (summaryEnabled && reportsDir) {
+    const thresholds: Record<string, number | undefined> = { ...(config.thresholds ?? {}) };
+    const summaryInput = {
+      results,
+      qualityGate,
+      thresholds,
+      summaryConfig,
+      branch,
+      pagesUrl,
+    };
+    await generateBuildSummary(summaryInput, reportsDir);
+    await generatePrSummary(summaryInput, reportsDir);
+  }
+
+  // 6. Compute exit code
   const failBuild = config.qualityGate?.failBuildOnThresholdMiss !== false;
   const exitCode = failBuild && !qualityGate.passed ? 1 : 0;
 

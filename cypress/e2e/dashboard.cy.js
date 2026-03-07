@@ -1,13 +1,14 @@
 /**
  * Cypress e2e tests for the coverage analysis dashboard.
  *
- * Covers all 9 routes and key UI interactions:
+ * Covers all 10 routes and key UI interactions:
  *   - Sidebar navigation to every page
  *   - Overview: summary table, quality gate banner, bar chart, header info
  *   - Detail pages (Endpoints, Parameters, Security, Error Handling, Performance):
  *       table rendering, search/filter, pie chart
  *   - Business Rules: accordion expand / collapse, search
  *   - Integration Flows: flow cards with step counts, search, pie chart
+ *   - Coverage Intelligence: placeholder / no-report state
  *   - Trends: loaded-reports list, "load 2 reports" prompt
  *   - Theme toggle: light ↔ dark mode
  *   - File upload button visibility
@@ -26,6 +27,7 @@ const PAGES = [
   { path: '/security',          heading: 'Security',                navText: 'Security'          },
   { path: '/error-handling',    heading: 'Error Handling',          navText: 'Error Handling'    },
   { path: '/performance',       heading: 'Performance & Resilience',navText: 'Performance'       },
+  { path: '/intelligence',      heading: 'Coverage Intelligence',   navText: 'Intelligence'      },
   { path: '/trends',            heading: 'Coverage Trends',         navText: 'Trends'            },
 ]
 
@@ -39,7 +41,7 @@ describe('Dashboard navigation', () => {
     cy.contains('API Coverage').should('be.visible')
   })
 
-  it('shows all 9 sidebar navigation links', () => {
+  it('shows all 10 sidebar navigation links', () => {
     PAGES.forEach(({ navText }) => {
       cy.get('nav').contains(navText).should('exist')
     })
@@ -398,5 +400,125 @@ describe('File upload (Load Report)', () => {
     cy.get('[data-testid="summary-table"]', { timeout: 10000 })
     cy.contains('Load Report').should('be.visible')
     cy.get('input[type="file"]#file-upload').should('exist')
+  })
+})
+
+// ─── 13. Coverage Intelligence page ──────────────────────────────────────────
+
+describe('Coverage Intelligence page', () => {
+  it('navigates to /intelligence via sidebar', () => {
+    cy.visit('/')
+    cy.get('nav').contains('Intelligence').click()
+    cy.url().should('include', '/intelligence')
+  })
+
+  it('shows the Coverage Intelligence heading', () => {
+    cy.visit('/intelligence')
+    cy.get('h1').should('contain', 'Coverage Intelligence')
+  })
+
+  it('shows the no-report state when report is not available', () => {
+    // Intercept the report fetch so it returns a 404
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { statusCode: 404 }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+    cy.contains('Coverage Intelligence report not available').should('be.visible')
+    cy.contains('api-coverage coverage-intelligence').should('be.visible')
+  })
+
+  it('renders summary cards when report data is available', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'test-project',
+      findings: [
+        {
+          id: 'ff-1',
+          source: 'coverage-gap-analysis',
+          category: 'uncovered-endpoint',
+          severity: 'HIGH',
+          title: 'Uncovered endpoint: POST /payments',
+          description: 'Endpoint POST /payments has no test coverage.',
+          endpoint: { method: 'POST', path: '/payments' },
+          missingTestTypes: ['positive-api-test'],
+        },
+      ],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P1',
+          title: 'Add positive api test for: Uncovered endpoint: POST /payments',
+          rationale: 'Endpoint POST /payments has no test coverage.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'POST', path: '/payments' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: ['ff-1'],
+          riskScore: 72,
+          confidence: 'medium',
+        },
+      ],
+      summary: {
+        totalFindings: 1,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 0 },
+        totalRecommendations: 1,
+        recommendationsByPriority: { P0: 0, P1: 1, P2: 0, P3: 0 },
+        maxRiskScore: 72,
+        avgRiskScore: 72,
+        criticalUncoveredItems: 1,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: ['POST /payments (score 72)'],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    cy.contains('Total Findings').should('be.visible')
+    cy.contains('Recommendations').should('be.visible')
+    cy.contains('Max Risk Score').should('be.visible')
+    cy.contains('P0 Actions').should('be.visible')
+  })
+
+  it('shows recommendations section with filter dropdowns', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'test-project',
+      findings: [],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P1',
+          title: 'Add security test',
+          rationale: 'Security finding unprotected.',
+          recommendedTestType: 'security-test',
+          endpoint: { method: 'POST', path: '/admin' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: [],
+          riskScore: 80,
+          confidence: 'high',
+        },
+      ],
+      summary: {
+        totalFindings: 0,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 },
+        totalRecommendations: 1,
+        recommendationsByPriority: { P0: 0, P1: 1, P2: 0, P3: 0 },
+        maxRiskScore: 80,
+        avgRiskScore: 80,
+        criticalUncoveredItems: 0,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: [],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    cy.contains('Missing Test Recommendations').should('be.visible')
+    cy.contains('All Priorities').should('be.visible')
+    cy.contains('All Risk Bands').should('be.visible')
   })
 })

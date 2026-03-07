@@ -17,6 +17,14 @@ A CLI tool that measures how thoroughly your test suite exercises your API surfa
 
 The answers appear in rich **HTML**, **JSON**, **CSV**, and **JUnit** reports that can be enforced as pass/fail gates in any CI pipeline.
 
+### Coverage Intelligence
+
+Beyond raw percentages, the **Coverage Intelligence** engine answers:
+
+> **What is missing? What matters most? What should be tested next?**
+
+It identifies **functional findings**, links them to **missing test recommendations**, assigns **risk scores** (0–100), and prioritises work as **P0/P1/P2/P3**.  Outputs are AI-friendly markdown — ready for LLM consumption or CI gating.
+
 ---
 
 ## Table of Contents
@@ -260,8 +268,57 @@ Summary files are always generated – even when the gate fails.
 | `perf-resilience-coverage` | Load-test SLA + resilience patterns | `--spec`, `--load-results` |
 | `compatibility-check` | Breaking changes + Pact contract violations | `--old-spec`, `--new-spec` |
 | `generate-md-report` | Markdown summary from JSON reports | `--reports`, `--output` |
+| `coverage-intelligence` | Identify findings, missing tests, risk scores, P0–P3 priorities | `--reports-dir`, `--out-dir` |
 
 All commands accept `--format json,html,csv,junit` and `--threshold-*` flags.
+
+### Coverage Intelligence (`coverage-intelligence`)
+
+The intelligence command ingests all coverage reports and produces prioritised, AI-friendly outputs:
+
+```bash
+# Generate intelligence reports after running other coverage commands
+api-coverage coverage-intelligence \
+  --reports-dir reports \
+  --out-dir     reports \
+  --project-name my-api \
+  --languages   typescript \
+  --frameworks  jest
+```
+
+**Generated files:**
+
+| File | Description |
+|------|-------------|
+| `reports/coverage-intelligence.json` | Full intelligence report (findings + recommendations) |
+| `reports/coverage-intelligence.md` | AI-friendly summary with top 10 findings and recommendations |
+| `reports/missing-tests-recommendations.json` | Prioritised missing test recommendations |
+| `reports/missing-tests-recommendations.md` | Markdown recommendations per recommendation |
+| `reports/risk-prioritization.json` | Risk breakdown by score, category, and endpoint |
+| `reports/risk-prioritization.md` | Risk prioritisation narrative |
+
+**Functional Findings** map gaps in coverage to specific root causes (e.g. "no auth test on DELETE /users/{id}").  
+**Missing Test Recommendations** are prioritised P0–P3 by a risk formula:
+
+```
+Risk Score =
+  0.30 × SeverityWeight +
+  0.20 × ExposureWeight +
+  0.15 × CriticalityWeight +
+  0.15 × MissingCoverageWeight +
+  0.10 × SecuritySignalWeight +
+  0.05 × FlowImpactWeight +
+  0.05 × ChangeVolatilityWeight
+```
+
+| Score | Risk Band | Priority |
+|-------|-----------|---------|
+| 85–100 | Critical | P0 — immediate action |
+| 70–84 | Critical | P1 — high urgency |
+| 50–69 | High | P2 — address soon |
+| 0–49 | Moderate/Low | P3 — backlog |
+
+Security findings, money-movement endpoints, and auth/authz gaps are never rated below P1 regardless of formula score.
 
 ## Configuration
 

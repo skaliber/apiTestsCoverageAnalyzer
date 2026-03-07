@@ -14,7 +14,7 @@
  *     0.05 * FlowImpactWeight +
  *     0.05 * ChangeVolatilityWeight
  *
- * All components are normalised to 0–100.  Final score is clamped to 0–100
+ * All components are normalized to 0–100.  Final score is clamped to 0–100
  * and rounded to the nearest integer.
  */
 

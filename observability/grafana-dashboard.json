@@ -1189,6 +1189,325 @@
           "instant": true
         }
       ]
+    },
+    {
+      "id": 20,
+      "title": "Coverage Intelligence",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      }
+    },
+    {
+      "id": 21,
+      "title": "Functional Findings Total",
+      "type": "stat",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 49
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_functional_findings_total{project=~\"$project\"}",
+          "legendFormat": "Findings"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 5,
+                "color": "yellow"
+              },
+              {
+                "value": 20,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 22,
+      "title": "Missing Test Recommendations",
+      "type": "stat",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 49
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_missing_test_recommendations_total{project=~\"$project\"}",
+          "legendFormat": "Recommendations"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 10,
+                "color": "yellow"
+              },
+              {
+                "value": 30,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 23,
+      "title": "Max Risk Score",
+      "type": "gauge",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 49
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_risk_score_max{project=~\"$project\"}",
+          "legendFormat": "Max Risk Score"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 75,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Critical Uncovered Items",
+      "type": "stat",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 49
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_critical_uncovered_items_total{project=~\"$project\"}",
+          "legendFormat": "Critical Uncovered"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Unprotected Security Findings",
+      "type": "stat",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 49
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_unprotected_security_findings_total{project=~\"$project\"}",
+          "legendFormat": "Unprotected"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 26,
+      "title": "Recommendations by Priority",
+      "type": "barchart",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_missing_test_recommendations_by_priority{project=~\"$project\"}",
+          "legendFormat": "{{priority}} ({{risk_band}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 27,
+      "title": "Avg Risk Score Over Time",
+      "type": "timeseries",
+      "datasource": "prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "api_coverage_risk_score_avg{project=~\"$project\"}",
+          "legendFormat": "Avg Risk Score"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 75,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
     }
   ],
   "refresh": "30s",
@@ -1221,6 +1540,16 @@
         "regex": "",
         "sort": 0,
         "type": "query"
+      },
+      {
+        "name": "project",
+        "label": "Project",
+        "type": "query",
+        "query": "label_values(api_coverage_risk_score_max, project)",
+        "refresh": 2,
+        "multi": false,
+        "includeAll": true,
+        "allValue": ".*"
       }
     ]
   },

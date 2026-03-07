@@ -296,7 +296,6 @@ function FindingDrawer({
 type SortField = 'riskScore' | 'severity' | 'priority' | 'linkedFindings';
 
 const PRIORITY_ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
-const SEVERITY_ORDER: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
 interface IntelligenceSectionProps {
   /** Coverage type label for filtering (e.g. "endpoint", "security", "business") */
@@ -357,7 +356,7 @@ export default function IntelligenceSection({
             return sortNumber(
               PRIORITY_ORDER[a.priority] ?? 9,
               PRIORITY_ORDER[b.priority] ?? 9,
-              sortDir === 'asc' ? 'asc' : 'desc',
+              sortDir,
             );
           case 'linkedFindings':
             return sortNumber(a.linkedFindingIds.length, b.linkedFindingIds.length, sortDir);

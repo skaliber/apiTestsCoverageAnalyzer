@@ -455,6 +455,7 @@ Documentation sections:
 | [Installation](docs/guide/installation.md) | Detailed setup steps |
 | [CLI Reference](docs/reference/cli.md) | All commands and options |
 | [Multi-Language Support](docs/guide/multi-language.md) | Java, Kotlin, Python, Ruby, Cucumber test suites |
+| [Coverage Intelligence](docs/guide/coverage-intelligence.md) | Findings, risk scoring, missing test recommendations |
 | [Architecture](docs/reference/architecture.md) | Module design and data flow |
 | [CI/CD Integration](docs/guide/ci-cd.md) | GitHub Actions & Jenkins |
 | [Interpreting Reports](docs/guide/interpreting-reports.md) | Reading each report type |
@@ -464,6 +465,66 @@ Documentation sections:
 | [Troubleshooting](docs/guide/troubleshooting.md) | Common issues & FAQ |
 | [Glossary](docs/guide/glossary.md) | Key terms |
 | [Contributing](docs/reference/contributing.md) | How to contribute |
+
+## TypeScript Example Project
+
+A complete end-to-end example is available under [`examples/typescript/`](examples/typescript/).
+
+This is a realistic **Wallets / Payments API** that demonstrates the analyzer in a real project context.
+
+### Domain
+
+| Concept | Description |
+|---------|-------------|
+| Wallets | Create, fund, debit, transfer, freeze/unfreeze, close |
+| Payments | Create, process, refund, track status |
+| Transactions | Ledger-style history |
+| Risk / Limits | Daily limits, currency checks, idempotency |
+| External deps | Payment processor + Fraud engine (nock-mocked) |
+
+### Test layers
+
+| Layer | Location | What it tests |
+|-------|----------|---------------|
+| Unit | `tests/unit/` | Service logic, risk rules, validation |
+| Integration | `tests/integration/` | Routes, auth, supertest end-to-end |
+| Blackbox | `tests/blackbox/` | Positive/negative/boundary/idempotency via HTTP |
+| WireMock/nock | `tests/wiremock/` | External dependency healthy / failed / timeout |
+
+### Running the example
+
+```bash
+cd examples/typescript
+npm install
+npm test            # all 63 tests
+npm run analyze     # run the analyzer + generate reports
+npm run screenshots # capture Playwright screenshots
+```
+
+### CI/CD demonstrations
+
+| CI System | Location | What it does |
+|-----------|----------|-------------|
+| GitHub Actions | `.github/workflows/ci.yml` | Install, test, analyze, screenshots, upload artifacts |
+| Jenkins | `ci/jenkins/Jenkinsfile` | Install, test, analyze, archive reports, surface gate failures |
+
+### Observability
+
+```bash
+cd examples/typescript/observability
+docker-compose up   # starts Prometheus + Grafana
+# Grafana at http://localhost:3000 — dashboards pre-configured
+```
+
+### Intentional coverage gaps
+
+The example intentionally omits some test scenarios so the intelligence engine generates meaningful findings:
+
+- Frozen wallet debit scenario (not tested)
+- Daily $10,000 limit enforcement (not tested)
+- Currency mismatch in transfer (not tested)
+- Refund after 30-day window (not tested)
+- Payment processor failure fallback (not tested)
 
 ## Coverage Analysis (Self-Analysis)
 

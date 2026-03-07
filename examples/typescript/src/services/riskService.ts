@@ -1,6 +1,6 @@
 import { Wallet } from '../types';
 
-/** Daily outbound transaction limit in the wallet's native currency units */
+/** Daily outbound transaction limit per wallet (not per user) in the wallet's native currency units */
 const DAILY_LIMIT = 10_000;
 /** Minimum funding amount in the wallet's native currency units */
 const MIN_FUND_AMOUNT = 1;

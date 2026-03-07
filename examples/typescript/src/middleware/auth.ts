@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthUser } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable must be set in production');
+}
+const JWT_SECRET = jwtSecret ?? 'test-secret';
 
 declare global {
   namespace Express {

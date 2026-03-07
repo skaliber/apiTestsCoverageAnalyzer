@@ -9,6 +9,9 @@ import { riskService, RiskError } from './riskService';
 const paymentStore = new Map<string, Payment>();
 const idempotencyStore = new Map<string, string>(); // key -> paymentId
 
+/** Maximum number of days after payment completion during which a refund is permitted. */
+const REFUND_WINDOW_DAYS = 30;
+
 export class PaymentNotFoundError extends Error {
   constructor(id: string) { super(`Payment not found: ${id}`); this.name = 'PaymentNotFoundError'; }
 }
@@ -119,9 +122,9 @@ export const paymentService = {
     if (payment.status !== 'completed') {
       throw new PaymentError('INVALID_STATUS', `Cannot refund payment with status: ${payment.status}`);
     }
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - REFUND_WINDOW_DAYS * 24 * 60 * 60 * 1000);
     if (payment.completedAt && payment.completedAt < thirtyDaysAgo) {
-      throw new PaymentError('REFUND_WINDOW_EXPIRED', 'Refund window of 30 days has expired');
+      throw new PaymentError('REFUND_WINDOW_EXPIRED', `Refund window of ${REFUND_WINDOW_DAYS} days has expired`);
     }
     const wallet = walletRepository.findById(payment.walletId);
     if (wallet) {

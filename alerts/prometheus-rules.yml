@@ -90,3 +90,94 @@ groups:
             dropped by more than 10 percentage points compared to 1 hour ago.
             This may indicate recently deleted or disabled tests.
           runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+
+  # ── Security scanning alerts ─────────────────────────────────────────────────
+  - name: api_security_scan
+    interval: 1m
+    rules:
+      # ── Security gate failed ──────────────────────────────────────────────────
+      - alert: SecurityGateFailed
+        expr: api_security_gate_passed == 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Security gate FAILED for service {{ $labels.service }}"
+          description: |
+            The security gate for service {{ $labels.service }} failed on the last scan.
+            One or more configured thresholds (failOnCritical, maxSecrets, etc.) were exceeded.
+            Review the security-scan-summary.html report and address findings immediately.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+
+      # ── Critical security findings detected ──────────────────────────────────
+      - alert: SecurityCriticalFindingsDetected
+        expr: sum(api_security_findings_total{severity="CRITICAL"}) by (service) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL security findings detected for service {{ $labels.service }}"
+          description: |
+            {{ $value }} CRITICAL severity finding(s) were detected in the last security scan
+            for service {{ $labels.service }}.
+            These must be addressed immediately. Review security-sast.json and security-dependencies.json.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+
+      # ── High security findings detected ──────────────────────────────────────
+      - alert: SecurityHighFindingsDetected
+        expr: sum(api_security_findings_total{severity="HIGH"}) by (service) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HIGH security findings detected for service {{ $labels.service }}"
+          description: |
+            {{ $value }} HIGH severity finding(s) were detected in the last security scan
+            for service {{ $labels.service }}.
+            Review and remediate these within 48 hours.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+
+      # ── Secrets detected ─────────────────────────────────────────────────────
+      - alert: SecuritySecretsDetected
+        expr: sum(api_security_findings_total{category="secret"}) by (service) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Secrets detected in repository for service {{ $labels.service }}"
+          description: |
+            {{ $value }} secret(s) were detected in the last security scan for service {{ $labels.service }}.
+            Revoke and rotate all affected credentials immediately.
+            Check security-secrets.json for details.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+
+      # ── Security scan stale (no recent scan) ─────────────────────────────────
+      - alert: SecurityScanStale
+        expr: (time() - api_security_scan_timestamp_seconds) > 86400
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Security scan has not run in >24 hours for service {{ $labels.service }}"
+          description: |
+            The last security scan for service {{ $labels.service }} ran more than 24 hours ago.
+            Ensure the security-scan step is running in the CI pipeline.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/ci-cd.md"
+
+      # ── Security findings increasing trend ───────────────────────────────────
+      - alert: SecurityFindingsIncreasing
+        expr: |
+          (
+            sum(api_security_findings_total{severity=~"CRITICAL|HIGH"}) by (service)
+            - sum(api_security_findings_total{severity=~"CRITICAL|HIGH"} offset 1h) by (service)
+          ) > 2
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CRITICAL/HIGH security findings increased by >2 in the last hour for {{ $labels.service }}"
+          description: |
+            The number of CRITICAL or HIGH security findings for service {{ $labels.service }}
+            increased by more than 2 in the past hour.
+            This may indicate a recent commit introduced new vulnerabilities.
+          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"

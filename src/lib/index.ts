@@ -85,6 +85,10 @@ import {
   SecurityScanSummary,
   ScannerResult,
 } from '../security/index';
+import {
+  recordSecurityScanMetrics,
+  SecurityScanMetricsSummary,
+} from '../observability';
 
 // Re-export shared types so consumers can use them without diving into sub-modules
 export type { CoverageResult, ReportFormat };
@@ -98,6 +102,7 @@ export type {
   SecurityScanConfig,
   SecurityScanSummary,
   ScannerResult,
+  SecurityScanMetricsSummary,
 };
 export {
   runSecurityScan,
@@ -107,6 +112,7 @@ export {
   normalizeSemgrepOutput,
   normalizeTrivyOutput,
   normalizeZapOutput,
+  recordSecurityScanMetrics,
 };
 
 // ─── Shared option types ──────────────────────────────────────────────────────

@@ -72,6 +72,7 @@ import {
   initLogger,
   initMetrics,
   recordCoverageMetrics,
+  recordSecurityScanMetrics,
   startMetricsServer,
   stopMetricsServer,
   initTracing,
@@ -1279,6 +1280,9 @@ program
       coveragePercent: 100,
       details: summary,
     };
+
+    // Record security-specific Prometheus metrics (by severity/category/scanner + gate status)
+    recordSecurityScanMetrics(summary, serviceName);
 
     await finaliseObservability([result], {}, metricsPort, serviceName);
 

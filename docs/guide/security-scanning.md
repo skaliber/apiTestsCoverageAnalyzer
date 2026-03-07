@@ -543,6 +543,125 @@ sequenceDiagram
     CI-->>Dev: ✅ Pass or ❌ Fail with reasons
 ```
 
+## Prometheus metrics and Grafana
+
+Every `security-scan` run records the following Prometheus metrics, which Grafana can query for long-term trend tracking.
+
+### Exposed metrics
+
+| Metric | Labels | Description |
+|--------|--------|-------------|
+| `api_security_findings_total` | `service`, `severity`, `category`, `scanner` | Number of findings per label combination |
+| `api_security_gate_passed` | `service` | `1` = passed, `0` = failed, `-1` = not configured |
+| `api_security_scan_timestamp_seconds` | `service` | Unix timestamp of the last completed scan |
+
+These metrics are registered alongside the existing coverage metrics (`api_coverage_ratio`, etc.) in the same Prometheus registry and exposed on the same `--metrics-port`.
+
+### Enabling metrics
+
+Add `--metrics-port` to your `security-scan` command to expose metrics after each run:
+
+```bash
+node dist/index.js security-scan \
+  --semgrep-report reports/semgrep.json \
+  --trivy-report   reports/trivy.json \
+  --fail-on-critical \
+  --max-secrets 0 \
+  --metrics-port 9091 \
+  --service-name my-api
+```
+
+Prometheus will scrape `http://localhost:9091/metrics` and receive output like:
+
+```
+# HELP api_security_findings_total Number of security scan findings labeled by severity, category and scanner
+# TYPE api_security_findings_total gauge
+api_security_findings_total{service="my-api",severity="CRITICAL",category="sca",scanner="trivy"} 2
+api_security_findings_total{service="my-api",severity="HIGH",category="sast",scanner="semgrep"} 5
+api_security_findings_total{service="my-api",severity="MEDIUM",category="sast",scanner="semgrep"} 12
+api_security_findings_total{service="my-api",severity="LOW",category="misconfig",scanner="trivy"} 8
+api_security_findings_total{service="my-api",severity="HIGH",category="secret",scanner="trivy"} 0
+
+# HELP api_security_gate_passed 1 if the security gate passed on the last scan, 0 if it failed, -1 if not configured
+# TYPE api_security_gate_passed gauge
+api_security_gate_passed{service="my-api"} 0
+
+# HELP api_security_scan_timestamp_seconds Unix timestamp (seconds) of the last security scan run
+# TYPE api_security_scan_timestamp_seconds gauge
+api_security_scan_timestamp_seconds{service="my-api"} 1741215600
+```
+
+### Useful PromQL queries
+
+```promql
+# CRITICAL and HIGH findings over time
+sum(api_security_findings_total{severity=~"CRITICAL|HIGH"}) by (service)
+
+# Gate pass rate (1 = always passing, 0 = currently failing)
+api_security_gate_passed
+
+# Secrets trend
+sum(api_security_findings_total{category="secret"}) by (service)
+
+# Findings by scanner
+sum by (scanner) (api_security_findings_total{service="my-api"})
+
+# Time since last scan (in hours)
+(time() - api_security_scan_timestamp_seconds) / 3600
+```
+
+### Grafana dashboard
+
+The pre-built Grafana dashboard (`observability/grafana-dashboard.json`) includes a **Security Scanning** section with:
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Security Gate | Stat (colored) | Green = PASSED, Red = FAILED |
+| CRITICAL Findings | Stat | Red background if > 0 |
+| HIGH Findings | Stat | Orange background if > 0 |
+| Secrets Found | Stat | Red background if > 0 |
+| Total Security Findings | Stat | Color-coded by threshold |
+| Last Scan | Stat | Human-readable "X minutes ago" |
+| Security Findings by Severity — Trend | Time series | CRITICAL/HIGH/MEDIUM/LOW over time |
+| Security Findings by Category | Table | Counts per category (sast, sca, secret, …) |
+| Security Findings by Scanner | Table | Counts per scanner (semgrep, trivy, zap) |
+
+To import the dashboard:
+1. Start the local Prometheus + Grafana stack: `docker-compose -f observability/docker-compose.yml up -d`
+2. Open Grafana at `http://localhost:3000` (admin/admin)
+3. Go to **Dashboards → Import**
+4. Upload `observability/grafana-dashboard.json`
+
+```mermaid
+flowchart LR
+    CLI["security-scan CLI\n(--metrics-port 9091)"] --> Prom[Prometheus\ntsdb]
+    Prom --> Grafana[Grafana Dashboard]
+    Grafana --> Gate[Security Gate panel\napi_security_gate_passed]
+    Grafana --> Sev[Severity Trend\napi_security_findings_total]
+    Grafana --> Cat[Category Table\nsum by category]
+    Grafana --> Stale[Stale Scan Alert\napi_security_scan_timestamp_seconds]
+```
+
+### Prometheus alerting rules
+
+The `alerts/prometheus-rules.yml` file contains the following security-specific alerting rules:
+
+| Alert | Severity | Trigger |
+|-------|----------|---------|
+| `SecurityGateFailed` | critical | `api_security_gate_passed == 0` |
+| `SecurityCriticalFindingsDetected` | critical | Any CRITICAL finding |
+| `SecurityHighFindingsDetected` | warning | Any HIGH finding |
+| `SecuritySecretsDetected` | critical | Any secret finding |
+| `SecurityScanStale` | warning | No scan in >24 h |
+| `SecurityFindingsIncreasing` | warning | CRITICAL+HIGH count grew by >2 in 1 h |
+
+Enable these rules by pointing Prometheus at the rule file (already configured in `observability/prometheus.yml`):
+
+```yaml
+rule_files:
+  - "../alerts/prometheus-rules.yml"
+```
+
 ## Next steps
 
 - [CLI Reference → `security-scan`](/reference/cli#security-scan)

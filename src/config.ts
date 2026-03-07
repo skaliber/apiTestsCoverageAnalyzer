@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import type { McpConfig } from './mcp/types';
 
 // ─── Configuration schema ─────────────────────────────────────────────────────
 
@@ -123,6 +124,8 @@ export interface CoverageConfig {
   qualityGate?: QualityGateConfig;
   /** Summary engine configuration */
   summary?: SummaryConfig;
+  /** MCP (Model Context Protocol) integration configuration */
+  mcp?: McpConfig;
 }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────

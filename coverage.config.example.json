@@ -56,5 +56,34 @@
     "methods": ["OPTIONS", "HEAD"]
   },
   "testPatterns": ["tests/**/*.ts"],
-  "plugins": []
+  "plugins": [],
+  "mcp": {
+    "enabled": false,
+    "defaultTransport": "stdio",
+    "timeoutMs": 30000,
+    "maxPayloadBytes": 1048576,
+    "retryPolicy": {
+      "maxRetries": 2,
+      "retryDelayMs": 500
+    },
+    "servers": {
+      "coverageSummary": {
+        "enabled": false,
+        "transport": "stdio",
+        "command": "node",
+        "args": ["./src/mcp/testing/mock-server/stdio-server.js"]
+      },
+      "securityScan": {
+        "enabled": false,
+        "transport": "http",
+        "url": "http://localhost:3099/mcp"
+      },
+      "performanceAnalysis": {
+        "enabled": false
+      },
+      "compatibilityAnalysis": {
+        "enabled": false
+      }
+    }
+  }
 }

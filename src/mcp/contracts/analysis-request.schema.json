@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mcp-analysis-request",
+  "title": "McpPromptRequest",
+  "description": "Schema for a prompt request sent to an MCP server",
+  "type": "object",
+  "required": ["category", "prompt", "context"],
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Analysis category identifier (e.g. 'coverage', 'security', 'ci-summary')"
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable prompt text sent to the MCP server"
+    },
+    "context": {
+      "type": "object",
+      "description": "Structured context data for the analysis (no secrets allowed)"
+    },
+    "events": {
+      "type": "array",
+      "description": "Optional real-time scan events accumulated during the scan run",
+      "items": {
+        "type": "object",
+        "required": ["type", "timestamp", "payload"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "scan_started",
+              "file_analyzed",
+              "endpoint_detected",
+              "coverage_gap_detected",
+              "security_finding_detected",
+              "performance_issue_detected",
+              "scan_completed"
+            ]
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "payload": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

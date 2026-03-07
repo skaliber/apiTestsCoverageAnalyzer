@@ -9,6 +9,25 @@
 
 import * as path from 'path';
 import {
+  runSecurityScan,
+  buildSecurityScanSummary,
+  generateSecurityScanReports,
+  evaluateSecurityGate,
+  normalizeSemgrepOutput,
+  normalizeTrivyOutput,
+  normalizeZapOutput,
+  SecurityScanConfig,
+  SecurityFinding,
+  SecurityGateConfig,
+  SecurityGateResult,
+  SecurityScanSummary,
+  ScannerResult,
+} from '../security/index';
+import {
+  recordSecurityScanMetrics,
+  SecurityScanMetricsSummary,
+} from '../observability';
+import {
   parseOpenApiSpec,
   analyzeTestCoverage,
   buildCoverageReport,
@@ -71,25 +90,6 @@ import {
 } from '../reporting';
 import { SupportedLanguage, parseLanguageOption } from '../languageDetection';
 import {
-  runSecurityScan,
-  buildSecurityScanSummary,
-  generateSecurityScanReports,
-  evaluateSecurityGate,
-  normalizeSemgrepOutput,
-  normalizeTrivyOutput,
-  normalizeZapOutput,
-  SecurityScanConfig,
-  SecurityFinding,
-  SecurityGateConfig,
-  SecurityGateResult,
-  SecurityScanSummary,
-  ScannerResult,
-} from '../security/index';
-import {
-  recordSecurityScanMetrics,
-  SecurityScanMetricsSummary,
-} from '../observability';
-import {
   evaluateQualityGate,
   QualityGateResult,
   QualityGateConfig,
@@ -107,11 +107,6 @@ import {
   printCiSummary,
 } from '../buildSummary';
 import type { CoverageConfig, PublishingConfig } from '../config';
-
-// Re-export shared types so consumers can use them without diving into sub-modules
-export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };
-export { parseFormats, checkThresholds, evaluateQualityGate };
-export { generateStepSummary, writeStepSummary, generatePrComment, printCiSummary };
 
 // Re-export security scanning types and functions
 export type {
@@ -133,6 +128,11 @@ export {
   normalizeZapOutput,
   recordSecurityScanMetrics,
 };
+
+// Re-export shared types so consumers can use them without diving into sub-modules
+export type { CoverageResult, ReportFormat, QualityGateResult, GeneratedReports, BuildMetadata };
+export { parseFormats, checkThresholds, evaluateQualityGate };
+export { generateStepSummary, writeStepSummary, generatePrComment, printCiSummary };
 
 // ─── Shared option types ──────────────────────────────────────────────────────
 
@@ -509,6 +509,41 @@ export async function analyzePerfResilience(
   return [perfResult, resilienceResult];
 }
 
+// ─── Security scanning API ────────────────────────────────────────────────────
+
+/**
+ * Options for running the integrated security scanner.
+ */
+export interface SecurityScanOptions {
+  /** Security scanning configuration */
+  config: SecurityScanConfig;
+  /** Directory to write reports into. Default: reports/ */
+  reportsDir?: string;
+}
+
+/**
+ * Run the integrated security scanning workflow.
+ * Executes configured scanners (Semgrep, Trivy, ZAP), normalizes findings,
+ * evaluates the security gate, and generates reports.
+ *
+ * @example
+ * const { runSecurityAnalysis } = require('api-test-coverage-analyzer');
+ * const summary = await runSecurityAnalysis({
+ *   config: {
+ *     enabled: true,
+ *     workspace: '.',
+ *     scanners: { trivy: { enabled: true, mode: 'import', reportPath: 'trivy.json' } },
+ *     gate: { failOnCritical: true, maxSecrets: 0 }
+ *   }
+ * });
+ */
+export async function runSecurityAnalysis(
+  options: SecurityScanOptions,
+): Promise<SecurityScanSummary> {
+  const reportsDir = path.resolve(options.reportsDir ?? 'reports');
+  return runSecurityScan(options.config, reportsDir);
+}
+
 /**
  * Compare two API spec versions and verify consumer contracts.
  *
@@ -561,41 +596,6 @@ export async function analyzeCompatibility(
 
   generateMultiFormatReports([compatResult, contractResult], formats, reportsDir, thresholds);
   return [compatResult, contractResult];
-}
-
-// ─── Security scanning API ────────────────────────────────────────────────────
-
-/**
- * Options for running the integrated security scanner.
- */
-export interface SecurityScanOptions {
-  /** Security scanning configuration */
-  config: SecurityScanConfig;
-  /** Directory to write reports into. Default: reports/ */
-  reportsDir?: string;
-}
-
-/**
- * Run the integrated security scanning workflow.
- * Executes configured scanners (Semgrep, Trivy, ZAP), normalizes findings,
- * evaluates the security gate, and generates reports.
- *
- * @example
- * const { runSecurityAnalysis } = require('api-test-coverage-analyzer');
- * const summary = await runSecurityAnalysis({
- *   config: {
- *     enabled: true,
- *     workspace: '.',
- *     scanners: { trivy: { enabled: true, mode: 'import', reportPath: 'trivy.json' } },
- *     gate: { failOnCritical: true, maxSecrets: 0 }
- *   }
- * });
- */
-export async function runSecurityAnalysis(
-  options: SecurityScanOptions,
-): Promise<SecurityScanSummary> {
-  const reportsDir = path.resolve(options.reportsDir ?? 'reports');
-  return runSecurityScan(options.config, reportsDir);
 }
 
 // ─── Quality Gate + Publishing API ───────────────────────────────────────────

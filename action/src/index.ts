@@ -8,10 +8,10 @@ import {
   analyzeIntegrationFlows,
   analyzeErrorHandling,
   analyzeSecurityControls,
-  runSecurityAnalysis,
   runAnalysisAndEnforceQualityGate,
   checkThresholds,
   CoverageResult,
+  runSecurityAnalysis,
 } from '../../src/lib/index';
 import { resolveConfig, mergeConfig } from '../../src/config';
 

@@ -12,7 +12,7 @@ Please read our [Code of Conduct](https://github.com/q-intel/apiTestsCoverageAna
 - **Request features** – open an issue with the `enhancement` label.
 - **Fix bugs / implement features** – fork the repo, make changes, and open a pull request.
 - **Improve documentation** – edit files in `docs/` and submit a PR.
-- **Write plugins** – see [Extending via Plugins](/guide/plugins).
+- **Write plugins** – see [Extending via Plugins](../guide/plugins.md).
 
 ## Development setup
 
@@ -80,7 +80,7 @@ npm run docs:check
 
 ## Project structure
 
-See [Architecture →](/reference/architecture) for a detailed description of each module.
+See [Architecture →](./architecture.md) for a detailed description of each module.
 
 ## Coding standards
 
@@ -172,17 +172,17 @@ The sidebar and navigation links are declared in `docs/.vitepress/config.mts`.
 
 ### How to write internal links
 
-Always use **absolute VitePress paths** (starting with `/`) for links between docs pages:
+Use **relative `.md` paths** for links between docs pages. These work both in the deployed VitePress site and when the Markdown is viewed directly on GitHub:
 
 ```markdown
-<!-- ✅ Correct – absolute path, no .md extension -->
-See [CLI Reference](/reference/cli) for all options.
-
-<!-- ✅ Correct – absolute path with fragment -->
-See [--language flag](/reference/cli#supported-languages).
-
-<!-- ❌ Avoid – relative paths are fragile and break when pages are moved -->
+<!-- ✅ Correct – relative path with .md extension (works on GitHub and in VitePress) -->
 See [CLI Reference](../reference/cli.md) for all options.
+
+<!-- ✅ Correct – relative path with fragment -->
+See [--language flag](../reference/cli.md#supported-languages).
+
+<!-- ❌ Avoid – absolute VitePress paths break when Markdown is viewed on GitHub -->
+See [CLI Reference](/reference/cli) for all options.
 ```
 
 ### How to reference image assets

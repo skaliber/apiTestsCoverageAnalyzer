@@ -82,5 +82,5 @@ npm run build    # recompile
 
 ## Next steps
 
-- [Getting Started →](/guide/getting-started)
-- [CLI Reference →](/reference/cli)
+- [Getting Started →](./getting-started.md)
+- [CLI Reference →](../reference/cli.md)

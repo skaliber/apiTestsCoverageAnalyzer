@@ -195,4 +195,4 @@ Yes. The tool uses `@apidevtools/swagger-parser` which handles both Swagger 2.x 
 ## Getting help
 
 - [Open an issue](https://github.com/q-intel/apiTestsCoverageAnalyzer/issues) on GitHub.
-- [Read the contributing guide →](/reference/contributing)
+- [Read the contributing guide →](../reference/contributing.md)

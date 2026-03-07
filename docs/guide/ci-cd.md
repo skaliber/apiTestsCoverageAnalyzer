@@ -219,7 +219,7 @@ For ZAP dynamic scanning, run ZAP in a separate job (or Docker container) and im
         --fail-on-critical
 ```
 
-See the [Security Scanning guide →](/guide/security-scanning) for full configuration options.
+See the [Security Scanning guide →](./security-scanning.md) for full configuration options.
 
 ## Integration flow
 
@@ -248,6 +248,6 @@ netlify deploy --prod --dir reports/
 
 ## Next steps
 
-- [Security Scanning →](/guide/security-scanning)
-- [Interpreting Reports →](/guide/interpreting-reports)
-- [CLI Reference →](/reference/cli)
+- [Security Scanning →](./security-scanning.md)
+- [Interpreting Reports →](./interpreting-reports.md)
+- [CLI Reference →](../reference/cli.md)

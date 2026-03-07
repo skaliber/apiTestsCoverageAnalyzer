@@ -145,5 +145,5 @@ flowchart TD
 
 ## See also
 
-- [Extending via Plugins →](/guide/plugins)
-- [Configuration Schema →](/reference/configuration)
+- [Extending via Plugins →](../guide/plugins.md)
+- [Configuration Schema →](./configuration.md)

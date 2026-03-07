@@ -4,7 +4,7 @@ This guide walks you through running your first coverage analysis in under five 
 
 ## 1. Install the tool
 
-If you haven't already, follow the [Installation guide](/guide/installation). The quickest path:
+If you haven't already, follow the [Installation guide](./installation.md). The quickest path:
 
 ```bash
 git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
@@ -84,11 +84,11 @@ Reports are written to the `reports/` directory:
 - `reports/endpoint-coverage.json` – machine-readable results (includes `languages` per endpoint)
 - `reports/endpoint-coverage.html` – interactive HTML report with Languages column
 
-See [Multi-Language Support →](/guide/multi-language) for all supported languages and frameworks.
+See [Multi-Language Support →](./multi-language.md) for all supported languages and frameworks.
 
 ## 4. Run all coverage types
 
-Run each coverage command in sequence (or all together in CI – see [CI/CD Integration](/guide/ci-cd)):
+Run each coverage command in sequence (or all together in CI – see [CI/CD Integration](./ci-cd.md)):
 
 ```bash
 # Parameter coverage
@@ -190,8 +190,8 @@ The analyzer automatically reads this file. Pass `--config path/to/config.json` 
 
 ## Next steps
 
-- [CLI Reference →](/reference/cli) – all commands and options
-- [Multi-Language Support →](/guide/multi-language) – Java, Kotlin, Python, Ruby, Cucumber
-- [CI/CD Integration →](/guide/ci-cd) – automate coverage checks in GitHub Actions / Jenkins
-- [Interpreting Reports →](/guide/interpreting-reports) – how to read each report type
-- [Writing Effective Tests →](/guide/writing-tests) – best practices for good coverage
+- [CLI Reference →](../reference/cli.md) – all commands and options
+- [Multi-Language Support →](./multi-language.md) – Java, Kotlin, Python, Ruby, Cucumber
+- [CI/CD Integration →](./ci-cd.md) – automate coverage checks in GitHub Actions / Jenkins
+- [Interpreting Reports →](./interpreting-reports.md) – how to read each report type
+- [Writing Effective Tests →](./writing-tests.md) – best practices for good coverage

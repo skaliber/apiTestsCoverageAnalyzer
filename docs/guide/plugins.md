@@ -137,5 +137,5 @@ Users install it and reference it by module name in `coverage.config.json`:
 
 ## Next steps
 
-- [Configuration Schema →](/reference/configuration)
-- [Plugin API →](/reference/plugin-api)
+- [Configuration Schema →](../reference/configuration.md)
+- [Plugin API →](../reference/plugin-api.md)

@@ -204,5 +204,5 @@ This is useful for including in PR descriptions or Confluence pages.
 
 ## Next steps
 
-- [Writing Effective Tests →](/guide/writing-tests)
-- [CLI Reference →](/reference/cli)
+- [Writing Effective Tests →](./writing-tests.md)
+- [CLI Reference →](../reference/cli.md)

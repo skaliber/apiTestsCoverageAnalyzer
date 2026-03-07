@@ -326,10 +326,10 @@ When('I send a POST request to {word}') do |path|
 end
 ```
 
-See [Multi-Language Support →](/guide/multi-language) for the full list of supported frameworks and detection patterns.
+See [Multi-Language Support →](./multi-language.md) for the full list of supported frameworks and detection patterns.
 
 ## Next steps
 
-- [Multi-Language Support →](/guide/multi-language)
-- [Extending via Plugins →](/guide/plugins)
-- [Interpreting Reports →](/guide/interpreting-reports)
+- [Multi-Language Support →](./multi-language.md)
+- [Extending via Plugins →](./plugins.md)
+- [Interpreting Reports →](./interpreting-reports.md)

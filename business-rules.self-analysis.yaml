@@ -1,0 +1,375 @@
+# Business rules for self-analysis.
+# Each rule represents a documented capability of the API Test Coverage Analyzer.
+# The business-coverage analyzer runs these rules against the analyzer's own test
+# suite (tests/**/*.ts) to verify every capability is exercised by at least one test.
+#
+# Rule categories (Section 8.3 of spec 17):
+#   endpoint-coverage, parameter-coverage, business-coverage, integration-coverage,
+#   error-coverage, security-coverage, security-scanning, performance-coverage,
+#   compatibility-coverage, summary-generation, threshold-enforcement,
+#   self-analysis, reporting, docs-validation, dashboard-ai-summaries,
+#   ci-integration, github-pages, mcp-integration, plugin-behaviour
+
+rules:
+  # ── Endpoint Coverage ───────────────────────────────────────────────────────
+  - id: RULE-001
+    title: "Endpoint coverage analysis"
+    description: "The analyzer discovers API endpoints from an OpenAPI spec and determines which are exercised by tests"
+    category: endpoint-coverage
+    endpoints:
+      - "POST /analyze/endpoints"
+    keywords:
+      - "analyzeEndpoints"
+      - "endpoint coverage"
+      - "endpoint-coverage"
+      - "covered endpoint"
+      - "uncovered endpoint"
+      - "totalEndpoints"
+    scenarios:
+      - id: RULE-001-covered
+        description: "Endpoints exercised by a test are marked as covered"
+        keywords: ["covered", "100%", "all endpoints"]
+      - id: RULE-001-uncovered
+        description: "Endpoints with no matching tests are reported as uncovered"
+        keywords: ["uncovered", "missing", "not covered"]
+
+  # ── Parameter Coverage ──────────────────────────────────────────────────────
+  - id: RULE-002
+    title: "Parameter coverage analysis"
+    description: "The analyzer checks query, path, header, and body parameters for test coverage across boundary and invalid scenarios"
+    category: parameter-coverage
+    endpoints:
+      - "POST /analyze/parameters"
+    keywords:
+      - "analyzeParameters"
+      - "parameter coverage"
+      - "parameter-coverage"
+      - "query param"
+      - "path param"
+      - "boundary"
+
+  # ── Business Rule Coverage ───────────────────────────────────────────────────
+  - id: RULE-003
+    title: "Business rule coverage analysis"
+    description: "The analyzer loads business rules from YAML and matches rule keywords against test descriptions"
+    category: business-coverage
+    endpoints:
+      - "POST /analyze/business-rules"
+    keywords:
+      - "analyzeBusinessRules"
+      - "business coverage"
+      - "business-coverage"
+      - "business rule"
+      - "rule keyword"
+    scenarios:
+      - id: RULE-003-match
+        description: "Rule keywords present in test names mark the rule as covered"
+        keywords: ["keyword", "match", "covered rule"]
+      - id: RULE-003-scenario
+        description: "Per-rule scenarios are tracked independently"
+        keywords: ["scenario", "sub-rule", "rule scenario"]
+
+  # ── Integration Flow Coverage ────────────────────────────────────────────────
+  - id: RULE-004
+    title: "Integration flow coverage analysis"
+    description: "The analyzer loads multi-step flow definitions and checks whether tests cover the full sequence"
+    category: integration-coverage
+    endpoints:
+      - "POST /analyze/integration-flows"
+    keywords:
+      - "analyzeIntegrationFlows"
+      - "integration flow"
+      - "integration-coverage"
+      - "flow step"
+      - "flow coverage"
+
+  # ── Error Coverage ──────────────────────────────────────────────────────────
+  - id: RULE-005
+    title: "Error scenario coverage analysis"
+    description: "The analyzer identifies error status codes defined in an OpenAPI spec and checks whether each is exercised by tests"
+    category: error-coverage
+    endpoints:
+      - "POST /analyze/errors"
+    keywords:
+      - "analyzeErrorHandling"
+      - "error coverage"
+      - "error-coverage"
+      - "error scenario"
+      - "status code"
+      - "400"
+      - "404"
+      - "500"
+
+  # ── Security Coverage ────────────────────────────────────────────────────────
+  - id: RULE-006
+    title: "Security control coverage analysis"
+    description: "The analyzer maps security assertions in tests to security controls defined in the OpenAPI spec"
+    category: security-coverage
+    endpoints:
+      - "POST /analyze/security"
+    keywords:
+      - "analyzeSecurityControls"
+      - "security coverage"
+      - "security-coverage"
+      - "security control"
+      - "auth"
+      - "authorization"
+      - "JWT"
+
+  # ── Security Scanning ────────────────────────────────────────────────────────
+  - id: RULE-007
+    title: "Security scanning via SAST and dependency scanners"
+    description: "The analyzer integrates with Semgrep, Trivy, and ZAP to surface SAST, dependency vulnerability, and secret findings"
+    category: security-scanning
+    endpoints:
+      - "POST /analyze/security-scan"
+    keywords:
+      - "securityScan"
+      - "security-scan"
+      - "semgrep"
+      - "trivy"
+      - "zap"
+      - "SAST"
+      - "vulnerability"
+      - "secret"
+    scenarios:
+      - id: RULE-007-semgrep
+        description: "Semgrep SAST results are ingested and normalized"
+        keywords: ["semgrep", "SAST", "code scanning"]
+      - id: RULE-007-trivy
+        description: "Trivy dependency and secret scan results are ingested"
+        keywords: ["trivy", "dependency", "CVE", "secret"]
+      - id: RULE-007-gate
+        description: "Security gate enforces zero-critical and zero-secret thresholds"
+        keywords: ["gate", "critical", "failOnCritical", "maxSecrets", "security gate"]
+
+  # ── Performance Coverage ─────────────────────────────────────────────────────
+  - id: RULE-008
+    title: "Performance and resilience coverage analysis"
+    description: "The analyzer evaluates latency, throughput, and resilience from load test results and test names"
+    category: performance-coverage
+    endpoints:
+      - "POST /analyze/perf-resilience"
+    keywords:
+      - "analyzePerfResilience"
+      - "perf resilience"
+      - "perf-resilience"
+      - "performance"
+      - "latency"
+      - "resilience"
+      - "timeout"
+      - "retry"
+      - "circuit breaker"
+
+  # ── Compatibility / Contract Coverage ────────────────────────────────────────
+  - id: RULE-009
+    title: "API compatibility and contract coverage"
+    description: "The analyzer compares two OpenAPI spec versions and verifies consumer contract compatibility"
+    category: compatibility-coverage
+    endpoints:
+      - "POST /analyze/compatibility"
+    keywords:
+      - "checkCompatibility"
+      - "compatibility"
+      - "contract"
+      - "breaking change"
+      - "oldSpec"
+      - "newSpec"
+      - "pact"
+
+  # ── Summary Generation ───────────────────────────────────────────────────────
+  - id: RULE-010
+    title: "PR and build summary generation"
+    description: "The analyzer generates PR comment summaries and CI build summaries including all metric results"
+    category: summary-generation
+    endpoints:
+      - "GET /reports/pr-summary"
+      - "GET /reports/build-summary"
+    keywords:
+      - "generateBuildSummary"
+      - "generatePrSummary"
+      - "buildSummary"
+      - "prSummary"
+      - "pr-summary"
+      - "build-summary"
+      - "PR comment"
+      - "step summary"
+    scenarios:
+      - id: RULE-010-pr
+        description: "PR summary contains per-metric sections with PASS/FAIL status"
+        keywords: ["PR summary", "pr-summary", "pull request", "comment"]
+      - id: RULE-010-build
+        description: "Build summary is written to reports/build-summary.md"
+        keywords: ["build summary", "build-summary.md", "CI log"]
+
+  # ── Threshold Enforcement ────────────────────────────────────────────────────
+  - id: RULE-011
+    title: "Quality gate threshold enforcement"
+    description: "The analyzer enforces configurable coverage thresholds and exits non-zero when breached"
+    category: threshold-enforcement
+    endpoints:
+      - "POST /thresholds/check"
+    keywords:
+      - "checkThresholds"
+      - "quality gate"
+      - "qualityGate"
+      - "threshold"
+      - "violations"
+      - "exit"
+      - "process.exit"
+    scenarios:
+      - id: RULE-011-pass
+        description: "Process exits 0 when all metrics meet their thresholds"
+        keywords: ["threshold met", "passes", "0 violations", "quality gate passed"]
+      - id: RULE-011-fail
+        description: "Process exits non-zero when any metric is below threshold"
+        keywords: ["violation", "below threshold", "fails", "exit 1"]
+      - id: RULE-011-default
+        description: "Default threshold is applied when no config override is provided"
+        keywords: ["default threshold", "100%", "self-analysis threshold"]
+
+  # ── Self-Analysis ────────────────────────────────────────────────────────────
+  - id: RULE-012
+    title: "Self-analysis: analyzer runs against its own codebase"
+    description: "The analyzer can analyze its own test suite and produce meaningful coverage reports"
+    category: self-analysis
+    keywords:
+      - "self-analysis"
+      - "self analysis"
+      - "run-coverage"
+      - "coverage script"
+      - "own tests"
+      - "self-check"
+
+  # ── Reporting ────────────────────────────────────────────────────────────────
+  - id: RULE-013
+    title: "Multi-format report generation"
+    description: "The analyzer produces JSON, HTML, CSV, JUnit, and AI-friendly markdown report formats"
+    category: reporting
+    endpoints:
+      - "GET /reports/summary"
+    keywords:
+      - "reporting"
+      - "generateReport"
+      - "json"
+      - "html"
+      - "csv"
+      - "junit"
+      - "ai-summary"
+      - "markdown"
+      - "multi-format"
+    scenarios:
+      - id: RULE-013-json
+        description: "JSON report is always produced"
+        keywords: ["json", "JSON report", ".json"]
+      - id: RULE-013-html
+        description: "HTML report is produced when requested"
+        keywords: ["html", "HTML report", ".html"]
+      - id: RULE-013-junit
+        description: "JUnit XML is produced for CI integration"
+        keywords: ["junit", "JUnit", ".xml"]
+
+  # ── CI Integration ───────────────────────────────────────────────────────────
+  - id: RULE-014
+    title: "GitHub Actions integration"
+    description: "The analyzer provides a reusable GitHub Action with all coverage types, PR comment posting, and quality gate enforcement"
+    category: ci-integration
+    keywords:
+      - "GitHub Action"
+      - "github-action"
+      - "action"
+      - "prComment"
+      - "post-pr-comment"
+      - "step-summary"
+      - "write-step-summary"
+      - "quality-gate"
+
+  # ── Dashboard AI Summaries ───────────────────────────────────────────────────
+  - id: RULE-015
+    title: "Intelligence engine and AI-friendly summaries"
+    description: "The analyzer provides an intelligence engine that produces risk-scored findings, missing test recommendations, and LLM-friendly output"
+    category: dashboard-ai-summaries
+    endpoints:
+      - "POST /analyze/intelligence"
+    keywords:
+      - "intelligence"
+      - "coverage-intelligence"
+      - "riskScore"
+      - "findings"
+      - "recommendations"
+      - "ai-summary"
+      - "LLM"
+      - "machine-readable"
+    scenarios:
+      - id: RULE-015-risk
+        description: "Risk scores are computed for uncovered items"
+        keywords: ["risk score", "riskScore", "maxRisk", "avgRisk"]
+      - id: RULE-015-recommendations
+        description: "Missing test recommendations are generated per gap"
+        keywords: ["recommendation", "missing test", "test suggestion"]
+
+  # ── Plugin Behaviour ─────────────────────────────────────────────────────────
+  - id: RULE-016
+    title: "Plugin loading and extension"
+    description: "The analyzer loads custom plugins to extend analysis with additional language support or custom logic"
+    category: plugin-behaviour
+    keywords:
+      - "pluginLoader"
+      - "loadPlugin"
+      - "plugin"
+      - "custom analyzer"
+      - "extension"
+      - "graphql"
+      - "java-analyzer"
+      - "python-analyzer"
+
+  # ── MCP Integration ──────────────────────────────────────────────────────────
+  - id: RULE-017
+    title: "Model Context Protocol (MCP) integration"
+    description: "The analyzer integrates with MCP servers to provide AI-assisted analysis context"
+    category: mcp-integration
+    keywords:
+      - "mcp"
+      - "MCP"
+      - "model context protocol"
+      - "mcpClient"
+      - "mcp-integration"
+      - "AI context"
+
+  # ── Configuration Loading ────────────────────────────────────────────────────
+  - id: RULE-018
+    title: "Configuration loading and merging"
+    description: "The analyzer loads project configuration from coverage.config.json, merges with CLI flags and environment variables"
+    category: threshold-enforcement
+    endpoints:
+      - "POST /config/load"
+    keywords:
+      - "loadConfig"
+      - "config"
+      - "coverage.config.json"
+      - "configuration"
+      - "merge"
+      - "override"
+      - "env"
+    scenarios:
+      - id: RULE-018-load
+        description: "Config file is loaded and parsed correctly"
+        keywords: ["loadConfig", "config file", "parse config"]
+      - id: RULE-018-merge
+        description: "CLI flags override config file values"
+        keywords: ["override", "merge", "CLI flag", "env var"]
+
+  # ── GitHub Pages Publishing ──────────────────────────────────────────────────
+  - id: RULE-019
+    title: "Static site and GitHub Pages publishing"
+    description: "The analyzer bundles reports into a static HTML site that can be published to GitHub Pages or any static host"
+    category: github-pages
+    keywords:
+      - "publishing"
+      - "publish"
+      - "static site"
+      - "github pages"
+      - "site-dir"
+      - "site/index.html"
+      - "bundle"
+      - "publishPages"

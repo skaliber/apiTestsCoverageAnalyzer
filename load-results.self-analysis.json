@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "tool": "k6",
+    "version": "0.47.0",
+    "testName": "self-analysis-perf",
+    "startTime": "2024-01-01T00:00:00Z",
+    "endTime": "2024-01-01T00:01:00Z"
+  },
+  "metrics": {
+    "http_req_duration": {
+      "avg": 45.2,
+      "p50": 38.1,
+      "p90": 72.4,
+      "p95": 89.3,
+      "p99": 145.6,
+      "max": 312.1
+    },
+    "http_req_failed": {
+      "rate": 0.002
+    },
+    "http_reqs": {
+      "count": 5000,
+      "rate": 83.3
+    },
+    "iterations": {
+      "count": 5000
+    }
+  },
+  "scenarios": [
+    {
+      "name": "analyze_endpoints",
+      "executor": "constant-vus",
+      "vus": 10,
+      "duration": "60s",
+      "result": {
+        "pass": true,
+        "p95LatencyMs": 89.3,
+        "errorRate": 0.002,
+        "throughputRps": 83.3
+      }
+    },
+    {
+      "name": "analyze_business_rules",
+      "executor": "constant-vus",
+      "vus": 5,
+      "duration": "60s",
+      "result": {
+        "pass": true,
+        "p95LatencyMs": 102.1,
+        "errorRate": 0.001,
+        "throughputRps": 41.7
+      }
+    },
+    {
+      "name": "generate_summary",
+      "executor": "constant-vus",
+      "vus": 5,
+      "duration": "30s",
+      "result": {
+        "pass": true,
+        "p95LatencyMs": 65.4,
+        "errorRate": 0,
+        "throughputRps": 50.0
+      }
+    },
+    {
+      "name": "check_thresholds",
+      "executor": "constant-vus",
+      "vus": 20,
+      "duration": "60s",
+      "result": {
+        "pass": true,
+        "p95LatencyMs": 22.8,
+        "errorRate": 0,
+        "throughputRps": 200.0
+      }
+    }
+  ],
+  "thresholdResults": {
+    "http_req_duration{p95}": {
+      "threshold": "p(95)<200",
+      "pass": true
+    },
+    "http_req_failed": {
+      "threshold": "rate<0.01",
+      "pass": true
+    }
+  }
+}

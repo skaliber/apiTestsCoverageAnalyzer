@@ -1,0 +1,40 @@
+{
+  "_comment": "Self-analysis configuration for the API Test Coverage Analyzer. All thresholds are set to 100% — the analyzer must fully cover its own capabilities. Override individual thresholds via environment variables (THRESHOLD_ENDPOINT=N etc.) for development workflows.",
+  "thresholds": {
+    "endpoint": 100,
+    "parameter": 100,
+    "business": 100,
+    "integration": 100,
+    "security": 100,
+    "error": 100,
+    "performance": 100,
+    "resilience": 100,
+    "compatibility": 100
+  },
+  "selfAnalysis": {
+    "spec": "openapi.self-analysis.yaml",
+    "tests": "tests/**/*.ts",
+    "rules": "business-rules.self-analysis.yaml",
+    "flows": "integration-flows.self-analysis.yaml",
+    "loadResults": "load-results.self-analysis.json",
+    "reportsDir": "reports",
+    "language": "typescript",
+    "formats": ["json", "html", "csv", "junit"]
+  },
+  "securityGate": {
+    "failOnCritical": true,
+    "maxHighVulnerabilities": 0,
+    "maxSecrets": 0,
+    "maxHighMisconfigurations": 0
+  },
+  "exclude": {
+    "paths": [],
+    "methods": ["OPTIONS"]
+  },
+  "testPatterns": ["tests/**/*.ts"],
+  "summary": {
+    "writePrSummary": true,
+    "writeBuildSummary": true,
+    "outputDir": "reports"
+  }
+}

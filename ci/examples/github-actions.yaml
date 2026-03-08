@@ -1,5 +1,9 @@
 name: API Coverage Analysis
 
+# Example GitHub Actions workflow for user projects.
+# All steps call Makefile targets — no inline coverage logic.
+# Pass/fail is governed by the analyzer's process exit code.
+
 on:
   push:
     branches: [main, develop]
@@ -21,44 +25,36 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install
+        run: make install
 
-      # ── Run coverage commands ──────────────────────────────────────────────
+      - name: Build
+        run: make build
 
-      - name: Analyze endpoint coverage
+      - name: Unit Tests
+        run: make test-unit
+
+      - name: Integration Tests
+        run: make test-integration
+
+      - name: Self-Analysis (all metrics)
+        run: make self-analysis-all
+        # Exits non-zero automatically when any threshold is breached.
+        # Override thresholds via environment variables:
+        #   env:
+        #     THRESHOLD_ENDPOINT: '90'
+        #     THRESHOLD_BUSINESS: '80'
+
+      - name: Generate Summaries
+        if: always()
+        run: make summary
+
+      - name: Post step summary
+        if: always()
         run: |
-          node -r ts-node/register src/index.ts endpoint-coverage \
-            --spec sample/openapi.yaml \
-            --tests "sample/tests/**/*.ts" \
-            --format json,html,csv,junit \
-            --threshold-endpoint 80
-
-      - name: Analyze parameter coverage
-        run: |
-          node -r ts-node/register src/index.ts parameter-coverage \
-            --spec sample/openapi-parameters.yaml \
-            --tests "sample/tests/**/*.ts" \
-            --format json,html,csv,junit \
-            --threshold-parameter 70
-
-      - name: Analyze business logic coverage
-        run: |
-          node -r ts-node/register src/index.ts business-coverage \
-            --rules sample/business-rules.yaml \
-            --tests "sample/tests/**/*.ts" \
-            --format json,html,csv,junit \
-            --threshold-business 60
-
-      - name: Analyze integration flow coverage
-        run: |
-          node -r ts-node/register src/index.ts integration-coverage \
-            --flows sample/integration-flows.yaml \
-            --tests "sample/tests/**/*.ts" \
-            --format json,html,csv,junit \
-            --threshold-integration 50
-
-      # ── Upload reports as artifacts ────────────────────────────────────────
+          if [ -f reports/build-summary.md ]; then
+            cat reports/build-summary.md >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload coverage reports
         if: always()
@@ -68,12 +64,9 @@ jobs:
           path: reports/
           retention-days: 30
 
-      # ── Publish JUnit test results ─────────────────────────────────────────
-      # Requires the 'EnricoMi/publish-unit-test-result-action' action.
-      # Remove or replace this step if you use a different JUnit reporter.
       - name: Publish JUnit coverage results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          junit_files: 'reports/coverage-summary-junit.xml'
+          junit_files: 'reports/*-junit.xml'
           check_name: 'API Coverage Thresholds'

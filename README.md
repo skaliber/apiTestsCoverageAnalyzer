@@ -526,58 +526,69 @@ The example intentionally omits some test scenarios so the intelligence engine g
 - Refund after 30-day window (not tested)
 - Payment processor failure fallback (not tested)
 
-## Coverage Analysis (Self-Analysis)
+## Self-Analysis
 
-The analyzer can run against its own sample spec and test suite to produce coverage reports. This
-is the recommended way to validate that the analyzer itself remains well-tested on every build.
+The analyzer is a **self-analyzing system**: on every build it runs all implemented metric types
+against its own codebase, enforces 100% thresholds, and fails automatically if any metric falls
+below threshold.
 
-### Running locally
+### Quick start
 
 ```bash
-# Build the library first, then run the coverage script
-npm run build
-npm run coverage
+make install               # Install dependencies
+make build                 # Compile TypeScript
+make self-analysis-all     # Run all 8 metric types + intelligence engine
 ```
 
-Reports are written to the `reports/` directory:
+Or run the full CI pipeline:
+
+```bash
+make ci    # install → build → test → self-analysis-all → summary
+```
+
+### Self-analysis input artifacts
+
+| Artifact | Path | Purpose |
+|---|---|---|
+| OpenAPI spec | `openapi.self-analysis.yaml` | Analyzer CLI/library API surface |
+| Business rules | `business-rules.self-analysis.yaml` | One rule per documented capability (19 rules) |
+| Integration flows | `integration-flows.self-analysis.yaml` | Key usage sequences (5 flows) |
+| Perf data | `load-results.self-analysis.json` | Reference data for performance metric |
+| Config | `coverage.self-analysis.json` | 100% thresholds across all metrics |
+
+### Reports
+
+All reports are written to `reports/` after each run:
 
 | File | Contents |
-|------|----------|
-| `reports/coverage-summary.json` | Combined summary across all coverage types |
-| `reports/endpoint-coverage*.json/html` | Endpoint coverage details |
-| `reports/parameter-coverage*.json/html` | Parameter coverage details |
-| `reports/business-coverage*.json/html` | Business rule coverage details |
-| `reports/integration-coverage*.json/html` | Integration flow coverage details |
-| `reports/error-coverage*.json/html` | Error handling coverage details |
-| `reports/security-coverage*.json/html` | Security coverage details |
-| `reports/perf-resilience-coverage*.json/html` | Performance & resilience coverage details |
+|---|---|
+| `reports/endpoint-report.json/html` | Endpoint coverage |
+| `reports/parameter-report.json/html` | Parameter coverage |
+| `reports/business-report.json/html` | Business rule coverage |
+| `reports/integration-report.json/html` | Integration flow coverage |
+| `reports/error-report.json/html` | Error scenario coverage |
+| `reports/security-report.json/html` | Security control coverage |
+| `reports/perf-resilience-report.json/html` | Performance/resilience coverage |
+| `reports/coverage-intelligence.json` | Intelligence findings + risk scores |
+| `reports/pr-summary.md` | PR comment summary |
+| `reports/build-summary.md` | Build log summary |
+
+### Thresholds
+
+All self-analysis thresholds default to **100%**. Override via environment variables for development:
+
+```bash
+THRESHOLD_ENDPOINT=80 make self-analysis-endpoint
+```
+
+See [docs/guides/thresholds.md](docs/guides/thresholds.md) for full threshold documentation.
 
 ### CI integration
 
-The `build` job in `.github/workflows/test-action.yml` automatically runs `npm run coverage` after
-unit tests and uploads the resulting `reports/` directory as the `coverage-reports` artifact.
+The `.github/workflows/self-analysis.yml` workflow runs on every push and pull request.
+All steps call Makefile targets. Pass/fail is governed by the analyzer's process exit code only.
 
-### Adjusting thresholds
-
-Pass `--threshold-*` flags via the CLI or set thresholds in `coverage.config.json`:
-
-```json
-{
-  "thresholds": {
-    "endpoint":    80,
-    "parameter":   70,
-    "business":    60,
-    "integration": 50,
-    "security":    60,
-    "error":       50,
-    "performance": 75,
-    "resilience":  50
-  }
-}
-```
-
-The `npm run coverage` script respects threshold values supplied via environment variables
-(e.g. `THRESHOLD_ENDPOINT=80 npm run coverage`); the CI job will fail when any threshold is not met.
+See [docs/guides/self-analysis.md](docs/guides/self-analysis.md) for the full self-analysis guide.
 
 ## Contributing
 

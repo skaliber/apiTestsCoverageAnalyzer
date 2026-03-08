@@ -98,10 +98,10 @@ test: ## Run all test suites (unit + integration)
 	$(NPM) test -- --no-coverage
 
 test-unit: ## Run unit tests only (excludes integration and smoke)
-	$(NPM) test -- --no-coverage --testPathIgnorePatterns="integration|smoke"
+	$(NPM) test -- --no-coverage --testPathIgnorePatterns="node_modules|dist|dashboard|examples|integration|smoke"
 
 test-integration: ## Run integration tests only
-	$(NPM) test -- --no-coverage --testPathPattern="integration"
+	$(NPM) test -- --no-coverage --testPathPattern="integration" --testPathIgnorePatterns="node_modules|dist|dashboard|examples"
 
 test-e2e: ## Run Cypress end-to-end tests (docs + dashboard)
 	$(NPM) run docs:test 2>/dev/null || true

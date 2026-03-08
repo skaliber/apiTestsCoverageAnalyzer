@@ -39,7 +39,7 @@ jobs:
           tests: 'tests/**/*.ts'
           format: 'json,html,csv,junit'
           coverage-types: 'endpoint,parameter,business,integration,error,security'
-          config: './coverage.config.json'
+          config: './config.yaml'
           publish-pages: 'true'
           site-dir: 'site'
           pages-base-path: '/your-repo-name/'

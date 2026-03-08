@@ -475,7 +475,7 @@ See [CI/CD Integration →](./ci-cd.md) for a full workflow example.
 
 ## Configuration reference
 
-Full `coverage.config.json` example with security scanning:
+Full `config.yaml` example with security scanning:
 
 ```json
 {

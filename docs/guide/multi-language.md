@@ -134,7 +134,7 @@ node dist/index.js endpoint-coverage \
 
 ## Language plugins
 
-Four ready-made plugins are provided for use in CI or custom workflows. Add them to `coverage.config.json` for reporting that is separate from the core endpoint-coverage analysis:
+Four ready-made plugins are provided for use in CI or custom workflows. Add them to `config.yaml` for reporting that is separate from the core endpoint-coverage analysis:
 
 ```json
 {

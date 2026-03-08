@@ -16,6 +16,7 @@ on:
       - 'business-rules.self-analysis.yaml'
       - 'integration-flows.self-analysis.yaml'
       - 'coverage.self-analysis.json'
+      - 'config.yaml'
       - 'Makefile'
       - '.github/workflows/self-analysis.yml'
   pull_request:
@@ -25,7 +26,7 @@ on:
       - 'openapi.self-analysis.yaml'
       - 'business-rules.self-analysis.yaml'
       - 'integration-flows.self-analysis.yaml'
-      - 'coverage.self-analysis.json'
+      - 'config.yaml'
       - 'Makefile'
       - '.github/workflows/self-analysis.yml'
   workflow_dispatch:

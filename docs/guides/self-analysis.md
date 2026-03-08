@@ -18,9 +18,9 @@ Self-analysis uses three types of input artifacts:
 | Business rules | `business-rules.self-analysis.yaml` | One rule per documented analyzer capability |
 | Integration flows | `integration-flows.self-analysis.yaml` | Multi-step scenarios the tests must exercise |
 | Perf data | `load-results.self-analysis.json` | k6-style reference data for performance metric |
-| Config | `coverage.self-analysis.json` | 100% thresholds across all metric types |
+| Config | `config.yaml` | 100% thresholds across all metric types |
 
-All thresholds are set to 100% in `coverage.self-analysis.json`. The build fails automatically
+All thresholds are set to 100% in `config.yaml`. The build fails automatically
 when any threshold is breached. No CI shell logic is needed to determine pass/fail — the analyzer
 process exit code governs the result.
 
@@ -50,27 +50,18 @@ make ci    # install → build → test → self-analysis-all → summary
 
 ## Configuration
 
-Self-analysis is configured in `coverage.self-analysis.json`:
+Self-analysis uses `config.yaml` at the project root:
 
-```json
-{
-  "thresholds": {
-    "endpoint": 100,
-    "parameter": 100,
-    "business": 100,
-    "integration": 100,
-    "error": 100,
-    "security": 100,
-    "performance": 100,
-    "resilience": 100
-  },
-  "selfAnalysis": {
-    "spec": "openapi.self-analysis.yaml",
-    "tests": "tests/**/*.ts",
-    "rules": "business-rules.self-analysis.yaml",
-    "flows": "integration-flows.self-analysis.yaml"
-  }
-}
+```yaml
+thresholds:
+  endpoint: 100
+  parameter: 100
+  business: 100
+  integration: 100
+  error: 100
+  security: 100
+  performance: 100
+  compatibility: 100
 ```
 
 Override individual thresholds via environment variables:

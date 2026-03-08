@@ -54,7 +54,7 @@ The endpoint report shows which `METHOD /path` combinations are exercised.
 
 **Action:** For each uncovered endpoint, either:
 1. Write a test that calls the endpoint, or
-2. Add it to `exclude.paths` in `coverage.config.json` if it is intentionally not tested.
+2. Add the path to an exclusion list via CLI `--exclude-paths` if it is intentionally not tested.
 
 ## Parameter coverage
 

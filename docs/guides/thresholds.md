@@ -11,68 +11,49 @@ to determine pass/fail.
 When **no threshold is configured** for a metric, the default is **100%**. This is the strictest
 possible setting and is the default for self-analysis.
 
-```json
-{
-  "thresholds": {
-    "endpoint": 100,
-    "parameter": 100,
-    "business": 100,
-    "integration": 100,
-    "error": 100,
-    "security": 100,
-    "performance": 100,
-    "resilience": 100
-  }
-}
+```yaml
+thresholds:
+  endpoint: 100
+  parameter: 100
+  business: 100
+  integration: 100
+  error: 100
+  security: 100
+  performance: 100
+  compatibility: 100
 ```
 
 ## Configuration
 
-Set thresholds in `coverage.config.json` (or `coverage.self-analysis.json` for self-analysis):
+Set thresholds in `config.yaml`:
 
-```json
-{
-  "thresholds": {
-    "endpoint": 80,
-    "parameter": 70,
-    "business": 60,
-    "integration": 50,
-    "security": 60,
-    "error": 50,
-    "performance": 75,
-    "resilience": 50
-  }
-}
+```yaml
+thresholds:
+  endpoint: 80
+  parameter: 70
+  business: 60
+  integration: 50
+  security: 60
+  error: 50
+  performance: 75
+  compatibility: 50
 ```
 
 ### Global threshold
 
 Apply a single threshold to all metrics:
 
-```json
-{
-  "thresholds": {
-    "global": 80
-  }
-}
+```yaml
+thresholds:
+  global: 80
 ```
 
 Per-metric thresholds override the global threshold.
 
-### Branch-aware thresholds
+### Legacy JSON config (deprecated)
 
-Apply different thresholds per branch pattern:
-
-```json
-{
-  "thresholds": { "global": 100 },
-  "thresholdsByBranch": {
-    "main": { "global": 100 },
-    "feature/*": { "global": 80 },
-    "hotfix/*": { "global": 90 }
-  }
-}
-```
+`coverage.config.json` is no longer supported. Migrate thresholds to the `thresholds` block in
+`config.yaml`. See `docs/guides/migration-to-config-yaml.md` for field-by-field mapping.
 
 ## CLI flag overrides
 
@@ -118,18 +99,19 @@ For metrics expressed as counts rather than percentages, the equivalent strict g
 | Secrets detected | Zero allowed (`--max-secrets 0`) |
 | High-severity misconfigurations | Zero allowed (`--max-high-misconfigurations 0`) |
 
-Configure in `coverage.self-analysis.json`:
+Configure in `config.yaml`:
 
-```json
-{
-  "securityGate": {
-    "failOnCritical": true,
-    "maxHighVulnerabilities": 0,
-    "maxSecrets": 0,
-    "maxHighMisconfigurations": 0
-  }
-}
+```yaml
+scans:
+  security:
+    enabled: true
+    scanners:
+      - semgrep
+      - trivy
+      - zap
 ```
+
+Security gate options (CLI flags): `--fail-on-critical`, `--max-high-vulnerabilities`, `--max-secrets`.
 
 ## Gate enforcement rules
 
@@ -145,14 +127,11 @@ Configure in `coverage.self-analysis.json`:
 | `strict` (default) | Exit non-zero on any threshold breach |
 | `warn` | Report violations but exit 0 (useful for gradual adoption) |
 
-Set mode in config:
+Set mode in `config.yaml`:
 
-```json
-{
-  "qualityGate": {
-    "mode": "warn"
-  }
-}
+```yaml
+qualityGate:
+  mode: warn
 ```
 
 Or via CLI:
@@ -166,7 +145,7 @@ api-coverage endpoint-coverage --quality-gate true --quality-gate-mode warn
 ### Build fails unexpectedly at 100%
 
 The 100% default applies when no threshold is set. To allow lower coverage during development,
-either set explicit thresholds in `coverage.config.json` or use `--quality-gate false`:
+either set explicit thresholds in `config.yaml` or use `--quality-gate false`:
 
 ```bash
 api-coverage endpoint-coverage --spec openapi.yaml --tests "tests/**" --quality-gate false

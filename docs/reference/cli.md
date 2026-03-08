@@ -15,7 +15,7 @@ These options are available on every command:
 | Flag | Description | Default |
 |------|-------------|---------|
 | `--format <formats>` | Comma-separated output formats: `json`, `html`, `csv`, `junit` | `json,html` |
-| `--config <path>` | Path to a `coverage.config.json` file | `./coverage.config.json` |
+| `--config <path>` | Path to a `config.yaml` file | `./config.yaml` |
 | `-h, --help` | Display help for the command | – |
 
 ---

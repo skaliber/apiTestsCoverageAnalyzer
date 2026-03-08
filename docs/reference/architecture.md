@@ -94,7 +94,7 @@ apiTestsCoverageAnalyzer/
 ├── ci/                           # CI/CD example configs
 ├── observability/                # Docker Compose + Grafana dashboard
 ├── alerts/                       # Prometheus alerting rules
-├── coverage.config.json          # Default configuration
+├── config.yaml                  # Central configuration (YAML)
 ├── tsconfig.json                 # TypeScript compiler config
 ├── jest.config.js                # Jest test runner config
 └── package.json
@@ -104,7 +104,7 @@ apiTestsCoverageAnalyzer/
 
 ### `src/index.ts` – CLI entry point
 
-Built on [Commander](https://github.com/tj/commander.js/). Registers all sub-commands and delegates to coverage engines. Loads `coverage.config.json` and merges it with CLI flags. Runs plugins via `pluginLoader`.
+Built on [Commander](https://github.com/tj/commander.js/). Registers all sub-commands and delegates to coverage engines. Loads `config.yaml` (or the path from `--config`) and merges it with CLI flags. Runs plugins via `pluginLoader`.
 
 ### `src/config.ts` – Configuration
 
@@ -114,7 +114,7 @@ Exports:
 - `mergeConfig(a, b)` – deep merge of two config objects.
 - `isExcluded(path, method, config)` – checks whether a given path/method should be ignored.
 
-Default config location: `coverage.config.json` in the current working directory.
+Default config location: `config.yaml` in the current working directory. Run `analyze` with no arguments; if absent, prints a warning and uses full default profile.
 
 ### `src/reporting.ts` – Report generation
 

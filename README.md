@@ -322,40 +322,74 @@ Security findings, money-movement endpoints, and auth/authz gaps are never rated
 
 ## Configuration
 
-Create a `coverage.config.json` in your project root:
+Create a `config.yaml` at your project root. Running `analyze` with no arguments discovers this
+file automatically. If it is absent the analyzer runs the full default profile and emits a warning.
 
-```json
-{
-  "thresholds": {
-    "endpoint":    80,
-    "parameter":   70,
-    "business":    60,
-    "integration": 50,
-    "security":    60,
-    "error":       50,
-    "performance": 75,
-    "resilience":  50
-  },
-  "summary": {
-    "enabled": true,
-    "generatePrSummary": true,
-    "generateBuildSummary": true,
-    "generateAiSummary": true,
-    "includeOnlyEvaluatedSections": false,
-    "publishPrComment": true,
-    "publishGithubStepSummary": true,
-    "publishJenkinsSummary": true
-  },
-  "exclude": {
-    "paths":   ["/internal/*"],
-    "methods": ["OPTIONS"]
-  },
-  "testPatterns": ["tests/**/*.ts"],
-  "plugins":    ["./plugins/graphql-coverage.js"]
-}
+```yaml
+version: 1
+
+project:
+  name: my-api
+
+analysis:
+  defaultMode: full
+
+scans:
+  coverage:
+    enabled: true
+    types:
+      - endpoint
+      - parameter
+      - business
+      - integration
+      - error
+      - security
+      - performance
+      - compatibility
+  security:
+    enabled: true
+    scanners:
+      - semgrep
+      - trivy
+      - zap
+  intelligence:
+    enabled: true
+    types:
+      - ai-summary
+      - risk-prioritization
+      - recommendations
+      - scanner-interpretation
+
+thresholds:
+  global: 80
+  endpoint: 90
+
+qualityGate:
+  enabled: true
+  mode: warn
+
+reports:
+  outputDir: reports
+  formats:
+    - json
+    - html
+
+mcp:
+  enabled: false
 ```
 
-CLI flags override config file values.
+Use `--config <path>` to load an arbitrary YAML file:
+
+```bash
+analyze --config ./configs/staging.yaml
+```
+
+See [`docs/guides/configuration.md`](docs/guides/configuration.md) for the full field reference.
+If you are migrating from `coverage.config.json`, see
+[`docs/guides/migration-to-config-yaml.md`](docs/guides/migration-to-config-yaml.md).
+
+CLI threshold flags (`--threshold-endpoint`, etc.) still work but are deprecated. Migrate
+values to the `thresholds` block in `config.yaml`.
 
 ## Built-in Summary Engine
 
@@ -377,10 +411,8 @@ are automatically written to the configured `--reports-dir`:
 ### Gate-aware inclusion
 
 Sections are included only when the analyzer ran or a threshold was configured.
-Analyzers that did not run are silently omitted – no empty sections appear.
-
-Set `includeOnlyEvaluatedSections: true` in `coverage.config.json` to omit even
-analyzers that ran but have no threshold configured.
+Analyzers that did not run are silently omitted — no empty sections appear.
+Control enabled scan types via `scans.coverage.types` in `config.yaml`.
 
 ### Public API
 
@@ -461,7 +493,7 @@ Documentation sections:
 | [Interpreting Reports](docs/guide/interpreting-reports.md) | Reading each report type |
 | [Writing Effective Tests](docs/guide/writing-tests.md) | Test best practices |
 | [Extending via Plugins](docs/guide/plugins.md) | Custom coverage types |
-| [Configuration Schema](docs/reference/configuration.md) | `coverage.config.json` reference |
+| [Configuration Reference](docs/guides/configuration.md) | `config.yaml` field reference |
 | [Troubleshooting](docs/guide/troubleshooting.md) | Common issues & FAQ |
 | [Glossary](docs/guide/glossary.md) | Key terms |
 | [Contributing](docs/reference/contributing.md) | How to contribute |

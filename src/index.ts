@@ -62,7 +62,7 @@ import {
   checkThresholds,
   CoverageResult,
 } from './reporting';
-import { resolveConfig, mergeConfig, CoverageConfig } from './config';
+import { resolveConfig, mergeConfig, CoverageConfig, loadCentralConfig } from './config';
 import {
   runSecurityScan,
   SecurityScanConfig,
@@ -98,7 +98,7 @@ program
   .name('api-tests-coverage-analyzer')
   .description('Analyze API test coverage based on OpenAPI specs')
   .version('0.1.0')
-  .option('--config <file>', 'Path to a coverage configuration file (default: coverage.config.json)')
+  .option('--config <file>', 'Path to a coverage configuration file (default: config.yaml)')
   .option('--log-level <level>', 'Log verbosity level: trace|debug|info|warn|error|silent', 'info')
   .option('--metrics-port <port>', 'Start a Prometheus /metrics HTTP server on this port after analysis', parseInt)
   .option('--service-name <name>', 'Service name label added to all Prometheus metrics', 'api-coverage-analyzer')
@@ -109,23 +109,73 @@ program
 
 /**
  * Load and return the resolved CoverageConfig for a command invocation.
- * CLI threshold flags (non-zero values) take precedence over config-file values.
+ *
+ * Loads via the central config loader (config.yaml) first.  CLI threshold
+ * flags (non-zero values) take precedence and emit a deprecation warning.
+ * Legacy `testPatterns` / `plugins` are preserved via the old JSON loader
+ * for backward compatibility during the config.yaml migration.
  */
 function loadCoverageConfig(
   configPath: string | undefined,
   cliThresholds: Record<string, number>,
 ): CoverageConfig {
-  const fileConfig = resolveConfig(configPath);
-  const cliOverrides: Partial<CoverageConfig> = {};
-  // Only apply CLI thresholds that were explicitly set (non-zero)
-  const activeThresholds: Record<string, number> = {};
+  // Load via central config (config.yaml). Emits missing-config warning if absent.
+  const analyzerCfg = loadCentralConfig(configPath);
+
+  // Emit deprecation warnings for explicitly-set CLI threshold flags.
+  const activeCliThresholds: Record<string, number> = {};
   for (const [key, value] of Object.entries(cliThresholds)) {
-    if (value > 0) activeThresholds[key] = value;
+    if (value > 0) {
+      process.stderr.write(
+        `[DEPRECATED] --threshold-${key} CLI flag is deprecated. ` +
+          `Use thresholds.${key} in config.yaml instead.\n`,
+      );
+      activeCliThresholds[key] = value;
+    }
   }
-  if (Object.keys(activeThresholds).length > 0) {
-    cliOverrides.thresholds = activeThresholds;
+
+  // Merge: central config thresholds < CLI threshold overrides.
+  const mergedThresholds = {
+    ...(analyzerCfg.thresholds as Record<string, number | undefined>),
+    ...activeCliThresholds,
+  };
+
+  // For fields not covered by the new AnalyzerConfig schema (testPatterns,
+  // plugins, exclude), fall back to the legacy JSON config loader — these are
+  // only read when a legacy coverage.config.json is still present.  They are
+  // not required and default to empty when absent.
+  let legacyTestPatterns: string[] = [];
+  let legacyPlugins: string[] = [];
+  let legacyExclude = { paths: [] as string[], methods: [] as string[] };
+
+  if (!configPath) {
+    try {
+      const legacyCfg = resolveConfig(undefined);
+      legacyTestPatterns = legacyCfg.testPatterns ?? [];
+      legacyPlugins = legacyCfg.plugins ?? [];
+      if (legacyCfg.exclude) legacyExclude = {
+        paths: legacyCfg.exclude.paths ?? [],
+        methods: legacyCfg.exclude.methods ?? [],
+      };
+    } catch {
+      // No legacy JSON config present — safe to ignore.
+    }
   }
-  return mergeConfig(fileConfig, cliOverrides);
+
+  return {
+    thresholds: mergedThresholds,
+    testPatterns: legacyTestPatterns,
+    plugins: legacyPlugins,
+    exclude: legacyExclude,
+    qualityGate: analyzerCfg.qualityGate,
+    mcp: analyzerCfg.mcp,
+    publishing: analyzerCfg.publishing
+      ? {
+          enabled: analyzerCfg.publishing.enabled,
+          githubPages: analyzerCfg.publishing.githubPages,
+        }
+      : undefined,
+  };
 }
 
 /**

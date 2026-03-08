@@ -146,7 +146,7 @@ pipeline {
 
 ## Enforcing thresholds
 
-When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Use `--threshold-*` flags or set them in `coverage.config.json`.
+When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Set thresholds in `config.yaml` or use `--threshold-*` CLI flags (deprecated).
 
 ```json
 {

@@ -29,7 +29,7 @@ MCP integration is **optional and disabled by default**. When disabled, the buil
 
 ## Configuration
 
-Add an `mcp` block to your `coverage.config.json`:
+Add an `mcp` block to your `config.yaml`:
 
 ```json
 {

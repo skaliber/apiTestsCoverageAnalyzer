@@ -1,104 +1,670 @@
 {
-  "generatedAt": "2026-03-08T07:20:00.000Z",
+  "generatedAt": "2026-03-08T09:15:54.654Z",
   "summary": [
-    { "type": "endpoint",    "totalItems": 12, "coveredItems": 10, "coveragePercent": 83.33 },
-    { "type": "parameter",   "totalItems": 8,  "coveredItems": 6,  "coveragePercent": 75    },
-    { "type": "business",    "totalItems": 5,  "coveredItems": 4,  "coveragePercent": 80    },
-    { "type": "integration", "totalItems": 4,  "coveredItems": 2,  "coveragePercent": 50    },
-    { "type": "security",    "totalItems": 8,  "coveredItems": 5,  "coveragePercent": 62.5  },
-    { "type": "error",       "totalItems": 10, "coveredItems": 4,  "coveragePercent": 40    },
-    { "type": "performance", "totalItems": 6,  "coveredItems": 4,  "coveragePercent": 66.67 },
-    { "type": "resilience",  "totalItems": 4,  "coveredItems": 2,  "coveragePercent": 50    }
+    {
+      "type": "endpoint",
+      "totalItems": 13,
+      "coveredItems": 11,
+      "coveragePercent": 84.62
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 7,
+      "coveragePercent": 87.5
+    },
+    {
+      "type": "error",
+      "totalItems": 30,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "security",
+      "totalItems": 26,
+      "coveredItems": 6,
+      "coveragePercent": 23.08
+    }
   ],
   "details": {
-    "endpoint": {
-      "items": [
-        { "id": "GET /api/users",             "covered": true,  "tests": ["should list all users", "should return 200"] },
-        { "id": "POST /api/users",            "covered": true,  "tests": ["should create a user"] },
-        { "id": "GET /api/users/:id",         "covered": true,  "tests": ["should return user by id"] },
-        { "id": "PUT /api/users/:id",         "covered": true,  "tests": ["should update user"] },
-        { "id": "DELETE /api/users/:id",      "covered": false, "tests": [] },
-        { "id": "GET /api/products",          "covered": true,  "tests": ["should list products"] },
-        { "id": "POST /api/products",         "covered": true,  "tests": ["should create product"] },
-        { "id": "GET /api/products/:id",      "covered": true,  "tests": ["should return product by id"] },
-        { "id": "PUT /api/products/:id",      "covered": true,  "tests": ["should update product"] },
-        { "id": "DELETE /api/products/:id",   "covered": false, "tests": [] },
-        { "id": "GET /api/orders",            "covered": true,  "tests": ["should list orders"] },
-        { "id": "POST /api/orders",           "covered": true,  "tests": ["should create order"] }
-      ]
-    },
-    "parameter": {
-      "items": [
-        { "id": "page",         "covered": true,  "tests": ["handles page param"] },
-        { "id": "pageSize",     "covered": true,  "tests": ["handles pageSize param"] },
-        { "id": "sortBy",       "covered": true,  "tests": ["handles sortBy param"] },
-        { "id": "sortOrder",    "covered": false, "tests": [] },
-        { "id": "filter",       "covered": true,  "tests": ["handles filter param"] },
-        { "id": "search",       "covered": true,  "tests": ["handles search param"] },
-        { "id": "include",      "covered": true,  "tests": ["handles include param"] },
-        { "id": "fields",       "covered": false, "tests": [] }
-      ]
-    },
-    "business": {
-      "items": [
-        { "id": "unique email per account",           "covered": true,  "tests": ["validates unique email", "returns 409 for duplicate"] },
-        { "id": "Order total must match item sum",    "covered": true,  "tests": ["validates order totals"] },
-        { "id": "Minimum order value is $5",          "covered": true,  "tests": ["rejects orders below $5"] },
-        { "id": "Max 3 failed login attempts",        "covered": true,  "tests": ["locks account on 3rd failed login"] },
-        { "id": "Inventory reservation on order",     "covered": false, "tests": [] }
-      ]
-    },
-    "integration": {
-      "items": [
-        { "id": "User registration flow",     "covered": true,  "steps": 4, "coveredSteps": 4, "tests": ["e2e registration", "email confirmation"] },
-        { "id": "Order checkout flow",        "covered": false, "steps": 6, "coveredSteps": 2, "tests": ["partial checkout test"] },
-        { "id": "Password reset flow",        "covered": true,  "steps": 3, "coveredSteps": 3, "tests": ["password reset e2e"] },
-        { "id": "Product purchase flow",      "covered": false, "steps": 5, "coveredSteps": 1, "tests": [] }
-      ]
-    },
-    "security": {
-      "items": [
-        { "id": "JWT token validation",              "covered": true,  "tests": ["validates JWT signature", "rejects expired token"] },
-        { "id": "JWT expiry enforcement",            "covered": true,  "tests": ["rejects expired JWT"] },
-        { "id": "SQL injection prevention on inputs","covered": true,  "tests": ["rejects SQL in query params"] },
-        { "id": "XSS input sanitisation",           "covered": false, "tests": [] },
-        { "id": "CSRF protection on mutations",     "covered": true,  "tests": ["validates CSRF token"] },
-        { "id": "Rate limiting on auth endpoints",  "covered": true,  "tests": ["rate limit 429 test"] },
-        { "id": "RBAC – admin role enforcement",    "covered": false, "tests": [] },
-        { "id": "HTTPS-only transport enforcement", "covered": false, "tests": [] }
-      ]
-    },
-    "error": {
-      "items": [
-        { "id": "400 – Bad request body",             "covered": true,  "tests": ["returns 400 for malformed JSON"] },
-        { "id": "401 – Unauthenticated access",       "covered": true,  "tests": ["returns 401 without token"] },
-        { "id": "403 – Forbidden resource",           "covered": false, "tests": [] },
-        { "id": "404 – Resource not found",           "covered": true,  "tests": ["returns 404 for unknown id"] },
-        { "id": "409 – Conflict on duplicate",        "covered": true,  "tests": ["returns 409 on duplicate email"] },
-        { "id": "422 – Unprocessable entity",         "covered": false, "tests": [] },
-        { "id": "429 – Too many requests",            "covered": false, "tests": [] },
-        { "id": "500 – Internal server error",        "covered": false, "tests": [] },
-        { "id": "503 – Service unavailable",          "covered": false, "tests": [] },
-        { "id": "504 – Gateway timeout",              "covered": false, "tests": [] }
-      ]
-    },
-    "performance": {
-      "items": [
-        { "id": "GET /api/users response time < 200ms",   "covered": true,  "threshold": "200ms", "tests": ["p95 latency test"] },
-        { "id": "POST /api/orders response time < 500ms", "covered": true,  "threshold": "500ms", "tests": ["order creation latency"] },
-        { "id": "GET /api/products throughput > 1000 rps","covered": true,  "threshold": "1000rps","tests": ["load test products"] },
-        { "id": "Database query < 50ms p99",              "covered": true,  "threshold": "50ms",   "tests": ["db latency test"] },
-        { "id": "Bulk import < 5s for 10k records",       "covered": false, "threshold": "5s",     "tests": [] },
-        { "id": "Search endpoint < 300ms",                "covered": false, "threshold": "300ms",  "tests": [] }
-      ]
-    },
-    "resilience": {
-      "items": [
-        { "id": "Retry on transient DB failure",      "covered": true,  "tests": ["retries after transient error"] },
-        { "id": "Circuit breaker for payment service","covered": true,  "tests": ["opens circuit on repeated failures"] },
-        { "id": "Graceful degradation on cache miss", "covered": false, "tests": [] },
-        { "id": "Timeout handling for external APIs", "covered": false, "tests": [] }
-      ]
-    }
+    "endpoint": [
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/wallets"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/wallets/{id}"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "DELETE",
+          "path": "/wallets/{id}"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/freeze"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/unfreeze"
+        },
+        "covered": false
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/fund"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/debit"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/transfer"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/payments/{id}"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments/{id}/refund"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/transactions"
+        },
+        "covered": false
+      }
+    ],
+    "business": [
+      {
+        "name": "min-fund-amount",
+        "covered": true
+      },
+      {
+        "name": "insufficient-funds",
+        "covered": true
+      },
+      {
+        "name": "frozen-wallet-reject",
+        "covered": true
+      },
+      {
+        "name": "daily-limit",
+        "covered": false
+      },
+      {
+        "name": "transfer-same-currency",
+        "covered": true
+      },
+      {
+        "name": "refund-window",
+        "covered": true
+      },
+      {
+        "name": "fraud-check",
+        "covered": true
+      },
+      {
+        "name": "idempotency",
+        "covered": true
+      }
+    ],
+    "error": [
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/wallets"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets"
+        },
+        "covered": false,
+        "errorCodes": [
+          "400"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/wallets/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/wallets/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "DELETE",
+          "path": "/wallets/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "DELETE",
+          "path": "/wallets/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/freeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/freeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/freeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/unfreeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/unfreeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "PATCH",
+          "path": "/wallets/{id}/unfreeze"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/fund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/fund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/fund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/debit"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/debit"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/debit"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/transfer"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/transfer"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/wallets/{id}/transfer"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/payments/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/payments/{id}"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments/{id}/refund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments/{id}/refund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "404"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "POST",
+          "path": "/payments/{id}/refund"
+        },
+        "covered": false,
+        "errorCodes": [
+          "422"
+        ]
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/transactions"
+        },
+        "covered": false,
+        "errorCodes": [
+          "401"
+        ]
+      }
+    ],
+    "security": [
+      {
+        "control": {
+          "id": "authentication:bearerAuth",
+          "category": "authentication",
+          "description": "Authentication via security scheme \"bearerAuth\" (http/bearer)"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "cryptography:https",
+          "category": "cryptography",
+          "description": "API servers include non-HTTPS URLs – cryptographic transport security may be missing"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:get:/wallets",
+          "category": "authorization",
+          "description": "Authorization check for GET /wallets"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:post:/wallets",
+          "category": "authorization",
+          "description": "Authorization check for POST /wallets"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/wallets",
+          "category": "input-validation",
+          "description": "Input validation for POST /wallets"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "authorization:get:/wallets/{id}",
+          "category": "authorization",
+          "description": "Authorization check for GET /wallets/{id}"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:get:/wallets/{id}",
+          "category": "input-validation",
+          "description": "Input validation for GET /wallets/{id}"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "authorization:delete:/wallets/{id}",
+          "category": "authorization",
+          "description": "Authorization check for DELETE /wallets/{id}"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:delete:/wallets/{id}",
+          "category": "input-validation",
+          "description": "Input validation for DELETE /wallets/{id}"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "authorization:patch:/wallets/{id}/freeze",
+          "category": "authorization",
+          "description": "Authorization check for PATCH /wallets/{id}/freeze"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:patch:/wallets/{id}/freeze",
+          "category": "input-validation",
+          "description": "Input validation for PATCH /wallets/{id}/freeze"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:patch:/wallets/{id}/unfreeze",
+          "category": "authorization",
+          "description": "Authorization check for PATCH /wallets/{id}/unfreeze"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:patch:/wallets/{id}/unfreeze",
+          "category": "input-validation",
+          "description": "Input validation for PATCH /wallets/{id}/unfreeze"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:post:/wallets/{id}/fund",
+          "category": "authorization",
+          "description": "Authorization check for POST /wallets/{id}/fund"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/wallets/{id}/fund",
+          "category": "input-validation",
+          "description": "Input validation for POST /wallets/{id}/fund"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:post:/wallets/{id}/debit",
+          "category": "authorization",
+          "description": "Authorization check for POST /wallets/{id}/debit"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/wallets/{id}/debit",
+          "category": "input-validation",
+          "description": "Input validation for POST /wallets/{id}/debit"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:post:/wallets/{id}/transfer",
+          "category": "authorization",
+          "description": "Authorization check for POST /wallets/{id}/transfer"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/wallets/{id}/transfer",
+          "category": "input-validation",
+          "description": "Input validation for POST /wallets/{id}/transfer"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:post:/payments",
+          "category": "authorization",
+          "description": "Authorization check for POST /payments"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/payments",
+          "category": "input-validation",
+          "description": "Input validation for POST /payments"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "authorization:get:/payments/{id}",
+          "category": "authorization",
+          "description": "Authorization check for GET /payments/{id}"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:get:/payments/{id}",
+          "category": "input-validation",
+          "description": "Input validation for GET /payments/{id}"
+        },
+        "covered": true
+      },
+      {
+        "control": {
+          "id": "authorization:post:/payments/{id}/refund",
+          "category": "authorization",
+          "description": "Authorization check for POST /payments/{id}/refund"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "input-validation:post:/payments/{id}/refund",
+          "category": "input-validation",
+          "description": "Input validation for POST /payments/{id}/refund"
+        },
+        "covered": false
+      },
+      {
+        "control": {
+          "id": "authorization:get:/transactions",
+          "category": "authorization",
+          "description": "Authorization check for GET /transactions"
+        },
+        "covered": false
+      }
+    ]
   }
 }

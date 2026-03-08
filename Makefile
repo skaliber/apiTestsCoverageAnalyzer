@@ -26,6 +26,7 @@ SELF_TESTS    ?= tests/**/*.ts
 SELF_RULES    ?= business-rules.self-analysis.yaml
 SELF_FLOWS    ?= integration-flows.self-analysis.yaml
 SELF_LOAD     ?= load-results.self-analysis.json
+SELF_CONFIG   ?= coverage.self-analysis.json
 SELF_SAMPLE_SPEC     ?= sample/openapi.yaml
 SELF_SAMPLE_PARAMS   ?= sample/openapi-parameters.yaml
 SELF_SAMPLE_ERRORS   ?= sample/openapi-errors.yaml
@@ -120,6 +121,7 @@ docs-build: ## Build the VitePress documentation site
 self-analysis-endpoint: build ## Run endpoint coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) endpoint-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -128,6 +130,7 @@ self-analysis-endpoint: build ## Run endpoint coverage against this repository
 self-analysis-parameter: build ## Run parameter coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) parameter-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -136,6 +139,7 @@ self-analysis-parameter: build ## Run parameter coverage against this repository
 self-analysis-business: build ## Run business rule coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) business-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --rules "$(SELF_RULES)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -144,6 +148,7 @@ self-analysis-business: build ## Run business rule coverage against this reposit
 self-analysis-integration: build ## Run integration flow coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) integration-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --flows "$(SELF_FLOWS)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -152,6 +157,7 @@ self-analysis-integration: build ## Run integration flow coverage against this r
 self-analysis-error: build ## Run error scenario coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) error-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -160,6 +166,7 @@ self-analysis-error: build ## Run error scenario coverage against this repositor
 self-analysis-security: build ## Run security control coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) security-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --format "$(FORMATS)" \
@@ -168,6 +175,7 @@ self-analysis-security: build ## Run security control coverage against this repo
 self-analysis-performance: build ## Run performance/resilience coverage against this repository
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) perf-resilience-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --load-results "$(SELF_LOAD)" \
@@ -196,48 +204,61 @@ self-analysis-all: build ## Run ALL metric types, produce all reports, apply all
 	@echo ""
 	@echo "[1/8] Endpoint coverage..."
 	$(ANALYZER_CMD) endpoint-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-endpoint 100
 
 	@echo ""
 	@echo "[2/8] Parameter coverage..."
 	$(ANALYZER_CMD) parameter-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-parameter 100
 
 	@echo ""
 	@echo "[3/8] Business rule coverage..."
 	$(ANALYZER_CMD) business-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --rules "$(SELF_RULES)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-business 100
 
 	@echo ""
 	@echo "[4/8] Integration flow coverage..."
 	$(ANALYZER_CMD) integration-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --flows "$(SELF_FLOWS)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-integration 100
 
 	@echo ""
 	@echo "[5/8] Error scenario coverage..."
 	$(ANALYZER_CMD) error-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-error 100
 
 	@echo ""
 	@echo "[6/8] Security control coverage..."
 	$(ANALYZER_CMD) security-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
-	  --format "$(FORMATS)"
+	  --format "$(FORMATS)" \
+	  --threshold-security 100
 
 	@echo ""
 	@echo "[7/8] Performance/resilience coverage..."
 	$(ANALYZER_CMD) perf-resilience-coverage \
+	  --config "$(SELF_CONFIG)" \
 	  --spec "$(SELF_SPEC)" \
 	  --tests "$(SELF_TESTS)" \
 	  --load-results "$(SELF_LOAD)" \

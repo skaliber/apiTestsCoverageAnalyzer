@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="API Coverage" tests="1" failures="1" time="0">
-  <testsuite name="Coverage Thresholds" tests="1" failures="1" time="0">
-    <testcase name="endpoint coverage" classname="CoverageThreshold" time="0">
-      <failure message="endpoint coverage 66.67% is below threshold 80% (gap: 13.33%)">
-        Coverage: 66.67% / Threshold: 80% / Gap: 13.33%
-      </failure>
-    </testcase>
+<testsuites name="API Coverage" tests="2" failures="0" time="0">
+  <testsuite name="Coverage Thresholds" tests="2" failures="0" time="0">
+    <testcase name="performance coverage" classname="CoverageThreshold" time="0"/>
+    <testcase name="resilience coverage" classname="CoverageThreshold" time="0"/>
   </testsuite>
 </testsuites>

@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-03-08T07:23:12.466Z",
+  "generatedAt": "2026-03-08T09:15:54.813Z",
   "projectName": "wallets-payments-api",
   "findings": [
     {
-      "id": "ff-ep-1772954592465-1",
+      "id": "ff-ep-1772961354812-1",
       "source": "coverage-gap-analysis",
       "category": "uncovered-endpoint",
       "severity": "HIGH",
@@ -30,7 +30,7 @@
       ]
     },
     {
-      "id": "ff-ep-1772954592465-2",
+      "id": "ff-ep-1772961354812-2",
       "source": "coverage-gap-analysis",
       "category": "uncovered-endpoint",
       "severity": "MEDIUM",
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "id": "ff-biz-1772954592465-3",
+      "id": "ff-biz-1772961354812-3",
       "source": "business-coverage",
       "category": "missing-business-rule-test",
       "severity": "MEDIUM",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-4",
+      "id": "ff-err-1772961354812-4",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -107,7 +107,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-5",
+      "id": "ff-err-1772961354812-5",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-7",
+      "id": "ff-err-1772961354812-7",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -159,7 +159,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-9",
+      "id": "ff-err-1772961354812-9",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -185,7 +185,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-11",
+      "id": "ff-err-1772961354812-11",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -211,7 +211,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-14",
+      "id": "ff-err-1772961354812-14",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -237,7 +237,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-17",
+      "id": "ff-err-1772961354812-17",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -263,7 +263,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-20",
+      "id": "ff-err-1772961354812-20",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -289,7 +289,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-23",
+      "id": "ff-err-1772961354812-23",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -315,7 +315,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-26",
+      "id": "ff-err-1772961354812-26",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -341,7 +341,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-28",
+      "id": "ff-err-1772961354812-28",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -367,7 +367,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-30",
+      "id": "ff-err-1772961354812-30",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -393,7 +393,7 @@
       ]
     },
     {
-      "id": "ff-err-1772954592465-33",
+      "id": "ff-err-1772961354812-33",
       "source": "error-coverage",
       "category": "error-scenario-gap",
       "severity": "MEDIUM",
@@ -419,7 +419,7 @@
       ]
     },
     {
-      "id": "ff-sec-cov-1772954592465-34",
+      "id": "ff-sec-cov-1772961354812-34",
       "source": "security-coverage",
       "category": "missing-auth-test",
       "severity": "HIGH",
@@ -445,7 +445,7 @@
   ],
   "recommendations": [
     {
-      "id": "rec-1772954592466-70",
+      "id": "rec-1772961354812-70",
       "priority": "P1",
       "title": "Add auth test for: Missing auth/security test: unknown",
       "rationale": "Security scenario for undefined has no test coverage. Jest + supertest: describe(\"unauthorized\") { it(\"returns 401\") }",
@@ -453,13 +453,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-sec-cov-1772954592465-34"
+        "ff-sec-cov-1772961354812-34"
       ],
       "riskScore": 76,
       "confidence": "high"
     },
     {
-      "id": "rec-1772954592466-54",
+      "id": "rec-1772961354812-54",
       "priority": "P1",
       "title": "Add positive api test for: Uncovered endpoint: PATCH /wallets/{id}/unfreeze",
       "rationale": "Endpoint PATCH /wallets/{id}/unfreeze has no test coverage. Jest test case",
@@ -471,13 +471,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-ep-1772954592465-1"
+        "ff-ep-1772961354812-1"
       ],
       "riskScore": 73,
       "confidence": "high"
     },
     {
-      "id": "rec-1772954592466-66",
+      "id": "rec-1772961354812-66",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /payments",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -489,13 +489,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-26"
+        "ff-err-1772961354812-26"
       ],
       "riskScore": 65,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-67",
+      "id": "rec-1772961354812-67",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /payments/{id}",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -507,13 +507,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-28"
+        "ff-err-1772961354812-28"
       ],
       "riskScore": 65,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-68",
+      "id": "rec-1772961354812-68",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /payments/{id}/refund",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -525,13 +525,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-30"
+        "ff-err-1772961354812-30"
       ],
       "riskScore": 65,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-57",
+      "id": "rec-1772961354812-57",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -543,13 +543,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-4"
+        "ff-err-1772961354812-4"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-58",
+      "id": "rec-1772961354812-58",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets",
       "rationale": "Error codes 400 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -561,13 +561,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-5"
+        "ff-err-1772961354812-5"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-59",
+      "id": "rec-1772961354812-59",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -579,13 +579,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-7"
+        "ff-err-1772961354812-7"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-60",
+      "id": "rec-1772961354812-60",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -597,13 +597,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-9"
+        "ff-err-1772961354812-9"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-61",
+      "id": "rec-1772961354812-61",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/freeze",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -615,13 +615,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-11"
+        "ff-err-1772961354812-11"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-62",
+      "id": "rec-1772961354812-62",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/unfreeze",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -633,13 +633,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-14"
+        "ff-err-1772961354812-14"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-63",
+      "id": "rec-1772961354812-63",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/fund",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -651,13 +651,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-17"
+        "ff-err-1772961354812-17"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-64",
+      "id": "rec-1772961354812-64",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/debit",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -669,13 +669,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-20"
+        "ff-err-1772961354812-20"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-65",
+      "id": "rec-1772961354812-65",
       "priority": "P1",
       "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/transfer",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -687,13 +687,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-23"
+        "ff-err-1772961354812-23"
       ],
       "riskScore": 62,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-55",
+      "id": "rec-1772961354812-55",
       "priority": "P2",
       "title": "Add positive api test for: Uncovered endpoint: GET /transactions",
       "rationale": "Endpoint GET /transactions has no test coverage. Jest test case",
@@ -705,13 +705,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-ep-1772954592465-2"
+        "ff-ep-1772961354812-2"
       ],
       "riskScore": 54,
       "confidence": "high"
     },
     {
-      "id": "rec-1772954592466-56",
+      "id": "rec-1772961354812-56",
       "priority": "P2",
       "title": "Add business rule test for: Uncovered business rule: daily-limit",
       "rationale": "Business rule \"daily-limit\" has no test coverage. Jest test case",
@@ -719,13 +719,13 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-biz-1772954592465-3"
+        "ff-biz-1772961354812-3"
       ],
       "riskScore": 52,
       "confidence": "medium"
     },
     {
-      "id": "rec-1772954592466-69",
+      "id": "rec-1772961354812-69",
       "priority": "P3",
       "title": "Add negative api test for: Missing error scenario tests for /transactions",
       "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
@@ -737,7 +737,7 @@
       "likelyFramework": "jest",
       "likelyLanguage": "typescript",
       "linkedFindingIds": [
-        "ff-err-1772954592465-33"
+        "ff-err-1772961354812-33"
       ],
       "riskScore": 48,
       "confidence": "medium"

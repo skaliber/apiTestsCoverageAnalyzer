@@ -17,16 +17,16 @@
       ],
       "covered": true,
       "testFiles": [
+        "tests/integration/wallets.integration.test.ts",
         "tests/blackbox/payments.blackbox.test.ts",
-        "tests/blackbox/wallets.blackbox.test.ts",
-        "tests/integration/wallets.integration.test.ts"
+        "tests/blackbox/wallets.blackbox.test.ts"
       ],
       "matchedTests": [
+        "returns 400 for invalid currency",
         "returns 400 for missing required fields",
         "returns 400 when currency is missing",
         "returns 400 for unsupported currency",
-        "funds exactly $1 (minimum amount)",
-        "returns 400 for invalid currency"
+        "funds exactly $1 (minimum amount)"
       ],
       "scenarios": []
     },
@@ -38,23 +38,23 @@
       ],
       "covered": true,
       "testFiles": [
-        "tests/blackbox/payments.blackbox.test.ts",
-        "tests/blackbox/wallets.blackbox.test.ts",
-        "tests/integration/wallets.integration.test.ts",
         "tests/unit/riskService.test.ts",
-        "tests/unit/walletService.test.ts"
+        "tests/unit/walletService.test.ts",
+        "tests/integration/wallets.integration.test.ts",
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts"
       ],
       "matchedTests": [
-        "returns 422 for invalid (non-existent) wallet",
-        "returns 422 when refunding a non-completed payment",
-        "returns 422 for insufficient funds",
-        "debits exactly the full balance",
-        "returns 422 with insufficient funds",
         "passes when balance >= amount",
         "throws for insufficient funds",
         "adds to balance and returns transaction",
         "reduces balance",
-        "fails with INSUFFICIENT_FUNDS when balance too low"
+        "fails with INSUFFICIENT_FUNDS when balance too low",
+        "returns 422 with insufficient funds",
+        "returns 422 for invalid (non-existent) wallet",
+        "returns 422 when refunding a non-completed payment",
+        "returns 422 for insufficient funds",
+        "debits exactly the full balance"
       ],
       "scenarios": []
     },
@@ -68,19 +68,19 @@
       ],
       "covered": true,
       "testFiles": [
-        "tests/blackbox/wallets.blackbox.test.ts",
-        "tests/integration/wallets.integration.test.ts",
         "tests/unit/riskService.test.ts",
-        "tests/unit/walletService.test.ts"
+        "tests/unit/walletService.test.ts",
+        "tests/integration/wallets.integration.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts"
       ],
       "matchedTests": [
-        "full lifecycle: create, fund, debit, transfer, freeze, unfreeze, delete",
-        "freezes a wallet",
-        "unfreezes a wallet",
         "throws for frozen wallet",
         "freeze changes status to frozen",
         "unfreeze changes status back to active",
-        "freeze throws RiskError on closed wallet"
+        "freeze throws RiskError on closed wallet",
+        "freezes a wallet",
+        "unfreezes a wallet",
+        "full lifecycle: create, fund, debit, transfer, freeze, unfreeze, delete"
       ],
       "scenarios": []
     },
@@ -104,18 +104,18 @@
       ],
       "covered": true,
       "testFiles": [
+        "tests/integration/wallets.integration.test.ts",
         "tests/blackbox/payments.blackbox.test.ts",
-        "tests/blackbox/wallets.blackbox.test.ts",
-        "tests/integration/wallets.integration.test.ts"
+        "tests/blackbox/wallets.blackbox.test.ts"
       ],
       "matchedTests": [
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds",
         "returns 422 for invalid (non-existent) wallet",
         "returns 422 when refunding a non-completed payment",
         "returns 400 when currency is missing",
         "returns 400 for unsupported currency",
-        "returns 422 for insufficient funds",
-        "returns 400 for invalid currency",
-        "returns 422 with insufficient funds"
+        "returns 422 for insufficient funds"
       ],
       "scenarios": []
     },
@@ -127,18 +127,18 @@
       ],
       "covered": true,
       "testFiles": [
-        "tests/blackbox/payments.blackbox.test.ts",
-        "tests/blackbox/wallets.blackbox.test.ts",
         "tests/integration/payments.integration.test.ts",
-        "tests/integration/wallets.integration.test.ts"
+        "tests/integration/wallets.integration.test.ts",
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts"
       ],
       "matchedTests": [
+        "refunds a completed payment",
+        "returns 422 with insufficient funds",
         "returns 422 for invalid (non-existent) wallet",
         "refunds a completed payment",
         "returns 422 when refunding a non-completed payment",
-        "returns 422 for insufficient funds",
-        "refunds a completed payment",
-        "returns 422 with insufficient funds"
+        "returns 422 for insufficient funds"
       ],
       "scenarios": []
     },
@@ -171,13 +171,13 @@
       ],
       "covered": true,
       "testFiles": [
-        "tests/blackbox/payments.blackbox.test.ts",
-        "tests/integration/payments.integration.test.ts"
+        "tests/integration/payments.integration.test.ts",
+        "tests/blackbox/payments.blackbox.test.ts"
       ],
       "matchedTests": [
+        "returns same payment for duplicate idempotency key",
         "creates payment with idempotency key",
-        "returns same payment id for duplicate key",
-        "returns same payment for duplicate idempotency key"
+        "returns same payment id for duplicate key"
       ],
       "scenarios": []
     }

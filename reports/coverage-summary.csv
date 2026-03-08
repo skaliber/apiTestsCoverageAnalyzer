@@ -1,2 +1,3 @@
 type,total,covered,percent
-endpoint,9,6,66.67
+performance,15,15,100
+resilience,90,90,100

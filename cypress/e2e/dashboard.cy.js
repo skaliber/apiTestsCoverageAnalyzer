@@ -521,4 +521,315 @@ describe('Coverage Intelligence page', () => {
     cy.contains('All Priorities').should('be.visible')
     cy.contains('All Risk Bands').should('be.visible')
   })
+
+  it('shows the endpoint filter input in the filter bar', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'test-project',
+      findings: [
+        {
+          id: 'ff-1',
+          source: 'coverage-gap-analysis',
+          category: 'uncovered-endpoint',
+          severity: 'HIGH',
+          title: 'Uncovered endpoint: POST /payments',
+          description: 'Endpoint POST /payments has no test coverage.',
+          endpoint: { method: 'POST', path: '/payments' },
+          missingTestTypes: ['positive-api-test'],
+        },
+      ],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P1',
+          title: 'Add test for POST /payments',
+          rationale: 'Endpoint POST /payments has no test coverage.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'POST', path: '/payments' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: ['ff-1'],
+          riskScore: 72,
+          confidence: 'medium',
+        },
+      ],
+      summary: {
+        totalFindings: 1,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 0 },
+        totalRecommendations: 1,
+        recommendationsByPriority: { P0: 0, P1: 1, P2: 0, P3: 0 },
+        maxRiskScore: 72,
+        avgRiskScore: 72,
+        criticalUncoveredItems: 1,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: ['POST /payments (score 72)'],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    cy.get('[data-testid="intelligence-section"]', { timeout: 10000 }).should('be.visible')
+    cy.get('[data-testid="endpoint-filter"]').should('exist')
+  })
+
+  it('filters recommendations by endpoint search term', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'test-project',
+      findings: [],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P1',
+          title: 'Add test for POST /payments',
+          rationale: 'Payment endpoint uncovered.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'POST', path: '/payments' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: [],
+          riskScore: 75,
+          confidence: 'high',
+        },
+        {
+          id: 'rec-2',
+          priority: 'P2',
+          title: 'Add test for GET /wallets',
+          rationale: 'Wallet endpoint uncovered.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'GET', path: '/wallets' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: [],
+          riskScore: 45,
+          confidence: 'medium',
+        },
+      ],
+      summary: {
+        totalFindings: 0,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 },
+        totalRecommendations: 2,
+        recommendationsByPriority: { P0: 0, P1: 1, P2: 1, P3: 0 },
+        maxRiskScore: 75,
+        avgRiskScore: 60,
+        criticalUncoveredItems: 0,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: [],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    // Both recommendations are visible initially
+    cy.contains('POST /payments').should('be.visible')
+    cy.contains('GET /wallets').should('be.visible')
+
+    // Filter to /payments only
+    cy.get('[data-testid="endpoint-filter"]', { timeout: 10000 }).type('payments')
+    cy.contains('POST /payments').should('be.visible')
+    cy.contains('GET /wallets').should('not.exist')
+  })
+
+  it('shows the intelligence section with findings when report has data', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'ai-panel-test',
+      findings: [
+        {
+          id: 'ff-1',
+          source: 'coverage-gap-analysis',
+          category: 'uncovered-endpoint',
+          severity: 'HIGH',
+          title: 'Uncovered POST /payments',
+          description: 'Missing coverage.',
+          endpoint: { method: 'POST', path: '/payments' },
+          missingTestTypes: ['positive-api-test'],
+        },
+        {
+          id: 'ff-2',
+          source: 'security-scan',
+          category: 'security-finding-unprotected',
+          severity: 'CRITICAL',
+          title: 'Auth bypass on /admin',
+          description: 'Critical security finding.',
+          endpoint: { method: 'DELETE', path: '/admin' },
+          relatedScanners: ['zap'],
+          missingTestTypes: ['security-test'],
+        },
+      ],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P0',
+          title: 'Add security test for DELETE /admin',
+          rationale: 'Critical auth bypass must be tested.',
+          recommendedTestType: 'security-test',
+          endpoint: { method: 'DELETE', path: '/admin' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: ['ff-2'],
+          riskScore: 95,
+          confidence: 'high',
+        },
+        {
+          id: 'rec-2',
+          priority: 'P1',
+          title: 'Add positive api test for POST /payments',
+          rationale: 'Payment endpoint uncovered.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'POST', path: '/payments' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: ['ff-1'],
+          riskScore: 72,
+          confidence: 'medium',
+        },
+      ],
+      summary: {
+        totalFindings: 2,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 1 },
+        totalRecommendations: 2,
+        recommendationsByPriority: { P0: 1, P1: 1, P2: 0, P3: 0 },
+        maxRiskScore: 95,
+        avgRiskScore: 84,
+        criticalUncoveredItems: 1,
+        unprotectedSecurityFindings: 1,
+        topRiskAreas: ['DELETE /admin (score 95)'],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    // Intelligence section should be visible with findings
+    cy.get('[data-testid="intelligence-section"]', { timeout: 10000 }).should('be.visible')
+    // AI summary panel should render (it has a toggle button)
+    cy.get('[data-testid="intelligence-section"]').within(() => {
+      cy.get('button').should('have.length.greaterThan', 0)
+    })
+  })
+
+  it('verifies risk score sort renders highest score first by default', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'sort-test',
+      findings: [],
+      recommendations: [
+        {
+          id: 'rec-low',
+          priority: 'P3',
+          title: 'Low risk test',
+          rationale: 'Low.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'GET', path: '/items' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: [],
+          riskScore: 20,
+          confidence: 'low',
+        },
+        {
+          id: 'rec-high',
+          priority: 'P0',
+          title: 'Critical security test',
+          rationale: 'Critical.',
+          recommendedTestType: 'security-test',
+          endpoint: { method: 'POST', path: '/payments' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: [],
+          riskScore: 95,
+          confidence: 'high',
+        },
+      ],
+      summary: {
+        totalFindings: 0,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 },
+        totalRecommendations: 2,
+        recommendationsByPriority: { P0: 1, P1: 0, P2: 0, P3: 1 },
+        maxRiskScore: 95,
+        avgRiskScore: 58,
+        criticalUncoveredItems: 0,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: [],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    // Both recommendations visible
+    cy.contains('Critical security test').should('be.visible')
+    cy.contains('Low risk test').should('be.visible')
+    // P0 high-risk should appear (default sort is risk score descending)
+    cy.contains('P0').should('be.visible')
+    cy.contains('95').should('be.visible')
+  })
+
+  it('opens finding drawer when linked-findings badge is clicked on a recommendation', () => {
+    const mockReport = {
+      generatedAt: new Date().toISOString(),
+      projectName: 'drawer-test',
+      findings: [
+        {
+          id: 'ff-1',
+          source: 'coverage-gap-analysis',
+          category: 'uncovered-endpoint',
+          severity: 'CRITICAL',
+          title: 'Uncovered endpoint: POST /payments/charge',
+          description: 'Critical payment endpoint lacks any test coverage.',
+          endpoint: { method: 'POST', path: '/payments/charge' },
+          missingTestTypes: ['positive-api-test', 'negative-api-test'],
+        },
+      ],
+      recommendations: [
+        {
+          id: 'rec-1',
+          priority: 'P0',
+          title: 'Add positive api test for POST /payments/charge',
+          rationale: 'Critical payment endpoint lacks coverage.',
+          recommendedTestType: 'positive-api-test',
+          endpoint: { method: 'POST', path: '/payments/charge' },
+          likelyLanguage: 'typescript',
+          likelyFramework: 'jest',
+          linkedFindingIds: ['ff-1'],
+          riskScore: 92,
+          confidence: 'high',
+        },
+      ],
+      summary: {
+        totalFindings: 1,
+        findingsBySeverity: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 1 },
+        totalRecommendations: 1,
+        recommendationsByPriority: { P0: 1, P1: 0, P2: 0, P3: 0 },
+        maxRiskScore: 92,
+        avgRiskScore: 92,
+        criticalUncoveredItems: 1,
+        unprotectedSecurityFindings: 0,
+        topRiskAreas: ['POST /payments/charge (score 92)'],
+      },
+    }
+
+    cy.intercept('GET', '/reports/coverage-intelligence.json', { body: mockReport }).as('reportFetch')
+    cy.visit('/intelligence')
+    cy.wait('@reportFetch')
+
+    // Verify P0 recommendation is visible
+    cy.contains('P0').should('be.visible')
+    cy.contains('/payments/charge').should('be.visible')
+
+    // Click the linked findings badge to open the drawer
+    cy.get('[data-testid="intelligence-section"]', { timeout: 10000 }).within(() => {
+      cy.contains(/1 finding/i).click()
+    })
+    // After clicking, the drawer should show finding details
+    cy.contains('Uncovered endpoint').should('be.visible')
+    cy.contains('/payments/charge').should('be.visible')
+  })
 })

@@ -22,11 +22,13 @@ import {
   buildPerformancePrompt,
   buildCompatibilityPrompt,
   buildCiSummaryPrompt,
+  buildIntelligencePrompt,
   type CoverageSummaryPromptInput,
   type SecurityScanPromptInput,
   type PerformancePromptInput,
   type CompatibilityPromptInput,
   type CiSummaryPromptInput,
+  type IntelligencePromptInput,
 } from './prompts';
 import { normalizeMcpResponse } from './normalizer';
 import {
@@ -39,6 +41,7 @@ import {
   generateFallbackCoverageAnalysis,
   generateFallbackSecurityAnalysis,
   generateFallbackAnalysis,
+  generateFallbackIntelligenceAnalysis,
 } from './fallback';
 import { AnalysisEventStream } from './events';
 
@@ -65,6 +68,7 @@ export type {
   PerformancePromptInput,
   CompatibilityPromptInput,
   CiSummaryPromptInput,
+  IntelligencePromptInput,
 } from './prompts';
 
 export type { AiPanelData } from './templates';
@@ -75,6 +79,7 @@ export {
   buildPerformancePrompt,
   buildCompatibilityPrompt,
   buildCiSummaryPrompt,
+  buildIntelligencePrompt,
 } from './prompts';
 
 export { normalizeMcpResponse } from './normalizer';
@@ -89,6 +94,7 @@ export {
   generateFallbackCoverageAnalysis,
   generateFallbackSecurityAnalysis,
   generateFallbackAnalysis,
+  generateFallbackIntelligenceAnalysis,
 } from './fallback';
 
 export { AnalysisEventStream, createNoOpStream } from './events';
@@ -219,6 +225,31 @@ export class McpIntegration {
     const request = buildCiSummaryPrompt(input);
     const raw = await this.client.send('coverageSummary', request);
     const normalized = normalizeMcpResponse(raw, 'ci-summary');
+    if (!raw.ok) normalized.isFallback = true;
+    return normalized;
+  }
+
+  /** Analyze coverage intelligence results via MCP (or fallback if unavailable) */
+  async analyzeIntelligence(input: IntelligencePromptInput): Promise<NormalizedAiAnalysis> {
+    if (!isMcpEnabledFor(this.config, 'intelligenceAnalysis')) {
+      return generateFallbackIntelligenceAnalysis({
+        totalFindings: input.totalFindings,
+        totalRecommendations: input.totalRecommendations,
+        maxRiskScore: input.maxRiskScore,
+        avgRiskScore: input.avgRiskScore,
+        criticalUncoveredItems: input.criticalUncoveredItems,
+        unprotectedSecurityFindings: input.unprotectedSecurityFindings,
+        recommendationsByPriority: input.recommendationsByPriority,
+        languages: input.languages,
+        frameworks: input.frameworks,
+      });
+    }
+
+    const request = buildIntelligencePrompt(input);
+    request.events = [...this.eventStream.getEvents()];
+
+    const raw = await this.client.send('intelligenceAnalysis', request);
+    const normalized = normalizeMcpResponse(raw, 'intelligence');
     if (!raw.ok) normalized.isFallback = true;
     return normalized;
   }

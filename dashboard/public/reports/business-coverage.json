@@ -1,0 +1,185 @@
+{
+  "total": 8,
+  "covered": 7,
+  "percentage": 87.5,
+  "uncoveredRules": [
+    {
+      "id": "daily-limit",
+      "description": "Daily transaction limit is $10,000"
+    }
+  ],
+  "rules": [
+    {
+      "id": "min-fund-amount",
+      "description": "Minimum funding amount is $1",
+      "endpoints": [
+        "POST /wallets/{walletId}/fund"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "matchedTests": [
+        "returns 400 for missing required fields",
+        "returns 400 when currency is missing",
+        "returns 400 for unsupported currency",
+        "funds exactly $1 (minimum amount)",
+        "returns 400 for invalid currency"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "insufficient-funds",
+      "description": "Debit cannot exceed balance",
+      "endpoints": [
+        "POST /wallets/{walletId}/debit"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts",
+        "tests/unit/riskService.test.ts",
+        "tests/unit/walletService.test.ts"
+      ],
+      "matchedTests": [
+        "returns 422 for invalid (non-existent) wallet",
+        "returns 422 when refunding a non-completed payment",
+        "returns 422 for insufficient funds",
+        "debits exactly the full balance",
+        "returns 422 with insufficient funds",
+        "passes when balance >= amount",
+        "throws for insufficient funds",
+        "adds to balance and returns transaction",
+        "reduces balance",
+        "fails with INSUFFICIENT_FUNDS when balance too low"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "frozen-wallet-reject",
+      "description": "Frozen wallets reject all transactions",
+      "endpoints": [
+        "POST /wallets/{walletId}/debit",
+        "POST /wallets/{walletId}/fund",
+        "POST /wallets/{walletId}/transfer"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts",
+        "tests/unit/riskService.test.ts",
+        "tests/unit/walletService.test.ts"
+      ],
+      "matchedTests": [
+        "full lifecycle: create, fund, debit, transfer, freeze, unfreeze, delete",
+        "freezes a wallet",
+        "unfreezes a wallet",
+        "throws for frozen wallet",
+        "freeze changes status to frozen",
+        "unfreeze changes status back to active",
+        "freeze throws RiskError on closed wallet"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "daily-limit",
+      "description": "Daily transaction limit is $10,000",
+      "endpoints": [
+        "POST /wallets/{walletId}/debit",
+        "POST /wallets/{walletId}/transfer"
+      ],
+      "covered": false,
+      "testFiles": [],
+      "matchedTests": [],
+      "scenarios": []
+    },
+    {
+      "id": "transfer-same-currency",
+      "description": "Transfer requires matching currencies",
+      "endpoints": [
+        "POST /wallets/{walletId}/transfer"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "matchedTests": [
+        "returns 422 for invalid (non-existent) wallet",
+        "returns 422 when refunding a non-completed payment",
+        "returns 400 when currency is missing",
+        "returns 400 for unsupported currency",
+        "returns 422 for insufficient funds",
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "refund-window",
+      "description": "Refund allowed only within 30 days",
+      "endpoints": [
+        "POST /payments/{paymentId}/refund"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/payments.integration.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "matchedTests": [
+        "returns 422 for invalid (non-existent) wallet",
+        "refunds a completed payment",
+        "returns 422 when refunding a non-completed payment",
+        "returns 422 for insufficient funds",
+        "refunds a completed payment",
+        "returns 422 with insufficient funds"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "fraud-check",
+      "description": "Payments require fraud check approval",
+      "endpoints": [
+        "POST /payments"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/unit/paymentService.test.ts",
+        "tests/wiremock/fraudEngine.wiremock.test.ts"
+      ],
+      "matchedTests": [
+        "returns completed payment when fraud approved and processor succeeds",
+        "returns failed payment when fraud engine blocks",
+        "fraud check returns approved: true",
+        "fraud check returns approved: false with reason",
+        "fraud engine returns 503 → error thrown",
+        "fraud engine connection error → error thrown"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "idempotency",
+      "description": "Duplicate requests with same key return same result",
+      "endpoints": [
+        "POST /payments"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "matchedTests": [
+        "creates payment with idempotency key",
+        "returns same payment id for duplicate key",
+        "returns same payment for duplicate idempotency key"
+      ],
+      "scenarios": []
+    }
+  ]
+}

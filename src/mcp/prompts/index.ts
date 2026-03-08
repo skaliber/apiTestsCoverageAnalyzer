@@ -232,6 +232,108 @@ export function buildCompatibilityPrompt(input: CompatibilityPromptInput): McpPr
   };
 }
 
+// ─── Coverage Intelligence prompt ─────────────────────────────────────────────
+
+export interface IntelligencePromptInput {
+  totalFindings: number;
+  totalRecommendations: number;
+  maxRiskScore: number;
+  avgRiskScore: number;
+  criticalUncoveredItems: number;
+  unprotectedSecurityFindings: number;
+  recommendationsByPriority: Record<string, number>;
+  topFindings: Array<{
+    category: string;
+    severity: string;
+    title: string;
+    endpoint?: { method?: string; path?: string };
+  }>;
+  topRecommendations: Array<{
+    priority: string;
+    riskScore: number;
+    title: string;
+    recommendedTestType: string;
+    likelyLanguage?: string;
+    likelyFramework?: string;
+  }>;
+  languages?: string[];
+  frameworks?: string[];
+  projectName?: string;
+  branch?: string;
+}
+
+export function buildIntelligencePrompt(input: IntelligencePromptInput): McpPromptRequest {
+  const lines: string[] = [
+    'Analyze the following Coverage Intelligence results for an API project.',
+    '',
+    '## Context',
+  ];
+  if (input.projectName) lines.push(`Project: ${input.projectName}`);
+  if (input.branch) lines.push(`Branch: ${input.branch}`);
+  if (input.languages?.length) lines.push(`Languages: ${input.languages.join(', ')}`);
+  if (input.frameworks?.length) lines.push(`Frameworks: ${input.frameworks.join(', ')}`);
+  lines.push('');
+
+  lines.push('## Intelligence Summary');
+  lines.push(`Total functional findings: ${input.totalFindings}`);
+  lines.push(`Total missing test recommendations: ${input.totalRecommendations}`);
+  lines.push(`Max risk score: ${input.maxRiskScore}`);
+  lines.push(`Avg risk score: ${input.avgRiskScore}`);
+  lines.push(`Critical uncovered items: ${input.criticalUncoveredItems}`);
+  lines.push(`Unprotected security findings: ${input.unprotectedSecurityFindings}`);
+  lines.push('');
+
+  lines.push('## Recommendations by Priority');
+  for (const [p, count] of Object.entries(input.recommendationsByPriority)) {
+    lines.push(`- ${p}: ${count}`);
+  }
+  lines.push('');
+
+  if (input.topFindings.length > 0) {
+    lines.push('## Top Functional Findings');
+    for (const f of input.topFindings.slice(0, 10)) {
+      const ep = f.endpoint ? ` [${f.endpoint.method ?? ''} ${f.endpoint.path ?? ''}]`.trim() : '';
+      lines.push(`- [${f.severity}] ${f.title}${ep} (${f.category})`);
+    }
+    lines.push('');
+  }
+
+  if (input.topRecommendations.length > 0) {
+    lines.push('## Top Missing Test Recommendations');
+    for (const r of input.topRecommendations.slice(0, 10)) {
+      lines.push(`- [${r.priority}] ${r.title} (risk: ${r.riskScore}, type: ${r.recommendedTestType})`);
+    }
+    lines.push('');
+  }
+
+  lines.push('## Required Output');
+  lines.push('Provide a JSON response with:');
+  lines.push('- summary (string): executive summary of testing intelligence gaps');
+  lines.push('- keyFindings (string[]): key functional findings');
+  lines.push('- topRisks (string[]): top risks ordered by severity and risk score');
+  lines.push('- recommendedActions (string[]): prioritized actions to close gaps');
+  lines.push('- missingCoverageAreas (string[]): specific areas lacking test coverage');
+  lines.push('- confidence ("low"|"medium"|"high")');
+
+  return {
+    category: 'intelligence',
+    prompt: lines.join('\n'),
+    context: {
+      projectName: input.projectName,
+      branch: input.branch,
+      totalFindings: input.totalFindings,
+      totalRecommendations: input.totalRecommendations,
+      maxRiskScore: input.maxRiskScore,
+      avgRiskScore: input.avgRiskScore,
+      criticalUncoveredItems: input.criticalUncoveredItems,
+      unprotectedSecurityFindings: input.unprotectedSecurityFindings,
+      recommendationsByPriority: input.recommendationsByPriority,
+      languages: input.languages ?? [],
+      frameworks: input.frameworks ?? [],
+    },
+  };
+}
+
 // ─── PR / Build summary prompt ────────────────────────────────────────────────
 
 export interface CiSummaryPromptInput {

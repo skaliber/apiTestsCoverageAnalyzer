@@ -154,10 +154,11 @@ When the metrics server is enabled (`--metrics-port`), the intelligence engine e
 The React dashboard includes a **🧠 Intelligence** page accessible from the sidebar. It shows:
 
 - Summary cards (total findings, recommendations, P0 count, max risk score)
-- Filterable list of Missing Test Recommendations (filter by priority, risk band)
-- Filterable table of Functional Findings (filter by severity, category)
+- Filterable list of Missing Test Recommendations (filter by priority, risk band, language, framework, endpoint path)
+- Filterable table of Functional Findings (filter by severity, category, scanner, endpoint path)
 - Top Risk Areas list
 - AI-friendly collapsed summary panel
+- Finding detail drawer — click any linked-finding badge to drill into the full finding context and linked recommendations
 
 The page loads `reports/coverage-intelligence.json` automatically if served by the dashboard server.
 

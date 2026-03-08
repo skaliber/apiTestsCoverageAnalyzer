@@ -17,6 +17,7 @@ export {
   renderCoverageSection,
   renderSecurityScanSection,
   renderAiSummary,
+  renderIntelligenceSection,
   statusBadge,
   pct,
   tableRow,

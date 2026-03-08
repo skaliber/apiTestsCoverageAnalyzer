@@ -61,11 +61,16 @@ The following scenarios are **deliberately untested** to demonstrate gap detecti
 ## Viewing the Dashboard
 
 ```bash
-# Start the analyzer dashboard (from repo root)
-npx api-coverage serve
+# From the example directory — launches the Vite dashboard at http://localhost:5173
+npm run dashboard
 
-# Then open http://localhost:3000
-node scripts/generate-screenshots.js   # capture screenshots
+# Or manually from the repo root:
+cd ../../dashboard
+npm install
+npm run dev   # http://localhost:5173
+
+# Capture screenshots
+node scripts/generate-screenshots.js
 ```
 
 ## Observability (Prometheus + Grafana)

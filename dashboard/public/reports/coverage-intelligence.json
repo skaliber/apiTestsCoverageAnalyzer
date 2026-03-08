@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-03-08T06:34:01.372Z",
+  "projectName": "wallets-payments-api",
+  "findings": [],
+  "recommendations": [],
+  "summary": {
+    "totalFindings": 0,
+    "findingsBySeverity": {
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 0,
+      "CRITICAL": 0
+    },
+    "totalRecommendations": 0,
+    "recommendationsByPriority": {
+      "P0": 0,
+      "P1": 0,
+      "P2": 0,
+      "P3": 0
+    },
+    "maxRiskScore": 0,
+    "avgRiskScore": 0,
+    "criticalUncoveredItems": 0,
+    "unprotectedSecurityFindings": 0,
+    "topRiskAreas": []
+  }
+}

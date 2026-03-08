@@ -1,0 +1,127 @@
+flows:
+  - id: FLOW001
+    name: "Fund Wallet and Make Payment"
+    description: "Create a wallet, fund it, then create a payment"
+    steps:
+      - id: FLOW001-step1
+        description: "Create a new wallet"
+        type: api
+        method: POST
+        path: /wallets
+        keywords: ["create wallet", "POST /wallets", "wallet created"]
+      - id: FLOW001-step2
+        description: "Fund the wallet"
+        type: api
+        method: POST
+        path: /wallets/{id}/fund
+        keywords: ["fund wallet", "fund", "add funds", "deposit"]
+      - id: FLOW001-step3
+        description: "Create a payment"
+        type: api
+        method: POST
+        path: /payments
+        keywords: ["create payment", "POST /payments", "payment created"]
+
+  - id: FLOW002
+    name: "Transfer Between Wallets"
+    description: "Create two wallets, fund source, transfer to destination"
+    steps:
+      - id: FLOW002-step1
+        description: "Create source wallet"
+        type: api
+        method: POST
+        path: /wallets
+        keywords: ["create wallet", "source wallet", "POST /wallets"]
+      - id: FLOW002-step2
+        description: "Fund the source wallet"
+        type: api
+        method: POST
+        path: /wallets/{id}/fund
+        keywords: ["fund", "fund wallet", "source"]
+      - id: FLOW002-step3
+        description: "Create destination wallet"
+        type: api
+        method: POST
+        path: /wallets
+        keywords: ["destination wallet", "target wallet"]
+      - id: FLOW002-step4
+        description: "Transfer between wallets"
+        type: api
+        method: POST
+        path: /wallets/{id}/transfer
+        keywords: ["transfer", "POST /wallets", "wallet transfer"]
+
+  - id: FLOW003
+    name: "Create Payment and Refund"
+    description: "Create a payment, wait for completion, then refund"
+    steps:
+      - id: FLOW003-step1
+        description: "Create a wallet and fund it"
+        type: api
+        method: POST
+        path: /wallets/{id}/fund
+        keywords: ["fund", "fund wallet"]
+      - id: FLOW003-step2
+        description: "Create a payment"
+        type: api
+        method: POST
+        path: /payments
+        keywords: ["create payment", "POST /payments"]
+      - id: FLOW003-step3
+        description: "Refund the payment"
+        type: api
+        method: POST
+        path: /payments/{id}/refund
+        keywords: ["refund", "POST /payments", "refund payment"]
+
+  - id: FLOW004
+    name: "Freeze Wallet and Attempt Transaction"
+    description: "Freeze a wallet and verify transactions are rejected"
+    steps:
+      - id: FLOW004-step1
+        description: "Create and fund a wallet"
+        type: api
+        method: POST
+        path: /wallets/{id}/fund
+        keywords: ["create wallet", "fund wallet"]
+      - id: FLOW004-step2
+        description: "Freeze the wallet"
+        type: api
+        method: PATCH
+        path: /wallets/{id}/freeze
+        keywords: ["freeze", "freeze wallet", "frozen"]
+      - id: FLOW004-step3
+        description: "Attempt debit on frozen wallet - should be rejected"
+        type: api
+        method: POST
+        path: /wallets/{id}/debit
+        keywords: ["frozen", "frozen wallet", "debit frozen", "422"]
+      - id: FLOW004-step4
+        description: "Unfreeze the wallet"
+        type: api
+        method: PATCH
+        path: /wallets/{id}/unfreeze
+        keywords: ["unfreeze", "unfreeze wallet"]
+
+  - id: FLOW005
+    name: "View Transaction History"
+    description: "Create wallet, make transactions, view history"
+    steps:
+      - id: FLOW005-step1
+        description: "Create and fund a wallet"
+        type: api
+        method: POST
+        path: /wallets/{id}/fund
+        keywords: ["fund wallet", "fund"]
+      - id: FLOW005-step2
+        description: "Make a debit transaction"
+        type: api
+        method: POST
+        path: /wallets/{id}/debit
+        keywords: ["debit", "debit wallet"]
+      - id: FLOW005-step3
+        description: "View wallet transaction history"
+        type: api
+        method: GET
+        path: /wallets/{id}/transactions
+        keywords: ["transactions", "GET /wallets", "transaction history", "list transactions"]

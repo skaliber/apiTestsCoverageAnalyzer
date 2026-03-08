@@ -18,6 +18,7 @@ import {
   renderCoverageSection,
   renderSecurityScanSection,
   renderAiSummary,
+  renderIntelligenceSection,
   statusBadge,
   pct,
   tableRow,
@@ -155,6 +156,18 @@ function buildSections(input: SummaryInput): SummarySection[] {
     });
   }
 
+  // Coverage Intelligence section
+  if (input.intelligenceSummary) {
+    sections.push({
+      id: 'coverage-intelligence',
+      title: 'Coverage Intelligence',
+      included: true,
+      gateEvaluated: false,
+      passed: undefined,
+      markdown: renderIntelligenceSection(input.intelligenceSummary),
+    });
+  }
+
   return sections;
 }
 
@@ -214,6 +227,18 @@ function buildJsonSummary(input: SummaryInput, sections: SummarySection[]): unkn
           gatePassed: input.securityScan.gateResult?.passed,
         }
       : undefined,
+    intelligence: input.intelligenceSummary
+      ? {
+          totalFindings: input.intelligenceSummary.totalFindings,
+          totalRecommendations: input.intelligenceSummary.totalRecommendations,
+          maxRiskScore: input.intelligenceSummary.maxRiskScore,
+          avgRiskScore: input.intelligenceSummary.avgRiskScore,
+          criticalUncoveredItems: input.intelligenceSummary.criticalUncoveredItems,
+          unprotectedSecurityFindings: input.intelligenceSummary.unprotectedSecurityFindings,
+          recommendationsByPriority: input.intelligenceSummary.recommendationsByPriority,
+          topRiskAreas: input.intelligenceSummary.topRiskAreas,
+        }
+      : undefined,
   };
 }
 
@@ -238,3 +263,4 @@ async function writeOutputFiles(
 // ─── Re-exports ───────────────────────────────────────────────────────────────
 
 export type { SummaryInput, SummaryResult, SummarySection, SummaryConfig } from './markdownRenderer';
+export { renderIntelligenceSection } from './markdownRenderer';

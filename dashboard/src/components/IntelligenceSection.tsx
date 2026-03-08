@@ -63,6 +63,8 @@ interface FilterState {
   framework: string;
   severity: string;
   scanner: string;
+  category: string;
+  endpoint: string;
 }
 
 function FilterBar({
@@ -71,18 +73,22 @@ function FilterBar({
   languages,
   frameworks,
   scanners,
+  categories,
 }: {
   filters: FilterState;
   setFilters: (f: FilterState) => void;
   languages: string[];
   frameworks: string[];
   scanners: string[];
+  categories: string[];
 }) {
   const sel = (value: string, field: keyof FilterState) =>
     setFilters({ ...filters, [field]: value });
 
   const selectClass =
     'rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 text-xs';
+  const inputClass =
+    'rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 text-xs placeholder-gray-400 dark:placeholder-gray-500';
 
   return (
     <div className="flex flex-wrap gap-2 mb-3" data-testid="intelligence-filters">
@@ -107,6 +113,12 @@ function FilterBar({
         <option value="MEDIUM">Medium</option>
         <option value="LOW">Low</option>
       </select>
+      {categories.length > 0 && (
+        <select value={filters.category} onChange={(e) => sel(e.target.value, 'category')} className={selectClass} data-testid="category-filter">
+          <option value="all">All Categories</option>
+          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      )}
       {languages.length > 0 && (
         <select value={filters.language} onChange={(e) => sel(e.target.value, 'language')} className={selectClass}>
           <option value="all">All Languages</option>
@@ -125,6 +137,14 @@ function FilterBar({
           {scanners.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       )}
+      <input
+        type="text"
+        value={filters.endpoint}
+        onChange={(e) => sel(e.target.value, 'endpoint')}
+        placeholder="Filter by endpoint..."
+        className={inputClass}
+        data-testid="endpoint-filter"
+      />
     </div>
   );
 }
@@ -319,6 +339,8 @@ export default function IntelligenceSection({
     framework: 'all',
     severity: 'all',
     scanner: 'all',
+    category: 'all',
+    endpoint: '',
   });
   const [sortField, setSortField] = useState<SortField>('riskScore');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -337,6 +359,10 @@ export default function IntelligenceSection({
     () => [...new Set(findings.flatMap((f) => f.relatedScanners ?? []))],
     [findings],
   );
+  const categories = useMemo(
+    () => [...new Set(findings.map((f) => f.category))],
+    [findings],
+  );
 
   // Filter recommendations
   const filteredRecs = useMemo(() => {
@@ -346,6 +372,10 @@ export default function IntelligenceSection({
         if (filters.riskBandFilter !== 'all' && riskBand(r.riskScore) !== filters.riskBandFilter) return false;
         if (filters.language !== 'all' && r.likelyLanguage !== filters.language) return false;
         if (filters.framework !== 'all' && r.likelyFramework !== filters.framework) return false;
+        if (filters.endpoint) {
+          const path = r.endpoint?.path?.toLowerCase() ?? '';
+          if (!path.includes(filters.endpoint.toLowerCase())) return false;
+        }
         return true;
       })
       .sort((a, b) => {
@@ -375,6 +405,11 @@ export default function IntelligenceSection({
         !(f.relatedScanners ?? []).includes(filters.scanner)
       )
         return false;
+      if (filters.category !== 'all' && f.category !== filters.category) return false;
+      if (filters.endpoint) {
+        const path = f.endpoint?.path?.toLowerCase() ?? '';
+        if (!path.includes(filters.endpoint.toLowerCase())) return false;
+      }
       return true;
     });
   }, [findings, filters]);
@@ -448,6 +483,7 @@ export default function IntelligenceSection({
           languages={languages}
           frameworks={frameworks}
           scanners={scanners}
+          categories={categories}
         />
 
         {/* Recommendations table */}

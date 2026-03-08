@@ -9,3 +9,11 @@ docs/.vitepress/cache/
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Generated example output
+examples/typescript/coverage/
+examples/typescript/reports/

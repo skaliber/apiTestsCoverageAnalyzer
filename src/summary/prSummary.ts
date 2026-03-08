@@ -19,6 +19,7 @@ import {
   renderCoverageSection,
   renderSecurityScanSection,
   renderAiSummary,
+  renderIntelligenceSection,
   statusBadge,
   pct,
   tableRow,
@@ -79,6 +80,17 @@ export async function generatePrSummary(
       gatePassed === undefined ? '—' : gatePassed ? '✅ PASS' : '❌ FAIL';
     lines.push(`**Security scan findings:** ${input.securityScan.totalFindings} total`);
     lines.push(`**Security gate:** ${gateStatus}`);
+    lines.push('');
+  }
+
+  // Intelligence summary row if present
+  if (input.intelligenceSummary) {
+    const intel = input.intelligenceSummary;
+    const p0 = intel.recommendationsByPriority['P0'] ?? 0;
+    const p1 = intel.recommendationsByPriority['P1'] ?? 0;
+    const criticalFlag = p0 > 0 ? ' ⚠️' : '';
+    lines.push(`**Coverage Intelligence:**${criticalFlag} ${intel.totalFindings} finding(s), ${intel.totalRecommendations} recommendation(s) (P0: ${p0}, P1: ${p1})`);
+    lines.push(`**Max risk score:** ${intel.maxRiskScore} | **Critical uncovered:** ${intel.criticalUncoveredItems}`);
     lines.push('');
   }
 
@@ -170,6 +182,18 @@ function buildPrSections(input: SummaryInput): SummarySection[] {
     });
   }
 
+  // Coverage Intelligence section
+  if (input.intelligenceSummary) {
+    sections.push({
+      id: 'coverage-intelligence',
+      title: 'Coverage Intelligence',
+      included: true,
+      gateEvaluated: false,
+      passed: undefined,
+      markdown: renderIntelligenceSection(input.intelligenceSummary),
+    });
+  }
+
   return sections;
 }
 
@@ -195,6 +219,16 @@ function buildPrJsonSummary(input: SummaryInput, sections: SummarySection[]): un
       gateEvaluated: s.gateEvaluated,
       passed: s.passed,
     })),
+    intelligence: input.intelligenceSummary
+      ? {
+          totalFindings: input.intelligenceSummary.totalFindings,
+          totalRecommendations: input.intelligenceSummary.totalRecommendations,
+          maxRiskScore: input.intelligenceSummary.maxRiskScore,
+          criticalUncoveredItems: input.intelligenceSummary.criticalUncoveredItems,
+          unprotectedSecurityFindings: input.intelligenceSummary.unprotectedSecurityFindings,
+          recommendationsByPriority: input.intelligenceSummary.recommendationsByPriority,
+        }
+      : undefined,
   };
 }
 

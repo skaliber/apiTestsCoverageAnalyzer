@@ -1,0 +1,142 @@
+{
+  "total": 13,
+  "covered": 11,
+  "percentage": 84.62,
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/wallets",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/wallets/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/wallets/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/wallets/{id}/freeze",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/wallets/{id}/unfreeze",
+      "covered": false,
+      "testFiles": []
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/fund",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/debit",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/transfer",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/payments",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/payments/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/refund",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/transactions",
+      "covered": false,
+      "testFiles": []
+    }
+  ]
+}

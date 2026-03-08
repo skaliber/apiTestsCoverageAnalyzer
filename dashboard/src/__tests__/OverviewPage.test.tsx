@@ -18,6 +18,18 @@ jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+// Mock the intelligence context so OverviewPage can render without IntelligenceProvider
+jest.mock('../context/IntelligenceContext', () => ({
+  ...(jest.requireActual('../context/IntelligenceContext') as object),
+  useIntelligence: () => ({
+    report: null,
+    loading: false,
+    error: null,
+    findingsFor: () => [],
+    recommendationsFor: () => [],
+  }),
+}));
+
 const sampleReport: CoverageReport = {
   generatedAt: '2024-01-15T12:00:00.000Z',
   summary: [

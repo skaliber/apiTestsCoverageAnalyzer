@@ -22,12 +22,11 @@ async function main() {
     { name: 'parameters', path: '/parameters' },
     { name: 'business-rules', path: '/business-rules' },
     { name: 'security', path: '/security' },
-    { name: 'errors', path: '/errors' },
-    { name: 'intelligence', path: '/intelligence' },
+    { name: 'errors', path: '/error-handling' },
     { name: 'performance', path: '/performance' },
-    { name: 'resilience', path: '/resilience' },
-    { name: 'compatibility', path: '/compatibility' },
     { name: 'integration-flows', path: '/integration-flows' },
+    { name: 'intelligence', path: '/intelligence' },
+    { name: 'trends', path: '/trends' },
   ];
 
   for (const p of dashboardPages) {

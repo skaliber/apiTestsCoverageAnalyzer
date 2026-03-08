@@ -1,27 +1,773 @@
 {
-  "generatedAt": "2026-03-08T07:06:04.088Z",
+  "generatedAt": "2026-03-08T07:23:12.466Z",
   "projectName": "wallets-payments-api",
-  "findings": [],
-  "recommendations": [],
+  "findings": [
+    {
+      "id": "ff-ep-1772954592465-1",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "HIGH",
+      "title": "Uncovered endpoint: PATCH /wallets/{id}/unfreeze",
+      "description": "Endpoint PATCH /wallets/{id}/unfreeze has no test coverage.",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/unfreeze"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1772954592465-2",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /transactions",
+      "description": "Endpoint GET /transactions has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transactions"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1772954592465-3",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: daily-limit",
+      "description": "Business rule \"daily-limit\" has no test coverage.",
+      "relatedRules": [
+        "daily-limit"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-4",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/wallets"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-5",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets",
+      "description": "Error codes 400 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-7",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/wallets/{id}"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-9",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/wallets/{id}"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-11",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}/freeze",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/freeze"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-14",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}/unfreeze",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/unfreeze"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-17",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}/fund",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/fund"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-20",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}/debit",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/debit"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-23",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /wallets/{id}/transfer",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/transfer"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-26",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /payments",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/payments"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-28",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /payments/{id}",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/payments/{id}"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-30",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /payments/{id}/refund",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/payments/{id}/refund"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-err-1772954592465-33",
+      "source": "error-coverage",
+      "category": "error-scenario-gap",
+      "severity": "MEDIUM",
+      "title": "Missing error scenario tests for /transactions",
+      "description": "Error codes 401 are documented but have no matching test.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transactions"
+      },
+      "missingTestTypes": [
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "error-coverage",
+        "negative-test"
+      ]
+    },
+    {
+      "id": "ff-sec-cov-1772954592465-34",
+      "source": "security-coverage",
+      "category": "missing-auth-test",
+      "severity": "HIGH",
+      "title": "Missing auth/security test: unknown",
+      "description": "Security scenario for undefined has no test coverage.",
+      "missingTestTypes": [
+        "auth-test",
+        "authz-test",
+        "security-test"
+      ],
+      "frameworkHints": [
+        "jest",
+        "supertest"
+      ],
+      "languageHints": [
+        "typescript"
+      ],
+      "tags": [
+        "security-coverage",
+        "auth-test"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-1772954592466-70",
+      "priority": "P1",
+      "title": "Add auth test for: Missing auth/security test: unknown",
+      "rationale": "Security scenario for undefined has no test coverage. Jest + supertest: describe(\"unauthorized\") { it(\"returns 401\") }",
+      "recommendedTestType": "auth-test",
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-sec-cov-1772954592465-34"
+      ],
+      "riskScore": 76,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1772954592466-54",
+      "priority": "P1",
+      "title": "Add positive api test for: Uncovered endpoint: PATCH /wallets/{id}/unfreeze",
+      "rationale": "Endpoint PATCH /wallets/{id}/unfreeze has no test coverage. Jest test case",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/unfreeze"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-ep-1772954592465-1"
+      ],
+      "riskScore": 73,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1772954592466-66",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /payments",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/payments"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-26"
+      ],
+      "riskScore": 65,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-67",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /payments/{id}",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/payments/{id}"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-28"
+      ],
+      "riskScore": 65,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-68",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /payments/{id}/refund",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/payments/{id}/refund"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-30"
+      ],
+      "riskScore": 65,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-57",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/wallets"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-4"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-58",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets",
+      "rationale": "Error codes 400 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-5"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-59",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/wallets/{id}"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-7"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-60",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/wallets/{id}"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-9"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-61",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/freeze",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/freeze"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-11"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-62",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/unfreeze",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "PATCH",
+        "path": "/wallets/{id}/unfreeze"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-14"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-63",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/fund",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/fund"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-17"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-64",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/debit",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/debit"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-20"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-65",
+      "priority": "P1",
+      "title": "Add negative api test for: Missing error scenario tests for /wallets/{id}/transfer",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/wallets/{id}/transfer"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-23"
+      ],
+      "riskScore": 62,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-55",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /transactions",
+      "rationale": "Endpoint GET /transactions has no test coverage. Jest test case",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transactions"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-ep-1772954592465-2"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1772954592466-56",
+      "priority": "P2",
+      "title": "Add business rule test for: Uncovered business rule: daily-limit",
+      "rationale": "Business rule \"daily-limit\" has no test coverage. Jest test case",
+      "recommendedTestType": "business-rule-test",
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-biz-1772954592465-3"
+      ],
+      "riskScore": 52,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1772954592466-69",
+      "priority": "P3",
+      "title": "Add negative api test for: Missing error scenario tests for /transactions",
+      "rationale": "Error codes 401 are documented but have no matching test. Jest + supertest: test invalid inputs → 4xx responses",
+      "recommendedTestType": "negative-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transactions"
+      },
+      "likelyFramework": "jest",
+      "likelyLanguage": "typescript",
+      "linkedFindingIds": [
+        "ff-err-1772954592465-33"
+      ],
+      "riskScore": 48,
+      "confidence": "medium"
+    }
+  ],
   "summary": {
-    "totalFindings": 0,
+    "totalFindings": 17,
     "findingsBySeverity": {
       "LOW": 0,
-      "MEDIUM": 0,
-      "HIGH": 0,
+      "MEDIUM": 15,
+      "HIGH": 2,
       "CRITICAL": 0
     },
-    "totalRecommendations": 0,
+    "totalRecommendations": 17,
     "recommendationsByPriority": {
       "P0": 0,
-      "P1": 0,
-      "P2": 0,
-      "P3": 0
+      "P1": 14,
+      "P2": 2,
+      "P3": 1
     },
-    "maxRiskScore": 0,
-    "avgRiskScore": 0,
-    "criticalUncoveredItems": 0,
-    "unprotectedSecurityFindings": 0,
-    "topRiskAreas": []
+    "maxRiskScore": 76,
+    "avgRiskScore": 62,
+    "criticalUncoveredItems": 2,
+    "unprotectedSecurityFindings": 1,
+    "topRiskAreas": [
+      "Add auth test for: Missing auth/security test: unknown (score 76)",
+      "PATCH /wallets/{id}/unfreeze (score 73)",
+      "POST /payments (score 65)",
+      "GET /payments/{id} (score 65)",
+      "POST /payments/{id}/refund (score 65)"
+    ]
   }
 }

@@ -77,11 +77,17 @@ jobs:
         run: |
           echo "## Coverage Analysis Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f reports/intelligence-report.json ]; then
+          if [ -f reports/coverage-intelligence.json ]; then
             echo "### Intelligence Report" >> $GITHUB_STEP_SUMMARY
             echo '```json' >> $GITHUB_STEP_SUMMARY
-            cat reports/intelligence-report.json | head -50 >> $GITHUB_STEP_SUMMARY
+            cat reports/coverage-intelligence.json | head -50 >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
             echo "No intelligence report generated." >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f reports/risk-prioritization.json ]; then
+            echo "### Risk Prioritization" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat reports/risk-prioritization.json | head -30 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
           fi

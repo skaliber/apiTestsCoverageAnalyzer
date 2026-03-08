@@ -5,7 +5,8 @@ const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
-const DASHBOARD_URL = process.env.DASHBOARD_URL || 'http://localhost:3000';
+const DASHBOARD_URL = process.env.DASHBOARD_URL || 'http://localhost:5173';
+const GRAFANA_URL = process.env.GRAFANA_URL || 'http://localhost:3000';
 const SCREENSHOTS_DIR = path.join(__dirname, '..', 'reports', 'screenshots');
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
   const page = await browser.newPage();
   await page.setViewportSize({ width: 1440, height: 900 });
 
-  const pages = [
+  const dashboardPages = [
     { name: 'overview', path: '/' },
     { name: 'endpoints', path: '/endpoints' },
     { name: 'parameters', path: '/parameters' },
@@ -23,9 +24,13 @@ async function main() {
     { name: 'security', path: '/security' },
     { name: 'errors', path: '/errors' },
     { name: 'intelligence', path: '/intelligence' },
+    { name: 'performance', path: '/performance' },
+    { name: 'resilience', path: '/resilience' },
+    { name: 'compatibility', path: '/compatibility' },
+    { name: 'integration-flows', path: '/integration-flows' },
   ];
 
-  for (const p of pages) {
+  for (const p of dashboardPages) {
     try {
       await page.goto(`${DASHBOARD_URL}${p.path}`, { waitUntil: 'networkidle', timeout: 10000 });
       await page.screenshot({ path: path.join(SCREENSHOTS_DIR, `${p.name}.png`), fullPage: true });
@@ -33,6 +38,15 @@ async function main() {
     } catch (err) {
       console.warn(`Could not capture ${p.name}: ${err.message}`);
     }
+  }
+
+  // Capture Grafana dashboard
+  try {
+    await page.goto(`${GRAFANA_URL}/d/wallets-payments`, { waitUntil: 'networkidle', timeout: 15000 });
+    await page.screenshot({ path: path.join(SCREENSHOTS_DIR, 'grafana-dashboard.png'), fullPage: true });
+    console.log('Screenshot saved: grafana-dashboard.png');
+  } catch (err) {
+    console.warn(`Could not capture Grafana dashboard: ${err.message}`);
   }
 
   await browser.close();

@@ -11,11 +11,11 @@ cd "$PROJECT_DIR"
 echo "=== Wallets/Payments API Coverage Analysis ==="
 echo ""
 
-echo "[1/6] Running tests with coverage..."
+echo "[1/7] Running tests with coverage..."
 ./node_modules/.bin/jest --coverage --forceExit
 echo ""
 
-echo "[2/6] Running endpoint coverage analysis..."
+echo "[2/7] Running endpoint coverage analysis..."
 $ANALYZER_CMD endpoint-coverage \
   --spec openapi.yaml \
   --tests "tests/**/*.test.ts" \
@@ -23,7 +23,7 @@ $ANALYZER_CMD endpoint-coverage \
   || echo "endpoint-coverage completed"
 echo ""
 
-echo "[3/6] Running business rule coverage..."
+echo "[3/7] Running business rule coverage..."
 $ANALYZER_CMD business-coverage \
   --rules business-rules.yaml \
   --tests "tests/**/*.test.ts" \
@@ -31,7 +31,7 @@ $ANALYZER_CMD business-coverage \
   || echo "business-coverage completed"
 echo ""
 
-echo "[4/6] Running security coverage..."
+echo "[4/7] Running security coverage..."
 $ANALYZER_CMD security-coverage \
   --spec openapi.yaml \
   --tests "tests/**/*.test.ts" \
@@ -39,7 +39,7 @@ $ANALYZER_CMD security-coverage \
   || echo "security-coverage completed"
 echo ""
 
-echo "[5/6] Running error scenario coverage..."
+echo "[5/7] Running error scenario coverage..."
 $ANALYZER_CMD error-coverage \
   --spec openapi.yaml \
   --tests "tests/**/*.test.ts" \
@@ -47,7 +47,11 @@ $ANALYZER_CMD error-coverage \
   || echo "error-coverage completed"
 echo ""
 
-echo "[6/6] Running coverage intelligence analysis..."
+echo "[6/7] Merging coverage reports..."
+node "$SCRIPT_DIR/merge-coverage-reports.js"
+echo ""
+
+echo "[7/7] Running coverage intelligence analysis..."
 $ANALYZER_CMD coverage-intelligence \
   --reports-dir reports \
   --out-dir reports \
@@ -55,6 +59,10 @@ $ANALYZER_CMD coverage-intelligence \
   --languages typescript \
   --frameworks jest \
   || echo "coverage-intelligence completed"
+echo ""
+
+echo "[Optional] Pushing metrics to Prometheus Pushgateway..."
+node "$SCRIPT_DIR/push-metrics.js" || echo "Pushgateway not available, skipping metrics push"
 echo ""
 
 echo "=== Analysis complete. Reports saved to reports/ ==="

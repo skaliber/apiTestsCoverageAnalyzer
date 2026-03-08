@@ -26,6 +26,12 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.retention.time=7d'
 
+  pushgateway:
+    image: prom/pushgateway:v1.6.2
+    ports:
+      - '9091:9091'
+    restart: unless-stopped
+
   grafana:
     image: grafana/grafana:10.2.0
     ports:

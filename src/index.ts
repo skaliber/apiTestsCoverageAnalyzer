@@ -13,6 +13,7 @@ import {
   analyzeParameterCoverage,
   buildParameterCoverageReport,
   generateParameterReports,
+  AstParameterAnalysisOptions,
 } from './parameterCoverage';
 import {
   parseBusinessRules,
@@ -31,12 +32,14 @@ import {
   analyzeErrorCoverage,
   buildErrorCoverageReport,
   generateErrorReports,
+  AstErrorAnalysisOptions,
 } from './errorCoverage';
 import {
   parseSecurityControls,
   analyzeSecurityCoverage,
   buildSecurityCoverageReport,
   generateSecurityReports,
+  AstSecurityAnalysisOptions,
 } from './securityCoverage';
 import {
   parseEndpointsFromSpec,
@@ -412,7 +415,12 @@ program
     const parameters = await parseParameters(specPath);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeParameterCoverage(parameters, testsGlob);
+    const analyzerCfgForParam = loadCentralConfig(parentOpts.config as string | undefined);
+    const astParamOptions: AstParameterAnalysisOptions = {
+      astConfig: analyzerCfgForParam.analysis.ast ?? {},
+      deepConfig: analyzerCfgForParam.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeParameterCoverage(parameters, testsGlob, astParamOptions);
 
     const report = buildParameterCoverageReport(coverages);
 
@@ -692,7 +700,12 @@ program
     console.log(`Found ${scenarios.length} error scenarios`);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeErrorCoverage(scenarios, testsGlob);
+    const analyzerCfgForError = loadCentralConfig(parentOpts.config as string | undefined);
+    const astErrorOptions: AstErrorAnalysisOptions = {
+      astConfig: analyzerCfgForError.analysis.ast ?? {},
+      deepConfig: analyzerCfgForError.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeErrorCoverage(scenarios, testsGlob, astErrorOptions);
 
     const report = buildErrorCoverageReport(coverages);
 
@@ -802,7 +815,12 @@ program
     console.log(`Found ${controls.length} security controls`);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeSecurityCoverage(controls, testsGlob, scanReportPath);
+    const analyzerCfgForSec = loadCentralConfig(parentOpts.config as string | undefined);
+    const astSecOptions: AstSecurityAnalysisOptions = {
+      astConfig: analyzerCfgForSec.analysis.ast ?? {},
+      deepConfig: analyzerCfgForSec.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeSecurityCoverage(controls, testsGlob, scanReportPath, astSecOptions);
 
     const report = buildSecurityCoverageReport(
       coverages,

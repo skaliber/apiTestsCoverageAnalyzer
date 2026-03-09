@@ -1,12 +1,12 @@
 /**
  * AST Analysis Orchestrator — primary entry point for per-file analysis.
  *
- * Two-tier cascade:
+ * Three-tier cascade:
  *   Tier 1: AST parse + semantic model → confidence: high/medium
- *           If AST parses successfully, its result is authoritative — even
- *           when that result is empty.  Silently falling through to regex
- *           when AST returns 0 would inject false positives.
- *   Tier 2: AST disabled or parse error → existing deepResolveFile(), unchanged confidence
+ *           AST yields ≥1 interactions → return them verbatim (authoritative)
+ *   Tier 2: AST parse succeeds but yields 0 interactions AND fallbackHeuristics is true
+ *           → run deepResolveFile(), tag all results resolutionType:'heuristic' + confidence:'low'
+ *   Tier 3: AST disabled or parse error → existing deepResolveFile(), unchanged confidence
  *
  * All language modules must be imported (side-effect) before this is called
  * so their analyzers are registered. Use `registerAllAnalyzers()` at startup.
@@ -33,22 +33,39 @@ export function analyzeFile(
   context: AnalysisContext,
 ): ResolvedHttpInteraction[] {
   const { astConfig, deepConfig } = context;
+  const fallbackEnabled = astConfig.fallbackHeuristics !== false;
 
   // ── Tier 1: AST path ──────────────────────────────────────────────────────
   if (astConfig.enabled !== false) {
     const astResults = analyzeFileWithAst(filePath, content, language, context);
 
     if (astResults !== null) {
-      // AST parsed successfully — return its result verbatim.
-      // Zero results means zero HTTP interactions; do NOT fall through to regex,
-      // which would add low-confidence guesses and hide true gaps.
+      // AST parsed successfully
+      if (astResults.length > 0) {
+        // Non-empty AST result — return verbatim (authoritative)
+        return astResults;
+      }
+
+      // ── Tier 2: AST found nothing — optionally run regex fallback ────────
+      if (fallbackEnabled && deepConfig.enabled) {
+        const regexLang = language === 'auto' ? ('typescript' as const) : language;
+        const heuristicResults = deepResolveFile(content, filePath, regexLang, deepConfig);
+        // Tag all fallback results as heuristic / low confidence
+        return heuristicResults.map((interaction) => ({
+          ...interaction,
+          resolutionType: 'heuristic' as const,
+          confidence: 'low' as const,
+        }));
+      }
+
+      // fallbackHeuristics: false — return the empty AST result verbatim
       return astResults;
     }
     // null = parse error or no analyzer registered for this language.
-    // Fall through to Tier 2 so the file is still analysed.
+    // Fall through to Tier 3 so the file is still analysed.
   }
 
-  // ── Tier 2: regex fallback ────────────────────────────────────────────────
+  // ── Tier 3: regex fallback ────────────────────────────────────────────────
   // Only reached when AST is disabled or could not parse the file.
   if (!deepConfig.enabled) return [];
 
@@ -82,6 +99,7 @@ export function buildAnalysisContext(
   return {
     astConfig: {
       enabled: true,
+      fallbackHeuristics: true,
       maxCallDepth: 4,
       assertionAware: true,
       languages: {
@@ -98,4 +116,3 @@ export function buildAnalysisContext(
     deepConfig: deepConfig ?? DEFAULT_DEEP_ANALYSIS_CONFIG,
   };
 }
-

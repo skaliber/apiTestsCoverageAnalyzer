@@ -9,6 +9,7 @@ analysis:
   warnOnConfigMissing: true
   ast:
     enabled: true
+    fallbackHeuristics: true
     maxCallDepth: 4
     assertionAware: true
     languages:

@@ -3,6 +3,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fg from 'fast-glob';
 import { OpenAPIV3 } from 'openapi-types';
+import type { AstAnalysisConfig, DeepAnalysisCoverageConfig } from './config/types';
+import {
+  analyzeFile as astAnalyzeFile,
+  buildAnalysisContext,
+  registerAllAnalyzers,
+} from './ast/astAnalysisOrchestrator';
+import type { ResolvedHttpInteraction, SupportedLanguage } from './ast/astTypes';
 
 // ─── Data structures ──────────────────────────────────────────────────────────
 
@@ -42,6 +49,22 @@ export interface SecurityControlCoverage {
   matchedTests: string[];
   /** Whether this was covered by an external scan report finding */
   coveredByScanReport: boolean;
+  /**
+   * AST metadata when coverage was informed by semantic analysis.
+   */
+  astMetadata?: {
+    sourceLanguage?: string;
+    resolutionType?: string;
+    confidence?: string;
+  };
+}
+
+/**
+ * Options to enable AST-augmented security coverage analysis.
+ */
+export interface AstSecurityAnalysisOptions {
+  astConfig: AstAnalysisConfig;
+  deepConfig?: DeepAnalysisCoverageConfig;
 }
 
 export interface SecurityCategorySummary {
@@ -472,16 +495,180 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// ─── AST augmentation ─────────────────────────────────────────────────────────
+
+/** Detect language from file extension for AST analysis. */
+function detectLanguageForSec(filePath: string): SupportedLanguage {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.ts': case '.tsx': return 'typescript';
+    case '.js': case '.jsx': return 'javascript';
+    case '.java': return 'java';
+    case '.kt': case '.kts': return 'kotlin';
+    case '.py': return 'python';
+    case '.rb': return 'ruby';
+    case '.feature': return 'cucumber';
+    default: return 'auto';
+  }
+}
+
+/** Normalise path for loose matching. */
+function normalizeSecPath(p: string): string {
+  return p.split('?')[0].replace(/\/$/, '').toLowerCase();
+}
+
+type SecAstMap = Map<string, ResolvedHttpInteraction[]>;
+
+/** Build an endpoint → interactions lookup from test files. */
+function buildSecAstMap(
+  testFiles: string[],
+  astOptions: AstSecurityAnalysisOptions,
+): SecAstMap {
+  registerAllAnalyzers();
+  const context = buildAnalysisContext(astOptions.astConfig, astOptions.deepConfig);
+  const map: SecAstMap = new Map();
+
+  for (const filePath of testFiles) {
+    let content: string;
+    try {
+      content = fs.readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+    const lang = detectLanguageForSec(filePath);
+    const interactions = astAnalyzeFile(content, filePath, lang, context);
+    for (const interaction of interactions) {
+      const key = normalizeSecPath(interaction.normalizedPath ?? interaction.path);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(interaction);
+    }
+  }
+
+  return map;
+}
+
+/**
+ * Map parameterScenarios / assertionType to SecurityCategory coverage signals.
+ * Returns the categories that the interaction hints at.
+ */
+function interactionToSecCategories(interaction: ResolvedHttpInteraction): SecurityCategory[] {
+  const cats: SecurityCategory[] = [];
+  const scenarios = (interaction.parameterScenarios ?? []).map((s) => s.toLowerCase());
+
+  // Authentication signals
+  if (
+    interaction.assertionType === 'status-code' ||
+    interaction.assertionType === 'fluent-chain' ||
+    scenarios.some((s) =>
+      s.includes('unauth') || s.includes('token') || s.includes('bearer') ||
+      s.includes('credential') || s.includes('login') || s.includes('401')
+    )
+  ) {
+    cats.push('authentication');
+  }
+
+  // Authorization signals
+  if (
+    scenarios.some((s) =>
+      s.includes('forbidden') || s.includes('permission') || s.includes('role') ||
+      s.includes('access') || s.includes('403')
+    )
+  ) {
+    cats.push('authorization');
+  }
+
+  // Input-validation signals
+  if (
+    scenarios.some((s) =>
+      s.includes('invalid') || s.includes('missing') || s.includes('malformed') ||
+      s.includes('injection') || s.includes('xss') || s.includes('400') || s.includes('422')
+    )
+  ) {
+    cats.push('input-validation');
+  }
+
+  // Cryptography signals
+  if (
+    scenarios.some((s) =>
+      s.includes('https') || s.includes('ssl') || s.includes('tls') || s.includes('encrypt')
+    )
+  ) {
+    cats.push('cryptography');
+  }
+
+  // Session-management signals
+  if (
+    scenarios.some((s) =>
+      s.includes('session') || s.includes('cookie') || s.includes('logout') ||
+      s.includes('refresh') || s.includes('expir')
+    )
+  ) {
+    cats.push('session-management');
+  }
+
+  return cats;
+}
+
+/**
+ * Check if any AST interactions at a control's endpoint cover the control.
+ */
+function checkAstSecurityCoverage(
+  astMap: SecAstMap,
+  control: SecurityControl,
+): { covered: boolean; astMetadata?: SecurityControlCoverage['astMetadata'] } {
+  // For endpoint-specific controls, find interactions at that path
+  const matchingInteractions: ResolvedHttpInteraction[] = [];
+
+  for (const [, interactions] of astMap) {
+    for (const interaction of interactions) {
+      // Endpoint-specific controls: require path match
+      if (control.endpoint) {
+        const endpointPath = control.endpoint.split(' ')[1];
+        const normalised = endpointPath.replace(/\{[^}]+\}/g, '').toLowerCase();
+        const iPath = normalizeSecPath(interaction.normalizedPath ?? interaction.path);
+        if (!iPath.startsWith(normalised)) continue;
+        const method = control.endpoint.split(' ')[0].toUpperCase();
+        if (interaction.method.toUpperCase() !== method) continue;
+      }
+
+      const coveredCats = interactionToSecCategories(interaction);
+      if (coveredCats.includes(control.category)) {
+        matchingInteractions.push(interaction);
+      }
+    }
+  }
+
+  if (matchingInteractions.length === 0) return { covered: false };
+
+  const best = matchingInteractions.find(
+    (i) => i.confidence === 'high',
+  ) ?? matchingInteractions.find(
+    (i) => i.confidence === 'medium',
+  ) ?? matchingInteractions[0];
+
+  return {
+    covered: true,
+    astMetadata: {
+      sourceLanguage: best.sourceLanguage,
+      resolutionType: best.resolutionType,
+      confidence: best.confidence,
+    },
+  };
+}
+
 // ─── Main analysis ────────────────────────────────────────────────────────────
 
 /**
  * Analyse test files (and optionally an external scan report) to determine
- * which security controls from the spec are covered.
+ * which security controls from the spec are covered. Optionally augments
+ * text-scan results with AST-derived semantic signals when `astOptions` is
+ * provided.
  */
 export async function analyzeSecurityCoverage(
   controls: SecurityControl[],
   testGlob: string,
   scanReportPath?: string,
+  astOptions?: AstSecurityAnalysisOptions,
 ): Promise<SecurityControlCoverage[]> {
   // Load and parse test files
   const testFiles = await fg(testGlob, { onlyFiles: true });
@@ -494,8 +681,13 @@ export async function analyzeSecurityCoverage(
   // Load scan report findings
   const scanFindings: ScanFinding[] = scanReportPath ? parseScanReport(scanReportPath) : [];
 
+  // Build AST map when options provided
+  const astMap: SecAstMap | null = astOptions
+    ? buildSecAstMap(testFiles, astOptions)
+    : null;
+
   return controls.map((control) => {
-    // Test-based coverage
+    // ── Text-scan pass ──────────────────────────────────────────────────────
     const matchedTests: string[] = [];
     for (const entry of allEntries) {
       if (testCoversControl(entry, control)) {
@@ -505,11 +697,22 @@ export async function analyzeSecurityCoverage(
       }
     }
 
-    // Scan-report-based coverage: any finding in the same category counts
+    // Scan-report-based coverage
     const coveredByScanReport = scanFindings.some((f) => f.category === control.category);
-    const covered = matchedTests.length > 0 || coveredByScanReport;
+    let covered = matchedTests.length > 0 || coveredByScanReport;
 
-    return { control, covered, matchedTests, coveredByScanReport };
+    let astMetadata: SecurityControlCoverage['astMetadata'] | undefined;
+
+    // ── AST augmentation pass ───────────────────────────────────────────────
+    if (astMap !== null) {
+      const astResult = checkAstSecurityCoverage(astMap, control);
+      if (astResult.covered) {
+        covered = true;
+        astMetadata = astResult.astMetadata;
+      }
+    }
+
+    return { control, covered, matchedTests, coveredByScanReport, astMetadata };
   });
 }
 

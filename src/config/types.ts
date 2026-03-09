@@ -26,6 +26,12 @@ export interface AstLanguageConfig {
 export interface AstAnalysisConfig {
   /** Master switch. When false, skip AST entirely and use regex fallback. Default: true. */
   enabled?: boolean;
+  /**
+   * When true (default), if AST parsing succeeds but returns 0 HTTP interactions the
+   * engine runs the regex fallback and tags its results with resolutionType:'heuristic'
+   * and confidence:'low'. When false, 0 AST results are returned verbatim.
+   */
+  fallbackHeuristics?: boolean;
   /** Maximum call-chain depth for wrapper/helper tracing. Default: 4. */
   maxCallDepth?: number;
   /** Include assertion type metadata in output. Default: true. */

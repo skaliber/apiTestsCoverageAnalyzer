@@ -32,6 +32,36 @@ analysis:
   # Default: true
   warnOnConfigMissing: true
 
+  # ── AST-based analysis ──────────────────────────────────────────────────────
+  ast:
+    # Optional. Master AST switch. When false, all files use the regex pipeline.
+    # Default: true
+    enabled: true
+
+    # Optional. When true, if AST parsing succeeds but finds 0 HTTP interactions,
+    # the regex fallback runs and tags results with resolutionType:'heuristic' and
+    # confidence:'low'. When false, 0 AST results are returned verbatim.
+    # Default: true
+    fallbackHeuristics: true
+
+    # Optional. Maximum call-chain depth when tracing wrapper/helper functions.
+    # Default: 4
+    maxCallDepth: 4
+
+    # Optional. Link HTTP calls to downstream response assertions.
+    # Default: true
+    assertionAware: true
+
+    # Optional. Per-language enable/disable toggles.
+    languages:
+      javascript: { enabled: true }
+      typescript: { enabled: true }
+      java:       { enabled: true }
+      kotlin:     { enabled: true }
+      python:     { enabled: true }
+      ruby:       { enabled: true }
+      cucumber:   { enabled: true }
+
 # ── Scans ─────────────────────────────────────────────────────────────────────
 
 scans:

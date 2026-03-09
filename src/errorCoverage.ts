@@ -3,6 +3,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fg from 'fast-glob';
 import { OpenAPIV3 } from 'openapi-types';
+import type { AstAnalysisConfig, DeepAnalysisCoverageConfig } from './config/types';
+import {
+  analyzeFile as astAnalyzeFile,
+  buildAnalysisContext,
+  registerAllAnalyzers,
+} from './ast/astAnalysisOrchestrator';
+import type { ResolvedHttpInteraction, SupportedLanguage } from './ast/astTypes';
 
 // ─── Data structures ─────────────────────────────────────────────────────────
 
@@ -41,6 +48,22 @@ export interface ErrorScenarioCoverage {
   covered: boolean;
   /** Test description strings that matched this scenario */
   matchedTests: string[];
+  /**
+   * AST metadata when coverage was informed by semantic analysis.
+   */
+  astMetadata?: {
+    sourceLanguage?: string;
+    resolutionType?: string;
+    confidence?: string;
+  };
+}
+
+/**
+ * Options to enable AST-augmented error coverage analysis.
+ */
+export interface AstErrorAnalysisOptions {
+  astConfig: AstAnalysisConfig;
+  deepConfig?: DeepAnalysisCoverageConfig;
 }
 
 export interface CategorySummary {
@@ -428,15 +451,139 @@ export function segmentCoversScenario(segment: TestSegment, scenario: ErrorScena
   return false;
 }
 
+// ─── AST augmentation ─────────────────────────────────────────────────────────
+
+/** Detect language from file extension for AST analysis. */
+function detectLanguageForAst(filePath: string): SupportedLanguage {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.ts': case '.tsx': return 'typescript';
+    case '.js': case '.jsx': return 'javascript';
+    case '.java': return 'java';
+    case '.kt': case '.kts': return 'kotlin';
+    case '.py': return 'python';
+    case '.rb': return 'ruby';
+    case '.feature': return 'cucumber';
+    default: return 'auto';
+  }
+}
+
+/** Normalize a path for loose matching against OpenAPI templates. */
+function normalizeErrPath(p: string): string {
+  return p.split('?')[0].replace(/\/$/, '').toLowerCase();
+}
+
+/**
+ * Return true when the interaction's path loosely matches the scenario path.
+ */
+function errorPathMatches(interaction: ResolvedHttpInteraction, scenarioPath: string): boolean {
+  const iPath = normalizeErrPath(interaction.normalizedPath ?? interaction.path);
+  const aPath = normalizeErrPath(scenarioPath);
+  if (iPath === aPath) return true;
+  const templateBase = aPath.split('{')[0].replace(/\/$/, '');
+  return !!(templateBase && iPath.startsWith(templateBase));
+}
+
+/**
+ * Map parameterScenarios strings to error categories.
+ */
+function scenariosToErrorCategories(scenarios: string[]): ErrorCategory[] {
+  const s = scenarios.map((x) => x.toLowerCase());
+  const cats: ErrorCategory[] = [];
+  if (s.some((x) => x.includes('missing') || x.includes('required'))) cats.push('missing-parameter');
+  if (s.some((x) => x.includes('invalid') || x.includes('bad') || x.includes('malformed'))) cats.push('invalid-value');
+  if (s.some((x) => x.includes('unauth') || x.includes('401'))) cats.push('unauthorized');
+  if (s.some((x) => x.includes('forbidden') || x.includes('403'))) cats.push('forbidden');
+  if (s.some((x) => x.includes('not-found') || x.includes('404'))) cats.push('not-found');
+  if (s.some((x) => x.includes('conflict') || x.includes('409'))) cats.push('conflict');
+  if (s.some((x) => x.includes('server') || x.includes('5xx') || x.includes('500'))) cats.push('server-error');
+  return cats;
+}
+
+type ErrorAstMap = Map<string, ResolvedHttpInteraction[]>;
+
+/**
+ * Build AST interaction map from test files for error coverage augmentation.
+ */
+function buildErrorAstMap(
+  testFiles: string[],
+  astOptions: AstErrorAnalysisOptions,
+): ErrorAstMap {
+  registerAllAnalyzers();
+  const context = buildAnalysisContext(astOptions.astConfig, astOptions.deepConfig);
+  const map: ErrorAstMap = new Map();
+
+  for (const filePath of testFiles) {
+    let content: string;
+    try {
+      content = fs.readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+    const lang = detectLanguageForAst(filePath);
+    const interactions = astAnalyzeFile(content, filePath, lang, context);
+    for (const interaction of interactions) {
+      const key = normalizeErrPath(interaction.normalizedPath ?? interaction.path);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(interaction);
+    }
+  }
+
+  return map;
+}
+
+/**
+ * Check if AST interactions at the scenario's endpoint cover this error scenario.
+ * Returns truthy with metadata when an AST-derived signal is found.
+ */
+function checkAstErrorCoverage(
+  matchingInteractions: ResolvedHttpInteraction[],
+  scenario: ErrorScenario,
+): { covered: boolean; astMetadata?: ErrorScenarioCoverage['astMetadata'] } {
+  let bestInteraction: ResolvedHttpInteraction | undefined;
+
+  for (const interaction of matchingInteractions) {
+    // A status-code assertion indicates the test checks an HTTP status at this
+    // endpoint — a strong signal that the scenario is exercised
+    if (
+      interaction.assertionType === 'status-code' ||
+      interaction.assertionType === 'fluent-chain'
+    ) {
+      bestInteraction = interaction;
+    }
+
+    // parameterScenarios → error category matching
+    if (interaction.parameterScenarios && interaction.parameterScenarios.length > 0) {
+      const cats = scenariosToErrorCategories(interaction.parameterScenarios);
+      if (cats.some((c) => scenario.categories.includes(c))) {
+        bestInteraction = interaction;
+      }
+    }
+  }
+
+  if (!bestInteraction) return { covered: false };
+
+  return {
+    covered: true,
+    astMetadata: {
+      sourceLanguage: bestInteraction.sourceLanguage,
+      resolutionType: bestInteraction.resolutionType,
+      confidence: bestInteraction.confidence,
+    },
+  };
+}
+
 // ─── Analysis ─────────────────────────────────────────────────────────────────
 
 /**
  * Scan test files matching testGlob and determine which error scenarios are
- * covered using heuristic analysis.
+ * covered. Optionally augments text-scan results with AST-derived semantic
+ * signals when `astOptions` is provided.
  */
 export async function analyzeErrorCoverage(
   scenarios: ErrorScenario[],
   testGlob: string,
+  astOptions?: AstErrorAnalysisOptions,
 ): Promise<ErrorScenarioCoverage[]> {
   const testFiles = await fg(testGlob, { onlyFiles: true });
 
@@ -447,20 +594,69 @@ export async function analyzeErrorCoverage(
     allSegments.push(...extractTestSegments(contents));
   }
 
-  return scenarios.map((scenario) => {
-    const matchedTests: string[] = [];
+  // Build AST interaction map when AST options provided
+  const astMap: ErrorAstMap | null = astOptions
+    ? buildErrorAstMap(testFiles, astOptions)
+    : null;
 
+  return scenarios.map((scenario) => {
+    // ── Text-scan pass ──────────────────────────────────────────────────────
+    const matchedTests: string[] = [];
     for (const segment of allSegments) {
       if (segmentMentionsEndpoint(segment, scenario) && segmentCoversScenario(segment, scenario)) {
         matchedTests.push(segment.description);
       }
     }
 
-    return {
-      scenario,
-      covered: matchedTests.length > 0,
-      matchedTests,
-    };
+    let covered = matchedTests.length > 0;
+    let astMetadata: ErrorScenarioCoverage['astMetadata'] | undefined;
+
+    // ── AST augmentation pass ───────────────────────────────────────────────
+    if (astMap !== null && !covered) {
+      const matchingInteractions: ResolvedHttpInteraction[] = [];
+      for (const [, interactions] of astMap) {
+        for (const interaction of interactions) {
+          if (
+            errorPathMatches(interaction, scenario.path) &&
+            interaction.method.toUpperCase() === scenario.method.toUpperCase()
+          ) {
+            matchingInteractions.push(interaction);
+          }
+        }
+      }
+      if (matchingInteractions.length > 0) {
+        const astResult = checkAstErrorCoverage(matchingInteractions, scenario);
+        if (astResult.covered) {
+          covered = true;
+          astMetadata = astResult.astMetadata;
+        }
+      }
+    } else if (covered && astMap !== null) {
+      // Already covered by text-scan — still attach AST metadata if available
+      const matchingInteractions: ResolvedHttpInteraction[] = [];
+      for (const [, interactions] of astMap) {
+        for (const interaction of interactions) {
+          if (
+            errorPathMatches(interaction, scenario.path) &&
+            interaction.method.toUpperCase() === scenario.method.toUpperCase()
+          ) {
+            matchingInteractions.push(interaction);
+          }
+        }
+      }
+      if (matchingInteractions.length > 0) {
+        const best = matchingInteractions.find(
+          (i) => i.confidence === 'high' || i.confidence === 'medium',
+        ) ?? matchingInteractions[0];
+        astMetadata = {
+          sourceLanguage: best.sourceLanguage,
+          resolutionType: best.resolutionType,
+          confidence: best.confidence,
+        };
+      }
+    }
+
+    return { scenario, covered, matchedTests, astMetadata };
   });
 }
 

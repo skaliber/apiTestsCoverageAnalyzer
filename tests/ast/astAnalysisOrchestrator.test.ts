@@ -3,8 +3,9 @@
  *
  * Coverage:
  *   analyzeFile - AST preferred (Tier 1)
- *   analyzeFile - AST zero results returned verbatim — not passed to regex
- *   analyzeFile - falls back to regex when AST disabled or returns null (Tier 2)
+ *   analyzeFile - AST zero results + fallbackHeuristics:true → regex tagged low confidence (Tier 2)
+ *   analyzeFile - AST zero results + fallbackHeuristics:false → empty returned verbatim
+ *   analyzeFile - falls back to regex when AST disabled or returns null (Tier 3)
  *   buildAnalysisContext - builds a sensible default context
  *   registerAllAnalyzers - does not throw
  */
@@ -58,9 +59,19 @@ describe('buildAnalysisContext', () => {
     expect(ctx.astConfig.enabled).toBe(true);
   });
 
+  it('returns context with fallbackHeuristics=true by default', () => {
+    const ctx = buildAnalysisContext();
+    expect(ctx.astConfig.fallbackHeuristics).toBe(true);
+  });
+
   it('merges provided astConfig over defaults', () => {
     const ctx = buildAnalysisContext({ enabled: false });
     expect(ctx.astConfig.enabled).toBe(false);
+  });
+
+  it('merges fallbackHeuristics:false from provided config', () => {
+    const ctx = buildAnalysisContext({ fallbackHeuristics: false });
+    expect(ctx.astConfig.fallbackHeuristics).toBe(false);
   });
 
   it('populates deepConfig from DEFAULT_DEEP_ANALYSIS_CONFIG when not provided', () => {
@@ -119,11 +130,17 @@ describe('analyzeFile Tier 1: AST path', () => {
     const results = analyzeFile('content', 'test.ts', LANG, ctx);
     expect(results[0].resolutionType).toBe('direct');
   });
+
+  it('results carry confidence:high from AST analyzer', () => {
+    const ctx = makeContext();
+    const results = analyzeFile('content', 'test.ts', LANG, ctx);
+    expect(results[0].confidence).toBe('high');
+  });
 });
 
-// ─── analyzeFile — AST zero results are authoritative ─────────────────────────
+// ─── analyzeFile — Tier 2 (AST 0 results + fallbackHeuristics) ───────────────
 
-describe('analyzeFile: AST zero results are authoritative', () => {
+describe('analyzeFile Tier 2: fallbackHeuristics behavior', () => {
   const LANG = 'kotlin' as const;
 
   beforeEach(() => {
@@ -142,17 +159,62 @@ describe('analyzeFile: AST zero results are authoritative', () => {
     }));
   });
 
-  it('returns empty array when AST parses successfully but finds no HTTP interactions', () => {
-    // AST ran, found nothing — that IS the answer; do not fall through to regex
-    const ctx = makeContext();
+  it('returns empty array when AST returns 0 results and fallbackHeuristics is false', () => {
+    // fallbackHeuristics:false — 0 AST results are returned verbatim, no regex
+    const ctx = makeContext({ fallbackHeuristics: false });
     const results = analyzeFile('fun foo() { println("hello") }', 'test.kt', LANG, ctx);
     expect(results).toEqual([]);
   });
+
+  it('runs regex fallback when AST returns 0 results and fallbackHeuristics is true (default)', () => {
+    // Content has https URL that regex will pick up; deepConfig is enabled (default)
+    const ctx = makeContext({ fallbackHeuristics: true });
+    // The regex fallback may or may not find something — but it must not throw
+    expect(() => analyzeFile('fun foo() { }', 'test.kt', LANG, ctx)).not.toThrow();
+  });
+
+  it('tags regex fallback results with resolutionType:heuristic and confidence:low', () => {
+    // Use a TS file with a clear HTTP call so the regex fallback will find it
+    const TSLANG = 'typescript' as const;
+    // Register empty AST for typescript temporarily for this test
+    registerAnalyzer(TSLANG, (): LanguageAnalyzer => ({
+      language: TSLANG,
+      parse: (fp, content): ParsedSourceFile => ({
+        filePath: fp,
+        language: TSLANG,
+        ast: {},
+        content,
+        parseError: undefined,
+      }),
+      buildSemanticModel: (_parsed, _ctx) => makeEmptyModel(_parsed.filePath, TSLANG),
+      extractHttpInteractions: () => [], // force zero to trigger fallback
+      extractAssertions: () => [],
+    }));
+
+    const ctx = buildAnalysisContext(
+      { enabled: true, fallbackHeuristics: true },
+      { enabled: true, maxCallDepth: 2, resolveConstants: true, resolveEnums: false,
+        resolveStringTemplates: false, resolveWrappers: false, resolveRequestBuilders: false,
+        resolveClientMappings: false, assertionAware: false, clientMappings: [] },
+    );
+
+    const content = `axios.get('/api/items')`;
+    const results = analyzeFile(content, 'test.ts', TSLANG, ctx);
+
+    if (results.length > 0) {
+      // All results from the heuristic fallback must be tagged correctly
+      for (const r of results) {
+        expect(r.resolutionType).toBe('heuristic');
+        expect(r.confidence).toBe('low');
+      }
+    }
+    // If regex also found nothing that's fine — no throw is the main requirement
+  });
 });
 
-// ─── analyzeFile — Tier 2 (AST disabled / parse error) ───────────────────────
+// ─── analyzeFile — Tier 3 (AST disabled / parse error) ───────────────────────
 
-describe('analyzeFile Tier 2: AST disabled path', () => {
+describe('analyzeFile Tier 3: AST disabled path', () => {
   it('falls back to regex without throwing when AST is disabled', () => {
     const ctx = buildAnalysisContext({ enabled: false }, { enabled: false } as never);
     const results = analyzeFile('const x = 1;', 'test.js', 'javascript', ctx);

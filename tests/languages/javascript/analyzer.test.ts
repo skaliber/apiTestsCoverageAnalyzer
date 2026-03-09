@@ -9,7 +9,7 @@ import { JavaScriptAnalyzer } from '../../../src/languages/javascript/index';
 import { buildAnalysisContext } from '../../../src/ast/astAnalysisOrchestrator';
 
 const analyzer = new JavaScriptAnalyzer();
-const ctx = buildAnalysisContext({ enabled: true, fallbackHeuristics: true });
+const ctx = buildAnalysisContext({ enabled: true });
 
 describe('JavaScriptAnalyzer end-to-end', () => {
   it('parses without error and returns a non-null AST', () => {

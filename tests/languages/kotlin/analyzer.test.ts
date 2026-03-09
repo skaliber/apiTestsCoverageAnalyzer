@@ -9,7 +9,7 @@ import { KotlinAnalyzer } from '../../../src/languages/kotlin/index';
 import { buildAnalysisContext } from '../../../src/ast/astAnalysisOrchestrator';
 
 const analyzer = new KotlinAnalyzer();
-const ctx = buildAnalysisContext({ enabled: true, fallbackHeuristics: true });
+const ctx = buildAnalysisContext({ enabled: true });
 
 describe('KotlinAnalyzer', () => {
   describe('parse()', () => {

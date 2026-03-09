@@ -25,7 +25,6 @@ export const DEFAULT_CONFIG: AnalyzerConfig = {
     warnOnConfigMissing: true,
     ast: {
       enabled: true,
-      fallbackHeuristics: true,
       maxCallDepth: 4,
       assertionAware: true,
       languages: {

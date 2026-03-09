@@ -26,8 +26,6 @@ export interface AstLanguageConfig {
 export interface AstAnalysisConfig {
   /** Master switch. When false, skip AST entirely and use regex fallback. Default: true. */
   enabled?: boolean;
-  /** Fall back to regex heuristics if AST fails or returns no results. Default: true. */
-  fallbackHeuristics?: boolean;
   /** Maximum call-chain depth for wrapper/helper tracing. Default: 4. */
   maxCallDepth?: number;
   /** Include assertion type metadata in output. Default: true. */

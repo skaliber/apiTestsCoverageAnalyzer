@@ -3,9 +3,8 @@
  *
  * Coverage:
  *   analyzeFile - AST preferred (Tier 1)
- *   analyzeFile - falls back to regex when AST returns null (Tier 3)
- *   analyzeFile - falls back to regex when AST disabled
- *   analyzeFile - runs regex fallback when AST returns 0 results + fallbackHeuristics=true (Tier 2)
+ *   analyzeFile - AST zero results returned verbatim — not passed to regex
+ *   analyzeFile - falls back to regex when AST disabled or returns null (Tier 2)
  *   buildAnalysisContext - builds a sensible default context
  *   registerAllAnalyzers - does not throw
  */
@@ -39,7 +38,6 @@ function makeEmptyModel(filePath = 'test.js', lang = 'javascript'): SemanticMode
 function makeContext(overrides: Partial<AnalysisContext['astConfig']> = {}): AnalysisContext {
   return buildAnalysisContext({
     enabled: true,
-    fallbackHeuristics: true,
     ...overrides,
   });
 }
@@ -77,7 +75,7 @@ describe('buildAnalysisContext', () => {
   });
 });
 
-// ─── analyzeFile — Tier 1 (AST succeeds) ─────────────────────────────────────
+// ─── analyzeFile — Tier 1 (AST succeeds with results) ────────────────────────
 
 describe('analyzeFile Tier 1: AST path', () => {
   const LANG = 'typescript' as const;
@@ -123,9 +121,9 @@ describe('analyzeFile Tier 1: AST path', () => {
   });
 });
 
-// ─── analyzeFile — Tier 2 (AST returns 0 results + fallbackHeuristics) ────────
+// ─── analyzeFile — AST zero results are authoritative ─────────────────────────
 
-describe('analyzeFile Tier 2: fallback on 0 AST results', () => {
+describe('analyzeFile: AST zero results are authoritative', () => {
   const LANG = 'kotlin' as const;
 
   beforeEach(() => {
@@ -139,22 +137,22 @@ describe('analyzeFile Tier 2: fallback on 0 AST results', () => {
         parseError: undefined,
       }),
       buildSemanticModel: (_parsed, _ctx) => makeEmptyModel(_parsed.filePath, LANG),
-      extractHttpInteractions: () => [], // Returns empty — triggers Tier 2
+      extractHttpInteractions: () => [], // AST finds nothing
       extractAssertions: () => [],
     }));
   });
 
-  it('returns empty array when AST gives 0 results and fallbackHeuristics=false', () => {
-    const ctx = makeContext({ fallbackHeuristics: false });
-    // deep fallback also disabled → empty result
-    const results = analyzeFile('content with no HTTP calls', 'test.kt', LANG, ctx);
+  it('returns empty array when AST parses successfully but finds no HTTP interactions', () => {
+    // AST ran, found nothing — that IS the answer; do not fall through to regex
+    const ctx = makeContext();
+    const results = analyzeFile('fun foo() { println("hello") }', 'test.kt', LANG, ctx);
     expect(results).toEqual([]);
   });
 });
 
-// ─── analyzeFile — Tier 3 (AST disabled) ─────────────────────────────────────
+// ─── analyzeFile — Tier 2 (AST disabled / parse error) ───────────────────────
 
-describe('analyzeFile Tier 3: AST disabled path', () => {
+describe('analyzeFile Tier 2: AST disabled path', () => {
   it('falls back to regex without throwing when AST is disabled', () => {
     const ctx = buildAnalysisContext({ enabled: false }, { enabled: false } as never);
     const results = analyzeFile('const x = 1;', 'test.js', 'javascript', ctx);
@@ -167,3 +165,4 @@ describe('analyzeFile Tier 3: AST disabled path', () => {
     expect(() => analyzeFile('content', 'test.feature', 'cucumber', ctx)).not.toThrow();
   });
 });
+

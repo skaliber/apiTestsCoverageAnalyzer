@@ -17,7 +17,7 @@ import { JavaAnalyzer } from '../../../src/languages/java/index';
 import { buildAnalysisContext } from '../../../src/ast/astAnalysisOrchestrator';
 
 const analyzer = new JavaAnalyzer();
-const ctx = buildAnalysisContext({ enabled: true, fallbackHeuristics: true });
+const ctx = buildAnalysisContext({ enabled: true });
 
 describe('JavaAnalyzer', () => {
   describe('parse()', () => {

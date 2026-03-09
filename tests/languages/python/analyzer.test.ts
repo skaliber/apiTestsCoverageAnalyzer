@@ -9,7 +9,7 @@ import { PythonAnalyzer } from '../../../src/languages/python/index';
 import { buildAnalysisContext } from '../../../src/ast/astAnalysisOrchestrator';
 
 const analyzer = new PythonAnalyzer();
-const ctx = buildAnalysisContext({ enabled: true, fallbackHeuristics: true });
+const ctx = buildAnalysisContext({ enabled: true });
 
 describe('PythonAnalyzer', () => {
   describe('parse()', () => {

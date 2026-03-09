@@ -35,7 +35,7 @@ function writeFile(dir: string, name: string, content: string): string {
   return p;
 }
 
-const ctx = buildAnalysisContext({ enabled: true, fallbackHeuristics: true });
+const ctx = buildAnalysisContext({ enabled: true });
 
 const sampleEndpoints: Endpoint[] = [
   { method: 'GET', path: '/users', pathRegex: /^\/users$/ },

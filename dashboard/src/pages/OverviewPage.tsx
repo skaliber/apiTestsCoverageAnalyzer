@@ -1,8 +1,11 @@
 import { useCoverage } from '../context/CoverageContext';
+import { useIntelligence } from '../context/IntelligenceContext';
 import { DEFAULT_THRESHOLDS } from '../types';
 import { getStatus } from '../components/QualityGateBanner';
 import QualityGateBanner from '../components/QualityGateBanner';
 import FileUpload from '../components/FileUpload';
+import IntelligenceSection from '../components/IntelligenceSection';
+import { Link } from 'react-router-dom';
 import {
   BarChart,
   Bar,
@@ -15,8 +18,16 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
+function riskBandColor(score: number): string {
+  if (score >= 75) return 'text-red-600 dark:text-red-400';
+  if (score >= 50) return 'text-orange-600 dark:text-orange-400';
+  if (score >= 25) return 'text-yellow-600 dark:text-yellow-400';
+  return 'text-gray-500';
+}
+
 export default function OverviewPage() {
   const { report, loading, error } = useCoverage();
+  const { report: intel, loading: intelLoading } = useIntelligence();
 
   if (loading) {
     return (
@@ -56,6 +67,36 @@ export default function OverviewPage() {
       </div>
 
       <QualityGateBanner summary={report.summary} />
+
+      {/* Intelligence Summary Banner */}
+      {!intelLoading && intel && intel.summary.totalRecommendations > 0 && (
+        <div className="mb-6 p-4 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <p className="font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-2">
+                🧠 Coverage Intelligence
+              </p>
+              <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                {intel.summary.totalFindings} findings · {intel.summary.totalRecommendations} recommendations ·{' '}
+                <span className={riskBandColor(intel.summary.maxRiskScore)}>
+                  Max risk: {intel.summary.maxRiskScore}
+                </span>
+                {(intel.summary.recommendationsByPriority.P0 ?? 0) > 0 && (
+                  <span className="ml-2 font-bold text-red-600 dark:text-red-400">
+                    ⚠️ {intel.summary.recommendationsByPriority.P0} P0 action{intel.summary.recommendationsByPriority.P0 !== 1 ? 's' : ''} required
+                  </span>
+                )}
+              </p>
+            </div>
+            <Link
+              to="/intelligence"
+              className="text-sm px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            >
+              View Intelligence →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Summary Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
@@ -111,7 +152,7 @@ export default function OverviewPage() {
       </div>
 
       {/* Bar Chart */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Coverage by Type</h2>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
@@ -126,6 +167,15 @@ export default function OverviewPage() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Top Intelligence Gaps on Overview */}
+      {!intelLoading && intel && (
+        <IntelligenceSection
+          coverageType="overview"
+          findings={intel.findings.slice(0, 10)}
+          recommendations={intel.recommendations.slice(0, 10)}
+        />
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@
 import type { CoverageResult } from '../reporting';
 import type { QualityGateResult } from '../qualityGate';
 import type { SecurityScanSummary, ScannerResult } from '../security/types';
+import type { EvaluatedMetric, MetricStatus } from './summaryTypes';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -64,6 +65,17 @@ export interface SummaryInput {
   buildId?: string;
   /** Full URL to the published Pages / HTML report */
   pagesUrl?: string;
+  /** Coverage Intelligence summary (if the intelligence engine ran) */
+  intelligenceSummary?: {
+    totalFindings: number;
+    totalRecommendations: number;
+    maxRiskScore: number;
+    avgRiskScore: number;
+    criticalUncoveredItems: number;
+    unprotectedSecurityFindings: number;
+    recommendationsByPriority: Record<string, number>;
+    topRiskAreas: string[];
+  };
 }
 
 /** Summary module configuration block (mirrors coverage.config.json "summary" key) */
@@ -325,6 +337,88 @@ function countBySeverity(
   return counts;
 }
 
+// ─── Evaluated-metric helpers (PASS / FAIL / SKIPPED / N/A) ──────────────────
+
+/**
+ * Render the status cell for a metric row in the coverage summary table.
+ * These are the only four valid statuses — ⚠️ PASS does not exist.
+ */
+export function metricStatusCell(status: MetricStatus): string {
+  switch (status) {
+    case 'PASS':    return '✅ PASS';
+    case 'FAIL':    return '❌ FAIL';
+    case 'SKIPPED': return '⏭ SKIPPED';
+    case 'N/A':     return '— N/A';
+  }
+}
+
+/**
+ * Render the "Summary Interpretation" section that explains what each metric
+ * status means in plain language.  Suitable for AI agents and humans alike.
+ */
+export function renderInterpretationSection(metrics: EvaluatedMetric[]): string {
+  const passed   = metrics.filter((m) => m.status === 'PASS');
+  const failed   = metrics.filter((m) => m.status === 'FAIL');
+  const skipped  = metrics.filter((m) => m.status === 'SKIPPED');
+  const na       = metrics.filter((m) => m.status === 'N/A');
+  const executed = metrics.filter((m) => m.executed);
+
+  const lines: string[] = [];
+  lines.push('## Summary Interpretation');
+  lines.push('');
+
+  if (executed.length > 0) {
+    lines.push(`**Analyzed:** ${executed.map((m) => m.category).join(', ')}`);
+  }
+  if (passed.length > 0) {
+    lines.push(`**Passed:** ${passed.map((m) => m.category).join(', ')}`);
+  }
+  if (failed.length > 0) {
+    lines.push(`**Failed:** ${failed.map((m) => m.category).join(', ')}`);
+  }
+  if (na.length > 0) {
+    lines.push(`**Not applicable:** ${na.map((m) => m.category).join(', ')}`);
+  }
+  if (skipped.length > 0) {
+    lines.push(`**Skipped (did not run):** ${skipped.map((m) => m.category).join(', ')}`);
+  }
+  lines.push('');
+
+  // Top gaps from failed metrics
+  const allGaps: string[] = failed.flatMap((m) => m.topGaps);
+  if (allGaps.length > 0) {
+    lines.push('### Top Gaps');
+    lines.push('');
+    for (const gap of allGaps.slice(0, 5)) {
+      lines.push(`- ${gap}`);
+    }
+    lines.push('');
+  }
+
+  // Recommended next actions
+  lines.push('### Recommended Next Actions');
+  lines.push('');
+  if (failed.length > 0) {
+    for (const m of failed) {
+      const gap = (m.threshold! - m.coveragePercent).toFixed(2);
+      lines.push(
+        `- Increase **${m.category}** coverage by ${gap}% ` +
+        `(currently ${m.coveragePercent.toFixed(2)}%, required ${m.threshold!.toFixed(2)}%)`,
+      );
+    }
+  } else if (executed.length > 0) {
+    lines.push('- All configured gates passed. Consider raising thresholds toward 100%.');
+  }
+  if (skipped.length > 0) {
+    lines.push(
+      `- Consider running: ${skipped.map((m) => m.category).join(', ')} analyzers to expand coverage visibility.`,
+    );
+  }
+  lines.push('');
+
+  return lines.join('\n');
+}
+
 /**
  * Render the AI-friendly summary markdown.
  * Optimized for consumption by AI agents (test generators, fixers, etc.)
@@ -425,6 +519,64 @@ export function renderAiSummary(input: SummaryInput, sections: SummarySection[])
     lines.push('- Review uncovered items and add tests to reach 100% where possible.');
   }
   lines.push('');
+
+  // Intelligence summary section (if available)
+  if (input.intelligenceSummary) {
+    lines.push(renderIntelligenceSection(input.intelligenceSummary));
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Render a Coverage Intelligence section for inclusion in build/PR summaries.
+ */
+export function renderIntelligenceSection(
+  intel: NonNullable<SummaryInput['intelligenceSummary']>,
+): string {
+  const lines: string[] = [];
+  const p0 = intel.recommendationsByPriority['P0'] ?? 0;
+  const p1 = intel.recommendationsByPriority['P1'] ?? 0;
+  const p2 = intel.recommendationsByPriority['P2'] ?? 0;
+  const p3 = intel.recommendationsByPriority['P3'] ?? 0;
+
+  lines.push('## Coverage Intelligence');
+  lines.push('');
+  lines.push('| | |');
+  lines.push('|---|---|');
+  lines.push(tableRow('Functional findings', String(intel.totalFindings)));
+  lines.push(tableRow('Missing test recommendations', String(intel.totalRecommendations)));
+  lines.push(tableRow('Max risk score', String(intel.maxRiskScore)));
+  lines.push(tableRow('Avg risk score', String(intel.avgRiskScore)));
+  lines.push(tableRow('Critical uncovered items', String(intel.criticalUncoveredItems)));
+  lines.push(tableRow('Unprotected security findings', String(intel.unprotectedSecurityFindings)));
+  lines.push('');
+
+  if (intel.totalRecommendations > 0) {
+    lines.push('### Recommendations by Priority');
+    lines.push('');
+    lines.push('| Priority | Count |');
+    lines.push('|---|---|');
+    if (p0 > 0) lines.push(`| **P0** (Immediate) | ${p0} |`);
+    if (p1 > 0) lines.push(`| **P1** (High) | ${p1} |`);
+    if (p2 > 0) lines.push(`| **P2** (Medium) | ${p2} |`);
+    if (p3 > 0) lines.push(`| **P3** (Low) | ${p3} |`);
+    lines.push('');
+  }
+
+  if (intel.topRiskAreas.length > 0) {
+    lines.push('### Top Risk Areas');
+    lines.push('');
+    for (const area of intel.topRiskAreas.slice(0, 5)) {
+      lines.push(`- ${area}`);
+    }
+    lines.push('');
+  }
+
+  if (p0 > 0) {
+    lines.push(`> ⚠️ **${p0} P0 recommendation(s) require immediate attention** before merging.`);
+    lines.push('');
+  }
 
   return lines.join('\n');
 }

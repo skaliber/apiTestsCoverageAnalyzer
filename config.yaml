@@ -1,0 +1,89 @@
+version: 1
+
+project:
+  name: apiTestsCoverageAnalyzer
+
+analysis:
+  defaultMode: full
+  failOnConfigMissing: false
+  warnOnConfigMissing: true
+
+scans:
+  coverage:
+    enabled: true
+    types:
+      - endpoint
+      - parameter
+      - business
+      - integration
+      - error
+      - security
+      - performance
+      - compatibility
+    deepAnalysis:
+      enabled: true
+      maxCallDepth: 4
+      resolveConstants: true
+      resolveEnums: true
+      resolveStringTemplates: true
+      resolveWrappers: true
+      resolveRequestBuilders: true
+      resolveClientMappings: true
+      assertionAware: true
+      clientMappings: []
+
+  security:
+    enabled: true
+    scanners:
+      - semgrep
+      - trivy
+      - zap
+
+  intelligence:
+    enabled: true
+    types:
+      - ai-summary
+      - risk-prioritization
+      - recommendations
+      - scanner-interpretation
+
+mcp:
+  enabled: false
+  defaultTransport: stdio
+  timeoutMs: 30000
+  servers: {}
+
+thresholds:
+  global: 100
+  endpoint: 100
+  parameter: 100
+  business: 100
+  integration: 100
+  error: 100
+  security: 100
+  performance: 100
+  compatibility: 100
+
+qualityGate:
+  enabled: true
+  failBuildOnThresholdMiss: true
+  mode: warn
+
+reports:
+  outputDir: reports
+  formats:
+    - json
+    - html
+    - csv
+    - junit
+
+publishing:
+  enabled: false
+  githubPages:
+    enabled: false
+
+dashboard:
+  aiSummary:
+    enabled: true
+    collapsedByDefault: true
+

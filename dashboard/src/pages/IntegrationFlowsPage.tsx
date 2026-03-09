@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useCoverage } from '../context/CoverageContext';
 import { useSettings } from '../context/SettingsContext';
+import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
+import IntelligenceSection from '../components/IntelligenceSection';
 import MermaidDiagram from '../components/MermaidDiagram';
 import type { DetailItem } from '../types';
 import { generateIntegrationFlowsSummary, generateMermaidFlowchart } from '../utils/markdownSummaries';
@@ -15,13 +17,20 @@ interface FlowItem extends DetailItem {
 export default function IntegrationFlowsPage() {
   const { report } = useCoverage();
   const { showAiSummaries } = useSettings();
+  const { findingsFor, recommendationsFor } = useIntelligence();
   const [search, setSearch] = useState('');
 
   const section = report?.details?.integration;
   if (!section) {
     return (
-      <div className="p-6 text-gray-500 dark:text-gray-400">
-        No integration flows data available.
+      <div className="p-6">
+        <div className="text-gray-500 dark:text-gray-400 mb-4">No integration flows data available.</div>
+        <IntelligenceSection
+          coverageType="integration"
+          findings={findingsFor('integration')}
+          recommendations={recommendationsFor('integration')}
+          alwaysShow
+        />
       </div>
     );
   }
@@ -112,6 +121,12 @@ export default function IntegrationFlowsPage() {
           </p>
         </div>
       </div>
+
+      <IntelligenceSection
+        coverageType="integration"
+        findings={findingsFor('integration')}
+        recommendations={recommendationsFor('integration')}
+      />
     </div>
   );
 }

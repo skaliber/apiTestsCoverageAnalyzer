@@ -1,6 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { McpConfig } from './mcp/types';
+import {
+  loadConfig as loadCentralConfigImpl,
+  LEGACY_CONFIG_WARNING,
+  LEGACY_CONFIG_FILENAME,
+  DEFAULT_CONFIG_FILENAME as CENTRAL_CONFIG_FILENAME,
+} from './config/loadConfig';
+import type { AnalyzerConfig } from './config/types';
 
 // ─── Configuration schema ─────────────────────────────────────────────────────
 
@@ -258,3 +265,59 @@ function matchesPathPattern(endpointPath: string, pattern: string): boolean {
   const regex = new RegExp(`^${regexStr}$`);
   return regex.test(endpointPath);
 }
+
+// ─── Central config integration (Feature 18) ──────────────────────────────────
+
+/**
+ * Load the central `config.yaml` and return a normalized `AnalyzerConfig`.
+ *
+ * This is the preferred loader for all new code.  The legacy `resolveConfig`
+ * function is kept for backward compatibility but emits a deprecation warning
+ * when `coverage.config.json` is detected without a `config.yaml` present.
+ *
+ * @param configPath  Optional explicit path (from --config flag).
+ */
+export function loadCentralConfig(configPath?: string): AnalyzerConfig {
+  // Detect legacy config and warn before delegating.
+  const legacyPath = path.join(process.cwd(), LEGACY_CONFIG_FILENAME);
+  const centralPath = path.join(process.cwd(), CENTRAL_CONFIG_FILENAME);
+  if (fs.existsSync(legacyPath) && !fs.existsSync(centralPath) && !configPath) {
+    process.stderr.write(LEGACY_CONFIG_WARNING + '\n');
+  }
+  return loadCentralConfigImpl(configPath);
+}
+
+/**
+ * Map a legacy `CoverageConfig` object to the new `AnalyzerConfig` shape.
+ * Used for backward compatibility when callers still hold a `CoverageConfig`.
+ */
+export function mapLegacyToAnalyzerConfig(legacy: CoverageConfig): Partial<AnalyzerConfig> {
+  const partial: Partial<AnalyzerConfig> = {};
+
+  if (legacy.thresholds) {
+    partial.thresholds = { ...legacy.thresholds };
+  }
+  if (legacy.qualityGate) {
+    partial.qualityGate = {
+      enabled: legacy.qualityGate.enabled,
+      failBuildOnThresholdMiss: legacy.qualityGate.failBuildOnThresholdMiss,
+      mode: legacy.qualityGate.mode,
+    };
+  }
+  if (legacy.publishing) {
+    partial.publishing = {
+      enabled: legacy.publishing.enabled,
+      githubPages: legacy.publishing.githubPages
+        ? { enabled: legacy.publishing.githubPages.enabled }
+        : undefined,
+    };
+  }
+  if (legacy.mcp) {
+    partial.mcp = legacy.mcp;
+  }
+
+  return partial;
+}
+
+// Re-export central config types for convenience.
+export type { AnalyzerConfig } from './config/types';

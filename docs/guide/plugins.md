@@ -77,7 +77,7 @@ async function analyze({ testPatterns, config }) {
 module.exports = { analyze }
 ```
 
-### 2. Register the plugin in `coverage.config.json`
+### 2. Register the plugin in `config.yaml`
 
 ```json
 {
@@ -102,7 +102,7 @@ A fully worked example is included at [`plugins/graphql-coverage.js`](https://gi
 
 ```mermaid
 flowchart TD
-    A[Load coverage.config.json] --> B[Read plugins array]
+    A[Load config.yaml] --> B[Read plugins array]
     B --> C{For each plugin path}
     C --> D[require plugin file]
     D --> E{Exports analyze?}
@@ -127,7 +127,7 @@ If you want to share your plugin, publish it as an npm package. Name it `api-cov
 npm publish --access public
 ```
 
-Users install it and reference it by module name in `coverage.config.json`:
+Users install it and reference it by module name in `config.yaml`:
 
 ```json
 {

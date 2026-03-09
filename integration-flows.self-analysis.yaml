@@ -1,0 +1,182 @@
+# Integration flows for self-analysis.
+# Describes multi-step scenarios that the analyzer's own tests must exercise.
+
+flows:
+  - id: SA-FLOW001
+    name: "Run single metric and enforce threshold"
+    description: "Analyze a single coverage metric, write reports, and check threshold passes"
+    steps:
+      - id: SA-FLOW001-step1
+        description: "Run endpoint coverage analysis"
+        type: api
+        method: POST
+        path: /analyze/endpoints
+        keywords:
+          - "analyzeEndpoints"
+          - "endpoint coverage"
+          - "endpoint-coverage"
+          - "analyze endpoints"
+      - id: SA-FLOW001-step2
+        description: "Verify output files are written"
+        type: assertion
+        keywords:
+          - "reports"
+          - "reportsDir"
+          - "json"
+          - "html"
+          - "output"
+      - id: SA-FLOW001-step3
+        description: "Check coverage threshold passes"
+        type: api
+        method: POST
+        path: /thresholds/check
+        keywords:
+          - "checkThresholds"
+          - "threshold"
+          - "quality gate"
+          - "pass"
+          - "violations"
+
+  - id: SA-FLOW002
+    name: "Run all metrics and generate aggregated summary"
+    description: "Execute all coverage metric types and produce a combined summary"
+    steps:
+      - id: SA-FLOW002-step1
+        description: "Run endpoint coverage"
+        type: api
+        method: POST
+        path: /analyze/endpoints
+        keywords:
+          - "analyzeEndpoints"
+          - "endpoint coverage"
+      - id: SA-FLOW002-step2
+        description: "Run business rule coverage"
+        type: api
+        method: POST
+        path: /analyze/business-rules
+        keywords:
+          - "analyzeBusinessRules"
+          - "business coverage"
+          - "business-coverage"
+      - id: SA-FLOW002-step3
+        description: "Run error scenario coverage"
+        type: api
+        method: POST
+        path: /analyze/errors
+        keywords:
+          - "analyzeErrorHandling"
+          - "error coverage"
+          - "error-coverage"
+      - id: SA-FLOW002-step4
+        description: "Generate build summary"
+        type: api
+        method: GET
+        path: /reports/build-summary
+        keywords:
+          - "buildSummary"
+          - "generateBuildSummary"
+          - "build summary"
+          - "summary"
+
+  - id: SA-FLOW003
+    name: "Threshold failure still produces reports"
+    description: "When coverage is below threshold, all reports are written before exit non-zero"
+    steps:
+      - id: SA-FLOW003-step1
+        description: "Run coverage analysis that will fail threshold"
+        type: api
+        method: POST
+        path: /analyze/endpoints
+        keywords:
+          - "analyzeEndpoints"
+          - "threshold"
+          - "below"
+          - "fail"
+      - id: SA-FLOW003-step2
+        description: "Verify report files exist despite threshold failure"
+        type: assertion
+        keywords:
+          - "reports"
+          - "output"
+          - "always"
+          - "exist"
+          - "even when"
+      - id: SA-FLOW003-step3
+        description: "Verify process exits with non-zero code"
+        type: assertion
+        keywords:
+          - "exit"
+          - "process.exit"
+          - "non-zero"
+          - "violations"
+          - "threshold breach"
+
+  - id: SA-FLOW004
+    name: "Load config, run analysis, generate intelligence"
+    description: "Full pipeline: load config → run all metrics → intelligence engine → summaries"
+    steps:
+      - id: SA-FLOW004-step1
+        description: "Load coverage configuration"
+        type: api
+        method: POST
+        path: /config/load
+        keywords:
+          - "loadConfig"
+          - "config"
+          - "coverage.config"
+          - "configuration"
+      - id: SA-FLOW004-step2
+        description: "Run security coverage"
+        type: api
+        method: POST
+        path: /analyze/security
+        keywords:
+          - "analyzeSecurityControls"
+          - "security coverage"
+          - "security-coverage"
+      - id: SA-FLOW004-step3
+        description: "Run intelligence engine"
+        type: api
+        method: POST
+        path: /analyze/intelligence
+        keywords:
+          - "coverage-intelligence"
+          - "intelligence"
+          - "findings"
+          - "riskScore"
+          - "recommendations"
+      - id: SA-FLOW004-step4
+        description: "Generate PR summary"
+        type: api
+        method: GET
+        path: /reports/pr-summary
+        keywords:
+          - "prSummary"
+          - "generatePrSummary"
+          - "pr-summary"
+          - "PR comment"
+
+  - id: SA-FLOW005
+    name: "Security scan and gate enforcement"
+    description: "Run security scanner, enforce zero-critical gate, post result"
+    steps:
+      - id: SA-FLOW005-step1
+        description: "Run security scan with Trivy/Semgrep reports"
+        type: api
+        method: POST
+        path: /analyze/security-scan
+        keywords:
+          - "securityScan"
+          - "security-scan"
+          - "trivy"
+          - "semgrep"
+          - "scan"
+      - id: SA-FLOW005-step2
+        description: "Evaluate security gate"
+        type: assertion
+        keywords:
+          - "gate"
+          - "critical"
+          - "failOnCritical"
+          - "maxSecrets"
+          - "security gate"

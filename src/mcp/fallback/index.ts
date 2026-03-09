@@ -152,6 +152,94 @@ export function generateFallbackSecurityAnalysis(
   };
 }
 
+// ─── Intelligence fallback ────────────────────────────────────────────────────
+
+export interface FallbackIntelligenceInput {
+  totalFindings: number;
+  totalRecommendations: number;
+  maxRiskScore: number;
+  avgRiskScore: number;
+  criticalUncoveredItems: number;
+  unprotectedSecurityFindings: number;
+  recommendationsByPriority: Record<string, number>;
+  topRiskAreas?: string[];
+  languages?: string[];
+  frameworks?: string[];
+}
+
+/**
+ * Generate a deterministic AI-style intelligence analysis without MCP.
+ */
+export function generateFallbackIntelligenceAnalysis(
+  input: FallbackIntelligenceInput,
+): NormalizedAiAnalysis {
+  const hasIssues = input.totalFindings > 0 || input.criticalUncoveredItems > 0;
+  const p0Count = input.recommendationsByPriority['P0'] ?? 0;
+  const p1Count = input.recommendationsByPriority['P1'] ?? 0;
+
+  const summary = hasIssues
+    ? `Coverage Intelligence identified ${input.totalFindings} functional finding(s) and ` +
+      `${input.totalRecommendations} missing test recommendation(s). ` +
+      `Maximum risk score: ${input.maxRiskScore}. ` +
+      (p0Count > 0 ? `${p0Count} P0 action(s) require immediate attention.` : '')
+    : `No functional findings detected. All analyzed coverage areas appear to be adequately tested.`;
+
+  const keyFindings: string[] = [
+    `Functional findings: ${input.totalFindings}`,
+    `Missing test recommendations: ${input.totalRecommendations}`,
+    `Max risk score: ${input.maxRiskScore} (avg: ${input.avgRiskScore})`,
+    `Critical uncovered items: ${input.criticalUncoveredItems}`,
+    `Unprotected security findings: ${input.unprotectedSecurityFindings}`,
+  ];
+
+  const topRisks: string[] = [];
+  if (p0Count > 0) topRisks.push(`${p0Count} P0 recommendation(s) require urgent action`);
+  if (p1Count > 0) topRisks.push(`${p1Count} P1 recommendation(s) should be addressed soon`);
+  if (input.unprotectedSecurityFindings > 0) {
+    topRisks.push(`${input.unprotectedSecurityFindings} security finding(s) lack test protection`);
+  }
+  if (input.criticalUncoveredItems > 0) {
+    topRisks.push(`${input.criticalUncoveredItems} critical flow(s) have zero test coverage`);
+  }
+  if (input.topRiskAreas && input.topRiskAreas.length > 0) {
+    topRisks.push(...input.topRiskAreas.slice(0, 3).map((a) => `High-risk area: ${a}`));
+  }
+
+  const missingCoverageAreas: string[] = [];
+  if (input.criticalUncoveredItems > 0) {
+    missingCoverageAreas.push(`${input.criticalUncoveredItems} critical endpoint(s)/flow(s) with no test coverage`);
+  }
+  if (input.unprotectedSecurityFindings > 0) {
+    missingCoverageAreas.push(`${input.unprotectedSecurityFindings} security finding(s) unprotected by tests`);
+  }
+
+  const frameworkHint = (input.frameworks ?? []).length > 0
+    ? ` using ${(input.frameworks!).slice(0, 2).join(' or ')}`
+    : '';
+
+  const recommendedActions: string[] = [];
+  if (p0Count > 0) recommendedActions.push(`Address ${p0Count} P0 recommendation(s) immediately${frameworkHint}`);
+  if (p1Count > 0) recommendedActions.push(`Schedule ${p1Count} P1 recommendation(s) for next sprint${frameworkHint}`);
+  if (input.unprotectedSecurityFindings > 0) {
+    recommendedActions.push('Add security-focused tests to cover unprotected scanner findings');
+  }
+  if (recommendedActions.length === 0) {
+    recommendedActions.push('Review intelligence report and schedule remaining recommendations');
+  }
+  recommendedActions.push('Re-run intelligence analysis after adding recommended tests');
+
+  return {
+    summary,
+    keyFindings,
+    topRisks,
+    recommendedActions,
+    missingCoverageAreas,
+    confidence: 'high',
+    isFallback: true,
+    category: 'intelligence',
+  };
+}
+
 // ─── Generic fallback ─────────────────────────────────────────────────────────
 
 /**

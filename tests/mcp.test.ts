@@ -36,6 +36,7 @@ import {
   buildPerformancePrompt,
   buildCompatibilityPrompt,
   buildCiSummaryPrompt,
+  buildIntelligencePrompt,
   // Normalizer
   normalizeMcpResponse,
   // Template mapper
@@ -46,6 +47,7 @@ import {
   generateFallbackCoverageAnalysis,
   generateFallbackSecurityAnalysis,
   generateFallbackAnalysis,
+  generateFallbackIntelligenceAnalysis,
   // Events
   AnalysisEventStream,
   createNoOpStream,
@@ -1054,5 +1056,274 @@ describe('CoverageConfig.mcp integration', () => {
     expect(defaultConfig).toBeDefined();
     // mcp is optional, so defaultConfig.mcp should be undefined
     expect(defaultConfig.mcp).toBeUndefined();
+  });
+});
+
+// ─── 15. Intelligence prompt builder ─────────────────────────────────────────
+
+describe('buildIntelligencePrompt', () => {
+  const sampleIntelligenceInput = {
+    totalFindings: 5,
+    totalRecommendations: 3,
+    maxRiskScore: 88,
+    avgRiskScore: 62,
+    criticalUncoveredItems: 2,
+    unprotectedSecurityFindings: 1,
+    recommendationsByPriority: { P0: 1, P1: 2, P2: 0, P3: 0 },
+    topFindings: [
+      { category: 'uncovered-endpoint', severity: 'HIGH', title: 'Uncovered endpoint POST /payments', endpoint: { method: 'POST', path: '/payments' } },
+      { category: 'missing-auth-test', severity: 'CRITICAL', title: 'Missing auth test on GET /admin', endpoint: { method: 'GET', path: '/admin' } },
+    ],
+    topRecommendations: [
+      { priority: 'P0', riskScore: 88, title: 'Add auth test for GET /admin', recommendedTestType: 'auth-test', likelyLanguage: 'typescript', likelyFramework: 'jest' },
+    ],
+    languages: ['typescript'],
+    frameworks: ['jest'],
+    projectName: 'wallets-api',
+    branch: 'main',
+  };
+
+  it('produces a prompt with category "intelligence"', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.category).toBe('intelligence');
+  });
+
+  it('includes project name in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('wallets-api');
+  });
+
+  it('includes branch in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('main');
+  });
+
+  it('includes finding counts in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('5'); // totalFindings
+    expect(req.prompt).toContain('3'); // totalRecommendations
+  });
+
+  it('includes max risk score in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('88');
+  });
+
+  it('includes top findings in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('/payments');
+    expect(req.prompt).toContain('/admin');
+  });
+
+  it('includes top recommendations in the prompt', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('P0');
+    expect(req.prompt).toContain('auth-test');
+  });
+
+  it('includes language and framework hints', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('typescript');
+    expect(req.prompt).toContain('jest');
+  });
+
+  it('requests JSON output format', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    expect(req.prompt).toContain('JSON');
+  });
+
+  it('includes intelligence data in context', () => {
+    const req = buildIntelligencePrompt(sampleIntelligenceInput);
+    const ctx = req.context as Record<string, unknown>;
+    expect(ctx['totalFindings']).toBe(5);
+    expect(ctx['maxRiskScore']).toBe(88);
+    expect(ctx['projectName']).toBe('wallets-api');
+  });
+
+  it('works with minimal input (no optional fields)', () => {
+    const req = buildIntelligencePrompt({
+      totalFindings: 0,
+      totalRecommendations: 0,
+      maxRiskScore: 0,
+      avgRiskScore: 0,
+      criticalUncoveredItems: 0,
+      unprotectedSecurityFindings: 0,
+      recommendationsByPriority: {},
+      topFindings: [],
+      topRecommendations: [],
+    });
+    expect(req.category).toBe('intelligence');
+    expect(req.prompt.length).toBeGreaterThan(0);
+  });
+
+  it('limits top findings to 10 in the prompt', () => {
+    const manyFindings = Array.from({ length: 20 }, (_, i) => ({
+      category: 'uncovered-endpoint',
+      severity: 'MEDIUM',
+      title: `Finding ${i}`,
+    }));
+    const req = buildIntelligencePrompt({ ...sampleIntelligenceInput, topFindings: manyFindings });
+    // Prompt should include some but not all (capped at 10)
+    const findingMatches = (req.prompt.match(/Finding \d+/g) ?? []).length;
+    expect(findingMatches).toBeLessThanOrEqual(10);
+  });
+});
+
+// ─── 16. Intelligence fallback ────────────────────────────────────────────────
+
+describe('generateFallbackIntelligenceAnalysis', () => {
+  const makeInput = (overrides = {}) => ({
+    totalFindings: 4,
+    totalRecommendations: 3,
+    maxRiskScore: 85,
+    avgRiskScore: 60,
+    criticalUncoveredItems: 1,
+    unprotectedSecurityFindings: 1,
+    recommendationsByPriority: { P0: 1, P1: 2, P2: 0, P3: 0 },
+    topRiskAreas: ['POST /payments (score 85)', 'DELETE /admin/users (score 78)'],
+    frameworks: ['jest'],
+    ...overrides,
+  });
+
+  it('marks result as fallback', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.isFallback).toBe(true);
+  });
+
+  it('sets category to "intelligence"', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.category).toBe('intelligence');
+  });
+
+  it('includes finding count in summary', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.summary).toContain('4');
+  });
+
+  it('includes P0 count in summary when P0 > 0', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.summary).toContain('P0');
+  });
+
+  it('generates passing summary when no findings', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput({
+      totalFindings: 0,
+      criticalUncoveredItems: 0,
+      unprotectedSecurityFindings: 0,
+      recommendationsByPriority: {},
+    }));
+    expect(result.summary).toContain('No functional findings');
+  });
+
+  it('includes P0 and P1 in topRisks when present', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.topRisks.some((r) => r.includes('P0'))).toBe(true);
+    expect(result.topRisks.some((r) => r.includes('P1'))).toBe(true);
+  });
+
+  it('includes unprotected security findings in topRisks', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput({ unprotectedSecurityFindings: 3 }));
+    expect(result.topRisks.some((r) => r.includes('3'))).toBe(true);
+  });
+
+  it('includes top risk areas in topRisks', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.topRisks.some((r) => r.includes('/payments'))).toBe(true);
+  });
+
+  it('includes framework hint in recommendedActions when available', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput({ frameworks: ['pytest'] }));
+    expect(result.recommendedActions.some((a) => a.toLowerCase().includes('pytest'))).toBe(true);
+  });
+
+  it('includes missingCoverageAreas when there are uncovered items', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput({ criticalUncoveredItems: 2 }));
+    expect(result.missingCoverageAreas!.length).toBeGreaterThan(0);
+  });
+
+  it('always includes keyFindings with required metrics', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.keyFindings.some((f) => f.includes('4'))).toBe(true); // totalFindings
+    expect(result.keyFindings.some((f) => f.includes('85'))).toBe(true); // maxRiskScore
+  });
+
+  it('confidence is "high" (deterministic fallback)', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(result.confidence).toBe('high');
+  });
+
+  it('recommendedActions always ends with re-run suggestion', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    const lastAction = result.recommendedActions[result.recommendedActions.length - 1];
+    expect(lastAction).toContain('Re-run');
+  });
+
+  it('conforms to NormalizedAiAnalysis schema', () => {
+    const result = generateFallbackIntelligenceAnalysis(makeInput());
+    expect(typeof result.summary).toBe('string');
+    expect(Array.isArray(result.keyFindings)).toBe(true);
+    expect(Array.isArray(result.topRisks)).toBe(true);
+    expect(Array.isArray(result.recommendedActions)).toBe(true);
+  });
+});
+
+// ─── 17. McpIntegration.analyzeIntelligence ───────────────────────────────────
+
+describe('McpIntegration – analyzeIntelligence (MCP disabled)', () => {
+  let mcp: McpIntegration;
+
+  beforeEach(() => {
+    mcp = new McpIntegration({ enabled: false });
+  });
+
+  const sampleIntelInput = {
+    totalFindings: 3,
+    totalRecommendations: 2,
+    maxRiskScore: 75,
+    avgRiskScore: 55,
+    criticalUncoveredItems: 1,
+    unprotectedSecurityFindings: 1,
+    recommendationsByPriority: { P0: 0, P1: 1, P2: 1, P3: 0 },
+    topFindings: [],
+    topRecommendations: [],
+    projectName: 'test-api',
+    languages: ['typescript'],
+    frameworks: ['jest'],
+  };
+
+  it('returns fallback analysis when MCP is disabled', async () => {
+    const result = await mcp.analyzeIntelligence(sampleIntelInput);
+    expect(result.isFallback).toBe(true);
+  });
+
+  it('returns category "intelligence"', async () => {
+    const result = await mcp.analyzeIntelligence(sampleIntelInput);
+    expect(result.category).toBe('intelligence');
+  });
+
+  it('fallback summary includes finding counts', async () => {
+    const result = await mcp.analyzeIntelligence(sampleIntelInput);
+    expect(result.summary).toContain('3'); // totalFindings
+  });
+
+  it('returns fallback when intelligenceAnalysis server is disabled', async () => {
+    const mcp2 = new McpIntegration({
+      enabled: true,
+      servers: { intelligenceAnalysis: { enabled: false } },
+    });
+    const result = await mcp2.analyzeIntelligence(sampleIntelInput);
+    expect(result.isFallback).toBe(true);
+    expect(result.category).toBe('intelligence');
+  });
+
+  it('analyzeIntelligence with no findings returns positive summary', async () => {
+    const result = await mcp.analyzeIntelligence({
+      ...sampleIntelInput,
+      totalFindings: 0,
+      criticalUncoveredItems: 0,
+      unprotectedSecurityFindings: 0,
+      recommendationsByPriority: {},
+    });
+    expect(result.summary).toContain('No functional findings');
   });
 });

@@ -167,26 +167,23 @@ You will see:
 
 ## 6. Use a configuration file
 
-Instead of passing all flags on the command line, create a `coverage.config.json` in your project root:
+Instead of passing all flags on the command line, create a `config.yaml` at your project root:
 
-```json
-{
-  "thresholds": {
-    "endpoint": 80,
-    "parameter": 70,
-    "business": 60,
-    "integration": 50
-  },
-  "exclude": {
-    "paths": ["/internal/*"],
-    "methods": ["OPTIONS"]
-  },
-  "testPatterns": ["tests/**/*.ts"],
-  "plugins": ["./plugins/graphql-coverage.js"]
-}
+```yaml
+version: 1
+
+thresholds:
+  endpoint: 80
+  parameter: 70
+  business: 60
+  integration: 50
+
+qualityGate:
+  mode: warn
 ```
 
-The analyzer automatically reads this file. Pass `--config path/to/config.json` to use a different file.
+The analyzer automatically reads `config.yaml` from the project root. Pass `--config path/to/config.yaml`
+to use a different file. See [Configuration Reference](../guides/configuration.md) for all options.
 
 ## Next steps
 

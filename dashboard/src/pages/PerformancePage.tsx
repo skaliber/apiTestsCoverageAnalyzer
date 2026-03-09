@@ -1,4 +1,5 @@
 import { useCoverage } from '../context/CoverageContext';
+import { useIntelligence } from '../context/IntelligenceContext';
 import DetailPage from './DetailPage';
 import { generatePerformanceSummary } from '../utils/markdownSummaries';
 
@@ -11,6 +12,7 @@ const columns = [
 
 export default function PerformancePage() {
   const { report } = useCoverage();
+  const { findingsFor, recommendationsFor } = useIntelligence();
   const aiSummary = report ? generatePerformanceSummary(report) : undefined;
 
   const merged = {
@@ -26,6 +28,9 @@ export default function PerformancePage() {
       section={merged.items.length > 0 ? merged : undefined}
       columns={columns}
       aiSummary={aiSummary}
+      coverageType="performance"
+      intelligenceFindings={findingsFor('performance')}
+      intelligenceRecommendations={recommendationsFor('performance')}
     />
   );
 }

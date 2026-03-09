@@ -66,7 +66,7 @@ apiTestsCoverageAnalyzer/
 ├── reports/        # generated reports land here (git-ignored by default)
 ├── dashboard/      # UI dashboard (Vite + React)
 ├── ci/             # CI/CD example configurations
-├── coverage.config.json  # default configuration file
+├── config.yaml           # central configuration file
 └── package.json
 ```
 

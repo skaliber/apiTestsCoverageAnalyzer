@@ -2,7 +2,9 @@ import { useState } from 'react';
 import type { DetailSection } from '../types';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
+import IntelligenceSection from '../components/IntelligenceSection';
 import { useSettings } from '../context/SettingsContext';
+import type { FunctionalFinding, MissingTestRecommendation } from '../context/IntelligenceContext';
 
 interface Props {
   title: string;
@@ -10,6 +12,10 @@ interface Props {
   columns?: { key: string; label: string }[];
   renderRow?: (item: Record<string, unknown>, i: number) => React.ReactNode;
   aiSummary?: string;
+  /** Coverage type for intelligence filtering (e.g. "endpoint", "security") */
+  coverageType?: string;
+  intelligenceFindings?: FunctionalFinding[];
+  intelligenceRecommendations?: MissingTestRecommendation[];
 }
 
 const defaultColumns = [
@@ -17,14 +23,33 @@ const defaultColumns = [
   { key: 'covered', label: 'Covered' },
 ];
 
-export default function DetailPage({ title, section, columns = defaultColumns, renderRow, aiSummary }: Props) {
+export default function DetailPage({
+  title,
+  section,
+  columns = defaultColumns,
+  renderRow,
+  aiSummary,
+  coverageType,
+  intelligenceFindings = [],
+  intelligenceRecommendations = [],
+}: Props) {
   const [search, setSearch] = useState('');
   const { showAiSummaries } = useSettings();
 
   if (!section) {
     return (
-      <div className="p-6 text-gray-500 dark:text-gray-400">
-        No data available for {title}. Load a report that includes this section.
+      <div className="p-6">
+        <div className="text-gray-500 dark:text-gray-400 mb-4">
+          No data available for {title}. Load a report that includes this section.
+        </div>
+        {coverageType && (intelligenceFindings.length > 0 || intelligenceRecommendations.length > 0) && (
+          <IntelligenceSection
+            coverageType={coverageType}
+            findings={intelligenceFindings}
+            recommendations={intelligenceRecommendations}
+            alwaysShow
+          />
+        )}
       </div>
     );
   }
@@ -134,6 +159,15 @@ export default function DetailPage({ title, section, columns = defaultColumns, r
           </p>
         </div>
       </div>
+
+      {/* Intelligence Section */}
+      {coverageType && (
+        <IntelligenceSection
+          coverageType={coverageType}
+          findings={intelligenceFindings}
+          recommendations={intelligenceRecommendations}
+        />
+      )}
     </div>
   );
 }

@@ -40,26 +40,56 @@ export function parseFormats(raw: string): ReportFormat[] {
 
 // ─── Report writers ───────────────────────────────────────────────────────────
 
-/** Write `reports/coverage-summary.json` */
+/** Write `reports/coverage-summary.json`, merging with any existing file so that
+ *  successive per-type runs accumulate a complete summary across all 8 metrics. */
 function writeJson(
   results: CoverageResult[],
   reportsDir: string,
   observability?: ObservabilityInfo,
 ): void {
-  const summary = results.map((r) => ({
-    type: r.type,
-    totalItems: r.totalItems,
-    coveredItems: r.coveredItems,
-    coveragePercent: r.coveragePercent,
-  }));
+  const outPath = path.join(reportsDir, 'coverage-summary.json');
 
-  const payload: Record<string, unknown> = {
-    generatedAt: new Date().toISOString(),
-    summary,
-    details: results.reduce<Record<string, unknown>>((acc, r) => {
+  // Load existing summary/details so that successive single-type runs accumulate
+  // all coverage types into one file rather than overwriting each other.
+  let existingSummary: Array<Record<string, unknown>> = [];
+  let existingDetails: Record<string, unknown> = {};
+  try {
+    if (fs.existsSync(outPath)) {
+      const existing = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
+      if (Array.isArray(existing.summary)) {
+        existingSummary = existing.summary as Array<Record<string, unknown>>;
+      }
+      if (existing.details && typeof existing.details === 'object') {
+        existingDetails = existing.details as Record<string, unknown>;
+      }
+    }
+  } catch {
+    // Corrupt file — start fresh
+  }
+
+  // New results replace any existing entry for the same type; others are kept.
+  const newTypes = new Set(results.map((r) => r.type));
+  const mergedSummary = [
+    ...existingSummary.filter((s) => !newTypes.has(s.type as string)),
+    ...results.map((r) => ({
+      type: r.type,
+      totalItems: r.totalItems,
+      coveredItems: r.coveredItems,
+      coveragePercent: r.coveragePercent,
+    })),
+  ];
+  const mergedDetails: Record<string, unknown> = {
+    ...existingDetails,
+    ...results.reduce<Record<string, unknown>>((acc, r) => {
       acc[r.type] = r.details;
       return acc;
     }, {}),
+  };
+
+  const payload: Record<string, unknown> = {
+    generatedAt: new Date().toISOString(),
+    summary: mergedSummary,
+    details: mergedDetails,
   };
 
   if (observability) {
@@ -79,7 +109,6 @@ function writeJson(
     };
   }
 
-  const outPath = path.join(reportsDir, 'coverage-summary.json');
   fs.writeFileSync(outPath, JSON.stringify(payload, null, 2), 'utf-8');
 }
 

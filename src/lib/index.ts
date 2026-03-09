@@ -25,8 +25,36 @@ export {
   normalizeTrivyOutput,
   normalizeZapOutput,
 } from '../security/index';
-export type { SecurityScanMetricsSummary } from '../observability';
-export { recordSecurityScanMetrics } from '../observability';
+export type { SecurityScanMetricsSummary, IntelligenceMetricsSummary } from '../observability';
+export { recordSecurityScanMetrics, recordIntelligenceMetrics } from '../observability';
+
+// Re-export coverage intelligence engine
+export type {
+  FunctionalFinding,
+  MissingTestRecommendation,
+  IntelligenceInput,
+  IntelligenceReport,
+  IntelligenceSummary,
+  RiskScoreComponents,
+  RiskBand,
+  Severity,
+  RecommendationPriority,
+  RecommendedTestType,
+  FindingCategory,
+  FindingSource,
+} from '../intelligence/index';
+export {
+  runIntelligenceEngine,
+  computeRiskScore,
+  scoreToRiskBand,
+  scoreToPriority,
+  runLinkageEngine,
+  buildRecommendationFromFinding,
+  writeIntelligenceReports,
+  renderCoverageIntelligenceMd,
+  renderMissingTestsMd,
+  renderRiskPrioritizationMd,
+} from '../intelligence/index';
 
 // Re-export summary engine
 export { generateBuildSummary, generatePrSummary } from '../summary/index';

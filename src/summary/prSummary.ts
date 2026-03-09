@@ -19,10 +19,13 @@ import {
   renderCoverageSection,
   renderSecurityScanSection,
   renderAiSummary,
+  renderIntelligenceSection,
   statusBadge,
   pct,
   tableRow,
+  metricStatusCell,
 } from './markdownRenderer';
+import { evaluateMetrics } from './evaluateMetrics';
 
 // ─── PR summary generator ─────────────────────────────────────────────────────
 
@@ -51,23 +54,18 @@ export async function generatePrSummary(
   if (input.buildId) lines.push(`Build \`${input.buildId}\``);
   lines.push('');
 
-  // Compact coverage table
+  // Compact coverage table — uses evaluated metrics for correct PASS/FAIL/N/A/SKIPPED
   if (input.results.length > 0) {
+    const evaluatedMetrics = evaluateMetrics(
+      input.results,
+      input.thresholds ?? {},
+      input.qualityGate,
+    );
     lines.push('| Category | Coverage | Status |');
     lines.push('|---|---|---|');
-    for (const r of input.results) {
-      const threshold = input.thresholds?.[r.type];
-      const gateEvaluated = threshold !== undefined;
-      const failed = input.qualityGate?.failures.some((f) => f.category === r.type) ?? false;
-      const zeroCoverage = r.coveragePercent === 0;
-      const status = !gateEvaluated
-        ? '—'
-        : failed
-          ? '❌ FAIL'
-          : zeroCoverage
-            ? '⚠️ PASS'
-            : '✅ PASS';
-      lines.push(`| ${r.type} | ${pct(r.coveragePercent)} | ${status} |`);
+    for (const m of evaluatedMetrics) {
+      const coverageCell = m.applicable ? pct(m.coveragePercent) : '—';
+      lines.push(`| ${m.category} | ${coverageCell} | ${metricStatusCell(m.status)} |`);
     }
     lines.push('');
   }
@@ -79,6 +77,17 @@ export async function generatePrSummary(
       gatePassed === undefined ? '—' : gatePassed ? '✅ PASS' : '❌ FAIL';
     lines.push(`**Security scan findings:** ${input.securityScan.totalFindings} total`);
     lines.push(`**Security gate:** ${gateStatus}`);
+    lines.push('');
+  }
+
+  // Intelligence summary row if present
+  if (input.intelligenceSummary) {
+    const intel = input.intelligenceSummary;
+    const p0 = intel.recommendationsByPriority['P0'] ?? 0;
+    const p1 = intel.recommendationsByPriority['P1'] ?? 0;
+    const criticalFlag = p0 > 0 ? ' ⚠️' : '';
+    lines.push(`**Coverage Intelligence:**${criticalFlag} ${intel.totalFindings} finding(s), ${intel.totalRecommendations} recommendation(s) (P0: ${p0}, P1: ${p1})`);
+    lines.push(`**Max risk score:** ${intel.maxRiskScore} | **Critical uncovered:** ${intel.criticalUncoveredItems}`);
     lines.push('');
   }
 
@@ -170,6 +179,18 @@ function buildPrSections(input: SummaryInput): SummarySection[] {
     });
   }
 
+  // Coverage Intelligence section
+  if (input.intelligenceSummary) {
+    sections.push({
+      id: 'coverage-intelligence',
+      title: 'Coverage Intelligence',
+      included: true,
+      gateEvaluated: false,
+      passed: undefined,
+      markdown: renderIntelligenceSection(input.intelligenceSummary),
+    });
+  }
+
   return sections;
 }
 
@@ -195,6 +216,16 @@ function buildPrJsonSummary(input: SummaryInput, sections: SummarySection[]): un
       gateEvaluated: s.gateEvaluated,
       passed: s.passed,
     })),
+    intelligence: input.intelligenceSummary
+      ? {
+          totalFindings: input.intelligenceSummary.totalFindings,
+          totalRecommendations: input.intelligenceSummary.totalRecommendations,
+          maxRiskScore: input.intelligenceSummary.maxRiskScore,
+          criticalUncoveredItems: input.intelligenceSummary.criticalUncoveredItems,
+          unprotectedSecurityFindings: input.intelligenceSummary.unprotectedSecurityFindings,
+          recommendationsByPriority: input.intelligenceSummary.recommendationsByPriority,
+        }
+      : undefined,
   };
 }
 

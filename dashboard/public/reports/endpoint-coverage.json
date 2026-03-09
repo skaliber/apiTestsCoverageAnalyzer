@@ -1,0 +1,336 @@
+{
+  "total": 15,
+  "covered": 14,
+  "percentage": 93.33,
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/wallets",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/wallets/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".get(`/wallets/${walletId}`"
+        }
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/wallets/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".delete(`/wallets/${walletAId}`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".delete(`/wallets/${walletId}`"
+        }
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/wallets/{id}/freeze",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".patch(`/wallets/${walletAId}/freeze`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".patch(`/wallets/${walletId}/freeze`"
+        }
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/wallets/{id}/unfreeze",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".patch(`/wallets/${walletAId}/unfreeze`"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".patch(`/wallets/${walletId}/unfreeze`"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/fund",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${walletAId}/fund`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${walletId}/fund`"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/debit",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${walletAId}/debit`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${walletId}/debit`"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/wallets/{id}/transfer",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/wallets.blackbox.test.ts",
+        "tests/integration/wallets.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${walletAId}/transfer`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/wallets/${fromId}/transfer`"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/payments",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/payments/{id}",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".get(`/payments/${paymentId}`"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/payments/{id}/refund",
+      "covered": true,
+      "testFiles": [
+        "tests/blackbox/payments.blackbox.test.ts",
+        "tests/integration/payments.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/payments/${createRes.body.id}/refund`"
+        },
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        },
+        {
+          "resolutionType": "string-template",
+          "confidence": "medium",
+          "rawCall": ".post(`/payments/${paymentId}/refund`"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/transactions",
+      "covered": false,
+      "testFiles": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/users",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/users.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/products",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/products.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    }
+  ]
+}

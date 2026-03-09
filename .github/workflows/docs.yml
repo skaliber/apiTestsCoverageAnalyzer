@@ -138,13 +138,13 @@ jobs:
         working-directory: dashboard
 
       - name: Start dashboard preview server
-        run: npm run preview &
+        run: npm run preview -- --host 127.0.0.1 &
         working-directory: dashboard
         env:
           NODE_ENV: production
 
       - name: Wait for dashboard preview server
-        run: npx wait-on http://localhost:4173 --timeout 30000
+        run: npx wait-on http://127.0.0.1:4173 --timeout 30000
 
       - name: Run Cypress dashboard tests
         run: npm run dashboard:test

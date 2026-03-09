@@ -17,6 +17,14 @@ A CLI tool that measures how thoroughly your test suite exercises your API surfa
 
 The answers appear in rich **HTML**, **JSON**, **CSV**, and **JUnit** reports that can be enforced as pass/fail gates in any CI pipeline.
 
+### Coverage Intelligence
+
+Beyond raw percentages, the **Coverage Intelligence** engine answers:
+
+> **What is missing? What matters most? What should be tested next?**
+
+It identifies **functional findings**, links them to **missing test recommendations**, assigns **risk scores** (0–100), and prioritises work as **P0/P1/P2/P3**.  Outputs are AI-friendly markdown — ready for LLM consumption or CI gating.
+
 ---
 
 ## Table of Contents
@@ -260,45 +268,128 @@ Summary files are always generated – even when the gate fails.
 | `perf-resilience-coverage` | Load-test SLA + resilience patterns | `--spec`, `--load-results` |
 | `compatibility-check` | Breaking changes + Pact contract violations | `--old-spec`, `--new-spec` |
 | `generate-md-report` | Markdown summary from JSON reports | `--reports`, `--output` |
+| `coverage-intelligence` | Identify findings, missing tests, risk scores, P0–P3 priorities | `--reports-dir`, `--out-dir` |
 
 All commands accept `--format json,html,csv,junit` and `--threshold-*` flags.
 
-## Configuration
+### Coverage Intelligence (`coverage-intelligence`)
 
-Create a `coverage.config.json` in your project root:
+The intelligence command ingests all coverage reports and produces prioritised, AI-friendly outputs:
 
-```json
-{
-  "thresholds": {
-    "endpoint":    80,
-    "parameter":   70,
-    "business":    60,
-    "integration": 50,
-    "security":    60,
-    "error":       50,
-    "performance": 75,
-    "resilience":  50
-  },
-  "summary": {
-    "enabled": true,
-    "generatePrSummary": true,
-    "generateBuildSummary": true,
-    "generateAiSummary": true,
-    "includeOnlyEvaluatedSections": false,
-    "publishPrComment": true,
-    "publishGithubStepSummary": true,
-    "publishJenkinsSummary": true
-  },
-  "exclude": {
-    "paths":   ["/internal/*"],
-    "methods": ["OPTIONS"]
-  },
-  "testPatterns": ["tests/**/*.ts"],
-  "plugins":    ["./plugins/graphql-coverage.js"]
-}
+```bash
+# Generate intelligence reports after running other coverage commands
+api-coverage coverage-intelligence \
+  --reports-dir reports \
+  --out-dir     reports \
+  --project-name my-api \
+  --languages   typescript \
+  --frameworks  jest
 ```
 
-CLI flags override config file values.
+**Generated files:**
+
+| File | Description |
+|------|-------------|
+| `reports/coverage-intelligence.json` | Full intelligence report (findings + recommendations) |
+| `reports/coverage-intelligence.md` | AI-friendly summary with top 10 findings and recommendations |
+| `reports/missing-tests-recommendations.json` | Prioritised missing test recommendations |
+| `reports/missing-tests-recommendations.md` | Markdown recommendations per recommendation |
+| `reports/risk-prioritization.json` | Risk breakdown by score, category, and endpoint |
+| `reports/risk-prioritization.md` | Risk prioritisation narrative |
+
+**Functional Findings** map gaps in coverage to specific root causes (e.g. "no auth test on DELETE /users/{id}").  
+**Missing Test Recommendations** are prioritised P0–P3 by a risk formula:
+
+```
+Risk Score =
+  0.30 × SeverityWeight +
+  0.20 × ExposureWeight +
+  0.15 × CriticalityWeight +
+  0.15 × MissingCoverageWeight +
+  0.10 × SecuritySignalWeight +
+  0.05 × FlowImpactWeight +
+  0.05 × ChangeVolatilityWeight
+```
+
+| Score | Risk Band | Priority |
+|-------|-----------|---------|
+| 85–100 | Critical | P0 — immediate action |
+| 70–84 | Critical | P1 — high urgency |
+| 50–69 | High | P2 — address soon |
+| 0–49 | Moderate/Low | P3 — backlog |
+
+Security findings, money-movement endpoints, and auth/authz gaps are never rated below P1 regardless of formula score.
+
+## Configuration
+
+Create a `config.yaml` at your project root. Running `analyze` with no arguments discovers this
+file automatically. If it is absent the analyzer runs the full default profile and emits a warning.
+
+```yaml
+version: 1
+
+project:
+  name: my-api
+
+analysis:
+  defaultMode: full
+
+scans:
+  coverage:
+    enabled: true
+    types:
+      - endpoint
+      - parameter
+      - business
+      - integration
+      - error
+      - security
+      - performance
+      - compatibility
+  security:
+    enabled: true
+    scanners:
+      - semgrep
+      - trivy
+      - zap
+  intelligence:
+    enabled: true
+    types:
+      - ai-summary
+      - risk-prioritization
+      - recommendations
+      - scanner-interpretation
+
+thresholds:
+  global: 80
+  endpoint: 90
+
+qualityGate:
+  enabled: true
+  mode: warn
+
+reports:
+  outputDir: reports
+  formats:
+    - json
+    - html
+
+mcp:
+  enabled: false
+```
+
+Use `--config <path>` to load an arbitrary YAML file:
+
+```bash
+analyze --config ./configs/staging.yaml
+```
+
+See [`docs/guides/configuration.md`](docs/guides/configuration.md) for the full field reference.
+If you are migrating from `coverage.config.json`, see
+[`docs/guides/migration-to-config-yaml.md`](docs/guides/migration-to-config-yaml.md).
+
+CLI threshold flags (`--threshold-endpoint`, etc.) still work but are deprecated. Migrate
+values to the `thresholds` block in `config.yaml`.
 
 ## Built-in Summary Engine
 
@@ -320,10 +411,8 @@ are automatically written to the configured `--reports-dir`:
 ### Gate-aware inclusion
 
 Sections are included only when the analyzer ran or a threshold was configured.
-Analyzers that did not run are silently omitted – no empty sections appear.
-
-Set `includeOnlyEvaluatedSections: true` in `coverage.config.json` to omit even
-analyzers that ran but have no threshold configured.
+Analyzers that did not run are silently omitted — no empty sections appear.
+Control enabled scan types via `scans.coverage.types` in `config.yaml`.
 
 ### Public API
 
@@ -398,68 +487,140 @@ Documentation sections:
 | [Installation](docs/guide/installation.md) | Detailed setup steps |
 | [CLI Reference](docs/reference/cli.md) | All commands and options |
 | [Multi-Language Support](docs/guide/multi-language.md) | Java, Kotlin, Python, Ruby, Cucumber test suites |
+| [Coverage Intelligence](docs/guide/coverage-intelligence.md) | Findings, risk scoring, missing test recommendations |
 | [Architecture](docs/reference/architecture.md) | Module design and data flow |
 | [CI/CD Integration](docs/guide/ci-cd.md) | GitHub Actions & Jenkins |
 | [Interpreting Reports](docs/guide/interpreting-reports.md) | Reading each report type |
 | [Writing Effective Tests](docs/guide/writing-tests.md) | Test best practices |
 | [Extending via Plugins](docs/guide/plugins.md) | Custom coverage types |
-| [Configuration Schema](docs/reference/configuration.md) | `coverage.config.json` reference |
+| [Configuration Reference](docs/guides/configuration.md) | `config.yaml` field reference |
 | [Troubleshooting](docs/guide/troubleshooting.md) | Common issues & FAQ |
 | [Glossary](docs/guide/glossary.md) | Key terms |
 | [Contributing](docs/reference/contributing.md) | How to contribute |
 
-## Coverage Analysis (Self-Analysis)
+## TypeScript Example Project
 
-The analyzer can run against its own sample spec and test suite to produce coverage reports. This
-is the recommended way to validate that the analyzer itself remains well-tested on every build.
+A complete end-to-end example is available under [`examples/typescript/`](examples/typescript/).
 
-### Running locally
+This is a realistic **Wallets / Payments API** that demonstrates the analyzer in a real project context.
+
+### Domain
+
+| Concept | Description |
+|---------|-------------|
+| Wallets | Create, fund, debit, transfer, freeze/unfreeze, close |
+| Payments | Create, process, refund, track status |
+| Transactions | Ledger-style history |
+| Risk / Limits | Daily limits, currency checks, idempotency |
+| External deps | Payment processor + Fraud engine (nock-mocked) |
+
+### Test layers
+
+| Layer | Location | What it tests |
+|-------|----------|---------------|
+| Unit | `tests/unit/` | Service logic, risk rules, validation |
+| Integration | `tests/integration/` | Routes, auth, supertest end-to-end |
+| Blackbox | `tests/blackbox/` | Positive/negative/boundary/idempotency via HTTP |
+| WireMock/nock | `tests/wiremock/` | External dependency healthy / failed / timeout |
+
+### Running the example
 
 ```bash
-# Build the library first, then run the coverage script
-npm run build
-npm run coverage
+cd examples/typescript
+npm install
+npm test            # all 63 tests
+npm run analyze     # run the analyzer + generate reports
+npm run screenshots # capture Playwright screenshots
 ```
 
-Reports are written to the `reports/` directory:
+### CI/CD demonstrations
+
+| CI System | Location | What it does |
+|-----------|----------|-------------|
+| GitHub Actions | `.github/workflows/ci.yml` | Install, test, analyze, screenshots, upload artifacts |
+| Jenkins | `ci/jenkins/Jenkinsfile` | Install, test, analyze, archive reports, surface gate failures |
+
+### Observability
+
+```bash
+cd examples/typescript/observability
+docker-compose up   # starts Prometheus + Grafana
+# Grafana at http://localhost:3000 — dashboards pre-configured
+```
+
+### Intentional coverage gaps
+
+The example intentionally omits some test scenarios so the intelligence engine generates meaningful findings:
+
+- Frozen wallet debit scenario (not tested)
+- Daily $10,000 limit enforcement (not tested)
+- Currency mismatch in transfer (not tested)
+- Refund after 30-day window (not tested)
+- Payment processor failure fallback (not tested)
+
+## Self-Analysis
+
+The analyzer is a **self-analyzing system**: on every build it runs all implemented metric types
+against its own codebase, enforces 100% thresholds, and fails automatically if any metric falls
+below threshold.
+
+### Quick start
+
+```bash
+make install               # Install dependencies
+make build                 # Compile TypeScript
+make self-analysis-all     # Run all 8 metric types + intelligence engine
+```
+
+Or run the full CI pipeline:
+
+```bash
+make ci    # install → build → test → self-analysis-all → summary
+```
+
+### Self-analysis input artifacts
+
+| Artifact | Path | Purpose |
+|---|---|---|
+| OpenAPI spec | `openapi.self-analysis.yaml` | Analyzer CLI/library API surface |
+| Business rules | `business-rules.self-analysis.yaml` | One rule per documented capability (19 rules) |
+| Integration flows | `integration-flows.self-analysis.yaml` | Key usage sequences (5 flows) |
+| Perf data | `load-results.self-analysis.json` | Reference data for performance metric |
+| Config | `coverage.self-analysis.json` | 100% thresholds across all metrics |
+
+### Reports
+
+All reports are written to `reports/` after each run:
 
 | File | Contents |
-|------|----------|
-| `reports/coverage-summary.json` | Combined summary across all coverage types |
-| `reports/endpoint-coverage*.json/html` | Endpoint coverage details |
-| `reports/parameter-coverage*.json/html` | Parameter coverage details |
-| `reports/business-coverage*.json/html` | Business rule coverage details |
-| `reports/integration-coverage*.json/html` | Integration flow coverage details |
-| `reports/error-coverage*.json/html` | Error handling coverage details |
-| `reports/security-coverage*.json/html` | Security coverage details |
-| `reports/perf-resilience-coverage*.json/html` | Performance & resilience coverage details |
+|---|---|
+| `reports/endpoint-report.json/html` | Endpoint coverage |
+| `reports/parameter-report.json/html` | Parameter coverage |
+| `reports/business-report.json/html` | Business rule coverage |
+| `reports/integration-report.json/html` | Integration flow coverage |
+| `reports/error-report.json/html` | Error scenario coverage |
+| `reports/security-report.json/html` | Security control coverage |
+| `reports/perf-resilience-report.json/html` | Performance/resilience coverage |
+| `reports/coverage-intelligence.json` | Intelligence findings + risk scores |
+| `reports/pr-summary.md` | PR comment summary |
+| `reports/build-summary.md` | Build log summary |
+
+### Thresholds
+
+All self-analysis thresholds default to **100%**. Override via environment variables for development:
+
+```bash
+THRESHOLD_ENDPOINT=80 make self-analysis-endpoint
+```
+
+See [docs/guides/thresholds.md](docs/guides/thresholds.md) for full threshold documentation.
 
 ### CI integration
 
-The `build` job in `.github/workflows/test-action.yml` automatically runs `npm run coverage` after
-unit tests and uploads the resulting `reports/` directory as the `coverage-reports` artifact.
+The `.github/workflows/self-analysis.yml` workflow runs on every push and pull request.
+All steps call Makefile targets. Pass/fail is governed by the analyzer's process exit code only.
 
-### Adjusting thresholds
-
-Pass `--threshold-*` flags via the CLI or set thresholds in `coverage.config.json`:
-
-```json
-{
-  "thresholds": {
-    "endpoint":    80,
-    "parameter":   70,
-    "business":    60,
-    "integration": 50,
-    "security":    60,
-    "error":       50,
-    "performance": 75,
-    "resilience":  50
-  }
-}
-```
-
-The `npm run coverage` script respects threshold values supplied via environment variables
-(e.g. `THRESHOLD_ENDPOINT=80 npm run coverage`); the CI job will fail when any threshold is not met.
+See [docs/guides/self-analysis.md](docs/guides/self-analysis.md) for the full self-analysis guide.
 
 ## Contributing
 

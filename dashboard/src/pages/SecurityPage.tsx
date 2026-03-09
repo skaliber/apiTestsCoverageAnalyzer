@@ -1,6 +1,7 @@
 import { useCoverage } from '../context/CoverageContext';
 import DetailPage from './DetailPage';
 import { generateSecuritySummary } from '../utils/markdownSummaries';
+import { useIntelligence } from '../context/IntelligenceContext';
 
 const columns = [
   { key: 'id', label: 'Security Check' },
@@ -10,6 +11,7 @@ const columns = [
 
 export default function SecurityPage() {
   const { report } = useCoverage();
+  const { findingsFor, recommendationsFor } = useIntelligence();
   const aiSummary = report ? generateSecuritySummary(report) : undefined;
   return (
     <DetailPage
@@ -17,6 +19,9 @@ export default function SecurityPage() {
       section={report?.details?.security}
       columns={columns}
       aiSummary={aiSummary}
+      coverageType="security"
+      intelligenceFindings={findingsFor('security')}
+      intelligenceRecommendations={recommendationsFor('security')}
     />
   );
 }

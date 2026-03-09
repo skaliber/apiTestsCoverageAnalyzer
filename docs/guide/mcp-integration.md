@@ -29,7 +29,7 @@ MCP integration is **optional and disabled by default**. When disabled, the buil
 
 ## Configuration
 
-Add an `mcp` block to your `coverage.config.json`:
+Add an `mcp` block to your `config.yaml`:
 
 ```json
 {
@@ -58,6 +58,11 @@ Add an `mcp` block to your `coverage.config.json`:
       },
       "compatibilityAnalysis": {
         "enabled": false
+      },
+      "intelligenceAnalysis": {
+        "enabled": true,
+        "transport": "http",
+        "url": "http://localhost:3000/mcp"
       }
     }
   }
@@ -127,6 +132,7 @@ Each server corresponds to an analysis category:
 | `securityScan` | Security scanning |
 | `performanceAnalysis` | Performance & resilience |
 | `compatibilityAnalysis` | Compatibility & contracts |
+| `intelligenceAnalysis` | Coverage Intelligence findings & recommendations |
 
 Set `enabled: false` on any server to use the fallback interpreter for that category only.
 
@@ -305,6 +311,23 @@ const ciAnalysis = await mcp.analyzeCiSummary({
   branch,
   commitSha,
   buildId,
+});
+
+// Analyze Coverage Intelligence output
+const intelAnalysis = await mcp.analyzeIntelligence({
+  totalFindings,
+  totalRecommendations,
+  maxRiskScore,
+  avgRiskScore,
+  criticalUncoveredItems,
+  unprotectedSecurityFindings,
+  recommendationsByPriority,   // e.g. { P0: 2, P1: 3, P2: 1, P3: 0 }
+  topFindings,                 // top FunctionalFinding objects
+  topRecommendations,          // top MissingTestRecommendation objects
+  languages,                   // e.g. ['typescript']
+  frameworks,                  // e.g. ['jest']
+  projectName,
+  branch,
 });
 
 // Render to markdown/HTML

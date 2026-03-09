@@ -112,15 +112,15 @@ test-e2e: ## Run all Cypress end-to-end tests (docs + dashboard)
 
 test-e2e-docs: ## Run Cypress docs link tests (mirrors CI test-links job)
 	$(NPM) run docs:build
-	$(NPM) run docs:preview &
+	$(NPM) run docs:preview > /dev/null 2>&1 &
 	npx wait-on http://localhost:4173/apiTestsCoverageAnalyzer --timeout 30000
-	unset ELECTRON_RUN_AS_NODE && $(NPM) run docs:test; EXIT=$$?; pkill -f "vite preview" 2>/dev/null || true; exit $$EXIT
+	unset ELECTRON_RUN_AS_NODE && $(NPM) run docs:test; EXIT=$$?; kill $$(lsof -t -i tcp:4173 2>/dev/null) 2>/dev/null || true; exit $$EXIT
 
 test-e2e-dashboard: ## Run Cypress dashboard tests (mirrors CI test-dashboard job)
 	cd dashboard && $(NPM) run build
-	cd dashboard && $(NPM) run preview -- --host 127.0.0.1 &
+	cd dashboard && $(NPM) run preview -- --host 127.0.0.1 > /dev/null 2>&1 &
 	npx wait-on http://127.0.0.1:4173 --timeout 30000
-	unset ELECTRON_RUN_AS_NODE && $(NPM) run dashboard:test; EXIT=$$?; pkill -f "vite preview" 2>/dev/null || true; exit $$EXIT
+	unset ELECTRON_RUN_AS_NODE && $(NPM) run dashboard:test; EXIT=$$?; kill $$(lsof -t -i tcp:4173 2>/dev/null) 2>/dev/null || true; exit $$EXIT
 
 test-smoke: ## Run self-analysis smoke test
 	$(NPM) test -- --no-coverage --testPathPattern="smoke"

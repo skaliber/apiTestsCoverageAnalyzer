@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="API Coverage" tests="2" failures="0" time="0">
-  <testsuite name="Coverage Thresholds" tests="2" failures="0" time="0">
-    <testcase name="performance coverage" classname="CoverageThreshold" time="0"/>
-    <testcase name="resilience coverage" classname="CoverageThreshold" time="0"/>
-  </testsuite>
-</testsuites>

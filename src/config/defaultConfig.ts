@@ -29,6 +29,18 @@ export const DEFAULT_CONFIG: AnalyzerConfig = {
     coverage: {
       enabled: true,
       types: [...VALID_COVERAGE_TYPES],
+      deepAnalysis: {
+        enabled: true,
+        maxCallDepth: 4,
+        resolveConstants: true,
+        resolveEnums: true,
+        resolveStringTemplates: true,
+        resolveWrappers: true,
+        resolveRequestBuilders: true,
+        resolveClientMappings: true,
+        assertionAware: true,
+        clientMappings: [],
+      },
     },
     security: {
       enabled: true,

@@ -9,6 +9,10 @@ import {
   extractHttpCalls,
   extractHttpCallsFromJs,
 } from './languageDetection';
+import type { DeepAnalysisConfig } from './coverage/deep-analysis/types';
+import { DEFAULT_DEEP_ANALYSIS_CONFIG } from './coverage/deep-analysis/types';
+import { deepResolveFile } from './coverage/deep-analysis/deepEndpointResolver';
+import type { ResolutionType, ConfidenceLevel } from './coverage/deep-analysis/types';
 
 export interface Endpoint {
   method: string;
@@ -17,11 +21,27 @@ export interface Endpoint {
   pathRegex: RegExp;
 }
 
+/**
+ * Metadata for a single match between a test call and an endpoint.
+ */
+export interface EndpointMatch {
+  /** How the endpoint was resolved */
+  resolutionType: ResolutionType;
+  /** Confidence level of the resolution */
+  confidence: ConfidenceLevel;
+  /** Whether the call was followed by a response assertion */
+  assertionLinked?: boolean;
+  /** The raw call text as seen in the source file */
+  rawCall?: string;
+}
+
 export interface EndpointCoverage extends Endpoint {
   covered: boolean;
   testFiles: string[];
   /** Languages from which this endpoint is covered (populated when --language is used). */
   languages?: string[];
+  /** Deep-analysis metadata for each match (populated when deep analysis is enabled). */
+  matches?: EndpointMatch[];
 }
 
 export interface CoverageReport {
@@ -107,17 +127,107 @@ function findCoveredEndpoints(
 }
 
 /**
+ * Run deep analysis on a single file and return a set of endpoint indices
+ * that are covered along with their match metadata.
+ *
+ * Returns a Map of endpoint index → EndpointMatch[] (may be multiple matches).
+ */
+function findDeepCoveredEndpoints(
+  fileContents: string,
+  filePath: string,
+  endpoints: Endpoint[],
+  language: SupportedLanguage,
+  deepConfig: DeepAnalysisConfig,
+): Map<number, EndpointMatch[]> {
+  const deepMatches = new Map<number, EndpointMatch[]>();
+
+  const resolvedCalls = deepResolveFile(
+    fileContents,
+    filePath,
+    language === 'auto' ? 'typescript' : language,
+    deepConfig,
+  );
+
+  for (const resolved of resolvedCalls) {
+    // Try both the raw path and the normalized path against each endpoint
+    const pathsToTry = [resolved.path];
+    if (resolved.normalizedPath && resolved.normalizedPath !== resolved.path) {
+      pathsToTry.push(resolved.normalizedPath);
+    }
+
+    endpoints.forEach((endpoint, idx) => {
+      if (endpoint.method !== resolved.method) return;
+
+      for (const candidatePath of pathsToTry) {
+        // Skip if it still contains unresolved placeholders that don't match templates
+        // Accept both concrete paths matching the regex and template paths matching the spec path
+        const matchesConcrete = !candidatePath.includes('{') && endpoint.pathRegex.test(candidatePath);
+        const matchesTemplate = candidatePath === endpoint.path;
+
+        // Also try matching normalized path patterns
+        const matchesNormalized = candidatePath.includes('{') && templatePathsMatch(candidatePath, endpoint.path);
+
+        if (matchesConcrete || matchesTemplate || matchesNormalized) {
+          const match: EndpointMatch = {
+            resolutionType: resolved.resolutionType,
+            confidence: resolved.confidence,
+            assertionLinked: resolved.assertionLinked,
+            rawCall: resolved.rawCall,
+          };
+
+          const existing = deepMatches.get(idx);
+          if (existing) {
+            // Avoid duplicate resolution types for same endpoint
+            const isDuplicate = existing.some(
+              (m) => m.resolutionType === match.resolutionType && m.confidence === match.confidence,
+            );
+            if (!isDuplicate) existing.push(match);
+          } else {
+            deepMatches.set(idx, [match]);
+          }
+          break;
+        }
+      }
+    });
+  }
+
+  return deepMatches;
+}
+
+/**
+ * Compare two OpenAPI-style path templates for structural equivalence.
+ * e.g. /users/{id} matches /users/{userId}
+ */
+function templatePathsMatch(a: string, b: string): boolean {
+  const partsA = a.split('/');
+  const partsB = b.split('/');
+  if (partsA.length !== partsB.length) return false;
+  return partsA.every((seg, i) => {
+    const segB = partsB[i]!;
+    // Both are params → match
+    if (/^\{.+\}$/.test(seg) && /^\{.+\}$/.test(segB)) return true;
+    // One is param, other isn't
+    if (/^\{.+\}$/.test(seg) || /^\{.+\}$/.test(segB)) return false;
+    return seg === segB;
+  });
+}
+
+/**
  * Analyse test files matching the given glob pattern and determine which
  * endpoints from the spec are covered.
  *
  * When `languages` is supplied the appropriate language-specific HTTP-call
  * extractor is used for each file (based on its extension when `languages`
  * contains `'auto'`, or the first matching language otherwise).
+ *
+ * When `deepAnalysisConfig` is supplied (and enabled), the deep analysis
+ * layer is also run to catch indirect calls (constants, templates, wrappers, etc.).
  */
 export async function analyzeTestCoverage(
   endpoints: Endpoint[],
   testGlob: string,
   languages?: SupportedLanguage[],
+  deepAnalysisConfig?: DeepAnalysisConfig,
 ): Promise<EndpointCoverage[]> {
   const testFiles = await fg(testGlob, { onlyFiles: true });
 
@@ -126,7 +236,10 @@ export async function analyzeTestCoverage(
     covered: false,
     testFiles: [],
     languages: [],
+    matches: [],
   }));
+
+  const deepConfig: DeepAnalysisConfig = deepAnalysisConfig ?? DEFAULT_DEEP_ANALYSIS_CONFIG;
 
   for (const filePath of testFiles) {
     const contents = fs.readFileSync(filePath, 'utf-8');
@@ -141,14 +254,54 @@ export async function analyzeTestCoverage(
       lang = detectLanguageFromExtension(filePath) ?? undefined;
     }
 
-    const coveredIndices = findCoveredEndpoints(contents, endpoints, lang);
     const fileLanguage = lang ?? 'javascript';
 
-    for (const idx of coveredIndices) {
+    // ── Direct regex-based coverage detection ─────────────────────────────
+    const directCoveredIndices = findCoveredEndpoints(contents, endpoints, lang);
+
+    for (const idx of directCoveredIndices) {
       coverageMap[idx].covered = true;
-      coverageMap[idx].testFiles.push(filePath);
+      if (!coverageMap[idx].testFiles.includes(filePath)) {
+        coverageMap[idx].testFiles.push(filePath);
+      }
       if (!coverageMap[idx].languages!.includes(fileLanguage)) {
         coverageMap[idx].languages!.push(fileLanguage);
+      }
+      // Record as a direct match
+      const alreadyHasDirect = coverageMap[idx].matches?.some((m) => m.resolutionType === 'direct');
+      if (!alreadyHasDirect) {
+        coverageMap[idx].matches!.push({ resolutionType: 'direct', confidence: 'high' });
+      }
+    }
+
+    // ── Deep analysis coverage detection ──────────────────────────────────
+    if (deepConfig.enabled) {
+      const deepCovered = findDeepCoveredEndpoints(
+        contents,
+        filePath,
+        endpoints,
+        fileLanguage as SupportedLanguage,
+        deepConfig,
+      );
+
+      for (const [idx, matches] of deepCovered.entries()) {
+        // Skip if already covered by direct detection (don't downgrade)
+        coverageMap[idx].covered = true;
+        if (!coverageMap[idx].testFiles.includes(filePath)) {
+          coverageMap[idx].testFiles.push(filePath);
+        }
+        if (!coverageMap[idx].languages!.includes(fileLanguage)) {
+          coverageMap[idx].languages!.push(fileLanguage);
+        }
+        for (const match of matches) {
+          // Don't add duplicate match entries
+          const isDuplicate = coverageMap[idx].matches!.some(
+            (m) => m.resolutionType === match.resolutionType && m.rawCall === match.rawCall,
+          );
+          if (!isDuplicate) {
+            coverageMap[idx].matches!.push(match);
+          }
+        }
       }
     }
   }
@@ -168,42 +321,63 @@ export function buildCoverageReport(coverageMap: EndpointCoverage[]): CoverageRe
 
 /**
  * Write JSON and HTML coverage reports to the given directory.
+ *
+ * The JSON report includes deep-analysis match metadata per endpoint.
+ * The HTML report shows resolution type and confidence badges.
  */
 export function generateReports(report: CoverageReport, reportsDir: string): void {
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
 
-  // JSON report
+  // ── JSON report ──────────────────────────────────────────────────────────
   const jsonPath = path.join(reportsDir, 'endpoint-coverage.json');
   const jsonReport = {
     total: report.total,
     covered: report.covered,
     percentage: report.percentage,
-    endpoints: report.endpoints.map(({ method, path: p, covered, testFiles, languages }) => ({
+    endpoints: report.endpoints.map(({ method, path: p, covered, testFiles, languages, matches }) => ({
       method,
       path: p,
       covered,
       testFiles,
       ...(languages && languages.length > 0 ? { languages } : {}),
+      ...(matches && matches.length > 0 ? { matches } : {}),
     })),
   };
   fs.writeFileSync(jsonPath, JSON.stringify(jsonReport, null, 2), 'utf-8');
 
-  // HTML report
+  // ── HTML report ──────────────────────────────────────────────────────────
   const htmlPath = path.join(reportsDir, 'endpoint-coverage.html');
   const rows = report.endpoints
-    .map(({ method, path: p, covered, testFiles, languages }) => {
+    .map(({ method, path: p, covered, testFiles, languages, matches }) => {
       const rowClass = covered ? 'covered' : 'uncovered';
-      const status = covered ? '✅ Covered' : '❌ Not covered';
-      const files = testFiles.length > 0 ? testFiles.join('<br>') : '—';
-      const langs = languages && languages.length > 0 ? languages.join(', ') : '—';
+      const status = covered ? '&#10003; Covered' : '&#10007; Not covered';
+      const files = testFiles.length > 0 ? testFiles.join('<br>') : '&mdash;';
+      const langs = languages && languages.length > 0 ? languages.join(', ') : '&mdash;';
+
+      // Resolution type + confidence badges
+      let matchBadges = '&mdash;';
+      if (matches && matches.length > 0) {
+        const uniqueTypes = [...new Set(matches.map((m) => m.resolutionType))];
+        matchBadges = uniqueTypes
+          .map((rt) => {
+            const bestMatch = matches.find((m) => m.resolutionType === rt);
+            const conf = bestMatch?.confidence ?? 'medium';
+            const assertLinked = bestMatch?.assertionLinked ? ' &#10003;' : '';
+            const confClass = conf === 'high' ? 'conf-high' : conf === 'medium' ? 'conf-medium' : 'conf-low';
+            return `<span class="badge badge-${rt}">${rt}</span> <span class="${confClass}">${conf}${assertLinked}</span>`;
+          })
+          .join(' ');
+      }
+
       return `    <tr class="${rowClass}">
       <td>${method}</td>
       <td>${p}</td>
       <td>${status}</td>
       <td>${files}</td>
       <td>${langs}</td>
+      <td>${matchBadges}</td>
     </tr>`;
     })
     .join('\n');
@@ -222,6 +396,20 @@ export function generateReports(report: CoverageReport, reportsDir: string): voi
     th { background: #f0f0f0; }
     tr.covered { background: #e6ffe6; }
     tr.uncovered { background: #ffe6e6; }
+    .badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px;
+             font-size: 0.75rem; font-weight: 600; color: #fff;
+             background: #555; margin-right: 0.2rem; }
+    .badge-direct { background: #2a9d8f; }
+    .badge-constant { background: #457b9d; }
+    .badge-enum { background: #6a4c93; }
+    .badge-string-template { background: #e9c46a; color: #333; }
+    .badge-wrapper-method { background: #e76f51; }
+    .badge-request-builder { background: #264653; }
+    .badge-client-mapping { background: #c77dff; }
+    .badge-heuristic { background: #aaa; }
+    .conf-high { color: #2a9d8f; font-weight: 600; font-size: 0.8rem; }
+    .conf-medium { color: #e9c46a; font-weight: 600; font-size: 0.8rem; }
+    .conf-low { color: #e76f51; font-weight: 600; font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -238,6 +426,7 @@ export function generateReports(report: CoverageReport, reportsDir: string): voi
         <th>Status</th>
         <th>Test Files</th>
         <th>Languages</th>
+        <th>Resolution</th>
       </tr>
     </thead>
     <tbody>

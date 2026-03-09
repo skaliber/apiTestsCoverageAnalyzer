@@ -47,9 +47,46 @@ export type IntelligenceType =
 
 export type ReportFormat = 'json' | 'html' | 'csv' | 'junit' | 'markdown';
 
+/**
+ * Configuration for the deep endpoint analysis feature.
+ * Nested under scans.coverage.deepAnalysis in config.yaml.
+ */
+export interface DeepAnalysisCoverageConfig {
+  /** Master switch. When false the engine falls back to direct regex only. */
+  enabled?: boolean;
+  /** Maximum call-chain depth to follow when tracing wrapper methods. Default: 4. */
+  maxCallDepth?: number;
+  /** Resolve named constant/variable references to their literal values. */
+  resolveConstants?: boolean;
+  /** Resolve enum member references to their literal path values. */
+  resolveEnums?: boolean;
+  /** Resolve template literals and string concatenation. */
+  resolveStringTemplates?: boolean;
+  /** Trace helper/wrapper methods to find HTTP calls. */
+  resolveWrappers?: boolean;
+  /** Detect request-builder / request-object patterns. */
+  resolveRequestBuilders?: boolean;
+  /** Apply explicit or inferred client-to-HTTP-method mapping. */
+  resolveClientMappings?: boolean;
+  /** Associate HTTP calls with downstream response assertions. */
+  assertionAware?: boolean;
+  /**
+   * Explicit client-method → HTTP mappings.
+   * Example: { classOrObject: 'userClient', method: 'getById', httpMethod: 'GET', pathTemplate: '/users/{id}' }
+   */
+  clientMappings?: Array<{
+    classOrObject: string;
+    method: string;
+    httpMethod: string;
+    pathTemplate: string;
+  }>;
+}
+
 export interface CoverageScansConfig {
   enabled?: boolean;
   types?: CoverageType[];
+  /** Deep endpoint analysis configuration. */
+  deepAnalysis?: DeepAnalysisCoverageConfig;
 }
 
 export interface SecurityScansConfig {

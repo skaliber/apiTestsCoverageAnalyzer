@@ -46,7 +46,8 @@ FORMATS       ?= json,html,csv,junit
         self-analysis-performance self-analysis-compatibility \
         self-analysis-all security-scan \
         summary pr-summary build-summary \
-        examples-analyze-all examples-analyze examples-test-structure \
+        dashboard \
+        examples-analyze-all examples-analyze examples-dashboard examples-test-structure \
         ci
 
 # ── Default target ─────────────────────────────────────────────────────────────
@@ -333,6 +334,17 @@ pr-summary: summary ## Generate PR summary markdown (alias — pr-summary.md wri
 build-summary: summary ## Generate build summary markdown (alias — build-summary.md written by coverage-summary-report)
 
 # =============================================================================
+#  DASHBOARD
+# =============================================================================
+
+dashboard: self-analysis-all summary ## Run full analysis then open the live dashboard
+	@echo "==========================================================="
+	@echo "  Starting dashboard with real reports at http://localhost:5173"
+	@echo "  Press Ctrl-C to stop."
+	@echo "==========================================================="
+	cd dashboard && $(NPM) run dev -- --mode real
+
+# =============================================================================
 #  CI ENTRYPOINT
 # =============================================================================
 
@@ -350,22 +362,69 @@ EXAMPLE ?= typescript
 examples-test-structure: ## Verify all example project directories have required files
 	$(NPM) test -- --no-coverage --testPathPattern="integration/examples"
 
-examples-analyze: build ## Run analyzer against a single example (EXAMPLE=<name>)
+examples-analyze: build ## Run full analysis against a single example (EXAMPLE=<name>)
 	@echo "Analyzing example: $(EXAMPLE)"
 	@test -d examples/$(EXAMPLE) || (echo "Example '$(EXAMPLE)' not found in examples/"; exit 1)
 	@test -f examples/$(EXAMPLE)/openapi.yaml || (echo "examples/$(EXAMPLE)/openapi.yaml not found"; exit 1)
 	@mkdir -p examples/$(EXAMPLE)/reports
 	@LANG=$$(grep -E '^  language:' examples/$(EXAMPLE)/config.yaml 2>/dev/null | head -1 | awk '{print $$2}' || echo 'typescript'); \
 	 TESTS_DIR=$$(ls -d examples/$(EXAMPLE)/tests/tests-complete examples/$(EXAMPLE)/src/test examples/$(EXAMPLE)/spec/requests/spec-complete examples/$(EXAMPLE)/features 2>/dev/null | head -1 || echo "examples/$(EXAMPLE)/tests"); \
+	 RDIR="examples/$(EXAMPLE)/reports"; \
+	 SPEC="examples/$(EXAMPLE)/openapi.yaml"; \
 	 echo "  Language: $$LANG"; \
-	 echo "  Tests: $$TESTS_DIR"; \
+	 echo "  Tests:    $$TESTS_DIR"; \
+	 echo "  Reports:  $$RDIR"; \
+	 echo "[1/7] Endpoint coverage..."; \
 	 $(ANALYZER_CMD) endpoint-coverage \
-	   --spec "examples/$(EXAMPLE)/openapi.yaml" \
-	   --tests "$$TESTS_DIR/**/*" \
-	   --language "$$LANG" \
-	   --format json,html \
-	   --output "examples/$(EXAMPLE)/reports" 2>/dev/null || true
-	@echo "Report written to examples/$(EXAMPLE)/reports/"
+	   --spec "$$SPEC" --tests "$$TESTS_DIR/**/*" \
+	   --language "$$LANG" --config "examples/$(EXAMPLE)/config.yaml" \
+	   --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 echo "[2/7] Parameter coverage..."; \
+	 $(ANALYZER_CMD) parameter-coverage \
+	   --spec "$$SPEC" --tests "$$TESTS_DIR/**/*" \
+	   --language "$$LANG" --config "examples/$(EXAMPLE)/config.yaml" \
+	   --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 echo "[3/7] Business rule coverage..."; \
+	 if [ -f "examples/$(EXAMPLE)/business-rules.yaml" ]; then \
+	   $(ANALYZER_CMD) business-coverage \
+	     --rules "examples/$(EXAMPLE)/business-rules.yaml" \
+	     --tests "$$TESTS_DIR/**/*" --language "$$LANG" \
+	     --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 else echo "  (no business-rules.yaml — skipped)"; fi; \
+	 echo "[4/7] Integration flow coverage..."; \
+	 if [ -f "examples/$(EXAMPLE)/integration-flows.yaml" ]; then \
+	   $(ANALYZER_CMD) integration-coverage \
+	     --flows "examples/$(EXAMPLE)/integration-flows.yaml" \
+	     --tests "$$TESTS_DIR/**/*" --language "$$LANG" \
+	     --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 else echo "  (no integration-flows.yaml — skipped)"; fi; \
+	 echo "[5/7] Error scenario coverage..."; \
+	 $(ANALYZER_CMD) error-coverage \
+	   --spec "$$SPEC" --tests "$$TESTS_DIR/**/*" \
+	   --language "$$LANG" --config "examples/$(EXAMPLE)/config.yaml" \
+	   --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 echo "[6/7] Security coverage..."; \
+	 $(ANALYZER_CMD) security-coverage \
+	   --spec "$$SPEC" --tests "$$TESTS_DIR/**/*" \
+	   --language "$$LANG" --config "examples/$(EXAMPLE)/config.yaml" \
+	   --format "json,html" --output "$$RDIR" 2>/dev/null || true; \
+	 echo "[7/7] Intelligence + summary..."; \
+	 $(ANALYZER_CMD) coverage-intelligence \
+	   --reports-dir "$$RDIR" --out-dir "$$RDIR" \
+	   --project-name "$(EXAMPLE)" 2>/dev/null || true; \
+	 $(ANALYZER_CMD) coverage-summary-report \
+	   --reports-dir "$$RDIR" --out-dir "$$RDIR" \
+	   --project-name "$(EXAMPLE)" 2>/dev/null || true
+	@echo "Reports written to examples/$(EXAMPLE)/reports/"
+
+examples-dashboard: build ## Run full analysis on an example then open the dashboard (EXAMPLE=<name>)
+	@test -d examples/$(EXAMPLE) || (echo "Example '$(EXAMPLE)' not found in examples/"; exit 1)
+	$(MAKE) examples-analyze EXAMPLE=$(EXAMPLE)
+	@echo "==========================================================="
+	@echo "  Starting dashboard for $(EXAMPLE) at http://localhost:5173"
+	@echo "  Press Ctrl-C to stop."
+	@echo "==========================================================="
+	cd dashboard && REPORTS_OVERRIDE="$(CURDIR)/examples/$(EXAMPLE)/reports" $(NPM) run dev -- --mode real
 
 examples-analyze-all: build ## Run analyzer against all example projects
 	@echo "==========================================================="

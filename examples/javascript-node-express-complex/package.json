@@ -15,6 +15,7 @@
     "analyze": "node scripts/run-analyzer.js",
     "analyze:initial": "node scripts/run-analyzer.js --tests tests-initial",
     "analyze:complete": "node scripts/run-analyzer.js --tests tests-complete",
+    "dashboard": "make -C ../.. examples-dashboard EXAMPLE=javascript-node-express-complex",
     "lint": "eslint src tests --ext .js"
   },
   "dependencies": {

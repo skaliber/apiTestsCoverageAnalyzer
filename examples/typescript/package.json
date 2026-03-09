@@ -14,7 +14,7 @@
     "test": "jest",
     "analyze": "bash scripts/run-analyzer.sh",
     "screenshots": "node scripts/generate-screenshots.js",
-    "dashboard": "cp -f reports/*.json ../../dashboard/public/reports/ && cd ../../dashboard && npm install --silent && npm run dev"
+    "dashboard": "npm run analyze && REPORTS_OVERRIDE=$PWD/reports npm --prefix ../../dashboard run dev -- --mode real"
   },
   "dependencies": {
     "axios": "^1.6.0",

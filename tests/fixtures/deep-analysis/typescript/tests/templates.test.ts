@@ -4,6 +4,11 @@ const BASE = '';
 const userId = '123';
 
 it('gets user by template', async () => {
+  const response = await client.get(`${BASE}/users/${userId}`);
+  expect(response.status).toBe(200);
+});
+
+it('gets user by two-step template', async () => {
   const path = `${BASE}/users/${userId}`;
   const response = await client.get(path);
   expect(response.status).toBe(200);

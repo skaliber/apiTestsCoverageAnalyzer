@@ -20,6 +20,17 @@ scans:
       - security
       - performance
       - compatibility
+    deepAnalysis:
+      enabled: true
+      maxCallDepth: 4
+      resolveConstants: true
+      resolveEnums: true
+      resolveStringTemplates: true
+      resolveWrappers: true
+      resolveRequestBuilders: true
+      resolveClientMappings: true
+      assertionAware: true
+      clientMappings: []
 
   security:
     enabled: true
@@ -75,3 +86,4 @@ dashboard:
   aiSummary:
     enabled: true
     collapsedByDefault: true
+

@@ -98,8 +98,9 @@ export function extractResponseVariables(
   }
 
   // Java/Kotlin: Type varName = ....(get|post|...)(path)
+  // Allow method calls with () in the chain: given(), spec(), etc.
   const javaPattern =
-    /\b(?:Response|HttpResponse|MockHttpServletResponse|ResponseEntity|ValidatableResponse|ExtractableResponse)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?:\w+[.\s]+)*(get|post|put|patch|delete|head|options)\s*\(\s*["'`]([^"'`]+)["'`]/gi;
+    /\b(?:Response|HttpResponse|MockHttpServletResponse|ResponseEntity|ValidatableResponse|ExtractableResponse)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?:\w+(?:\([^)]*\))?[.\s]+)*(get|post|put|patch|delete|head|options)\s*\(\s*["'`]([^"'`]+)["'`]/gi;
   while ((m = javaPattern.exec(content)) !== null) {
     results.push({ varName: m[1], method: m[2].toUpperCase(), path: m[3] });
   }

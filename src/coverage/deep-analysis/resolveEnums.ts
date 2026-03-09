@@ -71,7 +71,8 @@ export function resolveEnumToken(token: string, table: SymbolTable): string | un
  */
 export function extractTsEnumValues(content: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const enumPattern = /\benum\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\{([^}]+)\}/g;
+  // Allow {param} segments inside enum body strings (e.g. "/users/{id}")
+  const enumPattern = /\benum\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\{((?:[^{}]|\{[^}]*\})*)\}/g;
   let m: RegExpExecArray | null;
   while ((m = enumPattern.exec(content)) !== null) {
     const enumName = m[1];
@@ -92,7 +93,8 @@ export function extractTsEnumValues(content: string): Record<string, string> {
  */
 export function extractJavaEnumValues(content: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const enumBlock = /enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:implements[^{]*)?\{([^}]+)\}/gs;
+  // Allow {param} segments inside enum body strings (e.g. "/users/{id}")
+  const enumBlock = /enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:implements[^{]*)?\{((?:[^{}]|\{[^}]*\})*)\}/gs;
   let m: RegExpExecArray | null;
   while ((m = enumBlock.exec(content)) !== null) {
     const enumName = m[1];
@@ -133,8 +135,10 @@ export function extractKotlinEnumValues(content: string): Record<string, string>
  */
 export function extractPythonEnumValues(content: string): Record<string, string> {
   const result: Record<string, string> = {};
+  // Note: no \s* after colon — the \n must be left for the body group to match
+  // Use [ \t]* (not \s*) for trailing whitespace to avoid consuming next line's \n
   const enumBlock =
-    /class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*Enum[^)]*\)\s*:\s*((?:\n[ \t]+[A-Z_][A-Z0-9_]*\s*=\s*['"][^'"]+['"]\s*)+)/g;
+    /class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*Enum[^)]*\):((?:\n[ \t]+[A-Z_][A-Z0-9_]*\s*=\s*['"][^'"]+['"][ \t]*)+)/g;
   let m: RegExpExecArray | null;
   while ((m = enumBlock.exec(content)) !== null) {
     const enumName = m[1];

@@ -88,8 +88,8 @@ export function extractStringConstants(content: string): Record<string, string> 
     result[m[1]] = m[2];
   }
 
-  // Python: NAME = 'value'
-  const pyPattern = /^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*['"]([^'"\n]+)['"]/gm;
+  // Python: NAME = 'value'  (allow optional leading whitespace for indented blocks)
+  const pyPattern = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*['"]([^'"\n]+)['"]/gm;
   while ((m = pyPattern.exec(content)) !== null) {
     result[m[1]] = m[2];
   }

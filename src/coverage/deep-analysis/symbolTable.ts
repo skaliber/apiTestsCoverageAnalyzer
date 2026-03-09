@@ -23,8 +23,8 @@ import type { SymbolEntry, SymbolTable } from './types';
 export function buildSymbolTableFromJs(content: string): SymbolTable {
   const table: SymbolTable = new Map();
 
-  // Simple const/let/var assignments with a string literal value
-  const varPattern = /\b(const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*['"`]([^'"`\n]+)['"`]/g;
+  // Simple const/let/var assignments with a string literal value (allow empty strings)
+  const varPattern = /\b(const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*['"`]([^'"`\n]*)['"`]/g;
   let m: RegExpExecArray | null;
   while ((m = varPattern.exec(content)) !== null) {
     const [, kind, name, value] = m;
@@ -36,7 +36,8 @@ export function buildSymbolTableFromJs(content: string): SymbolTable {
   }
 
   // TypeScript string enum members: enum Routes { USERS = '/users' }
-  const enumPattern = /\benum\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\{([^}]+)\}/g;
+  // Allow {param} segments inside enum body strings (e.g. "/users/{id}")
+  const enumPattern = /\benum\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\{((?:[^{}]|\{[^}]*\})*)\}/g;
   while ((m = enumPattern.exec(content)) !== null) {
     const enumName = m[1];
     const body = m[2];
@@ -99,7 +100,8 @@ export function buildSymbolTableFromJava(content: string): SymbolTable {
   }
 
   // Enum constructor style: USERS("/users")
-  const enumBlock = /enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{([^}]+)\}/g;
+  // Allow {param} segments inside enum body strings (e.g. "/users/{id}")
+  const enumBlock = /enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{((?:[^{}]|\{[^}]*\})*)\}/g;
   while ((m = enumBlock.exec(content)) !== null) {
     const enumName = m[1];
     const body = m[2];
@@ -197,7 +199,9 @@ export function buildSymbolTableFromPython(content: string): SymbolTable {
   }
 
   // Enum class members: class Routes(Enum):\n    USERS = "/users"
-  const enumBlock = /class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*Enum[^)]*\)\s*:\s*((?:\n[ \t]+[A-Z_][A-Z0-9_]*\s*=\s*['"][^'"]+['"]\s*)+)/g;
+  // Note: no \s* after colon — the \n must be left for the body group to match
+  // Use [ \t]* (not \s*) for trailing whitespace to avoid consuming next line's \n
+  const enumBlock = /class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*Enum[^)]*\):((?:\n[ \t]+[A-Z_][A-Z0-9_]*\s*=\s*['"][^'"]+['"][ \t]*)+)/g;
   while ((m = enumBlock.exec(content)) !== null) {
     const enumName = m[1];
     const body = m[2];

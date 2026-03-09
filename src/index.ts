@@ -63,6 +63,8 @@ import {
   CoverageResult,
 } from './reporting';
 import { resolveConfig, mergeConfig, CoverageConfig, loadCentralConfig } from './config';
+import { DEFAULT_DEEP_ANALYSIS_CONFIG } from './coverage/deep-analysis/index';
+import type { DeepAnalysisConfig } from './coverage/deep-analysis/index';
 import {
   runSecurityScan,
   SecurityScanConfig,
@@ -310,7 +312,13 @@ program
     const endpoints = await parseOpenApiSpec(specPath);
 
     console.log(`Analyzing tests matching: ${testsGlob} (language: ${languages.join(', ')})`);
-    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, languages);
+    const analyzerCfgForDeep = loadCentralConfig(parentOpts.config as string | undefined);
+    const deepCfg = analyzerCfgForDeep.scans.coverage?.deepAnalysis;
+    const deepAnalysisConfig: DeepAnalysisConfig = {
+      ...DEFAULT_DEEP_ANALYSIS_CONFIG,
+      ...(deepCfg ?? {}),
+    };
+    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, languages, deepAnalysisConfig);
 
     const report = buildCoverageReport(coverageMap);
 

@@ -128,7 +128,7 @@ export async function analyze({ testPatterns, config }: PluginContext): Promise<
 }
 ```
 
-Compile with `tsc` and reference the compiled `.js` file in `coverage.config.json`.
+Compile with `tsc` and reference the compiled `.js` file in `config.yaml`.
 
 ## Plugin loading mechanism
 
@@ -145,5 +145,5 @@ flowchart TD
 
 ## See also
 
-- [Extending via Plugins →](/guide/plugins)
-- [Configuration Schema →](/reference/configuration)
+- [Extending via Plugins →](../guide/plugins.md)
+- [Configuration Schema →](./configuration.md)

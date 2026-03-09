@@ -62,12 +62,19 @@ import {
   checkThresholds,
   CoverageResult,
 } from './reporting';
-import { resolveConfig, mergeConfig, CoverageConfig } from './config';
+import { resolveConfig, mergeConfig, CoverageConfig, loadCentralConfig } from './config';
+import { DEFAULT_DEEP_ANALYSIS_CONFIG } from './coverage/deep-analysis/index';
+import type { DeepAnalysisConfig } from './coverage/deep-analysis/index';
+import {
+  runSecurityScan,
+  SecurityScanConfig,
+} from './security/index';
 import { runPlugins, PluginContext } from './pluginLoader';
 import {
   initLogger,
   initMetrics,
   recordCoverageMetrics,
+  recordSecurityScanMetrics,
   startMetricsServer,
   stopMetricsServer,
   initTracing,
@@ -78,6 +85,17 @@ import {
   getLogger,
   LogLevel,
 } from './observability';
+import {
+  SupportedLanguage,
+  parseLanguageOption,
+  getDefaultGlobsForLanguage,
+  SUPPORTED_LANGUAGES,
+} from './languageDetection';
+import { runIntelligenceEngine } from './intelligence/index';
+import { recordIntelligenceMetrics } from './observability';
+import { generateBuildSummary } from './summary/buildSummary';
+import { generatePrSummary } from './summary/prSummary';
+import type { SummaryInput } from './summary/markdownRenderer';
 
 const program = new Command();
 
@@ -85,7 +103,7 @@ program
   .name('api-tests-coverage-analyzer')
   .description('Analyze API test coverage based on OpenAPI specs')
   .version('0.1.0')
-  .option('--config <file>', 'Path to a coverage configuration file (default: coverage.config.json)')
+  .option('--config <file>', 'Path to a coverage configuration file (default: config.yaml)')
   .option('--log-level <level>', 'Log verbosity level: trace|debug|info|warn|error|silent', 'info')
   .option('--metrics-port <port>', 'Start a Prometheus /metrics HTTP server on this port after analysis', parseInt)
   .option('--service-name <name>', 'Service name label added to all Prometheus metrics', 'api-coverage-analyzer')
@@ -96,23 +114,73 @@ program
 
 /**
  * Load and return the resolved CoverageConfig for a command invocation.
- * CLI threshold flags (non-zero values) take precedence over config-file values.
+ *
+ * Loads via the central config loader (config.yaml) first.  CLI threshold
+ * flags (non-zero values) take precedence and emit a deprecation warning.
+ * Legacy `testPatterns` / `plugins` are preserved via the old JSON loader
+ * for backward compatibility during the config.yaml migration.
  */
 function loadCoverageConfig(
   configPath: string | undefined,
   cliThresholds: Record<string, number>,
 ): CoverageConfig {
-  const fileConfig = resolveConfig(configPath);
-  const cliOverrides: Partial<CoverageConfig> = {};
-  // Only apply CLI thresholds that were explicitly set (non-zero)
-  const activeThresholds: Record<string, number> = {};
+  // Load via central config (config.yaml). Emits missing-config warning if absent.
+  const analyzerCfg = loadCentralConfig(configPath);
+
+  // Emit deprecation warnings for explicitly-set CLI threshold flags.
+  const activeCliThresholds: Record<string, number> = {};
   for (const [key, value] of Object.entries(cliThresholds)) {
-    if (value > 0) activeThresholds[key] = value;
+    if (value > 0) {
+      process.stderr.write(
+        `[DEPRECATED] --threshold-${key} CLI flag is deprecated. ` +
+          `Use thresholds.${key} in config.yaml instead.\n`,
+      );
+      activeCliThresholds[key] = value;
+    }
   }
-  if (Object.keys(activeThresholds).length > 0) {
-    cliOverrides.thresholds = activeThresholds;
+
+  // Merge: central config thresholds < CLI threshold overrides.
+  const mergedThresholds = {
+    ...(analyzerCfg.thresholds as Record<string, number | undefined>),
+    ...activeCliThresholds,
+  };
+
+  // For fields not covered by the new AnalyzerConfig schema (testPatterns,
+  // plugins, exclude), fall back to the legacy JSON config loader — these are
+  // only read when a legacy coverage.config.json is still present.  They are
+  // not required and default to empty when absent.
+  let legacyTestPatterns: string[] = [];
+  let legacyPlugins: string[] = [];
+  let legacyExclude = { paths: [] as string[], methods: [] as string[] };
+
+  if (!configPath) {
+    try {
+      const legacyCfg = resolveConfig(undefined);
+      legacyTestPatterns = legacyCfg.testPatterns ?? [];
+      legacyPlugins = legacyCfg.plugins ?? [];
+      if (legacyCfg.exclude) legacyExclude = {
+        paths: legacyCfg.exclude.paths ?? [],
+        methods: legacyCfg.exclude.methods ?? [],
+      };
+    } catch {
+      // No legacy JSON config present — safe to ignore.
+    }
   }
-  return mergeConfig(fileConfig, cliOverrides);
+
+  return {
+    thresholds: mergedThresholds,
+    testPatterns: legacyTestPatterns,
+    plugins: legacyPlugins,
+    exclude: legacyExclude,
+    qualityGate: analyzerCfg.qualityGate,
+    mcp: analyzerCfg.mcp,
+    publishing: analyzerCfg.publishing
+      ? {
+          enabled: analyzerCfg.publishing.enabled,
+          githubPages: analyzerCfg.publishing.githubPages,
+        }
+      : undefined,
+  };
 }
 
 /**
@@ -184,6 +252,17 @@ program
   .option('--spec <path>', 'Path to the OpenAPI/Swagger spec file', 'sample/openapi.yaml')
   .option('--tests <glob>', 'Glob pattern for test files', 'tests/**/*.ts')
   .option(
+    '--language <lang>',
+    `Test language(s) to analyse. Accepted values: ${SUPPORTED_LANGUAGES.join(', ')}. ` +
+      'Use a comma-separated list or repeat the flag for multiple languages. ' +
+      "Default: 'auto' (inferred from file extensions).",
+    (val: string, prev: SupportedLanguage[]) => {
+      const parsed = parseLanguageOption(val);
+      return prev ? [...prev, ...parsed] : parsed;
+    },
+    [] as SupportedLanguage[],
+  )
+  .option(
     '--format <formats>',
     'Comma-separated list of report formats: json,html,csv,junit (default: json,html)',
     'json,html',
@@ -204,20 +283,42 @@ program
     });
 
     const specPath = path.resolve(options.spec);
-    const testsGlob = (config.testPatterns && config.testPatterns.length > 0)
-      ? config.testPatterns[0]
-      : (options.tests as string);
+    const languages: SupportedLanguage[] = (options.language as SupportedLanguage[]).length > 0
+      ? (options.language as SupportedLanguage[])
+      : ['auto'];
+
+    // Determine the test glob: config overrides CLI, and language overrides the default
+    let testsGlob: string;
+    if (config.testPatterns && config.testPatterns.length > 0) {
+      testsGlob = config.testPatterns[0];
+    } else if (options.tests !== 'tests/**/*.ts') {
+      // User explicitly passed --tests
+      testsGlob = options.tests as string;
+    } else if (!languages.includes('auto') && languages.length === 1) {
+      // Use language-specific default glob when a single language is specified
+      const langGlobs = getDefaultGlobsForLanguage(languages[0]);
+      testsGlob = langGlobs[0];
+    } else {
+      testsGlob = options.tests as string;
+    }
+
     const reportsDir = path.resolve('reports');
     const formats = parseFormats(options.format as string);
 
     const span = startSpan('endpoint-coverage', { specPath, testsGlob });
 
-    logger.info({ event: 'analysis_start', coverageType: 'endpoint', specPath, testsGlob }, `Parsing spec: ${specPath}`);
+    logger.info({ event: 'analysis_start', coverageType: 'endpoint', specPath, testsGlob, languages }, `Parsing spec: ${specPath}`);
     console.log(`Parsing spec: ${specPath}`);
     const endpoints = await parseOpenApiSpec(specPath);
 
-    console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob);
+    console.log(`Analyzing tests matching: ${testsGlob} (language: ${languages.join(', ')})`);
+    const analyzerCfgForDeep = loadCentralConfig(parentOpts.config as string | undefined);
+    const deepCfg = analyzerCfgForDeep.scans.coverage?.deepAnalysis;
+    const deepAnalysisConfig: DeepAnalysisConfig = {
+      ...DEFAULT_DEEP_ANALYSIS_CONFIG,
+      ...(deepCfg ?? {}),
+    };
+    const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, languages, deepAnalysisConfig);
 
     const report = buildCoverageReport(coverageMap);
 
@@ -1100,6 +1201,500 @@ program
       }
       process.exitCode = 1;
     }
+  });
+
+program
+  .command('security-scan')
+  .description(
+    'Run integrated security scanners (Semgrep, Trivy, ZAP) and evaluate a security gate',
+  )
+  .option(
+    '--workspace <path>',
+    'Root directory to scan (default: current working directory)',
+    '.',
+  )
+  .option(
+    '--semgrep',
+    'Enable Semgrep SAST scanning (requires semgrep binary or --semgrep-report)',
+  )
+  .option('--semgrep-config <config>', 'Semgrep config/ruleset (e.g. p/default, p/security-audit)', 'p/default')
+  .option('--semgrep-report <file>', 'Import pre-generated Semgrep JSON report instead of running binary')
+  .option(
+    '--trivy',
+    'Enable Trivy vulnerability/secret/misconfig scanning (requires trivy binary or --trivy-report)',
+  )
+  .option(
+    '--trivy-scanners <list>',
+    'Comma-separated Trivy scanners: vuln,secret,misconfig',
+    'vuln,secret',
+  )
+  .option('--trivy-report <file>', 'Import pre-generated Trivy JSON report instead of running binary')
+  .option('--zap-report <file>', 'Import pre-generated ZAP JSON report (enables ZAP findings)')
+  .option(
+    '--fail-on-critical',
+    'Fail the gate if any CRITICAL finding exists',
+  )
+  .option(
+    '--fail-on-high',
+    'Fail the gate if any HIGH finding exists',
+  )
+  .option('--max-medium <n>', 'Maximum allowed MEDIUM findings', parseInt)
+  .option('--max-secrets <n>', 'Maximum allowed secrets (any severity)', parseInt)
+  .option('--max-misconfig-high <n>', 'Maximum allowed HIGH/CRITICAL misconfigurations', parseInt)
+  .option('--max-critical-vulns <n>', 'Maximum allowed CRITICAL vulnerabilities', parseInt)
+  .option('--max-high-vulns <n>', 'Maximum allowed HIGH vulnerabilities', parseInt)
+  .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
+    const workspace = path.resolve(options.workspace as string ?? '.');
+    const reportsDir = path.resolve('reports');
+
+    // Build scanner configuration from CLI flags
+    const scanConfig: SecurityScanConfig = {
+      enabled: true,
+      workspace,
+      scanners: {},
+      gate: {},
+    };
+
+    // Semgrep
+    if (options.semgrep || options.semgrepReport) {
+      const mode = options.semgrepReport ? 'import' : 'embedded';
+      scanConfig.scanners!.semgrep = {
+        enabled: true,
+        mode,
+        config: options.semgrepConfig as string,
+        reportPath: options.semgrepReport as string | undefined,
+      };
+    }
+
+    // Trivy
+    if (options.trivy || options.trivyReport) {
+      const mode = options.trivyReport ? 'import' : 'embedded';
+      const trivyScanners = ((options.trivyScanners as string) ?? 'vuln,secret')
+        .split(',')
+        .map((s: string) => s.trim())
+        .filter((s: string) => ['vuln', 'misconfig', 'secret'].includes(s)) as Array<'vuln' | 'misconfig' | 'secret'>;
+      scanConfig.scanners!.trivy = {
+        enabled: true,
+        mode,
+        scanners: trivyScanners,
+        reportPath: options.trivyReport as string | undefined,
+      };
+    }
+
+    // ZAP
+    if (options.zapReport) {
+      scanConfig.scanners!.zap = {
+        enabled: true,
+        mode: 'import',
+        reportPath: options.zapReport as string,
+      };
+    }
+
+    // Gate configuration
+    if (options.failOnCritical) scanConfig.gate!.failOnCritical = true;
+    if (options.failOnHigh) scanConfig.gate!.failOnHigh = true;
+    if (options.maxMedium !== undefined) scanConfig.gate!.maxMedium = options.maxMedium as number;
+    if (options.maxSecrets !== undefined) scanConfig.gate!.maxSecrets = options.maxSecrets as number;
+    if (options.maxMisconfigHigh !== undefined) scanConfig.gate!.maxMisconfigHigh = options.maxMisconfigHigh as number;
+    if (options.maxCriticalVulns !== undefined) scanConfig.gate!.maxCriticalVulns = options.maxCriticalVulns as number;
+    if (options.maxHighVulns !== undefined) scanConfig.gate!.maxHighVulns = options.maxHighVulns as number;
+
+    // Remove empty gate/scanners objects if nothing was configured
+    if (Object.keys(scanConfig.gate!).length === 0) delete scanConfig.gate;
+    if (Object.keys(scanConfig.scanners!).length === 0) delete scanConfig.scanners;
+
+    const span = startSpan('security-scan', { workspace });
+    logger.info({ event: 'analysis_start', coverageType: 'security-scan', workspace }, 'Starting security scan');
+    console.log(`Running security scan in workspace: ${workspace}`);
+
+    const summary = await runSecurityScan(scanConfig, reportsDir);
+
+    // Console summary
+    console.log(`\nSecurity Scan Results:`);
+    console.log(`  Scanners run: ${summary.scannersRun.join(', ') || 'none'}`);
+    console.log(`  Total findings: ${summary.totalFindings}`);
+    console.log(`  CRITICAL: ${summary.bySeverity.CRITICAL}`);
+    console.log(`  HIGH: ${summary.bySeverity.HIGH}`);
+    console.log(`  MEDIUM: ${summary.bySeverity.MEDIUM}`);
+    console.log(`  LOW: ${summary.bySeverity.LOW}`);
+
+    if (summary.gateResult) {
+      const gateStatus = summary.gateResult.passed ? '✅ PASSED' : '❌ FAILED';
+      console.log(`\nSecurity Gate: ${gateStatus}`);
+      if (!summary.gateResult.passed) {
+        for (const reason of summary.gateResult.reasons) {
+          console.error(`  GATE FAILURE: ${reason}`);
+        }
+      }
+    }
+
+    console.log(`\nReports written to: ${reportsDir}`);
+
+    span.end({ totalFindings: summary.totalFindings });
+    logger.info({ event: 'analysis_complete', coverageType: 'security-scan' }, 'Security scan complete');
+
+    const result: CoverageResult = {
+      type: 'security-scan',
+      totalItems: summary.totalFindings,
+      coveredItems: summary.totalFindings,
+      coveragePercent: 100,
+      details: summary,
+    };
+
+    // Record security-specific Prometheus metrics (by severity/category/scanner + gate status)
+    recordSecurityScanMetrics(summary, serviceName);
+
+    await finaliseObservability([result], {}, metricsPort, serviceName);
+
+    if (summary.gateResult && !summary.gateResult.passed) {
+      process.exitCode = 1;
+    }
+  });
+
+// ─── coverage-intelligence command ──────────────────────────────────────────
+
+
+// ─── Intelligence details normalizer ─────────────────────────────────────────
+// The linkage engine expects `details` to be a flat array of
+// { endpoint?, covered, name?, ... } objects.  Each coverage command stores
+// its raw report object in CoverageResult.details, so we normalise here at
+// read time to avoid touching the 11 coverage command implementations.
+
+function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] {
+  if (Array.isArray(raw)) return raw; // already normalised (e.g. dashboard sample)
+  if (!raw || typeof raw !== 'object') return [];
+  const obj = raw as Record<string, unknown>;
+
+  switch (type) {
+    case 'endpoint': {
+      const eps = obj.endpoints;
+      if (!Array.isArray(eps)) return [];
+      return (eps as Array<Record<string, unknown>>).map((e) => ({
+        endpoint: { method: e.method, path: e.path },
+        covered: e.covered ?? false,
+      }));
+    }
+    case 'parameter': {
+      const params = obj.parameters;
+      if (!Array.isArray(params)) return [];
+      return (params as Array<Record<string, unknown>>).map((p) => {
+        const param = p.parameter as Record<string, unknown> | undefined;
+        return {
+          endpoint: param ? { method: param.method, path: param.path } : undefined,
+          covered: ((p.ratio as number) ?? 0) > 0,
+          name: param?.name ?? param?.id,
+        };
+      });
+    }
+    case 'business': {
+      const rules = obj.rules;
+      if (!Array.isArray(rules)) return [];
+      return (rules as Array<Record<string, unknown>>).flatMap((r) => {
+        const endpoints = (r.rule as Record<string, unknown>)?.endpoints;
+        if (!Array.isArray(endpoints) || endpoints.length === 0) {
+          return [{ covered: r.covered ?? false, name: (r.rule as Record<string, unknown>)?.id }];
+        }
+        return (endpoints as string[]).map((ep) => {
+          const parts = ep.split(' ');
+          return {
+            endpoint: parts.length > 1 ? { method: parts[0], path: parts[1] } : { path: parts[0] },
+            covered: r.covered ?? false,
+            name: (r.rule as Record<string, unknown>)?.id,
+          };
+        });
+      });
+    }
+    case 'integration': {
+      const flows = obj.flows;
+      if (!Array.isArray(flows)) return [];
+      return (flows as Array<Record<string, unknown>>).flatMap((f) => {
+        const steps = ((f.flow as Record<string, unknown>)?.steps ?? []) as Array<Record<string, unknown>>;
+        return steps
+          .filter((s) => s.method && s.path)
+          .map((s) => ({
+            endpoint: { method: s.method, path: s.path },
+            covered: f.status !== 'missing',
+            name: (s.id ?? s.name) as string | undefined,
+          }));
+      });
+    }
+    case 'error': {
+      const scenarios = obj.scenarios;
+      if (!Array.isArray(scenarios)) return [];
+      return (scenarios as Array<Record<string, unknown>>).map((s) => {
+        const sc = s.scenario as Record<string, unknown> | undefined;
+        return {
+          endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+          covered: s.covered ?? false,
+          errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
+          name: sc?.id,
+        };
+      });
+    }
+    case 'security': {
+      const controls = obj.controls;
+      if (!Array.isArray(controls)) return [];
+      return (controls as Array<Record<string, unknown>>)
+        .map((c) => {
+          const epStr = ((c.control as Record<string, unknown>)?.endpoint as string) ?? '';
+          const parts = epStr.split(' ');
+          return {
+            endpoint: parts.length > 1 ? { method: parts[0], path: parts[1] } : undefined,
+            covered: c.covered ?? false,
+            name: (c.control as Record<string, unknown>)?.id,
+          };
+        })
+        .filter((item) => item.endpoint?.path);
+    }
+    case 'performance': {
+      const coverages = obj.performanceCoverages;
+      if (!Array.isArray(coverages)) return [];
+      return (coverages as Array<Record<string, unknown>>).map((c) => {
+        const ep = c.endpoint as Record<string, unknown> | undefined;
+        return {
+          endpoint: ep ? { method: ep.method, path: ep.path } : undefined,
+          covered: (c.hasLoadTestData as boolean) ?? false,
+          hasThreshold: true,
+          name: ep?.id,
+        };
+      });
+    }
+    case 'resilience': {
+      const coverages = obj.resilienceCoverages;
+      if (!Array.isArray(coverages)) return [];
+      return (coverages as Array<Record<string, unknown>>)
+        .filter((c) => (c.scenario as Record<string, unknown>)?.endpoint)
+        .map((c) => {
+          const sc = c.scenario as Record<string, unknown>;
+          return {
+            endpoint: sc.endpoint as Record<string, unknown>,
+            covered: c.covered ?? false,
+            resilience: true,
+            name: sc.id,
+          };
+        });
+    }
+    default:
+      return [];
+  }
+}
+
+program
+  .command('coverage-intelligence')
+  .description('Run the coverage intelligence engine to identify functional findings and missing tests')
+  .option('--reports-dir <dir>', 'Directory containing existing coverage reports to analyse', 'reports')
+  .option('--out-dir <dir>', 'Output directory for intelligence reports', 'reports')
+  .option('--project-name <name>', 'Project / service name', 'unknown')
+  .option('--languages <langs>', 'Comma-separated list of languages (e.g. typescript,java)')
+  .option('--frameworks <fws>', 'Comma-separated list of test frameworks (e.g. jest,rest-assured)')
+  .action(async (options) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+
+    const reportsDir = path.resolve(options.reportsDir as string);
+    const outDir = path.resolve(options.outDir as string);
+    const projectName = options.projectName as string;
+    const languages = options.languages
+      ? (options.languages as string).split(',').map((l: string) => l.trim())
+      : [];
+    const frameworks = options.frameworks
+      ? (options.frameworks as string).split(',').map((f: string) => f.trim())
+      : [];
+
+    // Attempt to load existing coverage-summary.json from reportsDir
+    let coverageResults: Array<{
+      type: string;
+      totalItems: number;
+      coveredItems: number;
+      coveragePercent: number;
+      details: unknown;
+    }> = [];
+
+    const summaryPath = path.join(reportsDir, 'coverage-summary.json');
+    try {
+      if (require('fs').existsSync(summaryPath)) {
+        const raw = require('fs').readFileSync(summaryPath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.summary)) {
+          coverageResults = parsed.summary.map((s: Record<string, unknown>) => ({
+            type: s.type as string,
+            totalItems: (s.totalItems as number) ?? 0,
+            coveredItems: (s.coveredItems as number) ?? 0,
+            coveragePercent: (s.coveragePercent as number) ?? 0,
+            details: normalizeDetailsForIntelligence(
+              s.type as string,
+              (parsed.details as Record<string, unknown>)?.[s.type as string] ?? [],
+            ),
+          }));
+        }
+      }
+    } catch (err) {
+      logger.warn({ event: 'intelligence_load_warning', error: String(err) }, 'Could not load coverage-summary.json');
+    }
+
+    const report = runIntelligenceEngine({
+      coverageResults,
+      languages,
+      frameworks,
+      projectName,
+      outDir,
+    });
+
+    // Record intelligence metrics
+    recordIntelligenceMetrics({
+      projectName,
+      totalFindings: report.summary.totalFindings,
+      totalRecommendations: report.summary.totalRecommendations,
+      recommendationsByPriority: report.summary.recommendationsByPriority,
+      maxRiskScore: report.summary.maxRiskScore,
+      avgRiskScore: report.summary.avgRiskScore,
+      criticalUncoveredItems: report.summary.criticalUncoveredItems,
+      unprotectedSecurityFindings: report.summary.unprotectedSecurityFindings,
+      languages,
+      frameworks,
+    }, projectName);
+
+    console.log(`\n=== Coverage Intelligence Results ===`);
+    console.log(`  Project: ${projectName}`);
+    console.log(`  Functional Findings: ${report.summary.totalFindings}`);
+    console.log(`  Missing Test Recommendations: ${report.summary.totalRecommendations}`);
+    console.log(`  Max Risk Score: ${report.summary.maxRiskScore}`);
+    console.log(`  Avg Risk Score: ${report.summary.avgRiskScore}`);
+    console.log(`  Critical Uncovered Items: ${report.summary.criticalUncoveredItems}`);
+    console.log(`  Unprotected Security Findings: ${report.summary.unprotectedSecurityFindings}`);
+    if (report.summary.recommendationsByPriority.P0 > 0) {
+      console.log(`\n⚠️  P0 Recommendations: ${report.summary.recommendationsByPriority.P0} — immediate action required`);
+    }
+    console.log(`\nIntelligence reports written to: ${outDir}`);
+
+    logger.info({ event: 'analysis_complete', coverageType: 'intelligence' }, 'Coverage intelligence analysis complete');
+
+    await finaliseObservability(
+      [{
+        type: 'intelligence',
+        totalItems: report.summary.totalRecommendations,
+        coveredItems: 0,
+        coveragePercent: 0,
+        details: report.summary,
+      }],
+      {},
+      metricsPort,
+      serviceName,
+    );
+  });
+
+// ─── coverage-summary-report command ─────────────────────────────────────────
+
+program
+  .command('coverage-summary-report')
+  .description('Generate build-summary.md and pr-summary.md from accumulated coverage-summary.json')
+  .option('--reports-dir <dir>', 'Directory containing coverage-summary.json', 'reports')
+  .option('--out-dir <dir>', 'Output directory for summary files', 'reports')
+  .option('--project-name <name>', 'Project / service name', 'unknown')
+  .option('--branch <branch>', 'Branch name for display in summary')
+  .option('--commit-sha <sha>', 'Commit SHA for display in summary')
+  .option('--build-id <id>', 'Build identifier for display in summary')
+  .option('--write-step-summary', 'Append build-summary.md to $GITHUB_STEP_SUMMARY')
+  .action(async (options) => {
+    const logger = getLogger();
+    const parentOpts = program.opts();
+
+    const reportsDir = path.resolve(options.reportsDir as string);
+    const outDir = path.resolve(options.outDir as string);
+    const projectName = options.projectName as string;
+
+    // Load thresholds from config
+    const analyzerCfg = loadCentralConfig(parentOpts.config as string | undefined);
+    const thresholds = (analyzerCfg.thresholds ?? {}) as Record<string, number | undefined>;
+
+    // Read accumulated coverage-summary.json
+    let coverageResults: import('./reporting').CoverageResult[] = [];
+    let qualityGateResult: import('./qualityGate').QualityGateResult | undefined;
+
+    const summaryPath = require('path').join(reportsDir, 'coverage-summary.json');
+    try {
+      if (require('fs').existsSync(summaryPath)) {
+        const raw = require('fs').readFileSync(summaryPath, 'utf-8');
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        if (Array.isArray(parsed.summary)) {
+          coverageResults = (parsed.summary as Array<Record<string, unknown>>).map((s) => ({
+            type: s.type as string,
+            totalItems: (s.totalItems as number) ?? 0,
+            coveredItems: (s.coveredItems as number) ?? 0,
+            coveragePercent: (s.coveragePercent as number) ?? 0,
+            details: s.details ?? {},
+          }));
+        }
+        if (parsed.qualityGate && typeof parsed.qualityGate === 'object') {
+          qualityGateResult = parsed.qualityGate as import('./qualityGate').QualityGateResult;
+        }
+      }
+    } catch (err) {
+      logger.warn({ event: 'summary_report_load_warning', error: String(err) }, 'Could not load coverage-summary.json');
+    }
+
+    // Optionally load coverage-intelligence.json for intelligence section
+    let intelligenceSummary: SummaryInput['intelligenceSummary'] | undefined;
+    const intelligencePath = require('path').join(reportsDir, 'coverage-intelligence.json');
+    try {
+      if (require('fs').existsSync(intelligencePath)) {
+        const raw = require('fs').readFileSync(intelligencePath, 'utf-8');
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        if (parsed.summary && typeof parsed.summary === 'object') {
+          const s = parsed.summary as Record<string, unknown>;
+          intelligenceSummary = {
+            totalFindings: (s.totalFindings as number) ?? 0,
+            totalRecommendations: (s.totalRecommendations as number) ?? 0,
+            maxRiskScore: (s.maxRiskScore as number) ?? 0,
+            avgRiskScore: (s.avgRiskScore as number) ?? 0,
+            criticalUncoveredItems: (s.criticalUncoveredItems as number) ?? 0,
+            unprotectedSecurityFindings: (s.unprotectedSecurityFindings as number) ?? 0,
+            recommendationsByPriority: (s.recommendationsByPriority as Record<string, number>) ?? {},
+            topRiskAreas: (s.topRiskAreas as string[]) ?? [],
+          };
+        }
+      }
+    } catch (_) {
+      // intelligence report is optional — ignore read errors
+    }
+
+    const summaryInput: SummaryInput = {
+      results: coverageResults,
+      qualityGate: qualityGateResult,
+      thresholds,
+      projectName,
+      branch: options.branch as string | undefined,
+      commitSha: options.commitSha as string | undefined,
+      buildId: options.buildId as string | undefined,
+      intelligenceSummary,
+    };
+
+    const buildResult = await generateBuildSummary(summaryInput, outDir);
+    await generatePrSummary(summaryInput, outDir);
+
+    // Optionally write to GITHUB_STEP_SUMMARY
+    if (options.writeStepSummary) {
+      const stepSummaryPath = process.env['GITHUB_STEP_SUMMARY'];
+      if (stepSummaryPath) {
+        require('fs').appendFileSync(stepSummaryPath, buildResult.markdown + '\n', 'utf-8');
+        console.log(`Step summary written to ${stepSummaryPath}`);
+      } else {
+        logger.warn({ event: 'step_summary_missing_env' }, 'GITHUB_STEP_SUMMARY env var not set; skipping step summary write');
+      }
+    }
+
+    console.log(`\n=== Coverage Summary Report ===`);
+    console.log(`  Project: ${projectName}`);
+    console.log(`  Metrics: ${coverageResults.length}`);
+    if (qualityGateResult !== undefined) {
+      console.log(`  Overall: ${qualityGateResult.passed ? 'PASSED' : 'FAILED'}`);
+    }
+    console.log(`\nSummary reports written to: ${outDir}`);
+
+    logger.info({ event: 'summary_report_complete' }, 'Coverage summary report generated');
   });
 
 // Parse the command-line arguments

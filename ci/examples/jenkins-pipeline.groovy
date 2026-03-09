@@ -1,22 +1,24 @@
-// Jenkins Declarative Pipeline – API Test Coverage Analysis
+// Jenkins Declarative Pipeline — API Test Coverage Analysis
+//
+// All stages call Makefile targets.  No coverage logic is duplicated here.
+// Pass/fail is governed exclusively by the analyzer's process exit code.
 //
 // Prerequisites:
 //   - NodeJS tool named "node20" configured in Jenkins Global Tool Configuration
-//   - HTML Publisher plugin  (for publishing the HTML summary report)
-//   - JUnit plugin           (built-in; for publishing threshold results as test results)
+//   - GNU Make available on the build agent (install: sudo apt-get install make)
+//   - HTML Publisher plugin  (for publishing HTML report)
+//   - JUnit plugin           (built-in; for publishing threshold results)
 //
-// Adjust threshold values in the "Coverage thresholds" environment block below.
+// Reports written by the analyzer:
+//   reports/build-summary.md             CI summary (Markdown)
+//   reports/pr-summary.md                PR comment summary (Markdown)
+//   reports/coverage-intelligence.json   Intelligence findings
+//   reports/*-report.json                Per-metric JSON reports
+//   reports/*-report.html                Per-metric HTML reports
+//   reports/*-junit.xml                  Per-metric JUnit XML
 
 pipeline {
     agent any
-
-    // ── Coverage threshold values – edit these to suit your project ──────────
-    environment {
-        THRESHOLD_ENDPOINT    = '80'
-        THRESHOLD_PARAMETER   = '70'
-        THRESHOLD_BUSINESS    = '60'
-        THRESHOLD_INTEGRATION = '50'
-    }
 
     tools {
         nodejs 'node20'
@@ -29,61 +31,46 @@ pipeline {
             }
         }
 
-        stage('Install dependencies') {
+        stage('Install') {
             steps {
-                sh 'npm ci'
+                sh 'make install'
             }
         }
 
-        stage('API Coverage Analysis') {
+        stage('Build') {
+            steps {
+                sh 'make build'
+            }
+        }
+
+        stage('Tests') {
             parallel {
-                stage('Endpoint coverage') {
+                stage('Unit Tests') {
                     steps {
-                        sh """
-                            node -r ts-node/register src/index.ts endpoint-coverage \\
-                              --spec sample/openapi.yaml \\
-                              --tests 'sample/tests/**/*.ts' \\
-                              --format json,html,csv,junit \\
-                              --threshold-endpoint ${THRESHOLD_ENDPOINT}
-                        """
+                        sh 'make test-unit'
                     }
                 }
 
-                stage('Parameter coverage') {
+                stage('Integration Tests') {
                     steps {
-                        sh """
-                            node -r ts-node/register src/index.ts parameter-coverage \\
-                              --spec sample/openapi-parameters.yaml \\
-                              --tests 'sample/tests/**/*.ts' \\
-                              --format json,html,csv,junit \\
-                              --threshold-parameter ${THRESHOLD_PARAMETER}
-                        """
+                        sh 'make test-integration'
                     }
                 }
+            }
+        }
 
-                stage('Business logic coverage') {
-                    steps {
-                        sh """
-                            node -r ts-node/register src/index.ts business-coverage \\
-                              --rules sample/business-rules.yaml \\
-                              --tests 'sample/tests/**/*.ts' \\
-                              --format json,html,csv,junit \\
-                              --threshold-business ${THRESHOLD_BUSINESS}
-                        """
-                    }
-                }
+        stage('Self-Analysis (all metrics)') {
+            // The analyzer exits non-zero automatically when thresholds are breached.
+            // No shell logic is needed to determine pass/fail.
+            steps {
+                sh 'make self-analysis-all'
+            }
+        }
 
-                stage('Integration flow coverage') {
-                    steps {
-                        sh """
-                            node -r ts-node/register src/index.ts integration-coverage \\
-                              --flows sample/integration-flows.yaml \\
-                              --tests 'sample/tests/**/*.ts' \\
-                              --format json,html,csv,junit \\
-                              --threshold-integration ${THRESHOLD_INTEGRATION}
-                        """
-                    }
-                }
+        stage('Generate Summaries') {
+            steps {
+                sh 'make summary'
+                sh 'make build-summary'
             }
         }
     }
@@ -92,19 +79,36 @@ pipeline {
         always {
             // Publish HTML coverage report (requires HTML Publisher plugin)
             publishHTML(target: [
-                allowMissing         : false,
+                allowMissing         : true,
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 reportDir            : 'reports',
-                reportFiles          : 'coverage-summary.html',
+                reportFiles          : 'endpoint-report.html',
                 reportName           : 'API Coverage Report'
             ])
 
-            // Publish JUnit threshold results (built-in JUnit plugin)
-            junit allowEmptyResults: true, testResults: 'reports/coverage-summary-junit.xml'
+            // Publish build summary
+            publishHTML(target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : 'reports',
+                reportFiles          : 'build-summary.md',
+                reportName           : 'Build Summary'
+            ])
 
-            // Archive all reports as build artifacts
+            // Publish JUnit threshold results
+            junit allowEmptyResults: true, testResults: 'reports/*-junit.xml'
+
+            // Archive all reports
             archiveArtifacts artifacts: 'reports/**', fingerprint: true
+
+            // Print build summary to console log
+            script {
+                if (fileExists('reports/build-summary.md')) {
+                    echo readFile('reports/build-summary.md')
+                }
+            }
         }
     }
 }

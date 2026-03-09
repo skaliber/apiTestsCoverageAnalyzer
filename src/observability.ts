@@ -3,7 +3,7 @@
  *
  * Usage:
  *   import { createLogger, initMetrics, startMetricsServer, recordCoverageMetrics,
- *            initTracing, startSpan, endSpan } from './observability';
+ *            recordSecurityScanMetrics, initTracing, startSpan, endSpan } from './observability';
  */
 
 import * as http from 'http';
@@ -14,6 +14,20 @@ import {
   collectDefaultMetrics,
 } from 'prom-client';
 import type { CoverageResult } from './reporting';
+
+// ─── Security scanning types (kept minimal to avoid a circular import) ────────
+
+/** Shape of SecurityScanSummary used for metrics — mirrors src/security/types.ts. */
+export interface SecurityScanMetricsSummary {
+  totalFindings: number;
+  bySeverity: { LOW: number; MEDIUM: number; HIGH: number; CRITICAL: number };
+  byCategory: Record<string, number>;
+  byScanner: Record<string, number>;
+  scannersRun: string[];
+  gateResult?: { passed: boolean; reasons: string[] };
+  /** Individual findings list — present when the full SecurityScanSummary is passed. */
+  findings?: Array<{ severity: string; category: string; scanner: string }>;
+}
 
 // ─── Logging ─────────────────────────────────────────────────────────────────
 
@@ -100,6 +114,24 @@ let _gauges: {
   thresholdFailure: Gauge;
 } | null = null;
 
+/** Gauges for the security scanning layer. */
+let _securityGauges: {
+  findings: Gauge;        // api_security_findings_total{service, severity, category, scanner}
+  gatePassed: Gauge;      // api_security_gate_passed{service}
+  scanTimestamp: Gauge;   // api_security_scan_timestamp_seconds{service}
+} | null = null;
+
+/** Gauges for the coverage intelligence layer. */
+let _intelligenceGauges: {
+  functionalFindingsTotal: Gauge;         // api_coverage_functional_findings_total
+  missingTestRecommendationsTotal: Gauge; // api_coverage_missing_test_recommendations_total
+  missingTestByPriority: Gauge;           // api_coverage_missing_test_recommendations_by_priority
+  riskScoreMax: Gauge;                    // api_coverage_risk_score_max
+  riskScoreAvg: Gauge;                    // api_coverage_risk_score_avg
+  criticalUncoveredItems: Gauge;          // api_coverage_critical_uncovered_items_total
+  unprotectedSecurityFindings: Gauge;     // api_coverage_unprotected_security_findings_total
+} | null = null;
+
 /** Metrics HTTP server (set when --metrics-port is active). */
 let _metricsServer: http.Server | null = null;
 
@@ -140,8 +172,74 @@ export function initMetrics(serviceName = 'api-coverage-analyzer'): Registry {
     }),
   };
 
+  _securityGauges = {
+    findings: new Gauge({
+      name: 'api_security_findings_total',
+      help: 'Number of security scan findings labeled by severity, category and scanner',
+      labelNames: ['service', 'severity', 'category', 'scanner'],
+      registers: [_registry],
+    }),
+    gatePassed: new Gauge({
+      name: 'api_security_gate_passed',
+      help: '1 if the security gate passed on the last scan, 0 if it failed, -1 if not configured',
+      labelNames: ['service'],
+      registers: [_registry],
+    }),
+    scanTimestamp: new Gauge({
+      name: 'api_security_scan_timestamp_seconds',
+      help: 'Unix timestamp (seconds) of the last security scan run',
+      labelNames: ['service'],
+      registers: [_registry],
+    }),
+  };
+
   // Store service name for use in recordCoverageMetrics
   (_registry as Registry & { _serviceName?: string })._serviceName = serviceName;
+
+  _intelligenceGauges = {
+    functionalFindingsTotal: new Gauge({
+      name: 'api_coverage_functional_findings_total',
+      help: 'Total number of functional findings detected by the intelligence engine',
+      labelNames: ['project', 'coverage_type', 'language', 'framework'],
+      registers: [_registry],
+    }),
+    missingTestRecommendationsTotal: new Gauge({
+      name: 'api_coverage_missing_test_recommendations_total',
+      help: 'Total number of missing test recommendations',
+      labelNames: ['project', 'coverage_type', 'language', 'framework'],
+      registers: [_registry],
+    }),
+    missingTestByPriority: new Gauge({
+      name: 'api_coverage_missing_test_recommendations_by_priority',
+      help: 'Missing test recommendations grouped by priority',
+      labelNames: ['project', 'priority', 'risk_band'],
+      registers: [_registry],
+    }),
+    riskScoreMax: new Gauge({
+      name: 'api_coverage_risk_score_max',
+      help: 'Maximum risk score across all recommendations',
+      labelNames: ['project'],
+      registers: [_registry],
+    }),
+    riskScoreAvg: new Gauge({
+      name: 'api_coverage_risk_score_avg',
+      help: 'Average risk score across all recommendations',
+      labelNames: ['project'],
+      registers: [_registry],
+    }),
+    criticalUncoveredItems: new Gauge({
+      name: 'api_coverage_critical_uncovered_items_total',
+      help: 'Total number of critical/high severity uncovered items',
+      labelNames: ['project'],
+      registers: [_registry],
+    }),
+    unprotectedSecurityFindings: new Gauge({
+      name: 'api_coverage_unprotected_security_findings_total',
+      help: 'Number of security findings with no associated test protection',
+      labelNames: ['project'],
+      registers: [_registry],
+    }),
+  };
 
   return _registry;
 }
@@ -172,6 +270,125 @@ export function recordCoverageMetrics(
     _gauges.covered.set(labels, r.coveredItems);
     _gauges.ratio.set(labels, ratio);
     _gauges.thresholdFailure.set(labels, failing);
+  }
+}
+
+/**
+ * Record security scanning results into dedicated Prometheus gauges.
+ *
+ * Exposes:
+ *  - `api_security_findings_total{service, severity, category, scanner}` — count per label combination
+ *  - `api_security_gate_passed{service}` — 1 = passed, 0 = failed, -1 = not configured
+ *  - `api_security_scan_timestamp_seconds{service}` — Unix timestamp of this scan
+ *
+ * Must be called after initMetrics().
+ */
+export function recordSecurityScanMetrics(
+  summary: SecurityScanMetricsSummary,
+  serviceName = 'api-coverage-analyzer',
+): void {
+  if (!_securityGauges || !_registry) return;
+
+  const now = Math.floor(Date.now() / 1000);
+  _securityGauges.scanTimestamp.set({ service: serviceName }, now);
+
+  // Gate status: 1 passed, 0 failed, -1 not configured
+  const gateValue =
+    summary.gateResult === undefined ? -1 : summary.gateResult.passed ? 1 : 0;
+  _securityGauges.gatePassed.set({ service: serviceName }, gateValue);
+
+  const severities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+  const categories = Object.keys(summary.byCategory);
+  const scanners = summary.scannersRun.length > 0 ? summary.scannersRun : ['none'];
+
+  // Zero-out all combinations first so Grafana sees 0 instead of stale values
+  for (const sev of severities) {
+    for (const cat of categories) {
+      for (const scanner of scanners) {
+        _securityGauges.findings.set(
+          { service: serviceName, severity: sev, category: cat, scanner },
+          0,
+        );
+      }
+    }
+  }
+
+  if (summary.findings && summary.findings.length > 0) {
+    // Use the per-finding detail list when available (highest granularity)
+    for (const finding of summary.findings) {
+      _securityGauges.findings.inc(
+        { service: serviceName, severity: finding.severity, category: finding.category, scanner: finding.scanner },
+        1,
+      );
+    }
+  } else {
+    // Fallback: use pre-aggregated severity counts when no per-finding list is provided
+    for (const [sev, count] of Object.entries(summary.bySeverity)) {
+      for (const scanner of scanners) {
+        _securityGauges.findings.set(
+          { service: serviceName, severity: sev, category: 'unknown', scanner },
+          count,
+        );
+      }
+    }
+  }
+}
+
+/** Shape of IntelligenceSummary used for metrics recording. */
+export interface IntelligenceMetricsSummary {
+  projectName: string;
+  totalFindings: number;
+  totalRecommendations: number;
+  recommendationsByPriority: Record<string, number>;
+  maxRiskScore: number;
+  avgRiskScore: number;
+  criticalUncoveredItems: number;
+  unprotectedSecurityFindings: number;
+  languages?: string[];
+  frameworks?: string[];
+}
+
+/**
+ * Record coverage intelligence results into dedicated Prometheus gauges.
+ *
+ * Must be called after initMetrics().
+ */
+export function recordIntelligenceMetrics(
+  summary: IntelligenceMetricsSummary,
+  projectName?: string,
+): void {
+  if (!_intelligenceGauges || !_registry) return;
+
+  const project = projectName ?? summary.projectName ?? 'unknown';
+  const language = summary.languages?.[0] ?? 'unknown';
+  const framework = summary.frameworks?.[0] ?? 'unknown';
+
+  _intelligenceGauges.functionalFindingsTotal.set(
+    { project, coverage_type: 'all', language, framework },
+    summary.totalFindings,
+  );
+  _intelligenceGauges.missingTestRecommendationsTotal.set(
+    { project, coverage_type: 'all', language, framework },
+    summary.totalRecommendations,
+  );
+  _intelligenceGauges.riskScoreMax.set({ project }, summary.maxRiskScore);
+  _intelligenceGauges.riskScoreAvg.set({ project }, summary.avgRiskScore);
+  _intelligenceGauges.criticalUncoveredItems.set({ project }, summary.criticalUncoveredItems);
+  _intelligenceGauges.unprotectedSecurityFindings.set(
+    { project },
+    summary.unprotectedSecurityFindings,
+  );
+
+  for (const [priority, count] of Object.entries(summary.recommendationsByPriority)) {
+    // Derive a risk band label from priority
+    const riskBand =
+      priority === 'P0' ? 'Critical' :
+      priority === 'P1' ? 'High' :
+      priority === 'P2' ? 'Moderate' : 'Low';
+    _intelligenceGauges.missingTestByPriority.set(
+      { project, priority, risk_band: riskBand },
+      count,
+    );
   }
 }
 
@@ -383,6 +600,20 @@ export interface ObservabilityInfo {
     ratio: string;
     thresholdFailure: string;
   };
+  securityMetricNames?: {
+    findings: string;
+    gatePassed: string;
+    scanTimestamp: string;
+  };
+  intelligenceMetricNames?: {
+    functionalFindingsTotal: string;
+    missingTestRecommendationsTotal: string;
+    missingTestByPriority: string;
+    riskScoreMax: string;
+    riskScoreAvg: string;
+    criticalUncoveredItems: string;
+    unprotectedSecurityFindings: string;
+  };
 }
 
 /** Build an observability info object for embedding in reports. */
@@ -396,6 +627,20 @@ export function buildObservabilityInfo(metricsPort?: number): ObservabilityInfo 
       covered: 'api_coverage_covered{service="<name>",coverage_type="<type>"}',
       ratio: 'api_coverage_ratio{service="<name>",coverage_type="<type>"}',
       thresholdFailure: 'api_coverage_threshold_failure{service="<name>",coverage_type="<type>"}',
+    },
+    securityMetricNames: {
+      findings: 'api_security_findings_total{service="<name>",severity="<sev>",category="<cat>",scanner="<scanner>"}',
+      gatePassed: 'api_security_gate_passed{service="<name>"}',
+      scanTimestamp: 'api_security_scan_timestamp_seconds{service="<name>"}',
+    },
+    intelligenceMetricNames: {
+      functionalFindingsTotal: 'api_coverage_functional_findings_total{project="<name>",coverage_type="<type>",language="<lang>",framework="<fw>"}',
+      missingTestRecommendationsTotal: 'api_coverage_missing_test_recommendations_total{project="<name>",coverage_type="<type>",language="<lang>",framework="<fw>"}',
+      missingTestByPriority: 'api_coverage_missing_test_recommendations_by_priority{project="<name>",priority="<P0-P3>",risk_band="<band>"}',
+      riskScoreMax: 'api_coverage_risk_score_max{project="<name>"}',
+      riskScoreAvg: 'api_coverage_risk_score_avg{project="<name>"}',
+      criticalUncoveredItems: 'api_coverage_critical_uncovered_items_total{project="<name>"}',
+      unprotectedSecurityFindings: 'api_coverage_unprotected_security_findings_total{project="<name>"}',
     },
   };
 }

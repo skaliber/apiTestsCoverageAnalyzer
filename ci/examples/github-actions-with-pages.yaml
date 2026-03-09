@@ -1,0 +1,77 @@
+name: API Coverage with GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  api-coverage:
+    name: Run API Test Coverage Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Run the analyzer with quality gate and static site generation ──────
+
+      - name: API Test Coverage Analysis
+        id: coverage
+        uses: skaliber/apiTestsCoverageAnalyzer@main
+        with:
+          spec: './openapi.yaml'
+          tests: 'tests/**/*.ts'
+          format: 'json,html,csv,junit'
+          coverage-types: 'endpoint,parameter,business,integration,error,security'
+          config: './config.yaml'
+          publish-pages: 'true'
+          site-dir: 'site'
+          pages-base-path: '/your-repo-name/'
+          quality-gate: 'true'
+          quality-gate-mode: 'strict'
+          write-step-summary: 'true'
+
+      # ── Upload artifacts (runs even on failure) ────────────────────────────
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: reports/
+          retention-days: 30
+
+      - name: Upload static site artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: api-coverage
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

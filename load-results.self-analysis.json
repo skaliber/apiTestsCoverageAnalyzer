@@ -1,0 +1,146 @@
+{
+  "metadata": {
+    "tool": "k6",
+    "version": "0.47.0",
+    "testName": "self-analysis-perf",
+    "startTime": "2024-01-01T00:00:00Z",
+    "endTime": "2024-01-01T00:01:00Z"
+  },
+  "metrics": {
+    "http_req_duration": {
+      "avg": 45.2,
+      "p50": 38.1,
+      "p90": 72.4,
+      "p95": 89.3,
+      "p99": 145.6,
+      "max": 312.1
+    },
+    "http_req_failed": {
+      "rate": 0.002
+    },
+    "http_reqs": {
+      "count": 5000,
+      "rate": 83.3
+    },
+    "iterations": {
+      "count": 5000
+    }
+  },
+  "scenarios": {
+    "post /analyze/endpoints": {
+      "metrics": {
+        "http_req_duration": { "avg": 45.2, "p95": 89.3, "p99": 145.6 },
+        "http_req_failed": { "rate": 0.002 },
+        "http_reqs": { "count": 1000 }
+      }
+    },
+    "post /analyze/parameters": {
+      "metrics": {
+        "http_req_duration": { "avg": 47.1, "p95": 92.4, "p99": 148.2 },
+        "http_req_failed": { "rate": 0.002 },
+        "http_reqs": { "count": 1000 }
+      }
+    },
+    "post /analyze/business-rules": {
+      "metrics": {
+        "http_req_duration": { "avg": 52.3, "p95": 102.1, "p99": 158.4 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 800 }
+      }
+    },
+    "post /analyze/integration-flows": {
+      "metrics": {
+        "http_req_duration": { "avg": 55.7, "p95": 108.6, "p99": 162.3 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 800 }
+      }
+    },
+    "post /analyze/errors": {
+      "metrics": {
+        "http_req_duration": { "avg": 43.8, "p95": 87.1, "p99": 142.6 },
+        "http_req_failed": { "rate": 0.002 },
+        "http_reqs": { "count": 1000 }
+      }
+    },
+    "post /analyze/security": {
+      "metrics": {
+        "http_req_duration": { "avg": 61.4, "p95": 118.9, "p99": 175.2 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 700 }
+      }
+    },
+    "post /analyze/perf-resilience": {
+      "metrics": {
+        "http_req_duration": { "avg": 38.5, "p95": 76.2, "p99": 122.8 },
+        "http_req_failed": { "rate": 0.002 },
+        "http_reqs": { "count": 1200 }
+      }
+    },
+    "post /analyze/compatibility": {
+      "metrics": {
+        "http_req_duration": { "avg": 49.6, "p95": 96.3, "p99": 151.7 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 900 }
+      }
+    },
+    "post /analyze/security-scan": {
+      "metrics": {
+        "http_req_duration": { "avg": 78.3, "p95": 142.6, "p99": 198.4 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 600 }
+      }
+    },
+    "post /analyze/intelligence": {
+      "metrics": {
+        "http_req_duration": { "avg": 85.1, "p95": 158.3, "p99": 215.6 },
+        "http_req_failed": { "rate": 0.001 },
+        "http_reqs": { "count": 500 }
+      }
+    },
+    "post /thresholds/check": {
+      "metrics": {
+        "http_req_duration": { "avg": 12.4, "p95": 22.8, "p99": 35.6 },
+        "http_req_failed": { "rate": 0.0 },
+        "http_reqs": { "count": 2000 }
+      }
+    },
+    "get /reports/summary": {
+      "metrics": {
+        "http_req_duration": { "avg": 32.6, "p95": 65.4, "p99": 98.7 },
+        "http_req_failed": { "rate": 0.0 },
+        "http_reqs": { "count": 1500 }
+      }
+    },
+    "get /reports/pr-summary": {
+      "metrics": {
+        "http_req_duration": { "avg": 28.9, "p95": 58.2, "p99": 87.4 },
+        "http_req_failed": { "rate": 0.0 },
+        "http_reqs": { "count": 1500 }
+      }
+    },
+    "get /reports/build-summary": {
+      "metrics": {
+        "http_req_duration": { "avg": 31.2, "p95": 62.4, "p99": 94.1 },
+        "http_req_failed": { "rate": 0.0 },
+        "http_reqs": { "count": 1500 }
+      }
+    },
+    "post /config/load": {
+      "metrics": {
+        "http_req_duration": { "avg": 18.7, "p95": 35.4, "p99": 52.8 },
+        "http_req_failed": { "rate": 0.0 },
+        "http_reqs": { "count": 1800 }
+      }
+    }
+  },
+  "thresholdResults": {
+    "http_req_duration{p95}": {
+      "threshold": "p(95)<200",
+      "pass": true
+    },
+    "http_req_failed": {
+      "threshold": "rate<0.01",
+      "pass": true
+    }
+  }
+}

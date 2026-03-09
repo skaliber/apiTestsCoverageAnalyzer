@@ -1,18 +1,31 @@
 import { useState } from 'react';
 import { useCoverage } from '../context/CoverageContext';
+import { useSettings } from '../context/SettingsContext';
+import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
+import AiSummaryPanel from '../components/AiSummaryPanel';
+import IntelligenceSection from '../components/IntelligenceSection';
 import type { DetailItem } from '../types';
+import { generateBusinessRulesSummary } from '../utils/markdownSummaries';
 
 export default function BusinessRulesPage() {
   const { report } = useCoverage();
+  const { showAiSummaries } = useSettings();
+  const { findingsFor, recommendationsFor } = useIntelligence();
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const section = report?.details?.business;
   if (!section) {
     return (
-      <div className="p-6 text-gray-500 dark:text-gray-400">
-        No business rules data available.
+      <div className="p-6">
+        <div className="text-gray-500 dark:text-gray-400 mb-4">No business rules data available.</div>
+        <IntelligenceSection
+          coverageType="business"
+          findings={findingsFor('business')}
+          recommendations={recommendationsFor('business')}
+          alwaysShow
+        />
       </div>
     );
   }
@@ -26,6 +39,9 @@ export default function BusinessRulesPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Business Rules</h1>
+      {showAiSummaries && report && (
+        <AiSummaryPanel markdown={generateBusinessRulesSummary(report)} />
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <input
@@ -85,6 +101,12 @@ export default function BusinessRulesPage() {
           </p>
         </div>
       </div>
+
+      <IntelligenceSection
+        coverageType="business"
+        findings={findingsFor('business')}
+        recommendations={recommendationsFor('business')}
+      />
     </div>
   );
 }

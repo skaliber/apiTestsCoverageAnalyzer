@@ -4,7 +4,7 @@ The analyzer is designed to slot into any CI pipeline. This guide covers GitHub 
 
 ## GitHub Actions
 
-An example workflow is provided at [`ci/examples/github-actions.yaml`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/ci/examples/github-actions.yaml). Copy it to `.github/workflows/api-coverage.yaml` in your project.
+An example workflow is provided at [`ci/examples/github-actions.yaml`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/ci/examples/github-actions.yaml). Copy it to `.github/workflows/api-coverage.yaml` in your project.
 
 ```yaml
 name: API Coverage Analysis
@@ -111,7 +111,7 @@ Add a separate job to build and publish the documentation site:
 
 ## Jenkins Pipeline
 
-An example `Jenkinsfile` is at [`ci/examples/jenkins-pipeline.groovy`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/ci/examples/jenkins-pipeline.groovy). Key stages:
+An example `Jenkinsfile` is at [`ci/examples/jenkins-pipeline.groovy`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/ci/examples/jenkins-pipeline.groovy). Key stages:
 
 ```groovy
 pipeline {
@@ -146,7 +146,7 @@ pipeline {
 
 ## Enforcing thresholds
 
-When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Use `--threshold-*` flags or set them in `coverage.config.json`.
+When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Set thresholds in `config.yaml` or use `--threshold-*` CLI flags (deprecated).
 
 ```json
 {
@@ -163,18 +163,78 @@ When any threshold is exceeded the CLI exits with code **1**, causing the CI ste
 }
 ```
 
+## Security scanning in CI
+
+Add integrated scanner steps before the coverage gate to catch vulnerabilities, secrets, and misconfigurations:
+
+```yaml
+  - name: Run Semgrep SAST
+    run: semgrep scan --json --config p/security-audit src/ > reports/semgrep.json
+    continue-on-error: true   # let the gate decide pass/fail
+
+  - name: Run Trivy dependency + secret scan
+    run: |
+      trivy fs --format json --scanners vuln,secret,misconfig \
+        --output reports/trivy.json .
+
+  - name: Enforce security gate
+    run: |
+      node dist/index.js security-scan \
+        --semgrep-report reports/semgrep.json \
+        --trivy-report   reports/trivy.json \
+        --fail-on-critical \
+        --fail-on-high \
+        --max-secrets 0 \
+        --max-medium 10
+
+  - name: Upload security reports
+    if: always()
+    uses: actions/upload-artifact@v4
+    with:
+      name: security-reports
+      path: |
+        reports/security-scan-summary.json
+        reports/security-scan-summary.html
+        reports/security-sast.json
+        reports/security-dependencies.json
+        reports/security-secrets.json
+        reports/security-ai-summary.md
+      retention-days: 30
+```
+
+For ZAP dynamic scanning, run ZAP in a separate job (or Docker container) and import the report:
+
+```yaml
+  - name: ZAP baseline scan (staging)
+    run: |
+      docker run --rm -v $(pwd)/reports:/zap/wrk:rw \
+        owasp/zap2docker-stable \
+        zap-baseline.py -t https://staging.example.com -J /zap/wrk/zap.json
+    continue-on-error: true
+
+  - name: Import ZAP findings into security gate
+    run: |
+      node dist/index.js security-scan \
+        --zap-report reports/zap.json \
+        --fail-on-critical
+```
+
+See the [Security Scanning guide →](./security-scanning.md) for full configuration options.
+
 ## Integration flow
 
 ```mermaid
 flowchart TD
     A[Push / PR] --> B[Checkout]
     B --> C[npm ci]
-    C --> D[Run Coverage Commands]
-    D --> E{All thresholds met?}
-    E -- Yes --> F[Upload Reports]
-    E -- No --> G[❌ Fail Build]
-    F --> H[Publish JUnit results]
-    H --> I[✅ Pass]
+    C --> D[Run Semgrep + Trivy]
+    D --> E[Run Coverage Commands]
+    E --> F[Security Gate]
+    F --> G{All thresholds met?}
+    G -- Yes --> H[Upload Reports]
+    G -- No --> I[❌ Fail Build]
+    H --> J[Publish JUnit results]
+    J --> K[✅ Pass]
 ```
 
 ## Uploading HTML reports
@@ -188,5 +248,6 @@ netlify deploy --prod --dir reports/
 
 ## Next steps
 
-- [Interpreting Reports →](/guide/interpreting-reports)
-- [CLI Reference →](/reference/cli)
+- [Security Scanning →](./security-scanning.md)
+- [Interpreting Reports →](./interpreting-reports.md)
+- [CLI Reference →](../reference/cli.md)

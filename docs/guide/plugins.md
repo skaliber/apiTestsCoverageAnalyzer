@@ -77,7 +77,7 @@ async function analyze({ testPatterns, config }) {
 module.exports = { analyze }
 ```
 
-### 2. Register the plugin in `coverage.config.json`
+### 2. Register the plugin in `config.yaml`
 
 ```json
 {
@@ -91,7 +91,7 @@ Plugins are loaded and run automatically for every coverage command. Their resul
 
 ## GraphQL plugin example
 
-A fully worked example is included at [`plugins/graphql-coverage.js`](https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/plugins/graphql-coverage.js). It:
+A fully worked example is included at [`plugins/graphql-coverage.js`](https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/plugins/graphql-coverage.js). It:
 
 1. Reads a `schema.graphql` file from the project root.
 2. Parses all types and fields using a lightweight regex-based SDL parser (no `graphql` package dependency).
@@ -102,7 +102,7 @@ A fully worked example is included at [`plugins/graphql-coverage.js`](https://gi
 
 ```mermaid
 flowchart TD
-    A[Load coverage.config.json] --> B[Read plugins array]
+    A[Load config.yaml] --> B[Read plugins array]
     B --> C{For each plugin path}
     C --> D[require plugin file]
     D --> E{Exports analyze?}
@@ -127,7 +127,7 @@ If you want to share your plugin, publish it as an npm package. Name it `api-cov
 npm publish --access public
 ```
 
-Users install it and reference it by module name in `coverage.config.json`:
+Users install it and reference it by module name in `config.yaml`:
 
 ```json
 {
@@ -137,5 +137,5 @@ Users install it and reference it by module name in `coverage.config.json`:
 
 ## Next steps
 
-- [Configuration Schema →](/reference/configuration)
-- [Plugin API →](/reference/plugin-api)
+- [Configuration Schema →](../reference/configuration.md)
+- [Plugin API →](../reference/plugin-api.md)

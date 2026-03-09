@@ -9,6 +9,7 @@ const navItems = [
   { to: '/security', label: '🔒 Security' },
   { to: '/error-handling', label: '⚠️ Error Handling' },
   { to: '/performance', label: '⚡ Performance' },
+  { to: '/intelligence', label: '🧠 Intelligence' },
   { to: '/trends', label: '📈 Trends' },
 ];
 

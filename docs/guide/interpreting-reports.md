@@ -2,6 +2,10 @@
 
 Each coverage command writes one or more output files to the `reports/` directory. This guide explains what each report contains and how to act on it.
 
+**Dashboard view:**
+
+![Coverage overview dashboard showing all coverage percentages](../assets/screenshots/overview-dashboard.png)
+
 ## Report formats
 
 | Format | File | Best for |
@@ -50,7 +54,7 @@ The endpoint report shows which `METHOD /path` combinations are exercised.
 
 **Action:** For each uncovered endpoint, either:
 1. Write a test that calls the endpoint, or
-2. Add it to `exclude.paths` in `coverage.config.json` if it is intentionally not tested.
+2. Add the path to an exclusion list via CLI `--exclude-paths` if it is intentionally not tested.
 
 ## Parameter coverage
 
@@ -200,5 +204,5 @@ This is useful for including in PR descriptions or Confluence pages.
 
 ## Next steps
 
-- [Writing Effective Tests →](/guide/writing-tests)
-- [CLI Reference →](/reference/cli)
+- [Writing Effective Tests →](./writing-tests.md)
+- [CLI Reference →](../reference/cli.md)

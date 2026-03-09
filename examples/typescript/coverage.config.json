@@ -1,0 +1,21 @@
+{
+  "openApiSpec": "./openapi.yaml",
+  "testResultsDir": "./coverage",
+  "outputDir": "./reports",
+  "thresholds": {
+    "endpoint": 70,
+    "business": 60,
+    "security": 50,
+    "error": 50
+  },
+  "businessRules": [
+    { "id": "min-fund-amount", "description": "Minimum funding amount is $1", "tags": ["funding", "validation"] },
+    { "id": "insufficient-funds", "description": "Debit cannot exceed balance", "tags": ["debit", "balance"] },
+    { "id": "frozen-wallet-reject", "description": "Frozen wallets reject all transactions", "tags": ["freeze", "status"] },
+    { "id": "daily-limit", "description": "Daily transaction limit is $10,000", "tags": ["limit", "risk"] },
+    { "id": "transfer-same-currency", "description": "Transfer requires matching currencies", "tags": ["transfer", "currency"] },
+    { "id": "refund-window", "description": "Refund allowed only within 30 days", "tags": ["payment", "refund"] },
+    { "id": "fraud-check", "description": "Payments require fraud check approval", "tags": ["payment", "fraud"] },
+    { "id": "idempotency", "description": "Duplicate requests with same key return same result", "tags": ["payment", "idempotency"] }
+  ]
+}

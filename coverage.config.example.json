@@ -1,0 +1,89 @@
+{
+  "thresholds": {
+    "global": 100,
+    "endpoint": 100,
+    "parameter": 100,
+    "business": 100,
+    "integration": 100,
+    "security": 100,
+    "error": 100,
+    "performance": 90,
+    "compatibility": 100
+  },
+  "thresholdsByBranch": {
+    "main": { "global": 100 },
+    "release/*": { "global": 100 },
+    "feature/*": { "global": 80 }
+  },
+  "summary": {
+    "enabled": true,
+    "generatePrSummary": true,
+    "generateBuildSummary": true,
+    "generateAiSummary": true,
+    "includeOnlyEvaluatedSections": false,
+    "publishPrComment": true,
+    "publishGithubStepSummary": true,
+    "publishJenkinsSummary": true
+  },
+  "publishing": {
+    "enabled": true,
+    "outputDir": "site",
+    "buildId": "run-number",
+    "githubPages": {
+      "enabled": true,
+      "basePath": "/apiTestsCoverageAnalyzer/"
+    },
+    "artifacts": {
+      "includeJson": true,
+      "includeHtml": true,
+      "includeCsv": true,
+      "includeJunit": true,
+      "includeMarkdown": true,
+      "includeScreenshots": true
+    },
+    "screenshots": {
+      "enabled": false,
+      "strict": false
+    }
+  },
+  "qualityGate": {
+    "enabled": true,
+    "failBuildOnThresholdMiss": true,
+    "mode": "strict"
+  },
+  "exclude": {
+    "paths": ["/internal/*", "/health"],
+    "methods": ["OPTIONS", "HEAD"]
+  },
+  "testPatterns": ["tests/**/*.ts"],
+  "plugins": [],
+  "mcp": {
+    "enabled": false,
+    "defaultTransport": "stdio",
+    "timeoutMs": 30000,
+    "maxPayloadBytes": 1048576,
+    "retryPolicy": {
+      "maxRetries": 2,
+      "retryDelayMs": 500
+    },
+    "servers": {
+      "coverageSummary": {
+        "enabled": false,
+        "transport": "stdio",
+        "command": "node",
+        "args": ["./src/mcp/testing/mock-server/stdio-server.js"]
+      },
+      "securityScan": {
+        "enabled": false,
+        "transport": "http",
+        "url": "http://localhost:3099/mcp"
+      },
+      "performanceAnalysis": {
+        "enabled": false
+      },
+      "compatibilityAnalysis": {
+        "enabled": false
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'API Test Coverage Analyzer',
   description: 'Comprehensive documentation for the API Test Coverage Analyzer – analyse endpoint, parameter, business-logic, security, and more against your OpenAPI specs.',
   base: '/apiTestsCoverageAnalyzer/',
+  cleanUrls: true,
 
   ignoreDeadLinks: [
     /^http:\/\/localhost/,
@@ -34,6 +35,11 @@ export default defineConfig({
           text: 'Workflows',
           items: [
             { text: 'CI/CD Integration', link: '/guide/ci-cd' },
+            { text: 'Multi-Language Support', link: '/guide/multi-language' },
+            { text: 'Security Scanning', link: '/guide/security-scanning' },
+            { text: 'MCP Integration', link: '/guide/mcp-integration' },
+            { text: 'Coverage Intelligence', link: '/guide/coverage-intelligence' },
+            { text: 'TypeScript Example Project', link: '/guide/typescript-example' },
             { text: 'Interpreting Reports', link: '/guide/interpreting-reports' },
             { text: 'Writing Effective Tests', link: '/guide/writing-tests' },
             { text: 'Extending via Plugins', link: '/guide/plugins' },
@@ -62,7 +68,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/skaliber/apiTestsCoverageAnalyzer' },
+      { icon: 'github', link: 'https://github.com/q-intel/apiTestsCoverageAnalyzer' },
     ],
 
     search: {
@@ -70,7 +76,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/skaliber/apiTestsCoverageAnalyzer/edit/main/docs/:path',
+      pattern: 'https://github.com/q-intel/apiTestsCoverageAnalyzer/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 

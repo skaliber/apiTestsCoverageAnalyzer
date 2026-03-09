@@ -1,0 +1,171 @@
+name: 'API Test Coverage Analyzer'
+description: 'Analyze API test coverage based on OpenAPI specs and generate reports'
+author: 'skaliber'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  spec:
+    description: 'Path to OpenAPI/Swagger spec file'
+    required: false
+    default: 'sample/openapi.yaml'
+  tests:
+    description: 'Glob pattern for test files'
+    required: false
+    default: 'tests/**/*.ts'
+  format:
+    description: 'Comma-separated report formats: json,html,csv,junit'
+    required: false
+    default: 'json,html'
+  coverage-types:
+    description: 'Comma-separated coverage types to run: endpoint,parameter,business,integration,error,security,security-scan (default: endpoint)'
+    required: false
+    default: 'endpoint'
+  rules:
+    description: 'Path to business rules YAML/JSON file (required for business coverage)'
+    required: false
+  flows:
+    description: 'Path to integration flows YAML/JSON file (required for integration coverage)'
+    required: false
+  language:
+    description: 'Test language(s) to analyse (auto,typescript,javascript,java,python,ruby,cucumber). Default: auto'
+    required: false
+    default: 'auto'
+  threshold-endpoint:
+    description: 'Minimum required endpoint coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-parameter:
+    description: 'Minimum required parameter coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-business:
+    description: 'Minimum required business rule coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-integration:
+    description: 'Minimum required integration flow coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-error:
+    description: 'Minimum required error handling coverage percentage (0-100)'
+    required: false
+    default: '0'
+  # ── Security scanning inputs ──────────────────────────────────────────────
+  semgrep-report:
+    description: 'Path to a pre-generated Semgrep JSON report (enables Semgrep findings in security-scan)'
+    required: false
+  trivy-report:
+    description: 'Path to a pre-generated Trivy JSON report (enables Trivy findings in security-scan)'
+    required: false
+  zap-report:
+    description: 'Path to a pre-generated ZAP JSON report (enables ZAP findings in security-scan)'
+    required: false
+  fail-on-critical:
+    description: 'Fail the security gate if any CRITICAL finding exists (security-scan only)'
+    required: false
+    default: 'false'
+  fail-on-high:
+    description: 'Fail the security gate if any HIGH finding exists (security-scan only)'
+    required: false
+    default: 'false'
+  max-secrets:
+    description: 'Maximum allowed secrets (any severity). Empty = no limit. (security-scan only)'
+    required: false
+  max-medium:
+    description: 'Maximum allowed MEDIUM findings. Empty = no limit. (security-scan only)'
+    required: false
+  max-misconfig-high:
+    description: 'Maximum allowed HIGH/CRITICAL misconfigurations. Empty = no limit. (security-scan only)'
+    required: false
+  max-critical-vulns:
+    description: 'Maximum allowed CRITICAL dependency vulnerabilities. Empty = no limit. (security-scan only)'
+    required: false
+  max-high-vulns:
+    description: 'Maximum allowed HIGH dependency vulnerabilities. Empty = no limit. (security-scan only)'
+    required: false
+  threshold-security:
+    description: 'Minimum required security coverage percentage (0-100)'
+    required: false
+    default: '0'
+  threshold-global:
+    description: 'Global minimum coverage percentage applied to all categories (0-100) when no per-category threshold is defined.'
+    required: false
+    default: '0'
+  reports-dir:
+    description: 'Directory to write reports into'
+    required: false
+    default: 'reports'
+  config:
+    description: 'Path to a coverage.config.json configuration file'
+    required: false
+  publish-pages:
+    description: 'Generate a static site bundle suitable for GitHub Pages deployment'
+    required: false
+    default: 'false'
+  site-dir:
+    description: 'Output directory for the static site (default: site)'
+    required: false
+    default: 'site'
+  pages-base-path:
+    description: 'Base path for GitHub Pages (e.g. /apiTestsCoverageAnalyzer/)'
+    required: false
+    default: '/'
+  quality-gate:
+    description: 'Enable quality gate enforcement. Build fails when coverage is below threshold.'
+    required: false
+    default: 'true'
+  quality-gate-mode:
+    description: 'Quality gate mode: strict (fail build) or warn (log only)'
+    required: false
+    default: 'strict'
+  write-step-summary:
+    description: 'Write a Markdown summary to the GitHub Actions step summary'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'GitHub token used to post a coverage summary comment on the pull request. Requires pull-requests: write permission. Leave empty to disable PR comments.'
+    required: false
+    default: ''
+  post-pr-comment:
+    description: 'Post (or update) a coverage summary comment on the pull request when running in a PR context. Set to false to disable.'
+    required: false
+    default: 'true'
+
+outputs:
+  endpoint-coverage:
+    description: 'Endpoint coverage percentage'
+  parameter-coverage:
+    description: 'Parameter coverage percentage'
+  business-coverage:
+    description: 'Business rule coverage percentage'
+  integration-coverage:
+    description: 'Integration flow coverage percentage'
+  error-coverage:
+    description: 'Error handling coverage percentage'
+  security-scan-findings:
+    description: 'Total number of security scan findings (security-scan only)'
+  security-gate-passed:
+    description: 'Whether the security gate passed: "true" or "false" (security-scan only)'
+  security-coverage:
+    description: 'Security coverage percentage'
+  reports-dir:
+    description: 'Path to the generated reports directory'
+  site-dir:
+    description: 'Path to the generated static site directory'
+  quality-gate-passed:
+    description: 'Whether the quality gate passed (true/false)'
+  overallStatus:
+    description: 'Overall status: "passed" or "failed"'
+  overallCoverage:
+    description: 'Average coverage percentage across all analyzed categories'
+  failedGates:
+    description: 'Comma-separated list of categories whose gates failed (empty when all pass)'
+  summaryPath:
+    description: 'Path to the generated build-summary.md file'
+
+runs:
+  using: 'node20'
+  main: '../dist/action/src/index.js'

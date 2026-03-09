@@ -1,0 +1,299 @@
+{
+  "total": 27,
+  "covered": 7,
+  "percentage": 23.08,
+  "scanFindings": 0,
+  "categorySummary": {
+    "authentication": {
+      "total": 1,
+      "covered": 1
+    },
+    "authorization": {
+      "total": 13,
+      "covered": 0
+    },
+    "input-validation": {
+      "total": 11,
+      "covered": 5
+    },
+    "cryptography": {
+      "total": 1,
+      "covered": 0
+    },
+    "session-management": {
+      "total": 0,
+      "covered": 0
+    }
+  },
+  "controls": [
+    {
+      "id": "authentication:bearerAuth",
+      "category": "authentication",
+      "description": "Authentication via security scheme \"bearerAuth\" (http/bearer)",
+      "covered": true,
+      "matchedTests": [
+        "returns 401 when no token",
+        "returns 401 when no token provided",
+        "returns 401 for invalid token",
+        "returns 401 without auth"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "cryptography:https",
+      "category": "cryptography",
+      "description": "API servers include non-HTTPS URLs – cryptographic transport security may be missing",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:get:/wallets",
+      "category": "authorization",
+      "description": "Authorization check for GET /wallets",
+      "endpoint": "GET /wallets",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/wallets",
+      "category": "authorization",
+      "description": "Authorization check for POST /wallets",
+      "endpoint": "POST /wallets",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/wallets",
+      "category": "input-validation",
+      "description": "Input validation for POST /wallets",
+      "endpoint": "POST /wallets",
+      "covered": true,
+      "matchedTests": [
+        "returns 400 when currency is missing",
+        "returns 400 for unsupported currency",
+        "returns 422 for insufficient funds",
+        "returns 401 for invalid token",
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:get:/wallets/{id}",
+      "category": "authorization",
+      "description": "Authorization check for GET /wallets/{id}",
+      "endpoint": "GET /wallets/{id}",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:get:/wallets/{id}",
+      "category": "input-validation",
+      "description": "Input validation for GET /wallets/{id}",
+      "endpoint": "GET /wallets/{id}",
+      "covered": true,
+      "matchedTests": [
+        "returns 422 for insufficient funds",
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:delete:/wallets/{id}",
+      "category": "authorization",
+      "description": "Authorization check for DELETE /wallets/{id}",
+      "endpoint": "DELETE /wallets/{id}",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:delete:/wallets/{id}",
+      "category": "input-validation",
+      "description": "Input validation for DELETE /wallets/{id}",
+      "endpoint": "DELETE /wallets/{id}",
+      "covered": true,
+      "matchedTests": [
+        "returns 422 for insufficient funds",
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:patch:/wallets/{id}/freeze",
+      "category": "authorization",
+      "description": "Authorization check for PATCH /wallets/{id}/freeze",
+      "endpoint": "PATCH /wallets/{id}/freeze",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:patch:/wallets/{id}/freeze",
+      "category": "input-validation",
+      "description": "Input validation for PATCH /wallets/{id}/freeze",
+      "endpoint": "PATCH /wallets/{id}/freeze",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:patch:/wallets/{id}/unfreeze",
+      "category": "authorization",
+      "description": "Authorization check for PATCH /wallets/{id}/unfreeze",
+      "endpoint": "PATCH /wallets/{id}/unfreeze",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:patch:/wallets/{id}/unfreeze",
+      "category": "input-validation",
+      "description": "Input validation for PATCH /wallets/{id}/unfreeze",
+      "endpoint": "PATCH /wallets/{id}/unfreeze",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/wallets/{id}/fund",
+      "category": "authorization",
+      "description": "Authorization check for POST /wallets/{id}/fund",
+      "endpoint": "POST /wallets/{id}/fund",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/wallets/{id}/fund",
+      "category": "input-validation",
+      "description": "Input validation for POST /wallets/{id}/fund",
+      "endpoint": "POST /wallets/{id}/fund",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/wallets/{id}/debit",
+      "category": "authorization",
+      "description": "Authorization check for POST /wallets/{id}/debit",
+      "endpoint": "POST /wallets/{id}/debit",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/wallets/{id}/debit",
+      "category": "input-validation",
+      "description": "Input validation for POST /wallets/{id}/debit",
+      "endpoint": "POST /wallets/{id}/debit",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/wallets/{id}/transfer",
+      "category": "authorization",
+      "description": "Authorization check for POST /wallets/{id}/transfer",
+      "endpoint": "POST /wallets/{id}/transfer",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/wallets/{id}/transfer",
+      "category": "input-validation",
+      "description": "Input validation for POST /wallets/{id}/transfer",
+      "endpoint": "POST /wallets/{id}/transfer",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/payments",
+      "category": "authorization",
+      "description": "Authorization check for POST /payments",
+      "endpoint": "POST /payments",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/payments",
+      "category": "input-validation",
+      "description": "Input validation for POST /payments",
+      "endpoint": "POST /payments",
+      "covered": true,
+      "matchedTests": [
+        "returns 400 for missing required fields",
+        "returns 422 for invalid (non-existent) wallet",
+        "returns 422 when refunding a non-completed payment"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:get:/payments/{id}",
+      "category": "authorization",
+      "description": "Authorization check for GET /payments/{id}",
+      "endpoint": "GET /payments/{id}",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:get:/payments/{id}",
+      "category": "input-validation",
+      "description": "Input validation for GET /payments/{id}",
+      "endpoint": "GET /payments/{id}",
+      "covered": true,
+      "matchedTests": [
+        "returns 422 when refunding a non-completed payment"
+      ],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:post:/payments/{id}/refund",
+      "category": "authorization",
+      "description": "Authorization check for POST /payments/{id}/refund",
+      "endpoint": "POST /payments/{id}/refund",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "input-validation:post:/payments/{id}/refund",
+      "category": "input-validation",
+      "description": "Input validation for POST /payments/{id}/refund",
+      "endpoint": "POST /payments/{id}/refund",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authorization:get:/transactions",
+      "category": "authorization",
+      "description": "Authorization check for GET /transactions",
+      "endpoint": "GET /transactions",
+      "covered": false,
+      "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authentication:JWT",
+      "category": "authentication",
+      "description": "JWT token signature and expiry validation",
+      "covered": true,
+      "matchedTests": [
+        "returns 401 for expired JWT",
+        "returns 401 for invalid JWT signature"
+      ],
+      "coveredByScanReport": false
+    }
+  ]
+}

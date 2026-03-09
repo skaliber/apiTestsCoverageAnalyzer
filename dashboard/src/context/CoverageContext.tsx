@@ -5,7 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import type { CoverageReport } from '../types';
+import type { CoverageReport, DetailSection, DetailItem } from '../types';
 
 interface CoverageContextValue {
   report: CoverageReport | null;
@@ -18,6 +18,100 @@ interface CoverageContextValue {
 }
 
 const CoverageContext = createContext<CoverageContextValue | undefined>(undefined);
+
+// ─── Data normalization ───────────────────────────────────────────────────────
+// The analyzer CLI emits details as flat arrays; the dashboard expects
+// { items: DetailItem[] }.  This normalizer handles both shapes so the
+// dashboard works with reports from the analyzer AND with the demo report
+// (which already uses the items format).
+
+function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: number): DetailItem {
+  // Already in the right shape — has an 'id' field directly
+  if (typeof raw.id === 'string') {
+    return {
+      id: raw.id,
+      covered: Boolean(raw.covered),
+      tests: (raw.tests ?? raw.matchedTests) as string[] | undefined,
+      steps: raw.steps as number | undefined,
+      coveredSteps: raw.coveredSteps as number | undefined,
+      threshold: raw.threshold as string | undefined,
+    };
+  }
+
+  switch (sectionKey) {
+    case 'endpoint': {
+      const ep = (raw.endpoint ?? {}) as { method?: string; path?: string };
+      const tests = (raw.matchedTests ?? []) as string[];
+      return {
+        id: `${ep.method ?? ''} ${ep.path ?? ''}`.trim() || `endpoint-${idx}`,
+        covered: Boolean(raw.covered),
+        tests,
+      };
+    }
+    case 'business': {
+      const tests = (raw.matchedTests ?? []) as string[];
+      return {
+        id: (raw.name as string) || (raw.id as string) || `rule-${idx}`,
+        covered: Boolean(raw.covered),
+        tests,
+      };
+    }
+    case 'error': {
+      const ep = (raw.endpoint ?? {}) as { method?: string; path?: string };
+      const codes = (raw.errorCodes ?? []) as string[];
+      const codeStr = codes.length ? ` (${codes.join(', ')})` : '';
+      return {
+        id: (`${ep.method ?? ''} ${ep.path ?? ''}${codeStr}`).trim() || `error-${idx}`,
+        covered: Boolean(raw.covered),
+        tests: [],
+      };
+    }
+    case 'security': {
+      const ctrl = (raw.control ?? {}) as { id?: string; category?: string; description?: string };
+      const tests = (raw.matchedTests ?? []) as string[];
+      return {
+        id: ctrl.id || `security-${idx}`,
+        covered: Boolean(raw.covered),
+        tests,
+      };
+    }
+    default: {
+      return {
+        id: (raw.id as string) || (raw.name as string) || `${sectionKey}-${idx}`,
+        covered: Boolean(raw.covered),
+        tests: (raw.tests ?? raw.matchedTests) as string[] | undefined,
+        steps: raw.steps as number | undefined,
+        coveredSteps: raw.coveredSteps as number | undefined,
+        threshold: raw.threshold as string | undefined,
+      };
+    }
+  }
+}
+
+export function normalizeSection(value: unknown, sectionKey: string): DetailSection {
+  if (Array.isArray(value)) {
+    return {
+      items: value.map((item, idx) =>
+        normalizeItem(item as Record<string, unknown>, sectionKey, idx),
+      ),
+    };
+  }
+  if (value && typeof value === 'object' && 'items' in value) {
+    return value as DetailSection;
+  }
+  return { items: [] };
+}
+
+export function normalizeReport(raw: CoverageReport): CoverageReport {
+  if (!raw.details) return raw;
+  const normalizedDetails: Record<string, DetailSection> = {};
+  for (const [key, value] of Object.entries(raw.details)) {
+    normalizedDetails[key] = normalizeSection(value, key);
+  }
+  return { ...raw, details: normalizedDetails };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function CoverageProvider({ children }: { children: ReactNode }) {
   const [report, setReport] = useState<CoverageReport | null>(null);
@@ -35,8 +129,9 @@ export function CoverageProvider({ children }: { children: ReactNode }) {
         return res.json();
       })
       .then((data: CoverageReport) => {
-        setReport(data);
-        setHistoricalReports([{ name: 'coverage-summary.json', report: data }]);
+        const normalized = normalizeReport(data);
+        setReport(normalized);
+        setHistoricalReports([{ name: 'coverage-summary.json', report: normalized }]);
         setLoading(false);
       })
       .catch((err: unknown) => {
@@ -51,7 +146,8 @@ export function CoverageProvider({ children }: { children: ReactNode }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = JSON.parse(e.target?.result as string) as CoverageReport;
+        const raw = JSON.parse(e.target?.result as string) as CoverageReport;
+        const data = normalizeReport(raw);
         setReport(data);
         setReportName(file.name);
         setHistoricalReports((prev) => {

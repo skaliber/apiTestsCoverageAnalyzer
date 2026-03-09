@@ -1,0 +1,197 @@
+# =============================================================================
+#  config.yaml.example — Annotated full reference configuration
+#
+#  Copy this file to config.yaml and customize for your project.
+#  All fields are optional except `version`.
+#  When config.yaml is absent, the analyzer runs a full default profile and
+#  emits a warning.  See docs/guides/configuration.md for the full reference.
+# =============================================================================
+
+# Required. Config schema version. Must be 1 for this release.
+version: 1
+
+# ── Project ──────────────────────────────────────────────────────────────────
+
+project:
+  # Optional. Display name used in reports and summaries.
+  # Default: (absent)
+  name: my-api-project
+
+# ── Analysis mode ─────────────────────────────────────────────────────────────
+
+analysis:
+  # Optional. 'full' runs every scan type. 'custom' runs only explicitly-enabled types.
+  # Default: full
+  defaultMode: full
+
+  # Optional. If true, the analyzer exits non-zero when config.yaml is missing.
+  # Default: false
+  failOnConfigMissing: false
+
+  # Optional. If true, a warning is printed when config.yaml is absent.
+  # Default: true
+  warnOnConfigMissing: true
+
+# ── Scans ─────────────────────────────────────────────────────────────────────
+
+scans:
+
+  # Coverage scan configuration
+  coverage:
+    # Optional. Set false to skip all coverage scans.
+    # Default: true
+    enabled: true
+
+    # Optional. Which coverage types to run.
+    # Valid values: endpoint | parameter | business | integration | error |
+    #               security | performance | compatibility
+    # Default: all types
+    types:
+      - endpoint
+      - parameter
+      - business
+      - integration
+      - error
+      - security
+      - performance
+      - compatibility
+
+  # Security scanner configuration
+  security:
+    # Optional. Set false to skip all security scanners.
+    # Default: true
+    enabled: true
+
+    # Optional. Which security scanners to run (only runs if scanner is installed).
+    # Valid values: semgrep | trivy | zap
+    # Default: all scanners
+    scanners:
+      - semgrep
+      - trivy
+      - zap
+
+  # AI and intelligent analysis configuration
+  intelligence:
+    # Optional. Set false to skip all AI analysis silently.
+    # Default: true
+    enabled: true
+
+    # Optional. Which intelligence analysis types to run.
+    # Valid values: ai-summary | risk-prioritization | recommendations |
+    #               scanner-interpretation
+    # Default: all types
+    types:
+      - ai-summary
+      - risk-prioritization
+      - recommendations
+      - scanner-interpretation
+
+# ── MCP integration ───────────────────────────────────────────────────────────
+
+mcp:
+  # Optional. Set true to enable MCP server integrations.
+  # Default: false (disabled when config.yaml is absent to avoid unexpected network calls)
+  enabled: false
+
+  # Optional. Default transport for all servers that do not specify one.
+  # Valid values: stdio | http
+  # Default: stdio
+  defaultTransport: stdio
+
+  # Optional. Default request timeout in milliseconds.
+  # Default: 30000
+  timeoutMs: 30000
+
+  # Optional. Named MCP server definitions.
+  servers:
+    # Each key is a server ID of your choice.
+    # Example: stdio transport (spawns a local process)
+    # coverageSummary:
+    #   enabled: true                          # Required per-server
+    #   transport: stdio                       # Optional; inherits defaultTransport
+    #   command: node                          # Required when transport is 'stdio'
+    #   args:                                  # Optional arguments for the command
+    #     - ./mcp-servers/coverage-summary.js
+
+    # Example: HTTP transport (connects to a running HTTP MCP server)
+    # securityScan:
+    #   enabled: true
+    #   transport: http
+    #   url: http://localhost:3100/mcp         # Required when transport is 'http'
+    #   headers:                               # Optional auth headers
+    #     Authorization: Bearer my-token
+
+# ── Thresholds ────────────────────────────────────────────────────────────────
+
+thresholds:
+  # Optional. Default threshold applied when no type-specific value is set.
+  # Valid range: 0 – 100.
+  # Default: 80
+  global: 80
+
+  # Optional per-type thresholds (0–100). Each overrides 'global' for that type.
+  endpoint: 80
+  parameter: 80
+  business: 80
+  integration: 80
+  error: 80
+  security: 80
+  performance: 80
+  compatibility: 80
+
+# ── Quality gate ──────────────────────────────────────────────────────────────
+
+qualityGate:
+  # Optional. Enables threshold enforcement.
+  # Default: true
+  enabled: true
+
+  # Optional. When true, the analyzer exits non-zero if any threshold is missed.
+  # Default: false
+  failBuildOnThresholdMiss: false
+
+  # Optional. 'strict' fails on unknown config keys and any threshold miss.
+  #           'warn' logs threshold misses without failing the build.
+  # Valid values: strict | warn
+  # Default: warn
+  mode: warn
+
+# ── Reports ───────────────────────────────────────────────────────────────────
+
+reports:
+  # Optional. Directory where all report files are written.
+  # Default: reports
+  outputDir: reports
+
+  # Optional. Which report formats to produce.
+  # Valid values: json | html | csv | junit | markdown
+  # Default: [json]
+  formats:
+    - json
+    - html
+    - csv
+    - junit
+
+# ── Publishing ────────────────────────────────────────────────────────────────
+
+publishing:
+  # Optional. Set true to enable static site publishing.
+  # Default: false
+  enabled: false
+
+  githubPages:
+    # Optional. Set true to publish to GitHub Pages via gh-pages branch.
+    # Default: false
+    enabled: false
+
+# ── Dashboard ─────────────────────────────────────────────────────────────────
+
+dashboard:
+  aiSummary:
+    # Optional. When false, AI summary panels are hidden in the dashboard.
+    # Default: true
+    enabled: true
+
+    # Optional. When true, AI summary panels start collapsed in the dashboard.
+    # Default: true
+    collapsedByDefault: true

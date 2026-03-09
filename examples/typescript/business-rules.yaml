@@ -1,0 +1,93 @@
+rules:
+  - id: min-fund-amount
+    description: "Minimum funding amount is $1"
+    endpoints:
+      - "POST /wallets/{walletId}/fund"
+    keywords:
+      - "minimum"
+      - "fund amount"
+      - "min fund"
+      - "400"
+      - "invalid amount"
+      - "below minimum"
+
+  - id: insufficient-funds
+    description: "Debit cannot exceed balance"
+    endpoints:
+      - "POST /wallets/{walletId}/debit"
+    keywords:
+      - "insufficient"
+      - "insufficient funds"
+      - "exceed balance"
+      - "balance"
+      - "422"
+      - "not enough"
+
+  - id: frozen-wallet-reject
+    description: "Frozen wallets reject all transactions"
+    endpoints:
+      - "POST /wallets/{walletId}/debit"
+      - "POST /wallets/{walletId}/fund"
+      - "POST /wallets/{walletId}/transfer"
+    keywords:
+      - "frozen"
+      - "freeze"
+      - "wallet frozen"
+      - "403"
+      - "rejected"
+
+  - id: daily-limit
+    description: "Daily transaction limit is $10,000"
+    endpoints:
+      - "POST /wallets/{walletId}/debit"
+      - "POST /wallets/{walletId}/transfer"
+    keywords:
+      - "daily limit"
+      - "10000"
+      - "limit exceeded"
+      - "daily"
+      - "429"
+
+  - id: transfer-same-currency
+    description: "Transfer requires matching currencies"
+    endpoints:
+      - "POST /wallets/{walletId}/transfer"
+    keywords:
+      - "currency"
+      - "currency mismatch"
+      - "same currency"
+      - "422"
+      - "mismatch"
+
+  - id: refund-window
+    description: "Refund allowed only within 30 days"
+    endpoints:
+      - "POST /payments/{paymentId}/refund"
+    keywords:
+      - "refund"
+      - "30 days"
+      - "refund window"
+      - "422"
+      - "expired"
+
+  - id: fraud-check
+    description: "Payments require fraud check approval"
+    endpoints:
+      - "POST /payments"
+    keywords:
+      - "fraud"
+      - "fraud check"
+      - "fraud engine"
+      - "declined"
+      - "approved"
+
+  - id: idempotency
+    description: "Duplicate requests with same key return same result"
+    endpoints:
+      - "POST /payments"
+    keywords:
+      - "idempotency"
+      - "idempotency-key"
+      - "duplicate"
+      - "same result"
+      - "idempotent"

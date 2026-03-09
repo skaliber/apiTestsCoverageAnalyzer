@@ -68,6 +68,14 @@ test('GET /users/{id} - unauthorized request returns 401', () => {
 
 // ─── PUT /users/{id} ─────────────────────────────────────────────────────────
 
+test('PUT /users/{id} - unauthorized request without token returns 401', () => {
+  const method = 'PUT';
+  const url = '/users/1';
+  const headers = { Authorization: 'Bearer ' }; // credential is empty (invalid token)
+  const response = { status: 401, body: { error: 'Unauthorized' } };
+  expect(response.status).toBe(401);
+});
+
 test('PUT /users/{id} - forbidden when updating another user returns 403', () => {
   const method = 'PUT';
   const url = '/users/99';

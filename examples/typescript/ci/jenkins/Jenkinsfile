@@ -1,0 +1,98 @@
+pipeline {
+  agent any
+
+  environment {
+    NODE_VERSION = '20'
+    WORK_DIR = 'examples/typescript'
+  }
+
+  tools {
+    nodejs 'NodeJS-20'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install') {
+      steps {
+        dir(env.WORK_DIR) {
+          sh 'npm ci'
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir(env.WORK_DIR) {
+          sh 'npm run build'
+        }
+      }
+    }
+
+    stage('Test') {
+      parallel {
+        stage('Unit Tests') {
+          steps {
+            dir(env.WORK_DIR) {
+              sh 'npm run test:unit -- --coverage --ci'
+            }
+          }
+        }
+        stage('Integration Tests') {
+          steps {
+            dir(env.WORK_DIR) {
+              sh 'npm run test:integration -- --ci'
+            }
+          }
+        }
+        stage('Blackbox Tests') {
+          steps {
+            dir(env.WORK_DIR) {
+              sh 'npm run test:blackbox -- --ci'
+            }
+          }
+        }
+        stage('WireMock Tests') {
+          steps {
+            dir(env.WORK_DIR) {
+              sh 'npm run test:wiremock -- --ci'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Analyze') {
+      steps {
+        dir(env.WORK_DIR) {
+          sh 'bash scripts/run-analyzer.sh || true'
+        }
+      }
+    }
+
+    stage('Screenshots') {
+      steps {
+        dir(env.WORK_DIR) {
+          sh 'npx playwright install chromium || true'
+          sh 'node scripts/generate-screenshots.js || true'
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      dir(env.WORK_DIR) {
+        archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'coverage/**', allowEmptyArchive: true
+      }
+    }
+    failure {
+      echo 'Pipeline failed. Check the reports for details.'
+    }
+  }
+}

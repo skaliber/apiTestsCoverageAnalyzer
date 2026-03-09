@@ -1,0 +1,807 @@
+openapi: "3.0.3"
+info:
+  title: API Test Coverage Analyzer — Library & CLI API
+  version: "1.0.0"
+  description: |
+    OpenAPI specification representing the public library API and CLI command surface of
+    the API Test Coverage Analyzer.  Used as the input spec for self-analysis endpoint,
+    parameter, error, and security coverage metrics.
+
+servers:
+  - url: https://api.coverage-analyzer.local
+    description: Conceptual local library server (self-analysis target)
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CoverageResult:
+      type: object
+      required: [type, coveragePercent, coveredItems, totalItems]
+      properties:
+        type:
+          type: string
+          enum:
+            - endpoint
+            - parameter
+            - business
+            - integration
+            - error
+            - security
+            - performance
+            - resilience
+            - compatibility
+        coveragePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        coveredItems:
+          type: integer
+          minimum: 0
+        totalItems:
+          type: integer
+          minimum: 0
+        details:
+          type: object
+          additionalProperties: true
+
+    AnalysisOptions:
+      type: object
+      properties:
+        spec:
+          type: string
+          description: Path or URL to OpenAPI spec
+        tests:
+          type: string
+          description: Glob pattern for test files
+        rules:
+          type: string
+          description: Path to business rules YAML file
+        flows:
+          type: string
+          description: Path to integration flows YAML file
+        format:
+          type: string
+          description: Comma-separated output formats (json,html,csv,junit)
+          example: "json,html,csv,junit"
+        reportsDir:
+          type: string
+          description: Directory to write report files
+        language:
+          type: string
+          description: Language hint for test detection (ts, js, python, java, etc.)
+        threshold:
+          type: number
+          description: Coverage threshold (0-100)
+
+    IntelligenceReport:
+      type: object
+      required: [functionalFindings, missingTestRecommendations, maxRiskScore]
+      properties:
+        functionalFindings:
+          type: array
+          items:
+            type: object
+        missingTestRecommendations:
+          type: array
+          items:
+            type: object
+        maxRiskScore:
+          type: number
+        avgRiskScore:
+          type: number
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+paths:
+  /analyze/endpoints:
+    post:
+      summary: Analyze endpoint coverage
+      operationId: analyzeEndpoints
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Endpoint coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid analysis options (missing spec, bad glob)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Unprocessable spec (malformed YAML/JSON)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal analysis error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/parameters:
+    post:
+      summary: Analyze parameter coverage
+      operationId: analyzeParameters
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Parameter coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Unprocessable spec
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/business-rules:
+    post:
+      summary: Analyze business rule coverage
+      operationId: analyzeBusinessRules
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Business rule coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid options or missing rules file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Rules file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Malformed rules file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/integration-flows:
+    post:
+      summary: Analyze integration flow coverage
+      operationId: analyzeIntegrationFlows
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Integration flow coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Flows file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/errors:
+    post:
+      summary: Analyze error scenario coverage
+      operationId: analyzeErrorHandling
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Error coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Malformed spec
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/security:
+    post:
+      summary: Analyze security control coverage
+      operationId: analyzeSecurityControls
+      tags: [coverage, security]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisOptions"
+      responses:
+        "200":
+          description: Security coverage result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Invalid options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/perf-resilience:
+    post:
+      summary: Analyze performance and resilience coverage
+      operationId: analyzePerfResilience
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/AnalysisOptions"
+                - type: object
+                  properties:
+                    loadResults:
+                      type: string
+                      description: Path to JMeter CSV or k6 JSON load results
+                    thresholdResponseMs:
+                      type: number
+                    thresholdErrorRate:
+                      type: number
+      responses:
+        "200":
+          description: Perf/resilience coverage results (array of two results)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoverageResult"
+                minItems: 2
+                maxItems: 2
+        "400":
+          description: Invalid options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Malformed load results file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/compatibility:
+    post:
+      summary: Check API compatibility / contract coverage
+      operationId: checkCompatibility
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/AnalysisOptions"
+                - type: object
+                  properties:
+                    oldSpec:
+                      type: string
+                    newSpec:
+                      type: string
+                    contracts:
+                      type: string
+      responses:
+        "200":
+          description: Compatibility check result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageResult"
+        "400":
+          description: Missing spec paths
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Malformed spec or contract file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/security-scan:
+    post:
+      summary: Run security scanning (SAST/secrets/misconfiguration)
+      operationId: runSecurityScan
+      tags: [security]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                semgrepReport:
+                  type: string
+                trivyReport:
+                  type: string
+                zapReport:
+                  type: string
+                failOnCritical:
+                  type: boolean
+                maxHighVulnerabilities:
+                  type: integer
+                maxSecrets:
+                  type: integer
+      responses:
+        "200":
+          description: Security scan result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  findings:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Invalid scan options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Malformed scan report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyze/intelligence:
+    post:
+      summary: Run coverage intelligence engine
+      operationId: runCoverageIntelligence
+      tags: [intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reportsDir]
+              properties:
+                reportsDir:
+                  type: string
+                outDir:
+                  type: string
+                projectName:
+                  type: string
+                languages:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Intelligence report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntelligenceReport"
+        "400":
+          description: Missing or invalid reports directory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Reports directory not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /thresholds/check:
+    post:
+      summary: Evaluate quality gate thresholds
+      operationId: checkThresholds
+      tags: [quality-gate]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [results, thresholds]
+              properties:
+                results:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/CoverageResult"
+                thresholds:
+                  type: object
+                  additionalProperties:
+                    type: number
+      responses:
+        "200":
+          description: Threshold check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  passed:
+                    type: boolean
+                  violations:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/summary:
+    get:
+      summary: Generate aggregated coverage summary
+      operationId: generateSummary
+      tags: [reporting]
+      parameters:
+        - name: reportsDir
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, html, markdown]
+      responses:
+        "200":
+          description: Summary report
+          content:
+            application/json:
+              schema:
+                type: object
+            text/html:
+              schema:
+                type: string
+            text/markdown:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Reports directory not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/pr-summary:
+    get:
+      summary: Generate PR comment summary
+      operationId: generatePrSummary
+      tags: [reporting]
+      parameters:
+        - name: reportsDir
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PR summary markdown
+          content:
+            text/markdown:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/build-summary:
+    get:
+      summary: Generate build/CI log summary
+      operationId: generateBuildSummary
+      tags: [reporting]
+      parameters:
+        - name: reportsDir
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Build summary markdown
+          content:
+            text/markdown:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /config/load:
+    post:
+      summary: Load and validate coverage configuration
+      operationId: loadConfig
+      tags: [config]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                configPath:
+                  type: string
+      responses:
+        "200":
+          description: Loaded configuration
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Invalid configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Config file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

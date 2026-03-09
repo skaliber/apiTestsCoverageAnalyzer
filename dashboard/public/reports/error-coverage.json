@@ -1,0 +1,367 @@
+{
+  "total": 30,
+  "covered": 0,
+  "percentage": 0,
+  "categorySummary": {
+    "missing-parameter": {
+      "total": 0,
+      "covered": 0
+    },
+    "invalid-value": {
+      "total": 8,
+      "covered": 0
+    },
+    "unauthorized": {
+      "total": 13,
+      "covered": 0
+    },
+    "forbidden": {
+      "total": 0,
+      "covered": 0
+    },
+    "not-found": {
+      "total": 9,
+      "covered": 0
+    },
+    "conflict": {
+      "total": 0,
+      "covered": 0
+    },
+    "server-error": {
+      "total": 0,
+      "covered": 0
+    }
+  },
+  "scenarios": [
+    {
+      "id": "GET /wallets:401",
+      "endpoint": "GET /wallets",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets:400",
+      "endpoint": "POST /wallets",
+      "statusCode": 400,
+      "description": "Invalid input",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets:401",
+      "endpoint": "POST /wallets",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "GET /wallets/{id}:401",
+      "endpoint": "GET /wallets/{id}",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "GET /wallets/{id}:404",
+      "endpoint": "GET /wallets/{id}",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "DELETE /wallets/{id}:401",
+      "endpoint": "DELETE /wallets/{id}",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "DELETE /wallets/{id}:404",
+      "endpoint": "DELETE /wallets/{id}",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/freeze:401",
+      "endpoint": "PATCH /wallets/{id}/freeze",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/freeze:404",
+      "endpoint": "PATCH /wallets/{id}/freeze",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/freeze:422",
+      "endpoint": "PATCH /wallets/{id}/freeze",
+      "statusCode": 422,
+      "description": "Unprocessable",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/unfreeze:401",
+      "endpoint": "PATCH /wallets/{id}/unfreeze",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/unfreeze:404",
+      "endpoint": "PATCH /wallets/{id}/unfreeze",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "PATCH /wallets/{id}/unfreeze:422",
+      "endpoint": "PATCH /wallets/{id}/unfreeze",
+      "statusCode": 422,
+      "description": "Unprocessable",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/fund:401",
+      "endpoint": "POST /wallets/{id}/fund",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/fund:404",
+      "endpoint": "POST /wallets/{id}/fund",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/fund:422",
+      "endpoint": "POST /wallets/{id}/fund",
+      "statusCode": 422,
+      "description": "Business rule violation",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/debit:401",
+      "endpoint": "POST /wallets/{id}/debit",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/debit:404",
+      "endpoint": "POST /wallets/{id}/debit",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/debit:422",
+      "endpoint": "POST /wallets/{id}/debit",
+      "statusCode": 422,
+      "description": "Business rule violation",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/transfer:401",
+      "endpoint": "POST /wallets/{id}/transfer",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/transfer:404",
+      "endpoint": "POST /wallets/{id}/transfer",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /wallets/{id}/transfer:422",
+      "endpoint": "POST /wallets/{id}/transfer",
+      "statusCode": 422,
+      "description": "Business rule violation",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /payments:401",
+      "endpoint": "POST /payments",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /payments:422",
+      "endpoint": "POST /payments",
+      "statusCode": 422,
+      "description": "Business rule violation",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "GET /payments/{id}:401",
+      "endpoint": "GET /payments/{id}",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "GET /payments/{id}:404",
+      "endpoint": "GET /payments/{id}",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /payments/{id}/refund:401",
+      "endpoint": "POST /payments/{id}/refund",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /payments/{id}/refund:404",
+      "endpoint": "POST /payments/{id}/refund",
+      "statusCode": 404,
+      "description": "Not found",
+      "categories": [
+        "not-found"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "POST /payments/{id}/refund:422",
+      "endpoint": "POST /payments/{id}/refund",
+      "statusCode": 422,
+      "description": "Cannot refund",
+      "categories": [
+        "invalid-value"
+      ],
+      "covered": false,
+      "matchedTests": []
+    },
+    {
+      "id": "GET /transactions:401",
+      "endpoint": "GET /transactions",
+      "statusCode": 401,
+      "description": "Unauthorized",
+      "categories": [
+        "unauthorized"
+      ],
+      "covered": false,
+      "matchedTests": []
+    }
+  ]
+}

@@ -21,6 +21,13 @@ flowchart TB
         cc[compatibilityCoverage.ts]
     end
 
+    subgraph SecurityLayer ["Security Scanning Layer (src/security/)"]
+        ssi[index.ts – orchestrator]
+        ssn[normalizers/ – Semgrep, Trivy, ZAP]
+        sss[scanners/ – embedded + import]
+        ssg[gate/ – threshold evaluation]
+    end
+
     subgraph Support ["Support Modules"]
         cfg[config.ts]
         rep[reporting.ts]
@@ -43,8 +50,11 @@ flowchart TB
 
     cmd --> cfg
     cmd --> ep & pa & bz & ig & er & sc & pr & cc
+    cmd --> ssi
     cmd --> pl
     ep & pa & bz & ig & er & sc & pr & cc --> rep
+    ssi --> sss & ssn & ssg
+    ssi --> json
     pl --> rep
     rep --> json & html & csv & junit
     obs --> metrics & traces
@@ -63,9 +73,15 @@ apiTestsCoverageAnalyzer/
 │   ├── businessCoverage.ts       # Business rule coverage engine
 │   ├── integrationCoverage.ts    # Integration flow coverage engine
 │   ├── errorCoverage.ts          # Error handling coverage engine
-│   ├── securityCoverage.ts       # Security coverage engine
+│   ├── securityCoverage.ts       # Security test-heuristic coverage engine
 │   ├── perfResilienceCoverage.ts # Performance & resilience engine
 │   ├── compatibilityCoverage.ts  # Compatibility & contract engine
+│   ├── security/                 # Integrated scanner layer (Spec 16)
+│   │   ├── index.ts              #   Orchestrator + report generation
+│   │   ├── types.ts              #   SecurityFinding, gate config, etc.
+│   │   ├── scanners/             #   semgrep.ts, trivy.ts, zap.ts
+│   │   ├── normalizers/          #   semgrep.ts, trivy.ts, zap.ts
+│   │   └── gate/                 #   index.ts – threshold evaluation
 │   ├── config.ts                 # Configuration loading & merging
 │   ├── reporting.ts              # Multi-format report generation
 │   ├── pluginLoader.ts           # Plugin loading & execution
@@ -78,7 +94,7 @@ apiTestsCoverageAnalyzer/
 ├── ci/                           # CI/CD example configs
 ├── observability/                # Docker Compose + Grafana dashboard
 ├── alerts/                       # Prometheus alerting rules
-├── coverage.config.json          # Default configuration
+├── config.yaml                  # Central configuration (YAML)
 ├── tsconfig.json                 # TypeScript compiler config
 ├── jest.config.js                # Jest test runner config
 └── package.json
@@ -88,7 +104,7 @@ apiTestsCoverageAnalyzer/
 
 ### `src/index.ts` – CLI entry point
 
-Built on [Commander](https://github.com/tj/commander.js/). Registers all sub-commands and delegates to coverage engines. Loads `coverage.config.json` and merges it with CLI flags. Runs plugins via `pluginLoader`.
+Built on [Commander](https://github.com/tj/commander.js/). Registers all sub-commands and delegates to coverage engines. Loads `config.yaml` (or the path from `--config`) and merges it with CLI flags. Runs plugins via `pluginLoader`.
 
 ### `src/config.ts` – Configuration
 
@@ -98,7 +114,7 @@ Exports:
 - `mergeConfig(a, b)` – deep merge of two config objects.
 - `isExcluded(path, method, config)` – checks whether a given path/method should be ignored.
 
-Default config location: `coverage.config.json` in the current working directory.
+Default config location: `config.yaml` in the current working directory. Run `analyze` with no arguments; if absent, prints a warning and uses full default profile.
 
 ### `src/reporting.ts` – Report generation
 
@@ -119,6 +135,42 @@ Provides:
 - **Logging** via [Pino](https://getpino.io/) – structured JSON logs.
 - **Metrics** via [prom-client](https://github.com/siimon/prom-client) – exposes a `/metrics` Prometheus endpoint.
 - **Tracing** via [OpenTelemetry](https://opentelemetry.io/) – exports spans to an OTLP collector.
+
+### `src/security/` – Integrated security scanning layer
+
+A dedicated sub-module that runs open-source scanners (Semgrep, Trivy, ZAP), normalises their findings into a common schema, and enforces a configurable security gate.
+
+Key sub-modules:
+
+| Path | Responsibility |
+|------|---------------|
+| `security/types.ts` | `SecurityFinding`, `SecurityScanConfig`, `SecurityGateConfig`, `SecurityGateResult`, `ScannerResult` |
+| `security/scanners/` | Invokes each scanner binary or imports a pre-generated JSON report |
+| `security/normalizers/` | Maps each scanner's native JSON to `SecurityFinding` |
+| `security/gate/index.ts` | Evaluates findings against thresholds; returns pass/fail + reasons |
+| `security/index.ts` | Orchestrator: runs scanners → builds summary → evaluates gate → generates reports |
+
+```mermaid
+flowchart TD
+    subgraph Scanners
+        sem[Semgrep JSON]
+        trv[Trivy JSON]
+        zap[ZAP JSON]
+    end
+    subgraph Normalizers
+        sn[semgrep normalizer]
+        tn[trivy normalizer]
+        zn[zap normalizer]
+    end
+    sem --> sn
+    trv --> tn
+    zap --> zn
+    sn & tn & zn --> orch[Orchestrator]
+    orch --> gate[Security Gate]
+    orch --> reports[Reports: JSON / HTML / MD]
+    gate -->|passed=false| exit1[exit 1]
+    gate -->|passed=true| exit0[exit 0]
+```
 
 ### Coverage engines
 
@@ -179,7 +231,7 @@ sequenceDiagram
 
 ## Configuration schema
 
-See [Configuration Schema →](/reference/configuration) for the full JSON schema.
+See [Configuration Schema →](./configuration.md) for the full JSON schema.
 
 ## Versioning
 

@@ -1,0 +1,168 @@
+name: Self-Analysis
+
+# Runs the analyzer against its own codebase on every push to main
+# and on every pull request.  All steps call Makefile targets —
+# no inline coverage logic lives in this file.
+# Pass/fail is governed exclusively by the analyzer's process exit code.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'openapi.self-analysis.yaml'
+      - 'business-rules.self-analysis.yaml'
+      - 'integration-flows.self-analysis.yaml'
+      - 'coverage.self-analysis.json'
+      - 'config.yaml'
+      - 'Makefile'
+      - '.github/workflows/self-analysis.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'openapi.self-analysis.yaml'
+      - 'business-rules.self-analysis.yaml'
+      - 'integration-flows.self-analysis.yaml'
+      - 'config.yaml'
+      - 'Makefile'
+      - '.github/workflows/self-analysis.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  self-analysis:
+    name: Self-Analysis — all metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install
+        run: make install
+
+      - name: Build
+        run: make build
+
+      - name: Unit Tests
+        run: make test-unit
+
+      - name: Integration Tests
+        run: make test-integration
+
+      - name: Smoke Tests
+        run: make test-smoke
+        continue-on-error: true
+
+      - name: Self-Analysis (all metrics)
+        run: make self-analysis-all
+        # Process exit code governs pass/fail — no shell string-parsing.
+        # Reports are always written even when a threshold is breached.
+
+      - name: Generate Summaries
+        if: always()
+        run: make summary
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-analysis-reports
+          path: reports/
+          retention-days: 30
+
+      - name: Post summary to GitHub step summary
+        if: always()
+        run: |
+          if [ -f reports/build-summary.md ]; then
+            cat reports/build-summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: ./action
+        continue-on-error: true
+        with:
+          coverage-types: 'endpoint'
+          spec: 'openapi.self-analysis.yaml'
+          tests: 'tests/**/*.ts'
+          quality-gate: 'false'
+          post-pr-comment: 'true'
+          write-step-summary: 'false'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: self-analysis
+    if: always()
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install
+        run: make install
+
+      - name: Build
+        run: make build
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update -qq && sudo apt-get install -y trivy
+
+      - name: Run Trivy scan
+        run: |
+          mkdir -p reports
+          trivy fs --format json --scanners vuln,secret --output reports/trivy.json . || true
+
+      - name: Install Semgrep
+        run: pip install semgrep --quiet
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan --json --config p/default src/ > reports/semgrep.json || true
+
+      - name: Enforce security gate
+        id: security-gate
+        uses: ./action
+        with:
+          coverage-types: 'security-scan'
+          semgrep-report: 'reports/semgrep.json'
+          trivy-report: 'reports/trivy.json'
+          fail-on-critical: 'true'
+          max-secrets: '0'
+          post-pr-comment: 'false'
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-reports
+          path: |
+            reports/security-scan-summary.json
+            reports/security-scan-summary.html
+            reports/trivy.json
+            reports/semgrep.json
+          retention-days: 14

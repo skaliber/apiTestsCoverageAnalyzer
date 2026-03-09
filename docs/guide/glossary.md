@@ -34,7 +34,7 @@
 
 **Endpoint coverage** – The percentage of API endpoints defined in the OpenAPI spec that are exercised by at least one test.
 
-**Exclusion** – A path glob or HTTP method configured in `coverage.config.json` to be ignored during analysis (e.g. `/internal/*`, `OPTIONS`).
+**Exclusion** – A path glob or HTTP method configured in `config.yaml` to be ignored during analysis (e.g. `/internal/*`, `OPTIONS`).
 
 ## F
 
@@ -94,7 +94,7 @@
 
 ## T
 
-**Threshold** – A minimum coverage percentage below which the analyzer exits with a non-zero code, causing CI to fail. Configurable per coverage type in `coverage.config.json` or via `--threshold-*` CLI flags.
+**Threshold** – A minimum coverage percentage below which the analyzer exits with a non-zero code, causing CI to fail. Configurable per coverage type in `config.yaml` or via `--threshold-*` CLI flags.
 
 **ts-node** – A TypeScript execution engine for Node.js that allows running `.ts` files directly without a separate build step.
 

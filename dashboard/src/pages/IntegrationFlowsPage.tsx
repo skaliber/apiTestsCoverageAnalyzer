@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useCoverage } from '../context/CoverageContext';
+import { useSettings } from '../context/SettingsContext';
+import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
+import AiSummaryPanel from '../components/AiSummaryPanel';
+import IntelligenceSection from '../components/IntelligenceSection';
+import MermaidDiagram from '../components/MermaidDiagram';
 import type { DetailItem } from '../types';
+import { generateIntegrationFlowsSummary, generateMermaidFlowchart } from '../utils/markdownSummaries';
 
 interface FlowItem extends DetailItem {
   steps?: number;
@@ -10,13 +16,21 @@ interface FlowItem extends DetailItem {
 
 export default function IntegrationFlowsPage() {
   const { report } = useCoverage();
+  const { showAiSummaries } = useSettings();
+  const { findingsFor, recommendationsFor } = useIntelligence();
   const [search, setSearch] = useState('');
 
   const section = report?.details?.integration;
   if (!section) {
     return (
-      <div className="p-6 text-gray-500 dark:text-gray-400">
-        No integration flows data available.
+      <div className="p-6">
+        <div className="text-gray-500 dark:text-gray-400 mb-4">No integration flows data available.</div>
+        <IntelligenceSection
+          coverageType="integration"
+          findings={findingsFor('integration')}
+          recommendations={recommendationsFor('integration')}
+          alwaysShow
+        />
       </div>
     );
   }
@@ -26,10 +40,14 @@ export default function IntegrationFlowsPage() {
     item.id.toLowerCase().includes(search.toLowerCase()),
   );
   const covered = items.filter((i) => i.covered).length;
+  const mermaidChart = generateMermaidFlowchart(items);
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Integration Flows</h1>
+      {showAiSummaries && report && (
+        <AiSummaryPanel markdown={generateIntegrationFlowsSummary(report)} />
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <input
@@ -83,6 +101,14 @@ export default function IntegrationFlowsPage() {
               );
             })}
           </div>
+          {mermaidChart && (
+            <div className="mt-6">
+              <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                Flow Diagram
+              </h2>
+              <MermaidDiagram chart={mermaidChart} />
+            </div>
+          )}
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
@@ -95,6 +121,12 @@ export default function IntegrationFlowsPage() {
           </p>
         </div>
       </div>
+
+      <IntelligenceSection
+        coverageType="integration"
+        findings={findingsFor('integration')}
+        recommendations={recommendationsFor('integration')}
+      />
     </div>
   );
 }

@@ -21,7 +21,7 @@ npm --version    # e.g. 10.5.0
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 
 # 2. Install dependencies
@@ -66,7 +66,7 @@ apiTestsCoverageAnalyzer/
 ├── reports/        # generated reports land here (git-ignored by default)
 ├── dashboard/      # UI dashboard (Vite + React)
 ├── ci/             # CI/CD example configurations
-├── coverage.config.json  # default configuration file
+├── config.yaml           # central configuration file
 └── package.json
 ```
 
@@ -82,5 +82,5 @@ npm run build    # recompile
 
 ## Next steps
 
-- [Getting Started →](/guide/getting-started)
-- [CLI Reference →](/reference/cli)
+- [Getting Started →](./getting-started.md)
+- [CLI Reference →](../reference/cli.md)

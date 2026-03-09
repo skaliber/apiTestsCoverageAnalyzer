@@ -4,10 +4,10 @@ This guide walks you through running your first coverage analysis in under five 
 
 ## 1. Install the tool
 
-If you haven't already, follow the [Installation guide](/guide/installation). The quickest path:
+If you haven't already, follow the [Installation guide](./installation.md). The quickest path:
 
 ```bash
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 npm install
 npm run build
@@ -32,33 +32,63 @@ sample/
 │   ├── user-service-client.json
 │   └── product-service-client.json
 └── tests/                        # sample test suites
-    ├── sample.test.ts            # endpoint-level tests
+    ├── sample.test.ts            # endpoint-level tests (TypeScript)
     ├── parameter.test.ts         # parameter scenario tests
     ├── business.test.ts          # business-rule annotated tests
     ├── integration.test.ts       # integration flow annotated tests
     ├── error.test.ts             # error scenario tests
     ├── security.test.ts          # security scenario tests
-    └── perf-resilience.test.ts   # performance and resilience tests
+    ├── perf-resilience.test.ts   # performance and resilience tests
+    ├── java/
+    │   └── UserApiTest.java      # JUnit 5 + RestAssured
+    ├── kotlin/
+    │   └── UserApiSpec.kt        # Kotest + Ktor client
+    ├── python/
+    │   └── test_users.py         # pytest + requests
+    ├── ruby/
+    │   └── users_spec.rb         # RSpec request specs
+    └── cucumber/
+        ├── features/
+        │   └── users.feature     # Gherkin scenarios
+        └── step_definitions/
+            └── users_steps.rb    # Ruby step definitions
 ```
 
 ## 3. Run endpoint coverage
 
 ```bash
+# TypeScript tests (default)
 node dist/index.js endpoint-coverage \
   --spec sample/openapi.yaml \
   --tests "sample/tests/**/*.ts" \
   --format json,html \
   --threshold-endpoint 80
+
+# Java tests
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/java/**/*.java" \
+  --language java \
+  --format json,html
+
+# Python tests
+node dist/index.js endpoint-coverage \
+  --spec sample/openapi.yaml \
+  --tests "sample/tests/python/**/*.py" \
+  --language python \
+  --format json,html
 ```
 
 Reports are written to the `reports/` directory:
 
-- `reports/endpoint-coverage.json` – machine-readable results
-- `reports/endpoint-coverage.html` – interactive HTML report
+- `reports/endpoint-coverage.json` – machine-readable results (includes `languages` per endpoint)
+- `reports/endpoint-coverage.html` – interactive HTML report with Languages column
+
+See [Multi-Language Support →](./multi-language.md) for all supported languages and frameworks.
 
 ## 4. Run all coverage types
 
-Run each coverage command in sequence (or all together in CI – see [CI/CD Integration](/guide/ci-cd)):
+Run each coverage command in sequence (or all together in CI – see [CI/CD Integration](./ci-cd.md)):
 
 ```bash
 # Parameter coverage
@@ -137,30 +167,28 @@ You will see:
 
 ## 6. Use a configuration file
 
-Instead of passing all flags on the command line, create a `coverage.config.json` in your project root:
+Instead of passing all flags on the command line, create a `config.yaml` at your project root:
 
-```json
-{
-  "thresholds": {
-    "endpoint": 80,
-    "parameter": 70,
-    "business": 60,
-    "integration": 50
-  },
-  "exclude": {
-    "paths": ["/internal/*"],
-    "methods": ["OPTIONS"]
-  },
-  "testPatterns": ["tests/**/*.ts"],
-  "plugins": ["./plugins/graphql-coverage.js"]
-}
+```yaml
+version: 1
+
+thresholds:
+  endpoint: 80
+  parameter: 70
+  business: 60
+  integration: 50
+
+qualityGate:
+  mode: warn
 ```
 
-The analyzer automatically reads this file. Pass `--config path/to/config.json` to use a different file.
+The analyzer automatically reads `config.yaml` from the project root. Pass `--config path/to/config.yaml`
+to use a different file. See [Configuration Reference](../guides/configuration.md) for all options.
 
 ## Next steps
 
-- [CLI Reference →](/reference/cli) – all commands and options
-- [CI/CD Integration →](/guide/ci-cd) – automate coverage checks in GitHub Actions / Jenkins
-- [Interpreting Reports →](/guide/interpreting-reports) – how to read each report type
-- [Writing Effective Tests →](/guide/writing-tests) – best practices for good coverage
+- [CLI Reference →](../reference/cli.md) – all commands and options
+- [Multi-Language Support →](./multi-language.md) – Java, Kotlin, Python, Ruby, Cucumber
+- [CI/CD Integration →](./ci-cd.md) – automate coverage checks in GitHub Actions / Jenkins
+- [Interpreting Reports →](./interpreting-reports.md) – how to read each report type
+- [Writing Effective Tests →](./writing-tests.md) – best practices for good coverage

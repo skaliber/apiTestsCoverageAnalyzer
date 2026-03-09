@@ -15,10 +15,25 @@ export type ResolutionType =
   | 'constant'
   | 'enum'
   | 'string-template'
+  | 'interpolated-path'
   | 'wrapper-method'
   | 'request-builder'
   | 'client-mapping'
+  | 'client-abstraction'
+  | 'cucumber-step'
   | 'heuristic';
+
+// ─── Assertion type ───────────────────────────────────────────────────────────
+
+/**
+ * The kind of assertion that was linked to an HTTP interaction.
+ */
+export type AssertionType =
+  | 'status-code'
+  | 'body-field'
+  | 'fluent-chain'
+  | 'exception-catch'
+  | 'none';
 
 // ─── Confidence ───────────────────────────────────────────────────────────────
 
@@ -49,6 +64,8 @@ export interface ResolvedHttpCall {
   confidence: ConfidenceLevel;
   /** Whether the call was followed by an assertion on the response */
   assertionLinked?: boolean;
+  /** The type of assertion linked to this call, if any */
+  assertionType?: AssertionType;
   /** The raw call text as it appeared in the source for debugging */
   rawCall?: string;
 }

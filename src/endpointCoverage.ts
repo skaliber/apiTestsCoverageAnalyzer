@@ -13,6 +13,8 @@ import type { DeepAnalysisConfig } from './coverage/deep-analysis/types';
 import { DEFAULT_DEEP_ANALYSIS_CONFIG } from './coverage/deep-analysis/types';
 import { deepResolveFile } from './coverage/deep-analysis/deepEndpointResolver';
 import type { ResolutionType, ConfidenceLevel } from './coverage/deep-analysis/types';
+import { analyzeFile, buildAnalysisContext } from './ast/astAnalysisOrchestrator';
+import type { AstAnalysisConfig } from './config/types';
 
 export interface Endpoint {
   method: string;
@@ -138,15 +140,13 @@ function findDeepCoveredEndpoints(
   endpoints: Endpoint[],
   language: SupportedLanguage,
   deepConfig: DeepAnalysisConfig,
+  astConfig?: AstAnalysisConfig,
 ): Map<number, EndpointMatch[]> {
   const deepMatches = new Map<number, EndpointMatch[]>();
 
-  const resolvedCalls = deepResolveFile(
-    fileContents,
-    filePath,
-    language === 'auto' ? 'typescript' : language,
-    deepConfig,
-  );
+  // Use the AST orchestrator as primary path (falls back to regex automatically)
+  const context = buildAnalysisContext(astConfig, deepConfig);
+  const resolvedCalls = analyzeFile(fileContents, filePath, language, context);
 
   for (const resolved of resolvedCalls) {
     // Try both the raw path and the normalized path against each endpoint
@@ -228,6 +228,7 @@ export async function analyzeTestCoverage(
   testGlob: string,
   languages?: SupportedLanguage[],
   deepAnalysisConfig?: DeepAnalysisConfig,
+  astAnalysisConfig?: AstAnalysisConfig,
 ): Promise<EndpointCoverage[]> {
   const testFiles = await fg(testGlob, { onlyFiles: true });
 
@@ -282,6 +283,7 @@ export async function analyzeTestCoverage(
         endpoints,
         fileLanguage as SupportedLanguage,
         deepConfig,
+        astAnalysisConfig,
       );
 
       for (const [idx, matches] of deepCovered.entries()) {

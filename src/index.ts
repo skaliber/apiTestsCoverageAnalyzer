@@ -96,6 +96,11 @@ import { recordIntelligenceMetrics } from './observability';
 import { generateBuildSummary } from './summary/buildSummary';
 import { generatePrSummary } from './summary/prSummary';
 import type { SummaryInput } from './summary/markdownRenderer';
+import { registerAllAnalyzers } from './ast/astAnalysisOrchestrator';
+
+// Register all language AST analyzers at startup.
+// This side-effect import ensures each language module's registerAnalyzer() call runs.
+registerAllAnalyzers();
 
 const program = new Command();
 

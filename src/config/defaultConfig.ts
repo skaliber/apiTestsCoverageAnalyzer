@@ -23,6 +23,21 @@ export const DEFAULT_CONFIG: AnalyzerConfig = {
     defaultMode: 'full',
     failOnConfigMissing: false,
     warnOnConfigMissing: true,
+    ast: {
+      enabled: true,
+      fallbackHeuristics: true,
+      maxCallDepth: 4,
+      assertionAware: true,
+      languages: {
+        java: { enabled: true },
+        kotlin: { enabled: true },
+        python: { enabled: true },
+        ruby: { enabled: true },
+        javascript: { enabled: true },
+        typescript: { enabled: true },
+        cucumber: { enabled: true },
+      },
+    },
   },
 
   scans: {

@@ -18,6 +18,32 @@ export interface ProjectConfig {
   name?: string;
 }
 
+export interface AstLanguageConfig {
+  /** When false, skip AST analysis for this language and use regex fallback */
+  enabled?: boolean;
+}
+
+export interface AstAnalysisConfig {
+  /** Master switch. When false, skip AST entirely and use regex fallback. Default: true. */
+  enabled?: boolean;
+  /** Fall back to regex heuristics if AST fails or returns no results. Default: true. */
+  fallbackHeuristics?: boolean;
+  /** Maximum call-chain depth for wrapper/helper tracing. Default: 4. */
+  maxCallDepth?: number;
+  /** Include assertion type metadata in output. Default: true. */
+  assertionAware?: boolean;
+  /** Per-language enable/disable toggles */
+  languages?: {
+    java?: AstLanguageConfig;
+    kotlin?: AstLanguageConfig;
+    python?: AstLanguageConfig;
+    ruby?: AstLanguageConfig;
+    javascript?: AstLanguageConfig;
+    typescript?: AstLanguageConfig;
+    cucumber?: AstLanguageConfig;
+  };
+}
+
 export interface AnalysisConfig {
   /** 'full' runs all scans; 'custom' runs only explicitly-enabled scans */
   defaultMode?: 'full' | 'custom';
@@ -25,6 +51,8 @@ export interface AnalysisConfig {
   failOnConfigMissing?: boolean;
   /** If true, emits a warning when config.yaml is absent */
   warnOnConfigMissing?: boolean;
+  /** AST-based analysis configuration */
+  ast?: AstAnalysisConfig;
 }
 
 export type CoverageType =

@@ -40,7 +40,7 @@ FORMATS       ?= json,html,csv,junit
 
 # ── Phony targets ──────────────────────────────────────────────────────────────
 .PHONY: help install build lint clean reports-clean \
-        test test-unit test-integration test-e2e test-smoke docs-build \
+        test test-unit test-integration test-e2e test-e2e-docs test-e2e-dashboard test-smoke docs-build \
         self-analysis-endpoint self-analysis-parameter self-analysis-business \
         self-analysis-integration self-analysis-error self-analysis-security \
         self-analysis-performance self-analysis-compatibility \
@@ -95,8 +95,10 @@ reports-clean: ## Remove all generated reports and summaries from reports/
 #  TESTING
 # =============================================================================
 
-test: ## Run all test suites (unit + integration)
+test: ## Run all test suites (unit + integration + e2e)
 	$(NPM) test -- --no-coverage
+	$(MAKE) test-e2e-docs
+	$(MAKE) test-e2e-dashboard
 
 test-unit: ## Run unit tests only (excludes integration and smoke)
 	$(NPM) test -- --no-coverage --testPathIgnorePatterns="node_modules|dist|dashboard|examples|integration|smoke"
@@ -104,9 +106,21 @@ test-unit: ## Run unit tests only (excludes integration and smoke)
 test-integration: ## Run integration tests only
 	$(NPM) test -- --no-coverage --testPathPattern="integration" --testPathIgnorePatterns="node_modules|dist|dashboard|examples"
 
-test-e2e: ## Run Cypress end-to-end tests (docs + dashboard)
-	$(NPM) run docs:test 2>/dev/null || true
-	$(NPM) run dashboard:test 2>/dev/null || true
+test-e2e: ## Run all Cypress end-to-end tests (docs + dashboard)
+	$(MAKE) test-e2e-docs
+	$(MAKE) test-e2e-dashboard
+
+test-e2e-docs: ## Run Cypress docs link tests (mirrors CI test-links job)
+	$(NPM) run docs:build
+	$(NPM) run docs:preview &
+	npx wait-on http://localhost:4173/apiTestsCoverageAnalyzer --timeout 30000
+	unset ELECTRON_RUN_AS_NODE && $(NPM) run docs:test; EXIT=$$?; pkill -f "vite preview" 2>/dev/null || true; exit $$EXIT
+
+test-e2e-dashboard: ## Run Cypress dashboard tests (mirrors CI test-dashboard job)
+	cd dashboard && $(NPM) run build
+	cd dashboard && $(NPM) run preview -- --host 127.0.0.1 &
+	npx wait-on http://127.0.0.1:4173 --timeout 30000
+	unset ELECTRON_RUN_AS_NODE && $(NPM) run dashboard:test; EXIT=$$?; pkill -f "vite preview" 2>/dev/null || true; exit $$EXIT
 
 test-smoke: ## Run self-analysis smoke test
 	$(NPM) test -- --no-coverage --testPathPattern="smoke"

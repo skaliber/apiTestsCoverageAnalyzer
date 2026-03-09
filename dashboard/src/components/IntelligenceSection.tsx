@@ -138,7 +138,7 @@ function FilterBar({
         </select>
       )}
       <input
-        type="text"
+        type="search"
         value={filters.endpoint}
         onChange={(e) => sel(e.target.value, 'endpoint')}
         placeholder="Filter by endpoint..."
@@ -163,44 +163,33 @@ function RecRow({
   const linkedFindings = findings.filter((f) => rec.linkedFindingIds.includes(f.id));
 
   return (
-    <tr className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750">
-      <td className="px-3 py-2">
-        <span className={priorityBadge(rec.priority)}>{rec.priority}</span>
-      </td>
-      <td className="px-3 py-2 text-sm text-gray-900 dark:text-gray-100 max-w-xs">
-        <div className="font-medium leading-tight">{rec.title}</div>
+    <div className="flex flex-wrap items-start gap-2 px-3 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 last:border-0">
+      <span className={priorityBadge(rec.priority)}>{rec.priority}</span>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 leading-tight">{rec.title}</div>
         {rec.endpoint?.path && (
           <code className="text-xs text-gray-500 dark:text-gray-400">
             {rec.endpoint.method} {rec.endpoint.path}
           </code>
         )}
-      </td>
-      <td className="px-3 py-2">
-        <span className={`text-sm font-semibold ${riskBandColor(rec.riskScore)}`}>
-          {rec.riskScore} <span className="text-xs font-normal">({riskBand(rec.riskScore)})</span>
-        </span>
-      </td>
-      <td className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
-        {rec.recommendedTestType}
-      </td>
-      <td className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
-        {rec.likelyLanguage ?? '—'} / {rec.likelyFramework ?? '—'}
-      </td>
-      <td className="px-3 py-2">
-        <div className="flex flex-wrap gap-1">
-          {linkedFindings.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => onFindingClick(f)}
-              className="text-xs px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-              title={f.title}
-            >
-              {f.category}
-            </button>
-          ))}
-        </div>
-      </td>
-    </tr>
+      </div>
+      <span className={`text-xs font-semibold ${riskBandColor(rec.riskScore)}`}>
+        {rec.riskScore} <span className="text-xs font-normal">({riskBand(rec.riskScore)})</span>
+      </span>
+      <span className="text-xs text-gray-500 dark:text-gray-400">{rec.recommendedTestType}</span>
+      <div className="flex flex-wrap gap-1">
+        {linkedFindings.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => onFindingClick(f)}
+            className="text-xs px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+            title={f.title}
+          >
+            {f.category}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -313,10 +302,6 @@ function FindingDrawer({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-type SortField = 'riskScore' | 'severity' | 'priority' | 'linkedFindings';
-
-const PRIORITY_ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
-
 interface IntelligenceSectionProps {
   /** Coverage type label for filtering (e.g. "endpoint", "security", "business") */
   coverageType: string;
@@ -342,8 +327,6 @@ export default function IntelligenceSection({
     category: 'all',
     endpoint: '',
   });
-  const [sortField, setSortField] = useState<SortField>('riskScore');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [drawerFinding, setDrawerFinding] = useState<FunctionalFinding | null>(null);
 
   // Derived option lists
@@ -378,23 +361,8 @@ export default function IntelligenceSection({
         }
         return true;
       })
-      .sort((a, b) => {
-        switch (sortField) {
-          case 'riskScore':
-            return sortNumber(a.riskScore, b.riskScore, sortDir);
-          case 'priority':
-            return sortNumber(
-              PRIORITY_ORDER[a.priority] ?? 9,
-              PRIORITY_ORDER[b.priority] ?? 9,
-              sortDir,
-            );
-          case 'linkedFindings':
-            return sortNumber(a.linkedFindingIds.length, b.linkedFindingIds.length, sortDir);
-          default:
-            return 0;
-        }
-      });
-  }, [recommendations, filters, sortField, sortDir]);
+      .sort((a, b) => sortNumber(a.riskScore, b.riskScore, 'desc'));
+  }, [recommendations, filters]);
 
   // Filter findings
   const filteredFindings = useMemo(() => {
@@ -431,20 +399,6 @@ export default function IntelligenceSection({
     }
     return lines.join('\n');
   }, [coverageType, findings.length, recommendations.length, filteredRecs]);
-
-  function toggleSort(field: SortField) {
-    if (sortField === field) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortDir('desc');
-    }
-  }
-
-  function sortIcon(field: SortField) {
-    if (sortField !== field) return '↕';
-    return sortDir === 'asc' ? '↑' : '↓';
-  }
 
   if (!alwaysShow && findings.length === 0 && recommendations.length === 0) {
     return null;
@@ -488,53 +442,20 @@ export default function IntelligenceSection({
 
         {/* Recommendations table */}
         {filteredRecs.length > 0 ? (
-          <div className="overflow-x-auto mb-4">
+          <div className="mb-4">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Missing Test Recommendations
             </h3>
-            <table className="w-full text-xs">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th
-                    className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
-                    onClick={() => toggleSort('priority')}
-                  >
-                    Priority {sortIcon('priority')}
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                    Recommendation
-                  </th>
-                  <th
-                    className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
-                    onClick={() => toggleSort('riskScore')}
-                  >
-                    Risk {sortIcon('riskScore')}
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                    Test Type
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                    Language / Framework
-                  </th>
-                  <th
-                    className="px-3 py-2 text-left font-semibold text-gray-500 dark:text-gray-400 uppercase cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
-                    onClick={() => toggleSort('linkedFindings')}
-                  >
-                    Linked Findings {sortIcon('linkedFindings')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {filteredRecs.map((rec) => (
-                  <RecRow
-                    key={rec.id}
-                    rec={rec}
-                    findings={filteredFindings}
-                    onFindingClick={setDrawerFinding}
-                  />
-                ))}
-              </tbody>
-            </table>
+            <div className="w-full text-xs rounded border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {filteredRecs.map((rec) => (
+                <RecRow
+                  key={rec.id}
+                  rec={rec}
+                  findings={filteredFindings}
+                  onFindingClick={setDrawerFinding}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="text-xs text-gray-400 dark:text-gray-500 italic py-2">

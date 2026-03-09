@@ -133,7 +133,16 @@ function FindingRow({ finding }: { finding: FunctionalFinding }) {
   );
 }
 
-function RecommendationCard({ rec }: { rec: MissingTestRecommendation }) {
+function RecommendationCard({
+  rec,
+  allFindings,
+}: {
+  rec: MissingTestRecommendation;
+  allFindings: FunctionalFinding[];
+}) {
+  const [showLinked, setShowLinked] = useState(false);
+  const linkedFindings = allFindings.filter((f) => rec.linkedFindingIds.includes(f.id));
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
       <div className="flex items-start gap-3">
@@ -159,7 +168,35 @@ function RecommendationCard({ rec }: { rec: MissingTestRecommendation }) {
               <span className="text-gray-500 dark:text-gray-400">🧰 {rec.likelyFramework}</span>
             )}
             <span className="text-gray-500 dark:text-gray-400">📎 {rec.recommendedTestType}</span>
+            {linkedFindings.length > 0 && (
+              <button
+                onClick={() => setShowLinked(!showLinked)}
+                className="text-blue-600 dark:text-blue-400 underline cursor-pointer"
+              >
+                {linkedFindings.length} finding{linkedFindings.length !== 1 ? 's' : ''}
+              </button>
+            )}
           </div>
+          {showLinked && linkedFindings.length > 0 && (
+            <div className="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3 space-y-2">
+              {linkedFindings.map((f) => (
+                <div key={f.id} className="text-xs text-gray-700 dark:text-gray-300">
+                  <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-semibold mr-2 ${severityColor(f.severity)}`}>
+                    {f.severity}
+                  </span>
+                  <span className="font-medium">{f.title}</span>
+                  {f.endpoint?.path && (
+                    <span className="ml-2 font-mono text-gray-500 dark:text-gray-400">
+                      {f.endpoint.method ?? ''} {f.endpoint.path}
+                    </span>
+                  )}
+                  {f.description && (
+                    <p className="mt-1 text-gray-500 dark:text-gray-400 pl-2">{f.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -178,6 +215,7 @@ export default function CoverageIntelligencePage() {
   const [riskBandFilter, setRiskBandFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
+  const [endpointFilter, setEndpointFilter] = useState<string>('');
 
   useEffect(() => {
     fetch('/reports/coverage-intelligence.json')
@@ -221,12 +259,18 @@ export default function CoverageIntelligencePage() {
 
   const { summary, findings, recommendations } = report;
 
-  // Filtered recommendations
-  const filteredRecs = recommendations.filter((r) => {
-    if (priorityFilter !== 'all' && r.priority !== priorityFilter) return false;
-    if (riskBandFilter !== 'all' && riskBand(r.riskScore) !== riskBandFilter) return false;
-    return true;
-  });
+  // Filtered recommendations (sorted by risk score descending by default)
+  const filteredRecs = recommendations
+    .filter((r) => {
+      if (priorityFilter !== 'all' && r.priority !== priorityFilter) return false;
+      if (riskBandFilter !== 'all' && riskBand(r.riskScore) !== riskBandFilter) return false;
+      if (endpointFilter) {
+        const ep = `${r.endpoint?.method ?? ''} ${r.endpoint?.path ?? ''}`.toLowerCase();
+        if (!ep.includes(endpointFilter.toLowerCase())) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => b.riskScore - a.riskScore);
 
   // Filtered findings
   const filteredFindings = findings.filter((f) => {
@@ -246,7 +290,7 @@ export default function CoverageIntelligencePage() {
     : undefined;
 
   return (
-    <div className="p-6 space-y-6">
+    <div data-testid="intelligence-section" className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Coverage Intelligence</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -301,28 +345,42 @@ export default function CoverageIntelligencePage() {
 
       {/* Missing Test Recommendations */}
       <section>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Missing Test Recommendations
           </h2>
-          <div className="flex gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <input
+              type="text"
+              data-testid="endpoint-filter"
+              value={endpointFilter}
+              onChange={(e) => setEndpointFilter(e.target.value)}
+              placeholder="Filter by endpoint…"
+              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 text-xs"
+            />
+            <span className="text-xs text-gray-600 dark:text-gray-300">
+              {priorityFilter === 'all' ? 'All Priorities' : `Priority: ${priorityFilter}`}
+            </span>
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
               className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 text-xs"
             >
-              <option value="all">All Priorities</option>
+              <option value="all">All</option>
               <option value="P0">P0</option>
               <option value="P1">P1</option>
               <option value="P2">P2</option>
               <option value="P3">P3</option>
             </select>
+            <span className="text-xs text-gray-600 dark:text-gray-300">
+              {riskBandFilter === 'all' ? 'All Risk Bands' : `Band: ${riskBandFilter}`}
+            </span>
             <select
               value={riskBandFilter}
               onChange={(e) => setRiskBandFilter(e.target.value)}
               className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 text-xs"
             >
-              <option value="all">All Risk Bands</option>
+              <option value="all">All</option>
               <option value="Critical">Critical</option>
               <option value="High">High</option>
               <option value="Moderate">Moderate</option>
@@ -337,7 +395,7 @@ export default function CoverageIntelligencePage() {
         ) : (
           <div className="grid gap-3">
             {filteredRecs.map((rec) => (
-              <RecommendationCard key={rec.id} rec={rec} />
+              <RecommendationCard key={rec.id} rec={rec} allFindings={findings} />
             ))}
           </div>
         )}

@@ -1,0 +1,312 @@
+# integration-flows.yaml - End-to-end integration flows
+#
+# Documents the multi-step workflows that span multiple API endpoints.
+# The api-test-coverage-analyzer uses this file to verify that every
+# step in each flow is exercised by at least one Cucumber scenario.
+
+version: "1.0.0"
+domain: "Payment Processing Platform"
+
+flows:
+
+  - id: FLOW001
+    name: "Full Payment Lifecycle"
+    description: |
+      The canonical happy-path flow for a payment: authorize, capture, then
+      refund. This is the most common production pattern and must be fully
+      covered by the BDD suite.
+    tags: [smoke, critical, payments, refunds]
+    steps:
+      - step: 1
+        name: "Authenticate"
+        description: "Obtain valid merchant credentials"
+        preconditions:
+          - "Merchant account exists and is active"
+
+      - step: 2
+        name: "Create Payment Authorization"
+        description: "Send payment details to initiate an authorization hold"
+        api_call:
+          method: POST
+          path: /payments
+          expected_response:
+            status: 201
+            body_fields: [payment_id, status]
+            status_value: authorized
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Successful payment authorization"
+
+      - step: 3
+        name: "Retrieve Payment (verify authorized)"
+        description: "Confirm the payment is in authorized state before capture"
+        api_call:
+          method: GET
+          path: /payments/{id}
+          expected_response:
+            status: 200
+            body_fields: [payment_id, status, amount]
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Retrieve a specific payment"
+
+      - step: 4
+        name: "Capture Payment"
+        description: "Move funds from customer to merchant"
+        api_call:
+          method: POST
+          path: /payments/{id}/capture
+          expected_response:
+            status: 200
+            body_fields: [payment_id, status, captured_amount]
+            status_value: captured
+        depends_on_step: 2
+        business_rule: payment-authorization-before-capture
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Successful payment capture"
+
+      - step: 5
+        name: "Create Refund"
+        description: "Issue a full or partial refund to the customer"
+        api_call:
+          method: POST
+          path: /refunds
+          expected_response:
+            status: 201
+            body_fields: [refund_id, status, amount]
+            status_value: pending
+        depends_on_step: 4
+        business_rule: refund-captured-payments-only
+        cucumber_scenarios:
+          - feature: refunds.feature
+            scenario: "Full refund of a captured payment"
+
+      - step: 6
+        name: "Retrieve Refund (verify status)"
+        description: "Confirm refund details were persisted correctly"
+        api_call:
+          method: GET
+          path: /refunds/{id}
+          expected_response:
+            status: 200
+        depends_on_step: 5
+        cucumber_scenarios:
+          - feature: refunds.feature
+            scenario: "Retrieve a specific refund"
+
+  - id: FLOW002
+    name: "Payment Void Flow"
+    description: |
+      Authorized payment that is cancelled before capture. Used when a customer
+      changes their mind or an order is cancelled immediately after placement.
+    tags: [payments, void]
+    steps:
+      - step: 1
+        name: "Create Payment Authorization"
+        api_call:
+          method: POST
+          path: /payments
+          expected_response:
+            status: 201
+            status_value: authorized
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Successful payment authorization"
+
+      - step: 2
+        name: "Void Payment"
+        description: "Cancel the authorization before funds move"
+        api_call:
+          method: POST
+          path: /payments/{id}/void
+          expected_response:
+            status: 200
+            status_value: voided
+        depends_on_step: 1
+        business_rule: void-uncaptured-only
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Void an authorized payment"
+
+  - id: FLOW003
+    name: "Dispute Resolution"
+    description: |
+      Customer initiates a chargeback, merchant responds with evidence within
+      the 7-day window. Covers the full dispute lifecycle from creation to
+      resolution.
+    tags: [disputes, critical]
+    steps:
+      - step: 1
+        name: "Create and Capture Payment"
+        description: "Underlying payment must be captured for a dispute to apply"
+        api_calls:
+          - method: POST
+            path: /payments
+          - method: POST
+            path: /payments/{id}/capture
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Successful payment capture"
+
+      - step: 2
+        name: "Dispute is Opened"
+        description: "A dispute is created (typically initiated by the card network)"
+        api_call:
+          method: POST
+          path: /disputes
+          expected_response:
+            status: 201
+            body_fields: [dispute_id, status, response_deadline]
+            status_value: open
+        cucumber_scenarios:
+          - feature: disputes.feature
+            scenario: "View an open dispute"
+
+      - step: 3
+        name: "Retrieve Dispute Details"
+        description: "Merchant fetches dispute to understand the chargeback reason"
+        api_call:
+          method: GET
+          path: /disputes/{id}
+          expected_response:
+            status: 200
+            body_fields: [dispute_id, reason, response_deadline]
+        depends_on_step: 2
+        cucumber_scenarios:
+          - feature: disputes.feature
+            scenario: "View an open dispute"
+
+      - step: 4
+        name: "Submit Dispute Response"
+        description: "Merchant uploads evidence and submits a counter-response"
+        api_call:
+          method: PUT
+          path: /disputes/{id}/respond
+          expected_response:
+            status: 200
+            status_value: under_review
+        depends_on_step: 3
+        business_rule: dispute-response-window
+        cucumber_scenarios:
+          - feature: disputes.feature
+            scenario: "Respond to a dispute within the time window"
+
+      - step: 5
+        name: "Verify Payment Dispute Flag"
+        description: "Confirm the payment shows the disputed flag during the dispute"
+        api_call:
+          method: GET
+          path: /payments/{id}
+          expected_response:
+            status: 200
+        depends_on_step: 2
+        cucumber_scenarios:
+          - feature: disputes.feature
+            scenario: "Dispute affects payment status"
+
+  - id: FLOW004
+    name: "Account Balance Management"
+    description: |
+      Merchant checks their account status, reviews their current balance,
+      and updates their transaction limits. Covers the account management
+      lifecycle.
+    tags: [accounts]
+    steps:
+      - step: 1
+        name: "Retrieve Account Details"
+        api_call:
+          method: GET
+          path: /accounts/{id}
+          expected_response:
+            status: 200
+            body_fields: [merchant_id, status, currency]
+        cucumber_scenarios:
+          - feature: account_management.feature
+            scenario: "Retrieve account details"
+
+      - step: 2
+        name: "Check Account Balance"
+        description: "View current available balance before processing payments"
+        api_call:
+          method: GET
+          path: /accounts/{id}/balance
+          expected_response:
+            status: 200
+            body_fields: [available_balance, currency]
+        depends_on_step: 1
+        cucumber_scenarios:
+          - feature: account_management.feature
+            scenario: "Check account balance"
+
+      - step: 3
+        name: "Update Transaction Limits"
+        description: "Adjust per-transaction and daily/monthly limits as needed"
+        api_call:
+          method: PATCH
+          path: /accounts/{id}/limits
+          expected_response:
+            status: 200
+            body_fields: [limits, updated_at]
+        depends_on_step: 1
+        business_rule: account-active-for-payments
+        cucumber_scenarios:
+          - feature: account_management.feature
+            scenario: "Update transaction limits"
+
+  - id: FLOW005
+    name: "Webhook Event Processing"
+    description: |
+      Merchant registers a webhook endpoint, a payment event fires, and the
+      platform delivers the event with an HMAC signature for validation.
+      Covers webhook registration, delivery, and signature verification.
+    tags: [webhooks, security]
+    steps:
+      - step: 1
+        name: "Register Webhook Endpoint"
+        api_call:
+          method: POST
+          path: /webhooks
+          expected_response:
+            status: 201
+            body_fields: [webhook_id, url, events, secret, status]
+            status_value: active
+        business_rule: webhook-signature-validation
+        cucumber_scenarios:
+          - feature: webhooks.feature
+            scenario: "Register a webhook endpoint"
+
+      - step: 2
+        name: "Trigger Payment Event"
+        description: "Process a payment to generate a webhook event"
+        api_calls:
+          - method: POST
+            path: /payments
+          - method: POST
+            path: /payments/{id}/capture
+        cucumber_scenarios:
+          - feature: payments.feature
+            scenario: "Successful payment capture"
+
+      - step: 3
+        name: "Receive Webhook with Signature"
+        description: "Webhook is delivered to the registered URL with HMAC header"
+        validation:
+          header: X-Webhook-Signature
+          format: "sha256=<hex_digest>"
+          algorithm: HMAC-SHA256
+        business_rule: webhook-signature-validation
+        cucumber_scenarios:
+          - feature: webhooks.feature
+            scenario: "Webhook payload includes HMAC signature"
+
+      - step: 4
+        name: "Validate Webhook Signature"
+        description: "Recipient computes and compares the expected signature"
+        cucumber_scenarios:
+          - feature: webhooks.feature
+            scenario: "Webhook payload includes HMAC signature"
+          - feature: webhooks.feature
+            scenario: "Reject webhook with invalid signature"
+          - feature: security_scenarios.feature
+            scenario: "Webhook signature must be validated"

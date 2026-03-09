@@ -1,0 +1,275 @@
+#!/usr/bin/env groovy
+/**
+ * Jenkinsfile
+ * CI/CD pipeline for the Logistics & Shipment Tracking API.
+ * Runs tests, API coverage analysis, and security scans.
+ *
+ * Requires:
+ *  - NodeJS Jenkins plugin (configured as 'NodeJS 20')
+ *  - HTML Publisher plugin (for coverage dashboard reports)
+ *  - Warnings NG plugin (for Trivy/Semgrep SARIF results)
+ */
+
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    tools {
+        nodejs 'NodeJS 20'
+    }
+
+    environment {
+        PROJECT_DIR   = 'examples/javascript-node-express-complex'
+        REPORTS_DIR   = "${PROJECT_DIR}/reports"
+        COVERAGE_DIR  = "${PROJECT_DIR}/coverage"
+        THRESHOLD     = '90'
+        NODE_ENV      = 'test'
+    }
+
+    parameters {
+        choice(
+            name: 'TESTS_SUITE',
+            choices: ['tests-complete', 'tests-initial', 'all'],
+            description: 'Which test suite to run for coverage analysis'
+        )
+        booleanParam(
+            name: 'RUN_SECURITY_SCAN',
+            defaultValue: true,
+            description: 'Run Trivy + Semgrep security scans'
+        )
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Branch: ${env.BRANCH_NAME}"
+                echo "Commit: ${env.GIT_COMMIT?.take(8)}"
+            }
+        }
+
+        stage('Install Dependencies') {
+            parallel {
+                stage('Root (analyzer)') {
+                    steps {
+                        sh 'npm ci'
+                    }
+                }
+                stage('Example project') {
+                    steps {
+                        dir("${PROJECT_DIR}") {
+                            sh 'npm ci'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Tests') {
+            parallel {
+                stage('Initial Tests (baseline)') {
+                    steps {
+                        dir("${PROJECT_DIR}") {
+                            sh 'npm run test:initial -- --reporters=default --reporters=jest-junit || true'
+                        }
+                    }
+                    post {
+                        always {
+                            junit testResults: "${PROJECT_DIR}/junit-initial.xml",
+                                  allowEmptyResults: true
+                        }
+                    }
+                }
+
+                stage('Complete Tests') {
+                    steps {
+                        dir("${PROJECT_DIR}") {
+                            sh 'npm run test:complete -- --reporters=default --reporters=jest-junit'
+                        }
+                    }
+                    post {
+                        always {
+                            junit testResults: "${PROJECT_DIR}/junit-complete.xml",
+                                  allowEmptyResults: true
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Jest Code Coverage') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh 'npm test -- --coverage --coverageReporters=lcov --coverageReporters=text'
+                }
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing:          true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll:               true,
+                        reportDir:             "${COVERAGE_DIR}/lcov-report",
+                        reportFiles:           'index.html',
+                        reportName:            'Jest Coverage Report',
+                    ])
+                }
+            }
+        }
+
+        stage('API Coverage Analysis') {
+            steps {
+                script {
+                    def testsSuite = params.TESTS_SUITE == 'all'
+                        ? 'tests-complete'
+                        : params.TESTS_SUITE
+
+                    echo "Analyzing ${testsSuite}..."
+
+                    dir("${PROJECT_DIR}") {
+                        sh """
+                            node scripts/run-analyzer.js \\
+                                --tests     ${testsSuite} \\
+                                --format    html \\
+                                --output    ./reports \\
+                                --threshold ${env.THRESHOLD}
+                        """
+                    }
+                }
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing:          true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll:               true,
+                        reportDir:             "${REPORTS_DIR}",
+                        reportFiles:           'coverage-report.html',
+                        reportName:            'API Coverage Dashboard',
+                    ])
+
+                    archiveArtifacts artifacts: "${REPORTS_DIR}/**",
+                                     allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage('Coverage Comparison') {
+            steps {
+                script {
+                    // Run analysis for both test suites to show the "journey"
+                    dir("${PROJECT_DIR}") {
+                        sh """
+                            node scripts/run-analyzer.js \\
+                                --tests  tests-initial \\
+                                --format json \\
+                                --output ./reports/initial || true
+                        """
+                        sh """
+                            node scripts/run-analyzer.js \\
+                                --tests  tests-complete \\
+                                --format json \\
+                                --output ./reports/complete
+                        """
+                    }
+
+                    // Print comparison summary
+                    echo """
+                    ========================================
+                    API COVERAGE COMPARISON
+                    ========================================
+                    Initial tests (tests-initial):
+                      - Endpoints tested: shipments (partial) + orders (partial)
+                      - Estimated coverage: ~45%
+                      - Missing: dispatch, deliver, cancel, tracking,
+                                warehouses, carriers, returns, tracking events,
+                                customers, admin
+
+                    Complete tests (tests-complete):
+                      - All 25 endpoints covered
+                      - Business rules: all 8 rules tested
+                      - Error scenarios included
+                      - Security/RBAC tests included
+                      - Estimated coverage: 100%
+                    ========================================
+                    """
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            when {
+                expression { params.RUN_SECURITY_SCAN }
+            }
+            parallel {
+                stage('Trivy (dependencies)') {
+                    steps {
+                        dir("${PROJECT_DIR}") {
+                            sh """
+                                trivy fs . \\
+                                    --format sarif \\
+                                    --output trivy-results.sarif \\
+                                    --severity CRITICAL,HIGH \\
+                                    --ignore-unfixed \\
+                                    --exit-code 0 || true
+                            """
+                        }
+                    }
+                    post {
+                        always {
+                            recordIssues enabledForFailure: true,
+                                         tool: sarif(pattern: "${PROJECT_DIR}/trivy-results.sarif",
+                                                     id: 'trivy',
+                                                     name: 'Trivy Vulnerabilities')
+                        }
+                    }
+                }
+
+                stage('Semgrep (SAST)') {
+                    steps {
+                        dir("${PROJECT_DIR}") {
+                            sh """
+                                semgrep scan \\
+                                    --config=p/javascript \\
+                                    --config=p/express \\
+                                    --config=p/security-audit \\
+                                    --sarif \\
+                                    --output semgrep-results.sarif \\
+                                    . || true
+                            """
+                        }
+                    }
+                    post {
+                        always {
+                            recordIssues enabledForFailure: true,
+                                         tool: sarif(pattern: "${PROJECT_DIR}/semgrep-results.sarif",
+                                                     id: 'semgrep',
+                                                     name: 'Semgrep SAST')
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished with status: ${currentBuild.result}"
+        }
+        success {
+            echo "Build succeeded — API coverage threshold met."
+        }
+        failure {
+            echo "Build FAILED — check coverage report and test output."
+            // emailext body: '...', subject: 'Build Failed', to: 'team@example.com'
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}

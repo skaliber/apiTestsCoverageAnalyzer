@@ -1,0 +1,118 @@
+# config.yaml - api-test-coverage-analyzer configuration for cucumber-ruby-complex
+#
+# This file tells the analyzer where to find tests, how to parse them,
+# and which OpenAPI spec to compare against.
+#
+# The analyzer will:
+#   1. Scan features/ for .feature files (Gherkin)
+#   2. Trace each Cucumber step to its step definition
+#   3. Follow helper method calls from step defs to ApiHelper classes
+#   4. Resolve path constants from PathConstants module
+#   5. Match resolved (method, path) pairs against openapi.yaml endpoints
+
+analyzer:
+  project_name: "Payment Processing Platform - Cucumber/Ruby BDD Suite"
+  version: "1.0.0"
+
+  # ─── Test source configuration ──────────────────────────────────────────────
+  tests:
+    framework: cucumber
+    language: ruby
+    test_directory: features/
+
+    # Gherkin feature files (the top-level BDD scenarios)
+    feature_patterns:
+      - "features/**/*.feature"
+
+    # Ruby step definitions that implement the Gherkin steps
+    step_definition_patterns:
+      - "features/step_definitions/**/*.rb"
+
+    # Support files loaded before each test run (helpers, configuration)
+    support_patterns:
+      - "features/support/**/*.rb"
+
+    # Exclude generated/fixture files from analysis
+    exclude_patterns:
+      - "features/support/vcr_cassettes/**"
+      - "vendor/**"
+
+  # ─── Path constant resolution ───────────────────────────────────────────────
+  # The analyzer understands PathConstants-style indirection:
+  #   helper calls PathConstants::SOME_PATH
+  #   analyzer expands the constant value to get the actual URL template
+  path_resolution:
+    strategy: ruby_constants
+    constant_files:
+      - "features/support/path_constants.rb"
+    module_name: PathConstants
+    # Pattern used to find gsub-based parameter substitution
+    # e.g. PAYMENT_PATH.gsub(":id", id) -> /payments/:id -> /payments/{id}
+    parameter_style: colon   # :param notation (converted to {param} for OpenAPI matching)
+
+  # ─── API helper class mapping ─────────────────────────────────────────────
+  # Maps helper class names to their source files for call graph tracing
+  helpers:
+    - class: PaymentApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+    - class: RefundApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+    - class: DisputeApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+    - class: AccountApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+    - class: WebhookApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+    - class: AdminApiHelper
+      file: "features/support/api_helper.rb"
+      http_client: ApiClient
+
+  # ─── OpenAPI specification ──────────────────────────────────────────────────
+  openapi:
+    spec_file: openapi.yaml
+    spec_version: "3.0.3"
+    base_url: http://localhost:4567
+
+  # ─── Coverage thresholds ────────────────────────────────────────────────────
+  coverage:
+    # Fail the analysis if endpoint coverage drops below this percentage
+    minimum_endpoint_coverage: 80
+    # Warn (but don't fail) if scenario-level coverage drops below this
+    minimum_scenario_coverage: 70
+    # List endpoints that are intentionally excluded from coverage requirements
+    excluded_endpoints:
+      # Test helper endpoints are not part of the public API contract
+      - path: "/test/*"
+        reason: "Test infrastructure endpoints; not part of public API"
+
+  # ─── Report output ──────────────────────────────────────────────────────────
+  reporting:
+    output_dir: reports/
+    formats:
+      - json
+      - html
+      - markdown
+    include_uncovered_endpoints: true
+    include_scenario_mapping: true
+    group_by_tag: true
+
+  # ─── Business rules integration ─────────────────────────────────────────────
+  business_rules:
+    file: business-rules.yaml
+    tag_mapping:
+      # Cucumber tags that map to business rule validation scenarios
+      "@business_rules": all
+      "@void":           [void-uncaptured-only]
+      "@capture":        [payment-authorization-before-capture]
+      "@refunds":        [refund-captured-payments-only, refund-amount-not-exceed-original]
+
+  # ─── Integration flow tracing ────────────────────────────────────────────────
+  integration_flows:
+    file: integration-flows.yaml
+    # The analyzer verifies that each flow's steps are covered by at least one scenario
+    validate_flow_coverage: true

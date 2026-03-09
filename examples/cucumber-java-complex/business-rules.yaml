@@ -1,0 +1,135 @@
+##
+## Business rules that must be verified by the BDD test suite.
+##
+## Each rule specifies:
+##   id          - unique identifier
+##   name        - short human-readable label
+##   description - detailed explanation of the rule
+##   endpoints   - API endpoints that enforce or are affected by this rule
+##   scenarios   - Gherkin scenario titles that demonstrate the rule
+##   severity    - impact level if the rule is not tested (critical / high / medium / low)
+##
+
+rules:
+
+  - id: BR-001
+    name: account-balance-positive
+    description: >
+      A bank account balance must never go below $0.00.
+      Any transaction (withdrawal or transfer) that would result in a
+      negative balance must be rejected with HTTP 422 and error code
+      INSUFFICIENT_FUNDS.
+    severity: critical
+    endpoints:
+      - method: POST
+        path: /api/v1/transactions
+      - method: POST
+        path: /api/v1/transfers
+    scenarios:
+      - "Prevent overdraft - balance cannot go below zero"
+    tags: [balance, withdrawal, fraud-prevention]
+
+  - id: BR-002
+    name: transfer-daily-limit
+    description: >
+      A customer may not transfer more than $50,000 in aggregate within a
+      rolling 24-hour window. Attempts to exceed this limit must be rejected
+      with HTTP 422 and error code TRANSFER_DAILY_LIMIT_EXCEEDED.
+    severity: critical
+    endpoints:
+      - method: POST
+        path: /api/v1/transfers
+    scenarios:
+      - "Reject transfer exceeding daily limit"
+    tags: [transfer, limits, compliance]
+
+  - id: BR-003
+    name: loan-eligibility-check
+    description: >
+      Customers must have a minimum credit score of 620 to qualify for a
+      personal loan and 680 for a mortgage. Applications below the threshold
+      are rejected with HTTP 422, status REJECTED, and a reason containing
+      "credit".
+    severity: high
+    endpoints:
+      - method: POST
+        path: /api/v1/loans
+    scenarios:
+      - "Reject loan application for poor credit score"
+      - "Apply for a personal loan with good credit"
+    tags: [loan, credit, eligibility]
+
+  - id: BR-004
+    name: loan-payment-schedule
+    description: >
+      Loan repayments must match the pre-computed amortization schedule within
+      ±$1.00. Payments that deviate from the scheduled amount must be rejected
+      with HTTP 422 and error code LOAN_PAYMENT_SCHEDULE_MISMATCH.
+    severity: high
+    endpoints:
+      - method: POST
+        path: /api/v1/loans/{id}/payment
+    scenarios:
+      - "Reject off-schedule loan payment"
+      - "Make a scheduled loan payment"
+    tags: [loan, payment, amortization]
+
+  - id: BR-005
+    name: savings-minimum-balance
+    description: >
+      Savings accounts have a mandatory minimum balance (defined at account
+      opening). Withdrawal requests that would bring the balance below the
+      minimum must be rejected with HTTP 422 and error code
+      MINIMUM_BALANCE_VIOLATION.
+    severity: high
+    endpoints:
+      - method: POST
+        path: /api/v1/transactions
+    scenarios:
+      - "Savings account cannot go below minimum balance"
+    tags: [savings, balance, constraints]
+
+  - id: BR-006
+    name: beneficiary-verification
+    description: >
+      Fund transfers can only be sent to beneficiaries whose verified flag is
+      true. Transfers to unverified beneficiaries must be rejected with HTTP
+      422 and error code BENEFICIARY_NOT_VERIFIED.
+    severity: critical
+    endpoints:
+      - method: POST
+        path: /api/v1/transfers
+    scenarios:
+      - "Reject transfer to unverified beneficiary"
+    tags: [transfer, beneficiary, security]
+
+  - id: BR-007
+    name: dormant-account-restrictions
+    description: >
+      Accounts that have had no activity for 12+ months are automatically
+      marked DORMANT. No withdrawals, transfers, or outgoing transactions
+      may be initiated on dormant accounts. Attempts must return HTTP 422.
+    severity: high
+    endpoints:
+      - method: POST
+        path: /api/v1/transactions
+      - method: POST
+        path: /api/v1/transfers
+    scenarios:
+      - "Cannot withdraw from dormant account"
+    tags: [account, dormant, restrictions]
+
+  - id: BR-008
+    name: two-factor-for-large-transfers
+    description: >
+      Transfers exceeding $10,000 require the customer to have completed a
+      Two-Factor Authentication challenge in the current session. Attempting
+      such a transfer without 2FA must return HTTP 403 and error code
+      TWO_FACTOR_REQUIRED.
+    severity: critical
+    endpoints:
+      - method: POST
+        path: /api/v1/transfers
+    scenarios:
+      - "Two-factor authentication required for large transfers"
+    tags: [transfer, 2fa, security, high-value]

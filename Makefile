@@ -46,6 +46,7 @@ FORMATS       ?= json,html,csv,junit
         self-analysis-performance self-analysis-compatibility \
         self-analysis-all security-scan \
         summary pr-summary build-summary \
+        examples-analyze-all examples-analyze examples-test-structure \
         ci
 
 # ── Default target ─────────────────────────────────────────────────────────────
@@ -338,4 +339,50 @@ build-summary: summary ## Generate build summary markdown (alias — build-summa
 ci: install build test self-analysis-all summary ## Full CI pipeline: install → build → test → self-analysis → summary
 	@echo "==========================================================="
 	@echo "  CI pipeline complete."
+	@echo "==========================================================="
+
+# =============================================================================
+#  EXAMPLE PROJECTS
+# =============================================================================
+
+EXAMPLE ?= typescript
+
+examples-test-structure: ## Verify all example project directories have required files
+	$(NPM) test -- --no-coverage --testPathPattern="integration/examples"
+
+examples-analyze: build ## Run analyzer against a single example (EXAMPLE=<name>)
+	@echo "Analyzing example: $(EXAMPLE)"
+	@test -d examples/$(EXAMPLE) || (echo "Example '$(EXAMPLE)' not found in examples/"; exit 1)
+	@test -f examples/$(EXAMPLE)/openapi.yaml || (echo "examples/$(EXAMPLE)/openapi.yaml not found"; exit 1)
+	@mkdir -p examples/$(EXAMPLE)/reports
+	@LANG=$$(grep -E '^  language:' examples/$(EXAMPLE)/config.yaml 2>/dev/null | head -1 | awk '{print $$2}' || echo 'typescript'); \
+	 TESTS_DIR=$$(ls -d examples/$(EXAMPLE)/tests/tests-complete examples/$(EXAMPLE)/src/test examples/$(EXAMPLE)/spec/requests/spec-complete examples/$(EXAMPLE)/features 2>/dev/null | head -1 || echo "examples/$(EXAMPLE)/tests"); \
+	 echo "  Language: $$LANG"; \
+	 echo "  Tests: $$TESTS_DIR"; \
+	 $(ANALYZER_CMD) endpoint-coverage \
+	   --spec "examples/$(EXAMPLE)/openapi.yaml" \
+	   --tests "$$TESTS_DIR/**/*" \
+	   --language "$$LANG" \
+	   --format json,html \
+	   --output "examples/$(EXAMPLE)/reports" 2>/dev/null || true
+	@echo "Report written to examples/$(EXAMPLE)/reports/"
+
+examples-analyze-all: build ## Run analyzer against all example projects
+	@echo "==========================================================="
+	@echo "  Running analyzer against all example projects"
+	@echo "==========================================================="
+	@for EXAMPLE in typescript java-spring-complex python-fastapi-complex \
+	    ruby-rails-complex cucumber-ruby-complex cucumber-java-complex \
+	    kotlin-ktor-complex javascript-node-express-complex; do \
+	  if [ -d "examples/$$EXAMPLE" ] && [ -f "examples/$$EXAMPLE/openapi.yaml" ]; then \
+	    echo ""; \
+	    echo "--- $$EXAMPLE ---"; \
+	    $(MAKE) examples-analyze EXAMPLE=$$EXAMPLE || true; \
+	  else \
+	    echo "[SKIP] examples/$$EXAMPLE not found or missing openapi.yaml"; \
+	  fi; \
+	done
+	@echo ""
+	@echo "==========================================================="
+	@echo "  All examples analyzed."
 	@echo "==========================================================="

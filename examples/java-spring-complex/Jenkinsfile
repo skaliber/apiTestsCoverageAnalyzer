@@ -1,0 +1,194 @@
+#!/usr/bin/env groovy
+/**
+ * Jenkinsfile — E-Commerce Orders API
+ * Builds, tests, and analyzes API test coverage for the java-spring-complex example.
+ *
+ * Prerequisites on Jenkins agent:
+ *   - Java 21 (configured as 'JDK21' in Global Tool Config)
+ *   - Node.js 20 (configured as 'NodeJS20' in Global Tool Config)
+ *   - Gradle (wrapper is included — no separate installation needed)
+ */
+
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK21'
+        nodejs 'NodeJS20'
+    }
+
+    environment {
+        PROJECT_DIR = 'examples/java-spring-complex'
+        REPORTS_DIR = "${PROJECT_DIR}/reports"
+        ANALYZER_CONFIG = "${PROJECT_DIR}/config.yaml"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Building branch: ${env.BRANCH_NAME}"
+                echo "Commit: ${env.GIT_COMMIT}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir("${env.PROJECT_DIR}") {
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean build -x test --info'
+                }
+            }
+            post {
+                failure {
+                    echo 'Build failed. Check Gradle output above.'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir("${env.PROJECT_DIR}") {
+                    sh './gradlew test'
+                }
+            }
+            post {
+                always {
+                    junit testResults: "${env.PROJECT_DIR}/build/test-results/test/*.xml",
+                          allowEmptyResults: true
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "${env.PROJECT_DIR}/build/reports/tests/test",
+                        reportFiles: 'index.html',
+                        reportName: 'JUnit Test Report'
+                    ])
+                }
+                failure {
+                    echo 'Tests failed. Failing the build.'
+                }
+            }
+        }
+
+        stage('Analyze API Coverage') {
+            parallel {
+
+                stage('Analyze: Complete Tests') {
+                    steps {
+                        dir("${env.PROJECT_DIR}") {
+                            sh 'npm install -g api-test-coverage-analyzer || npx api-test-coverage-analyzer --version'
+                            sh '''
+                                api-coverage analyze \
+                                    --config config.yaml \
+                                    --testDir src/test/java/com/example/orders/tests-complete \
+                                    --outputDir reports/complete \
+                                    --format json,html
+                            '''
+                        }
+                    }
+                }
+
+                stage('Analyze: Initial Tests (Baseline)') {
+                    steps {
+                        dir("${env.PROJECT_DIR}") {
+                            sh '''
+                                api-coverage analyze \
+                                    --config config.yaml \
+                                    --testDir src/test/java/com/example/orders/tests-initial \
+                                    --outputDir reports/initial \
+                                    --format json,html \
+                                    --no-fail-on-threshold || true
+                            '''
+                        }
+                    }
+                }
+
+            }
+            post {
+                failure {
+                    echo 'API coverage quality gate failed. Review the reports.'
+                }
+            }
+        }
+
+        stage('Coverage Summary') {
+            steps {
+                script {
+                    def reportPath = "${env.PROJECT_DIR}/reports/complete/coverage-report.json"
+                    if (fileExists(reportPath)) {
+                        def report = readJSON file: reportPath
+                        def scores = report.scores ?: [:]
+                        def passed = report.qualityGatePassed ?: false
+
+                        echo "============================================"
+                        echo "  API TEST COVERAGE REPORT"
+                        echo "============================================"
+                        echo "  Endpoint Coverage : ${(scores.endpoint ?: 0) * 100}%"
+                        echo "  Parameter Coverage: ${(scores.parameter ?: 0) * 100}%"
+                        echo "  Business Rules    : ${(scores.business ?: 0) * 100}%"
+                        echo "  Integration Flows : ${(scores.integration ?: 0) * 100}%"
+                        echo "  Error Paths       : ${(scores.error ?: 0) * 100}%"
+                        echo "  Security          : ${(scores.security ?: 0) * 100}%"
+                        echo "  Quality Gate      : ${passed ? 'PASSED' : 'FAILED'}"
+                        echo "============================================"
+
+                        if (!passed) {
+                            error("Coverage quality gate did not pass. See report for details.")
+                        }
+                    } else {
+                        echo "Coverage report not found at: ${reportPath}"
+                    }
+                }
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: "${env.PROJECT_DIR}/reports/**/*",
+                                 allowEmptyArchive: true,
+                                 fingerprint: true
+
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: "${env.PROJECT_DIR}/reports/complete",
+                    reportFiles: 'index.html',
+                    reportName: 'API Coverage Report (Complete)'
+                ])
+
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: "${env.PROJECT_DIR}/reports/initial",
+                    reportFiles: 'index.html',
+                    reportName: 'API Coverage Report (Initial Baseline)'
+                ])
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed with status: ${currentBuild.currentResult}"
+        }
+        success {
+            echo 'All stages passed. API coverage requirements met.'
+        }
+        failure {
+            echo 'Pipeline failed. Check stages above for details.'
+        }
+        unstable {
+            echo 'Pipeline is unstable. Tests may have failures.'
+        }
+    }
+}

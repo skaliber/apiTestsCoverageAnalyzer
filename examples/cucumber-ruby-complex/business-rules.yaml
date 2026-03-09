@@ -1,0 +1,211 @@
+# business-rules.yaml - Business rules governing payment processing behaviour
+#
+# Each rule documents the constraint, the API endpoints it applies to,
+# the Cucumber tags that validate it, and the expected error response
+# when the rule is violated.
+
+version: "1.0.0"
+domain: "Payment Processing Platform"
+
+rules:
+
+  - id: payment-authorization-before-capture
+    name: "Payment must be authorized before capture"
+    description: |
+      A payment must progress through the "authorized" state before it can be
+      captured. Attempting to capture a payment in any other state (e.g. already
+      captured, voided, or failed) is not permitted.
+    severity: critical
+    applies_to:
+      - method: POST
+        path: /payments/{id}/capture
+    enforcement: server-side
+    valid_prior_states:
+      - authorized
+    invalid_prior_states:
+      - captured
+      - voided
+      - refunded
+      - failed
+    violation_response:
+      http_status: 422
+      error_code: INVALID_STATE_TRANSITION
+      message: "Only authorized payments can be captured"
+    cucumber_tags:
+      - "@capture"
+      - "@business_rules"
+    scenarios:
+      - "Successful payment capture"
+      - "Cannot capture an already captured payment"
+
+  - id: void-uncaptured-only
+    name: "Only uncaptured (authorized) payments can be voided"
+    description: |
+      A void operation is only applicable to payments that have been authorized
+      but not yet captured. Once a payment is captured, the funds have moved;
+      a refund must be issued instead.
+    severity: critical
+    applies_to:
+      - method: POST
+        path: /payments/{id}/void
+    enforcement: server-side
+    valid_prior_states:
+      - authorized
+    invalid_prior_states:
+      - captured
+      - voided
+      - refunded
+    violation_response:
+      http_status: 422
+      error_code: VOID_NOT_ALLOWED
+      message: "captured payments cannot be voided"
+    cucumber_tags:
+      - "@void"
+      - "@business_rules"
+    scenarios:
+      - "Void an authorized payment"
+      - "Cannot void a captured payment"
+      - "Cannot void a refunded payment"
+
+  - id: refund-captured-payments-only
+    name: "Refunds can only be issued for captured payments"
+    description: |
+      Issuing a refund requires that funds have already moved from customer to
+      merchant (i.e. the payment is in "captured" status). Refunding an authorized
+      but uncaptured payment is not allowed; void should be used instead.
+    severity: critical
+    applies_to:
+      - method: POST
+        path: /refunds
+      - method: POST
+        path: /payments/{id}/refund
+    enforcement: server-side
+    valid_prior_states:
+      - captured
+    invalid_prior_states:
+      - authorized
+      - voided
+      - failed
+    violation_response:
+      http_status: 422
+      error_code: REFUND_NOT_ALLOWED
+      message: "only captured payments can be refunded"
+    cucumber_tags:
+      - "@refunds"
+      - "@business_rules"
+    scenarios:
+      - "Full refund of a captured payment"
+      - "Cannot refund an authorized (uncaptured) payment"
+      - "Cannot refund a voided payment"
+
+  - id: refund-amount-not-exceed-original
+    name: "Total refund amount cannot exceed the original payment amount"
+    description: |
+      The sum of all refunds issued against a single payment cannot exceed the
+      original payment amount. Partial refunds are supported; the platform tracks
+      the cumulative refunded amount and rejects any refund that would cause an
+      over-refund.
+    severity: critical
+    applies_to:
+      - method: POST
+        path: /refunds
+      - method: POST
+        path: /payments/{id}/refund
+    enforcement: server-side
+    validation:
+      rule: "sum(all_refunds_for_payment) + new_refund_amount <= original_payment_amount"
+    violation_response:
+      http_status: 422
+      error_code: REFUND_EXCEEDS_ORIGINAL
+      message: "refund amount exceeds original payment"
+    secondary_violation:
+      error_code: REFUND_EXCEEDS_REMAINING
+      message: "refund amount exceeds remaining refundable balance"
+    cucumber_tags:
+      - "@refunds"
+      - "@business_rules"
+    scenarios:
+      - "Refund amount cannot exceed original payment"
+      - "Cannot refund more than remaining balance"
+      - "Multiple partial refunds up to the original amount"
+
+  - id: dispute-response-window
+    name: "Disputes must be responded to within 7 days"
+    description: |
+      Merchants have a 7-calendar-day window from the time a dispute is opened
+      to submit their evidence and response. Once this window expires, the
+      dispute cannot be contested and the platform will automatically find in
+      favour of the customer.
+    severity: high
+    applies_to:
+      - method: PUT
+        path: /disputes/{id}/respond
+    enforcement: server-side
+    window:
+      duration_days: 7
+      starts_at: dispute_created_at
+    violation_response:
+      http_status: 422
+      error_code: DISPUTE_WINDOW_EXPIRED
+      message: "response window of 7 days has passed"
+    cucumber_tags:
+      - "@disputes"
+      - "@business_rules"
+    scenarios:
+      - "Respond to a dispute within the time window"
+      - "Cannot respond to an expired dispute"
+
+  - id: account-active-for-payments
+    name: "Merchant account must be active to accept payments"
+    description: |
+      Payment authorization requests are only processed for merchants whose
+      account status is "active". Suspended, under-review, or closed accounts
+      will have all payment creation attempts rejected.
+    severity: high
+    applies_to:
+      - method: POST
+        path: /payments
+    enforcement: server-side
+    valid_account_statuses:
+      - active
+    invalid_account_statuses:
+      - suspended
+      - under_review
+      - closed
+    violation_response:
+      http_status: 403
+      error_code: ACCOUNT_INACTIVE
+      message: "Account is not active"
+    cucumber_tags:
+      - "@business_rules"
+    scenarios:
+      - "Account must be active to accept payments"
+      - "Verify account must be active for payments"
+
+  - id: webhook-signature-validation
+    name: "Webhook payloads must carry a valid HMAC-SHA256 signature"
+    description: |
+      All webhook deliveries from the platform include an X-Webhook-Signature
+      header containing an HMAC-SHA256 digest of the payload, keyed with the
+      webhook's secret. Recipients must validate this signature before processing
+      the event to prevent replay attacks and payload tampering.
+    severity: high
+    applies_to:
+      - method: POST
+        path: /webhooks
+    enforcement: client-side-validation
+    algorithm: HMAC-SHA256
+    header: X-Webhook-Signature
+    format: "sha256=<hex_digest>"
+    violation_response:
+      http_status: 401
+      error_code: INVALID_SIGNATURE
+      message: "Webhook signature validation failed"
+    cucumber_tags:
+      - "@webhook_security"
+      - "@business_rules"
+    scenarios:
+      - "Webhook payload includes HMAC signature"
+      - "Reject webhook with invalid signature"
+      - "Webhook with tampered payload is rejected"
+      - "Webhook signature must be validated"

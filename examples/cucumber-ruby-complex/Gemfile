@@ -1,0 +1,44 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby ">= 3.1.0"
+
+# ─── BDD Test Framework ────────────────────────────────────────────────────────
+gem "cucumber",        "~> 9.2"   # BDD framework - parses .feature files and runs step definitions
+gem "cucumber-core",   "~> 13.0"  # Core Cucumber engine
+
+# ─── HTTP Client ──────────────────────────────────────────────────────────────
+# rest-client is used in api_helper.rb via ApiClient to make HTTP calls.
+# The analyzer traces: step def -> ApiHelper -> ApiClient.get/post -> PathConstants -> URL
+gem "rest-client",     "~> 2.1"   # HTTP client used by ApiClient in api_helper.rb
+
+# ─── Assertions / Matchers ────────────────────────────────────────────────────
+gem "rspec-expectations", "~> 3.13"  # expect(...).to matchers used in step definitions
+
+# ─── JSON Handling ────────────────────────────────────────────────────────────
+gem "json",            "~> 2.7"   # JSON parse/generate (stdlib extension)
+gem "multi_json",      "~> 1.15"  # Portable JSON adapter
+
+# ─── HTTP Stubbing & Recording ────────────────────────────────────────────────
+gem "vcr",             "~> 6.3"   # Record/replay HTTP interactions for offline testing
+gem "webmock",         "~> 3.23"  # HTTP request stubbing (used by VCR)
+
+# ─── Application Server (for local test target) ───────────────────────────────
+gem "sinatra",         "~> 4.0"   # Lightweight web framework used in app/routes.rb
+gem "sinatra-contrib", "~> 4.0"   # sinatra/json helper
+gem "rack",            "~> 3.1"   # Rack::Utils.secure_compare for webhook signature validation
+gem "puma",            "~> 6.4"   # Application server for running app/routes.rb locally
+
+# ─── Utilities ────────────────────────────────────────────────────────────────
+gem "securerandom"                 # Included with Ruby stdlib (explicit for clarity)
+gem "openssl"                      # HMAC-SHA256 signing for webhook validation (stdlib)
+
+group :development, :test do
+  gem "rubocop",            "~> 1.65", require: false  # Ruby style linter
+  gem "rubocop-rspec",      "~> 3.1",  require: false
+  gem "rubocop-performance", "~> 1.21", require: false
+  gem "simplecov",          "~> 0.22", require: false  # Code coverage for step definitions
+  gem "simplecov-lcov",     "~> 0.8",  require: false  # LCOV output for CI
+  gem "pry",                "~> 0.14"                  # Debug REPL
+end

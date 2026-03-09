@@ -1,0 +1,200 @@
+version: 1
+description: "Integration flows for the Financial Accounts & Transactions API"
+
+flows:
+  - id: FLOW001
+    name: Account Opening and First Transaction
+    description: |
+      A new user authenticates, opens a checking account, makes an initial
+      deposit via a credit transaction, then verifies their balance.
+    steps:
+      - step: 1
+        name: authenticate
+        endpoint: POST /auth/token
+        description: User logs in and receives a JWT access token
+        expectedStatus: 200
+      - step: 2
+        name: open-account
+        endpoint: POST /accounts
+        description: User opens a new checking account with an initial deposit
+        expectedStatus: 201
+        dependsOn: [1]
+      - step: 3
+        name: credit-transaction
+        endpoint: POST /transactions
+        description: Record the initial deposit as a credit transaction
+        expectedStatus: 201
+        dependsOn: [2]
+      - step: 4
+        name: verify-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Confirm the account balance reflects the deposit
+        expectedStatus: 200
+        dependsOn: [3]
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_accounts.py::TestCreateAccount::test_create_checking_account
+        - tests/tests-complete/test_transactions.py::TestCreateTransaction::test_create_credit_returns_201
+        - tests/tests-complete/test_accounts.py::TestGetBalance::test_get_balance_returns_200
+
+  - id: FLOW002
+    name: Fund Transfer Between Accounts
+    description: |
+      Alice transfers funds from her checking account to her savings account,
+      verifying that both balances are updated correctly.
+    steps:
+      - step: 1
+        name: authenticate-alice
+        endpoint: POST /auth/token
+        description: Alice authenticates
+        expectedStatus: 200
+      - step: 2
+        name: get-checking-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Record the initial checking balance
+        expectedStatus: 200
+        dependsOn: [1]
+      - step: 3
+        name: execute-transfer
+        endpoint: POST /transfers
+        description: Transfer $500 from checking to savings
+        expectedStatus: 201
+        dependsOn: [2]
+        businessRules: [BR-002, BR-003, BR-007]
+      - step: 4
+        name: verify-source-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Confirm checking balance decreased
+        expectedStatus: 200
+        dependsOn: [3]
+      - step: 5
+        name: verify-destination-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Confirm savings balance increased
+        expectedStatus: 200
+        dependsOn: [3]
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_between_own_accounts
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_reduces_source_balance
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_increases_destination_balance
+
+  - id: FLOW003
+    name: Card Lifecycle Management
+    description: |
+      Issue a card for an account, activate it, use it for a debit transaction,
+      suspend it, then permanently cancel it.
+    steps:
+      - step: 1
+        name: authenticate
+        endpoint: POST /auth/token
+        description: User authenticates
+        expectedStatus: 200
+      - step: 2
+        name: issue-card
+        endpoint: POST /cards
+        description: Issue a debit card (card starts INACTIVE)
+        expectedStatus: 201
+        dependsOn: [1]
+      - step: 3
+        name: activate-card
+        endpoint: PUT /cards/{card_id}/status
+        description: Activate the card
+        expectedStatus: 200
+        dependsOn: [2]
+        businessRules: [BR-004]
+      - step: 4
+        name: verify-active
+        endpoint: GET /cards/{card_id}
+        description: Confirm card is now active
+        expectedStatus: 200
+        dependsOn: [3]
+      - step: 5
+        name: suspend-card
+        endpoint: PUT /cards/{card_id}/status
+        description: Suspend the card temporarily
+        expectedStatus: 200
+        dependsOn: [4]
+      - step: 6
+        name: cancel-card
+        endpoint: DELETE /cards/{card_id}
+        description: Permanently cancel the card
+        expectedStatus: 204
+        dependsOn: [5]
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_cards.py::TestIssueCard::test_issue_debit_card
+        - tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_activate_card
+        - tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_suspend_card
+        - tests/tests-complete/test_cards.py::TestCancelCard::test_cancel_card_returns_204
+
+  - id: FLOW004
+    name: Monthly Statement Retrieval
+    description: |
+      The user lists available statement periods for their account, then
+      downloads the detailed statement for the current month.
+    steps:
+      - step: 1
+        name: authenticate
+        endpoint: POST /auth/token
+        description: User authenticates
+        expectedStatus: 200
+      - step: 2
+        name: list-statement-periods
+        endpoint: GET /statements/{account_id}
+        description: List all available statement periods
+        expectedStatus: 200
+        dependsOn: [1]
+      - step: 3
+        name: get-current-month-statement
+        endpoint: GET /statements/{account_id}/{month}
+        description: Download the detailed statement for the current month
+        expectedStatus: 200
+        dependsOn: [2]
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_statements.py::TestListStatements::test_list_statements_returns_200
+        - tests/tests-complete/test_statements.py::TestGetStatementByMonth::test_get_statement_for_current_month
+
+  - id: FLOW005
+    name: Account Closure Process
+    description: |
+      Alice transfers all remaining funds out of a checking account, verifies
+      the zero balance, then closes the account permanently.
+    steps:
+      - step: 1
+        name: authenticate
+        endpoint: POST /auth/token
+        description: Alice authenticates
+        expectedStatus: 200
+      - step: 2
+        name: check-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Confirm remaining balance
+        expectedStatus: 200
+        dependsOn: [1]
+      - step: 3
+        name: transfer-out
+        endpoint: POST /transfers
+        description: Transfer all funds to savings account
+        expectedStatus: 201
+        dependsOn: [2]
+        businessRules: [BR-005]
+      - step: 4
+        name: verify-zero-balance
+        endpoint: GET /accounts/{account_id}/balance
+        description: Confirm account now has zero balance
+        expectedStatus: 200
+        dependsOn: [3]
+      - step: 5
+        name: close-account
+        endpoint: DELETE /accounts/{account_id}
+        description: Close the now-empty account
+        expectedStatus: 204
+        dependsOn: [4]
+        businessRules: [BR-005]
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_zero_balance_returns_204
+        - tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_nonzero_balance_returns_400
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_between_own_accounts

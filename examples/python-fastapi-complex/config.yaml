@@ -1,0 +1,50 @@
+version: 1
+
+project:
+  name: python-fastapi-complex
+  language: python
+  description: "Financial Accounts & Transactions API — FastAPI example project"
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./tests/tests-complete
+  language: python
+
+thresholds:
+  endpoint: 100
+  parameter: 80
+  business: 100
+  integration: 100
+  error: 80
+  security: 80
+
+qualityGate:
+  enabled: true
+  failBuildOnThresholdMiss: true
+
+businessRules:
+  file: ./business-rules.yaml
+
+integrationFlows:
+  file: ./integration-flows.yaml
+
+reports:
+  outputDir: ./reports
+  formats:
+    - json
+    - html
+
+# Optional: extra hints for the Python/FastAPI parser
+parser:
+  framework: fastapi
+  testClientPatterns:
+    - "TestClient"
+    - "client.get"
+    - "client.post"
+    - "client.put"
+    - "client.delete"
+    - "client.patch"
+  urlConstantFiles:
+    - "app/constants.py"
+    - "app/helpers/api_client.py"
+    - "app/helpers/path_builder.py"

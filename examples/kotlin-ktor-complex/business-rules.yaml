@@ -1,0 +1,183 @@
+# Business Rules for Healthcare Appointments & Patient Management API
+# These rules define constraints that must be enforced by the API and tested
+# The analyzer uses these to identify business-rule-specific test coverage gaps
+
+business_rules:
+
+  - id: "patient-data-privacy"
+    name: "Patient Data Privacy"
+    description: >
+      Patients can only access their own medical records and personal data.
+      Healthcare providers (doctors, nurses) can access records for patients
+      under their care. Administrators have full read access.
+    severity: "critical"
+    category: "authorization"
+    affected_endpoints:
+      - method: GET
+        path: "/patients/{id}"
+      - method: GET
+        path: "/medical-records/{patientId}"
+    enforcement:
+      header: "X-User-Id"
+      rule: "userId must match patientId OR userId must start with 'doctor-' OR userId must start with 'admin-'"
+    test_scenarios:
+      - "patient accessing own records returns 200"
+      - "patient accessing different patient records returns 403"
+      - "doctor accessing patient records returns 200"
+      - "admin accessing any patient records returns 200"
+      - "unauthenticated access to public patient data"
+
+  - id: "appointment-advance-booking"
+    name: "Appointment Advance Booking Requirement"
+    description: >
+      Appointments must be booked at least 24 hours in advance to allow
+      proper scheduling, preparation, and resource allocation.
+      Emergency appointments may bypass this rule with proper authorization.
+    severity: "high"
+    category: "scheduling"
+    affected_endpoints:
+      - method: POST
+        path: "/appointments"
+    enforcement:
+      minimum_advance_hours: 24
+      exception_type: "EMERGENCY"
+    test_scenarios:
+      - "booking appointment 48h in advance succeeds (201)"
+      - "booking appointment 24h in advance succeeds (201)"
+      - "booking appointment 23h in advance fails (400)"
+      - "booking appointment in the past fails (400)"
+      - "emergency appointment can be booked less than 24h in advance"
+
+  - id: "doctor-availability-check"
+    name: "Doctor Availability Verification"
+    description: >
+      Appointments can only be booked when the doctor is available.
+      The system must check for existing appointments and scheduled
+      unavailability before confirming a booking.
+    severity: "high"
+    category: "scheduling"
+    affected_endpoints:
+      - method: POST
+        path: "/appointments"
+      - method: GET
+        path: "/doctors/{id}/availability"
+    test_scenarios:
+      - "booking with available doctor succeeds"
+      - "booking when doctor has conflicting appointment returns 409"
+      - "doctor availability endpoint shows correct available slots"
+      - "lunch hour slots are not available"
+
+  - id: "prescription-controlled-substance"
+    name: "Controlled Substance Two-Factor Confirmation"
+    description: >
+      Prescriptions for controlled substances (Schedule I-V) require
+      two-factor confirmation from the prescribing doctor before the
+      pharmacy can fulfill the prescription. The prescription enters
+      AWAITING_TWO_FACTOR status and a confirmation code is sent
+      to the prescribing doctor's registered contact.
+    severity: "critical"
+    category: "compliance"
+    compliance_references:
+      - "DEA 21 CFR Part 1306"
+      - "HIPAA Security Rule"
+    affected_endpoints:
+      - method: POST
+        path: "/prescriptions"
+      - method: PUT
+        path: "/prescriptions/{id}/fulfill"
+    test_scenarios:
+      - "non-controlled substance prescription created with status ACTIVE (201)"
+      - "controlled substance prescription created with status AWAITING_TWO_FACTOR (202)"
+      - "fulfillment without two-factor code returns 403 for controlled substances"
+      - "fulfillment with invalid two-factor code format returns 400"
+      - "fulfillment with valid six-digit two-factor code succeeds"
+      - "requiresTwoFactor flag is true for controlled substances"
+
+  - id: "billing-insurance-first"
+    name: "Insurance Before Patient Billing"
+    description: >
+      Insurance claims must be submitted and processed before billing the patient
+      for their responsibility amount. This ensures patients are not overcharged
+      and insurance coverage is properly applied.
+    severity: "high"
+    category: "billing"
+    compliance_references:
+      - "ACA Section 1557"
+      - "CMS Billing Guidelines"
+    affected_endpoints:
+      - method: POST
+        path: "/billing/invoices"
+      - method: POST
+        path: "/billing/invoices/{id}/pay"
+    test_scenarios:
+      - "new invoice starts in PENDING_INSURANCE status"
+      - "patient payment attempt on PENDING_INSURANCE invoice returns 400"
+      - "patient payment on INSURANCE_PROCESSED invoice succeeds"
+      - "full payment marks invoice as PAID"
+      - "partial payment marks invoice as PARTIALLY_PAID"
+
+  - id: "appointment-cancellation-fee"
+    name: "Late Cancellation Fee"
+    description: >
+      Appointments cancelled within 24 hours of the scheduled time incur
+      a $50 cancellation fee. This compensates the practice for lost revenue
+      from short-notice cancellations that cannot be replaced.
+    severity: "medium"
+    category: "billing"
+    affected_endpoints:
+      - method: DELETE
+        path: "/appointments/{id}"
+      - method: PUT
+        path: "/appointments/{id}"
+    enforcement:
+      fee_amount: 50.00
+      fee_window_hours: 24
+    test_scenarios:
+      - "cancellation > 24h before appointment has no fee"
+      - "cancellation within 24h incurs $50 fee"
+      - "cancellation fee appears on cancellationFee field in response"
+      - "already cancelled appointment cannot be cancelled again"
+      - "completed appointment cannot be cancelled"
+
+  - id: "duplicate-appointment-prevention"
+    name: "Duplicate Appointment Prevention"
+    description: >
+      A patient cannot have two overlapping appointments at the same time.
+      The system checks for time overlap within the same day and rejects
+      bookings that would create scheduling conflicts for the patient.
+    severity: "high"
+    category: "scheduling"
+    affected_endpoints:
+      - method: POST
+        path: "/appointments"
+    test_scenarios:
+      - "booking non-overlapping appointments for same patient succeeds"
+      - "booking overlapping appointments for same patient returns 409"
+      - "booking after previous appointment ends succeeds"
+      - "cancelled appointments don't block new bookings"
+
+  - id: "medical-record-access-control"
+    name: "Medical Record Access Control"
+    description: >
+      Only the doctor who authored a confidential medical record or who
+      is explicitly listed in the accessibleByDoctors list can view that record.
+      Non-confidential records are accessible to any authenticated provider.
+      Patients can view their own non-confidential records.
+    severity: "critical"
+    category: "authorization"
+    compliance_references:
+      - "HIPAA Privacy Rule 45 CFR §164.502"
+      - "42 CFR Part 2 (Substance Abuse Records)"
+    affected_endpoints:
+      - method: GET
+        path: "/medical-records/{patientId}"
+      - method: POST
+        path: "/medical-records"
+    test_scenarios:
+      - "doctor creates record and is in accessibleByDoctors list"
+      - "confidential record hidden from unrelated patient"
+      - "confidential record visible to author doctor"
+      - "confidential record visible to doctor in accessibleByDoctors"
+      - "non-confidential record visible to patient owning it"
+      - "creating record without X-Doctor-Id returns 401"
+      - "admin can see all records"

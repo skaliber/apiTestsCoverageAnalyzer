@@ -1,0 +1,149 @@
+# business-rules.yaml
+# Formal specification of business rules enforced by this API.
+# These rules are referenced in code comments, test assertions, and
+# the coverage analyzer dashboard to link test scenarios to business requirements.
+
+version: "1.0"
+domain: logistics-tracking
+
+rules:
+  - id: shipment-weight-limit
+    name: Single Shipment Weight Limit
+    description: >
+      A single shipment cannot exceed 1000 kg gross weight.
+      This limit exists due to carrier insurance maximums and
+      warehouse loading dock constraints.
+    enforcement:
+      - endpoint: POST /shipments
+        field: weightKg
+        condition: weightKg > 1000
+        response: 400
+        errorCode: WEIGHT_LIMIT_EXCEEDED
+      - endpoint: middleware/validation.js:validateCreateShipment
+    testScenarios:
+      - "POST /shipments with weightKg=1001 returns 400"
+      - "POST /shipments with weightKg=1000 succeeds"
+    priority: critical
+    category: safety
+
+  - id: carrier-active-required
+    name: Carrier Must Be Active
+    description: >
+      A carrier must have active=true to be assigned to new shipments.
+      Inactive carriers may have lapsed insurance or suspended operations.
+    enforcement:
+      - endpoint: POST /shipments
+        condition: carrier.active === false
+        response: 409
+        errorCode: CARRIER_INACTIVE
+      - endpoint: PUT /shipments/:id
+        condition: carrier.active === false
+        response: 409
+      - endpoint: POST /shipments/:id/dispatch
+        condition: carrier.active === false
+        response: 422
+    testScenarios:
+      - "POST /shipments with inactive carrier (CAR-004) returns 409"
+      - "POST /shipments with active carrier succeeds"
+    priority: critical
+    category: compliance
+
+  - id: address-validation-required
+    name: Address Must Be Validated Before Dispatch
+    description: >
+      The destination shipping address must be validated (geocoded and confirmed
+      deliverable) before a shipment can be dispatched. This reduces failed
+      delivery attempts.
+    enforcement:
+      - endpoint: POST /shipments/:id/dispatch
+        condition: shipment.addressValidated === false
+        response: 422
+        errorCode: ADDRESS_NOT_VALIDATED
+    testScenarios:
+      - "POST /shipments/:id/dispatch with addressValidated=false returns 422"
+      - "POST /shipments/:id/dispatch with addressValidated=true succeeds"
+    priority: high
+    category: operations
+
+  - id: return-window-30-days
+    name: 30-Day Return Window
+    description: >
+      Returns can only be initiated within 30 days of the delivery date.
+      After this window, returns must be approved through a manual exception process.
+    enforcement:
+      - endpoint: POST /returns
+        condition: daysSinceDelivery > 30
+        response: 422
+        errorCode: RETURN_WINDOW_EXPIRED
+    testScenarios:
+      - "POST /returns within 30 days of delivery succeeds"
+      - "POST /returns 45 days after delivery returns 422"
+    priority: high
+    category: customer-service
+
+  - id: warehouse-capacity-check
+    name: Warehouse Cannot Exceed Capacity
+    description: >
+      Inventory additions to a warehouse are rejected if they would cause
+      the currentOccupancy to exceed the warehouse's declared capacity.
+    enforcement:
+      - endpoint: POST /warehouses/:id/inventory
+        condition: currentOccupancy + deltaUnits > capacity
+        response: 409
+        errorCode: CAPACITY_EXCEEDED
+    testScenarios:
+      - "POST /warehouses/:id/inventory that would exceed capacity returns 409"
+      - "POST /warehouses/:id/inventory within capacity succeeds"
+    priority: high
+    category: operations
+
+  - id: duplicate-tracking-prevention
+    name: Unique Tracking Events
+    description: >
+      A tracking event is considered a duplicate if a record with the same
+      trackingNumber, status, and timestamp already exists.
+      Prevents double-posting from carrier webhook integrations.
+    enforcement:
+      - endpoint: POST /tracking/events
+        condition: duplicate event detected
+        response: 409
+        errorCode: DUPLICATE_EVENT
+    testScenarios:
+      - "POST /tracking/events with same payload twice returns 409 on second call"
+      - "POST /tracking/events with different timestamps succeeds"
+    priority: medium
+    category: data-integrity
+
+  - id: hazmat-special-carrier
+    name: Hazardous Materials Require Certified Carrier
+    description: >
+      Shipments containing hazardous materials (isHazmat=true) can only be
+      assigned to carriers with hazmatCertified=true. This is a DOT compliance
+      requirement.
+    enforcement:
+      - endpoint: POST /shipments
+        condition: isHazmat && !carrier.hazmatCertified
+        response: 409
+        errorCode: HAZMAT_CARRIER_REQUIRED
+    testScenarios:
+      - "POST /shipments with isHazmat=true and non-certified carrier returns 409"
+      - "POST /shipments with isHazmat=true and certified carrier succeeds"
+    priority: critical
+    category: compliance
+
+  - id: insurance-required-high-value
+    name: High-Value Shipments Require Insurance
+    description: >
+      Shipments with declaredValueUsd > 5000 must have insured=true
+      before they can be dispatched. This protects against loss claims.
+    enforcement:
+      - endpoint: POST /shipments/:id/dispatch
+        condition: declaredValueUsd > 5000 && !insured
+        response: 422
+        errorCode: INSURANCE_REQUIRED
+    testScenarios:
+      - "POST /shipments/:id/dispatch for $6000 uninsured shipment returns 422"
+      - "POST /shipments/:id/dispatch for $6000 insured shipment succeeds"
+      - "POST /shipments/:id/dispatch for $4000 uninsured shipment succeeds"
+    priority: high
+    category: financial

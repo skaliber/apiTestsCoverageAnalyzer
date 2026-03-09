@@ -1,7 +1,7 @@
 {
-  "total": 13,
-  "covered": 12,
-  "percentage": 92.31,
+  "total": 15,
+  "covered": 14,
+  "percentage": 93.33,
   "endpoints": [
     {
       "method": "GET",
@@ -297,6 +297,40 @@
       "path": "/transactions",
       "covered": false,
       "testFiles": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/users",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/users.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/products",
+      "covered": true,
+      "testFiles": [
+        "tests/integration/products.integration.test.ts"
+      ],
+      "languages": [
+        "typescript"
+      ],
+      "matches": [
+        {
+          "resolutionType": "direct",
+          "confidence": "high"
+        }
+      ]
     }
   ]
 }

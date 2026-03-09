@@ -24,6 +24,30 @@
       "totalItems": 26,
       "coveredItems": 6,
       "coveragePercent": 23.08
+    },
+    {
+      "type": "parameter",
+      "totalItems": 12,
+      "coveredItems": 9,
+      "coveragePercent": 75.0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 4,
+      "coveragePercent": 80.0
+    },
+    {
+      "type": "performance",
+      "totalItems": 6,
+      "coveredItems": 4,
+      "coveragePercent": 66.67
+    },
+    {
+      "type": "resilience",
+      "totalItems": 4,
+      "coveredItems": 3,
+      "coveragePercent": 75.0
     }
   ],
   "details": {
@@ -118,6 +142,20 @@
           "path": "/transactions"
         },
         "covered": false
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/api/users"
+        },
+        "covered": true
+      },
+      {
+        "endpoint": {
+          "method": "GET",
+          "path": "/api/products"
+        },
+        "covered": true
       }
     ],
     "business": [
@@ -151,6 +189,10 @@
       },
       {
         "name": "idempotency",
+        "covered": true
+      },
+      {
+        "name": "unique email validation",
         "covered": true
       }
     ],
@@ -664,7 +706,58 @@
           "description": "Authorization check for GET /transactions"
         },
         "covered": false
+      },
+      {
+        "control": {
+          "id": "authentication:JWT",
+          "category": "authentication",
+          "description": "JWT token signature and expiry validation"
+        },
+        "covered": true
       }
-    ]
+    ],
+    "parameter": {
+      "items": [
+        { "id": "page", "covered": true, "tests": ["pagination returns page 1", "pagination defaults to page 1"] },
+        { "id": "limit", "covered": true, "tests": ["pagination returns limited results"] },
+        { "id": "offset", "covered": false, "tests": [] },
+        { "id": "currency", "covered": true, "tests": ["POST /wallets validates currency"] },
+        { "id": "amount", "covered": true, "tests": ["POST /wallets/{id}/fund validates amount"] },
+        { "id": "walletId", "covered": true, "tests": ["GET /wallets/{id} validates walletId"] },
+        { "id": "paymentId", "covered": true, "tests": ["GET /payments/{id} validates paymentId"] },
+        { "id": "idempotencyKey", "covered": true, "tests": ["POST /payments validates idempotency key"] },
+        { "id": "fromWalletId", "covered": true, "tests": ["POST /wallets/{id}/transfer validates fromWalletId"] },
+        { "id": "toWalletId", "covered": false, "tests": [] },
+        { "id": "status", "covered": false, "tests": [] },
+        { "id": "startDate", "covered": false, "tests": [] }
+      ]
+    },
+    "performance": {
+      "items": [
+        { "id": "response-time-200ms", "threshold": "200ms", "covered": true, "tests": ["response time within 200ms"] },
+        { "id": "throughput", "threshold": "1000 rps", "covered": true, "tests": ["throughput load test"] },
+        { "id": "concurrent-users", "threshold": "100", "covered": true, "tests": ["concurrent users load test"] },
+        { "id": "bulk-operations", "threshold": "500ms", "covered": false, "tests": [] },
+        { "id": "db-query-time", "threshold": "50ms", "covered": true, "tests": ["db query benchmark"] },
+        { "id": "cache-hit-rate", "threshold": "80%", "covered": false, "tests": [] }
+      ]
+    },
+    "resilience": {
+      "items": [
+        { "id": "Retry-on-transient-failure", "threshold": "3 retries", "covered": true, "tests": ["retry on 503", "retry on timeout"] },
+        { "id": "circuit-breaker", "threshold": "5 failures", "covered": true, "tests": ["circuit breaker opens after failures"] },
+        { "id": "timeout-handling", "threshold": "30s", "covered": true, "tests": ["request timeout test"] },
+        { "id": "graceful-degradation", "threshold": "N/A", "covered": false, "tests": [] }
+      ]
+    },
+    "integration": {
+      "items": [
+        { "id": "User-registration-flow", "covered": true, "steps": 3, "coveredSteps": 3, "tests": ["user registration e2e"] },
+        { "id": "User-payment-flow", "covered": true, "steps": 5, "coveredSteps": 5, "tests": ["user payment e2e"] },
+        { "id": "Wallet-lifecycle-flow", "covered": true, "steps": 6, "coveredSteps": 6, "tests": ["wallet lifecycle test"] },
+        { "id": "Refund-flow", "covered": false, "steps": 4, "coveredSteps": 2, "tests": [] },
+        { "id": "Transfer-flow", "covered": true, "steps": 4, "coveredSteps": 4, "tests": ["transfer e2e"] }
+      ]
+    }
   }
 }

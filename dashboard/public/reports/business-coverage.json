@@ -1,7 +1,7 @@
 {
-  "total": 8,
-  "covered": 7,
-  "percentage": 87.5,
+  "total": 9,
+  "covered": 8,
+  "percentage": 88.89,
   "uncoveredRules": [
     {
       "id": "daily-limit",
@@ -178,6 +178,22 @@
         "creates payment with idempotency key",
         "returns same payment id for duplicate key",
         "returns same payment for duplicate idempotency key"
+      ],
+      "scenarios": []
+    },
+    {
+      "id": "unique-email",
+      "description": "Unique email required for all user accounts",
+      "endpoints": [
+        "POST /api/users"
+      ],
+      "covered": true,
+      "testFiles": [
+        "tests/integration/users.integration.test.ts"
+      ],
+      "matchedTests": [
+        "returns 409 for duplicate email",
+        "rejects registration with existing email"
       ],
       "scenarios": []
     }

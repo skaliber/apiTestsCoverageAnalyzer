@@ -1,6 +1,6 @@
 {
-  "total": 26,
-  "covered": 6,
+  "total": 27,
+  "covered": 7,
   "percentage": 23.08,
   "scanFindings": 0,
   "categorySummary": {
@@ -282,6 +282,17 @@
       "endpoint": "GET /transactions",
       "covered": false,
       "matchedTests": [],
+      "coveredByScanReport": false
+    },
+    {
+      "id": "authentication:JWT",
+      "category": "authentication",
+      "description": "JWT token signature and expiry validation",
+      "covered": true,
+      "matchedTests": [
+        "returns 401 for expired JWT",
+        "returns 401 for invalid JWT signature"
+      ],
       "coveredByScanReport": false
     }
   ]

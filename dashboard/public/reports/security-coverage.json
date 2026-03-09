@@ -32,10 +32,10 @@
       "description": "Authentication via security scheme \"bearerAuth\" (http/bearer)",
       "covered": true,
       "matchedTests": [
-        "returns 401 without auth",
         "returns 401 when no token",
         "returns 401 when no token provided",
-        "returns 401 for invalid token"
+        "returns 401 for invalid token",
+        "returns 401 without auth"
       ],
       "coveredByScanReport": false
     },
@@ -72,12 +72,12 @@
       "endpoint": "POST /wallets",
       "covered": true,
       "matchedTests": [
-        "returns 400 for invalid currency",
-        "returns 422 with insufficient funds",
         "returns 400 when currency is missing",
         "returns 400 for unsupported currency",
         "returns 422 for insufficient funds",
-        "returns 401 for invalid token"
+        "returns 401 for invalid token",
+        "returns 400 for invalid currency",
+        "returns 422 with insufficient funds"
       ],
       "coveredByScanReport": false
     },
@@ -97,9 +97,9 @@
       "endpoint": "GET /wallets/{id}",
       "covered": true,
       "matchedTests": [
+        "returns 422 for insufficient funds",
         "returns 400 for invalid currency",
-        "returns 422 with insufficient funds",
-        "returns 422 for insufficient funds"
+        "returns 422 with insufficient funds"
       ],
       "coveredByScanReport": false
     },
@@ -119,9 +119,9 @@
       "endpoint": "DELETE /wallets/{id}",
       "covered": true,
       "matchedTests": [
+        "returns 422 for insufficient funds",
         "returns 400 for invalid currency",
-        "returns 422 with insufficient funds",
-        "returns 422 for insufficient funds"
+        "returns 422 with insufficient funds"
       ],
       "coveredByScanReport": false
     },

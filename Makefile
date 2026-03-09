@@ -315,42 +315,21 @@ security-scan: build ## Run security scanner(s) (Trivy + Semgrep if available)
 #  SUMMARIES AND REPORTING
 # =============================================================================
 
-summary: ## Generate summary files for all metrics into reports/
+summary: ## Generate intelligence + summary reports for all metrics
 	@mkdir -p $(REPORTS_DIR)
 	$(ANALYZER_CMD) coverage-intelligence \
 	  --reports-dir "$(REPORTS_DIR)" \
 	  --out-dir "$(REPORTS_DIR)" \
 	  --project-name "api-test-coverage-analyzer" 2>/dev/null || true
+	$(ANALYZER_CMD) coverage-summary-report \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --out-dir "$(REPORTS_DIR)" \
+	  --project-name "api-test-coverage-analyzer"
 	@echo "Summary written to $(REPORTS_DIR)/"
 
-pr-summary: ## Generate PR summary markdown into reports/pr-summary.md
-	@mkdir -p $(REPORTS_DIR)
-	@echo "# API Coverage PR Summary" > $(REPORTS_DIR)/pr-summary.md
-	@echo "" >> $(REPORTS_DIR)/pr-summary.md
-	@echo "Generated: $$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $(REPORTS_DIR)/pr-summary.md
-	@echo "" >> $(REPORTS_DIR)/pr-summary.md
-	@if [ -f "$(REPORTS_DIR)/coverage-summary.json" ]; then \
-	  echo "## Coverage Results" >> $(REPORTS_DIR)/pr-summary.md; \
-	  cat "$(REPORTS_DIR)/coverage-summary.json" >> $(REPORTS_DIR)/pr-summary.md; \
-	fi
-	@if [ -f "$(REPORTS_DIR)/coverage-intelligence.json" ]; then \
-	  echo "" >> $(REPORTS_DIR)/pr-summary.md; \
-	  echo "## Intelligence Findings" >> $(REPORTS_DIR)/pr-summary.md; \
-	  cat "$(REPORTS_DIR)/coverage-intelligence.json" >> $(REPORTS_DIR)/pr-summary.md; \
-	fi
-	@echo "PR summary written to $(REPORTS_DIR)/pr-summary.md"
+pr-summary: summary ## Generate PR summary markdown (alias — pr-summary.md written by coverage-summary-report)
 
-build-summary: ## Generate build summary markdown into reports/build-summary.md
-	@mkdir -p $(REPORTS_DIR)
-	@echo "# API Coverage Build Summary" > $(REPORTS_DIR)/build-summary.md
-	@echo "" >> $(REPORTS_DIR)/build-summary.md
-	@echo "Generated: $$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $(REPORTS_DIR)/build-summary.md
-	@echo "" >> $(REPORTS_DIR)/build-summary.md
-	@if [ -f "$(REPORTS_DIR)/coverage-intelligence.json" ]; then \
-	  echo "## Intelligence Report" >> $(REPORTS_DIR)/build-summary.md; \
-	  head -30 "$(REPORTS_DIR)/coverage-intelligence.json" >> $(REPORTS_DIR)/build-summary.md; \
-	fi
-	@echo "Build summary written to $(REPORTS_DIR)/build-summary.md"
+build-summary: summary ## Generate build summary markdown (alias — build-summary.md written by coverage-summary-report)
 
 # =============================================================================
 #  CI ENTRYPOINT

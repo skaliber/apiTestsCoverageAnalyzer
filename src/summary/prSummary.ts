@@ -23,7 +23,9 @@ import {
   statusBadge,
   pct,
   tableRow,
+  metricStatusCell,
 } from './markdownRenderer';
+import { evaluateMetrics } from './evaluateMetrics';
 
 // ─── PR summary generator ─────────────────────────────────────────────────────
 
@@ -52,23 +54,18 @@ export async function generatePrSummary(
   if (input.buildId) lines.push(`Build \`${input.buildId}\``);
   lines.push('');
 
-  // Compact coverage table
+  // Compact coverage table — uses evaluated metrics for correct PASS/FAIL/N/A/SKIPPED
   if (input.results.length > 0) {
+    const evaluatedMetrics = evaluateMetrics(
+      input.results,
+      input.thresholds ?? {},
+      input.qualityGate,
+    );
     lines.push('| Category | Coverage | Status |');
     lines.push('|---|---|---|');
-    for (const r of input.results) {
-      const threshold = input.thresholds?.[r.type];
-      const gateEvaluated = threshold !== undefined;
-      const failed = input.qualityGate?.failures.some((f) => f.category === r.type) ?? false;
-      const zeroCoverage = r.coveragePercent === 0;
-      const status = !gateEvaluated
-        ? '—'
-        : failed
-          ? '❌ FAIL'
-          : zeroCoverage
-            ? '⚠️ PASS'
-            : '✅ PASS';
-      lines.push(`| ${r.type} | ${pct(r.coveragePercent)} | ${status} |`);
+    for (const m of evaluatedMetrics) {
+      const coverageCell = m.applicable ? pct(m.coveragePercent) : '—';
+      lines.push(`| ${m.category} | ${coverageCell} | ${metricStatusCell(m.status)} |`);
     }
     lines.push('');
   }

@@ -251,12 +251,16 @@ export function renderRiskPrioritizationMd(report: IntelligenceReport): string {
   }
 
   lines.push(`## Risks by Category`, ``);
-  for (const [cat, recs] of byCategory.entries()) {
-    lines.push(`### ${cat}`, ``);
-    recs.forEach((r) => {
-      lines.push(`- ${priorityEmoji(r.priority)} **[${r.priority}]** ${r.title} — Score: ${r.riskScore}`);
-    });
-    lines.push('');
+  if (byCategory.size === 0) {
+    lines.push('_No risks by category detected._', '');
+  } else {
+    for (const [cat, recs] of byCategory.entries()) {
+      lines.push(`### ${cat}`, ``);
+      recs.forEach((r) => {
+        lines.push(`- ${priorityEmoji(r.priority)} **[${r.priority}]** ${r.title} — Score: ${r.riskScore}`);
+      });
+      lines.push('');
+    }
   }
 
   const byEndpoint = new Map<string, MissingTestRecommendation[]>();

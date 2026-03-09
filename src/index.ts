@@ -91,6 +91,9 @@ import {
 } from './languageDetection';
 import { runIntelligenceEngine } from './intelligence/index';
 import { recordIntelligenceMetrics } from './observability';
+import { generateBuildSummary } from './summary/buildSummary';
+import { generatePrSummary } from './summary/prSummary';
+import type { SummaryInput } from './summary/markdownRenderer';
 
 const program = new Command();
 
@@ -1345,6 +1348,132 @@ program
 
 // ─── coverage-intelligence command ──────────────────────────────────────────
 
+
+// ─── Intelligence details normalizer ─────────────────────────────────────────
+// The linkage engine expects `details` to be a flat array of
+// { endpoint?, covered, name?, ... } objects.  Each coverage command stores
+// its raw report object in CoverageResult.details, so we normalise here at
+// read time to avoid touching the 11 coverage command implementations.
+
+function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] {
+  if (Array.isArray(raw)) return raw; // already normalised (e.g. dashboard sample)
+  if (!raw || typeof raw !== 'object') return [];
+  const obj = raw as Record<string, unknown>;
+
+  switch (type) {
+    case 'endpoint': {
+      const eps = obj.endpoints;
+      if (!Array.isArray(eps)) return [];
+      return (eps as Array<Record<string, unknown>>).map((e) => ({
+        endpoint: { method: e.method, path: e.path },
+        covered: e.covered ?? false,
+      }));
+    }
+    case 'parameter': {
+      const params = obj.parameters;
+      if (!Array.isArray(params)) return [];
+      return (params as Array<Record<string, unknown>>).map((p) => {
+        const param = p.parameter as Record<string, unknown> | undefined;
+        return {
+          endpoint: param ? { method: param.method, path: param.path } : undefined,
+          covered: ((p.ratio as number) ?? 0) > 0,
+          name: param?.name ?? param?.id,
+        };
+      });
+    }
+    case 'business': {
+      const rules = obj.rules;
+      if (!Array.isArray(rules)) return [];
+      return (rules as Array<Record<string, unknown>>).flatMap((r) => {
+        const endpoints = (r.rule as Record<string, unknown>)?.endpoints;
+        if (!Array.isArray(endpoints) || endpoints.length === 0) {
+          return [{ covered: r.covered ?? false, name: (r.rule as Record<string, unknown>)?.id }];
+        }
+        return (endpoints as string[]).map((ep) => {
+          const parts = ep.split(' ');
+          return {
+            endpoint: parts.length > 1 ? { method: parts[0], path: parts[1] } : { path: parts[0] },
+            covered: r.covered ?? false,
+            name: (r.rule as Record<string, unknown>)?.id,
+          };
+        });
+      });
+    }
+    case 'integration': {
+      const flows = obj.flows;
+      if (!Array.isArray(flows)) return [];
+      return (flows as Array<Record<string, unknown>>).flatMap((f) => {
+        const steps = ((f.flow as Record<string, unknown>)?.steps ?? []) as Array<Record<string, unknown>>;
+        return steps
+          .filter((s) => s.method && s.path)
+          .map((s) => ({
+            endpoint: { method: s.method, path: s.path },
+            covered: f.status !== 'missing',
+            name: (s.id ?? s.name) as string | undefined,
+          }));
+      });
+    }
+    case 'error': {
+      const scenarios = obj.scenarios;
+      if (!Array.isArray(scenarios)) return [];
+      return (scenarios as Array<Record<string, unknown>>).map((s) => {
+        const sc = s.scenario as Record<string, unknown> | undefined;
+        return {
+          endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+          covered: s.covered ?? false,
+          errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
+          name: sc?.id,
+        };
+      });
+    }
+    case 'security': {
+      const controls = obj.controls;
+      if (!Array.isArray(controls)) return [];
+      return (controls as Array<Record<string, unknown>>)
+        .map((c) => {
+          const epStr = ((c.control as Record<string, unknown>)?.endpoint as string) ?? '';
+          const parts = epStr.split(' ');
+          return {
+            endpoint: parts.length > 1 ? { method: parts[0], path: parts[1] } : undefined,
+            covered: c.covered ?? false,
+            name: (c.control as Record<string, unknown>)?.id,
+          };
+        })
+        .filter((item) => item.endpoint?.path);
+    }
+    case 'performance': {
+      const coverages = obj.performanceCoverages;
+      if (!Array.isArray(coverages)) return [];
+      return (coverages as Array<Record<string, unknown>>).map((c) => {
+        const ep = c.endpoint as Record<string, unknown> | undefined;
+        return {
+          endpoint: ep ? { method: ep.method, path: ep.path } : undefined,
+          covered: (c.hasLoadTestData as boolean) ?? false,
+          hasThreshold: true,
+          name: ep?.id,
+        };
+      });
+    }
+    case 'resilience': {
+      const coverages = obj.resilienceCoverages;
+      if (!Array.isArray(coverages)) return [];
+      return (coverages as Array<Record<string, unknown>>)
+        .filter((c) => (c.scenario as Record<string, unknown>)?.endpoint)
+        .map((c) => {
+          const sc = c.scenario as Record<string, unknown>;
+          return {
+            endpoint: sc.endpoint as Record<string, unknown>,
+            covered: c.covered ?? false,
+            resilience: true,
+            name: sc.id,
+          };
+        });
+    }
+    default:
+      return [];
+  }
+}
+
 program
   .command('coverage-intelligence')
   .description('Run the coverage intelligence engine to identify functional findings and missing tests')
@@ -1387,7 +1516,10 @@ program
             totalItems: (s.totalItems as number) ?? 0,
             coveredItems: (s.coveredItems as number) ?? 0,
             coveragePercent: (s.coveragePercent as number) ?? 0,
-            details: (parsed.details as Record<string, unknown>)?.[s.type as string] ?? [],
+            details: normalizeDetailsForIntelligence(
+              s.type as string,
+              (parsed.details as Record<string, unknown>)?.[s.type as string] ?? [],
+            ),
           }));
         }
       }
@@ -1444,6 +1576,117 @@ program
       metricsPort,
       serviceName,
     );
+  });
+
+// ─── coverage-summary-report command ─────────────────────────────────────────
+
+program
+  .command('coverage-summary-report')
+  .description('Generate build-summary.md and pr-summary.md from accumulated coverage-summary.json')
+  .option('--reports-dir <dir>', 'Directory containing coverage-summary.json', 'reports')
+  .option('--out-dir <dir>', 'Output directory for summary files', 'reports')
+  .option('--project-name <name>', 'Project / service name', 'unknown')
+  .option('--branch <branch>', 'Branch name for display in summary')
+  .option('--commit-sha <sha>', 'Commit SHA for display in summary')
+  .option('--build-id <id>', 'Build identifier for display in summary')
+  .option('--write-step-summary', 'Append build-summary.md to $GITHUB_STEP_SUMMARY')
+  .action(async (options) => {
+    const logger = getLogger();
+    const parentOpts = program.opts();
+
+    const reportsDir = path.resolve(options.reportsDir as string);
+    const outDir = path.resolve(options.outDir as string);
+    const projectName = options.projectName as string;
+
+    // Load thresholds from config
+    const analyzerCfg = loadCentralConfig(parentOpts.config as string | undefined);
+    const thresholds = (analyzerCfg.thresholds ?? {}) as Record<string, number | undefined>;
+
+    // Read accumulated coverage-summary.json
+    let coverageResults: import('./reporting').CoverageResult[] = [];
+    let qualityGateResult: import('./qualityGate').QualityGateResult | undefined;
+
+    const summaryPath = require('path').join(reportsDir, 'coverage-summary.json');
+    try {
+      if (require('fs').existsSync(summaryPath)) {
+        const raw = require('fs').readFileSync(summaryPath, 'utf-8');
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        if (Array.isArray(parsed.summary)) {
+          coverageResults = (parsed.summary as Array<Record<string, unknown>>).map((s) => ({
+            type: s.type as string,
+            totalItems: (s.totalItems as number) ?? 0,
+            coveredItems: (s.coveredItems as number) ?? 0,
+            coveragePercent: (s.coveragePercent as number) ?? 0,
+            details: s.details ?? {},
+          }));
+        }
+        if (parsed.qualityGate && typeof parsed.qualityGate === 'object') {
+          qualityGateResult = parsed.qualityGate as import('./qualityGate').QualityGateResult;
+        }
+      }
+    } catch (err) {
+      logger.warn({ event: 'summary_report_load_warning', error: String(err) }, 'Could not load coverage-summary.json');
+    }
+
+    // Optionally load coverage-intelligence.json for intelligence section
+    let intelligenceSummary: SummaryInput['intelligenceSummary'] | undefined;
+    const intelligencePath = require('path').join(reportsDir, 'coverage-intelligence.json');
+    try {
+      if (require('fs').existsSync(intelligencePath)) {
+        const raw = require('fs').readFileSync(intelligencePath, 'utf-8');
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        if (parsed.summary && typeof parsed.summary === 'object') {
+          const s = parsed.summary as Record<string, unknown>;
+          intelligenceSummary = {
+            totalFindings: (s.totalFindings as number) ?? 0,
+            totalRecommendations: (s.totalRecommendations as number) ?? 0,
+            maxRiskScore: (s.maxRiskScore as number) ?? 0,
+            avgRiskScore: (s.avgRiskScore as number) ?? 0,
+            criticalUncoveredItems: (s.criticalUncoveredItems as number) ?? 0,
+            unprotectedSecurityFindings: (s.unprotectedSecurityFindings as number) ?? 0,
+            recommendationsByPriority: (s.recommendationsByPriority as Record<string, number>) ?? {},
+            topRiskAreas: (s.topRiskAreas as string[]) ?? [],
+          };
+        }
+      }
+    } catch (_) {
+      // intelligence report is optional — ignore read errors
+    }
+
+    const summaryInput: SummaryInput = {
+      results: coverageResults,
+      qualityGate: qualityGateResult,
+      thresholds,
+      projectName,
+      branch: options.branch as string | undefined,
+      commitSha: options.commitSha as string | undefined,
+      buildId: options.buildId as string | undefined,
+      intelligenceSummary,
+    };
+
+    const buildResult = await generateBuildSummary(summaryInput, outDir);
+    await generatePrSummary(summaryInput, outDir);
+
+    // Optionally write to GITHUB_STEP_SUMMARY
+    if (options.writeStepSummary) {
+      const stepSummaryPath = process.env['GITHUB_STEP_SUMMARY'];
+      if (stepSummaryPath) {
+        require('fs').appendFileSync(stepSummaryPath, buildResult.markdown + '\n', 'utf-8');
+        console.log(`Step summary written to ${stepSummaryPath}`);
+      } else {
+        logger.warn({ event: 'step_summary_missing_env' }, 'GITHUB_STEP_SUMMARY env var not set; skipping step summary write');
+      }
+    }
+
+    console.log(`\n=== Coverage Summary Report ===`);
+    console.log(`  Project: ${projectName}`);
+    console.log(`  Metrics: ${coverageResults.length}`);
+    if (qualityGateResult !== undefined) {
+      console.log(`  Overall: ${qualityGateResult.passed ? 'PASSED' : 'FAILED'}`);
+    }
+    console.log(`\nSummary reports written to: ${outDir}`);
+
+    logger.info({ event: 'summary_report_complete' }, 'Coverage summary report generated');
   });
 
 // Parse the command-line arguments

@@ -75,14 +75,6 @@ jobs:
         if: always()
         run: make summary
 
-      - name: Generate PR Summary
-        if: always()
-        run: make pr-summary
-
-      - name: Generate Build Summary
-        if: always()
-        run: make build-summary
-
       - name: Upload coverage reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -91,23 +83,11 @@ jobs:
           path: reports/
           retention-days: 30
 
-      - name: Post PR Summary as step summary
+      - name: Post summary to GitHub step summary
         if: always()
         run: |
           if [ -f reports/build-summary.md ]; then
             cat reports/build-summary.md >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ -f reports/coverage-intelligence.json ]; then
-            echo "## Intelligence Report" >> $GITHUB_STEP_SUMMARY
-            echo '```json' >> $GITHUB_STEP_SUMMARY
-            head -60 reports/coverage-intelligence.json >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ -f reports/risk-prioritization.json ]; then
-            echo "## Risk Prioritization" >> $GITHUB_STEP_SUMMARY
-            echo '```json' >> $GITHUB_STEP_SUMMARY
-            head -30 reports/risk-prioritization.json >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Post PR comment

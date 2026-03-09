@@ -22,7 +22,10 @@ import {
   statusBadge,
   pct,
   tableRow,
+  metricStatusCell,
+  renderInterpretationSection,
 } from './markdownRenderer';
+import { evaluateMetrics } from './evaluateMetrics';
 
 // ─── Build summary generator ──────────────────────────────────────────────────
 
@@ -86,18 +89,22 @@ function buildHeader(input: SummaryInput, mode: 'build' | 'pr'): string[] {
   if (input.buildId) lines.push(tableRow('Build ID', `\`${input.buildId}\``));
   lines.push('');
 
-  // Coverage summary table
+  // Coverage summary table — uses evaluated metrics for correct PASS/FAIL/N/A/SKIPPED
   if (input.results.length > 0) {
+    const evaluatedMetrics = evaluateMetrics(
+      input.results,
+      input.thresholds ?? {},
+      input.qualityGate,
+    );
     lines.push('### Coverage Summary');
     lines.push('');
     lines.push('| Category | Total | Covered | Coverage | Status |');
     lines.push('|---|---|---|---|---|');
-    for (const r of input.results) {
-      const failed = input.qualityGate?.failures.some((f) => f.category === r.type) ?? false;
-      const threshold = input.thresholds?.[r.type];
-      const gateEvaluated = threshold !== undefined;
-      const status = !gateEvaluated ? '—' : failed ? '❌ FAIL' : '✅ PASS';
-      lines.push(`| ${r.type} | ${r.totalItems} | ${r.coveredItems} | ${pct(r.coveragePercent)} | ${status} |`);
+    for (const m of evaluatedMetrics) {
+      const totalCell    = m.applicable ? String(m.totalItems) : '—';
+      const coveredCell  = m.applicable ? String(m.coveredItems) : '—';
+      const coverageCell = m.applicable ? pct(m.coveragePercent) : '—';
+      lines.push(`| ${m.category} | ${totalCell} | ${coveredCell} | ${coverageCell} | ${metricStatusCell(m.status)} |`);
     }
     lines.push('');
   }
@@ -184,6 +191,16 @@ function buildFooter(input: SummaryInput): string {
       );
     }
     lines.push('');
+  }
+
+  // Interpretation section
+  if (input.results.length > 0) {
+    const evaluatedMetrics = evaluateMetrics(
+      input.results,
+      input.thresholds ?? {},
+      input.qualityGate,
+    );
+    lines.push(renderInterpretationSection(evaluatedMetrics));
   }
 
   // Links

@@ -535,8 +535,8 @@ describe('generatePrSummary – content', () => {
     expect(result.markdown).toContain('business');
   });
 
-  it('shows ⚠️ PASS for 0% coverage when threshold is met', async () => {
-    const zeroResult = makeResult('error', 0);
+  it('shows ✅ PASS for 0% coverage when threshold is 0 and items exist', async () => {
+    const zeroResult = makeResult('error', 0);   // totalItems=10, coveragePercent=0
     const input: SummaryInput = {
       ...sampleInput,
       results: [zeroResult],
@@ -544,8 +544,32 @@ describe('generatePrSummary – content', () => {
       qualityGate: makeGate(true),
     };
     const result = await generatePrSummary(input);
-    expect(result.markdown).toContain('⚠️ PASS');
+    expect(result.markdown).toContain('✅ PASS');
+    expect(result.markdown).not.toContain('⚠️ PASS');
+  });
+
+  it('shows — N/A for 0% coverage when totalItems is 0', async () => {
+    const zeroItemsResult = makeResult('error', 0, 0);  // totalItems=0
+    const input: SummaryInput = {
+      ...sampleInput,
+      results: [zeroItemsResult],
+      thresholds: { error: 0 },
+      qualityGate: makeGate(true),
+    };
+    const result = await generatePrSummary(input);
+    expect(result.markdown).toContain('— N/A');
     expect(result.markdown).not.toContain('✅ PASS');
+    expect(result.markdown).not.toContain('⚠️ PASS');
+  });
+
+  it('shows ⏭ SKIPPED for known metric types absent from results', async () => {
+    const input: SummaryInput = {
+      ...sampleInput,
+      results: [makeResult('endpoint', 100)],
+      thresholds: { endpoint: 80 },
+    };
+    const result = await generatePrSummary(input);
+    expect(result.markdown).toContain('⏭ SKIPPED');
   });
 
   it('shows — for categories with no threshold configured', async () => {

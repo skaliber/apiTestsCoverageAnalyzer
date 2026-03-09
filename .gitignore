@@ -1,5 +1,6 @@
 node_modules/
 dist/
+reports/*
 reports/*.json
 reports/*.html
 dashboard/node_modules/

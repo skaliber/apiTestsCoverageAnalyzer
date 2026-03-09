@@ -8,6 +8,7 @@
 import type { CoverageResult } from '../reporting';
 import type { QualityGateResult } from '../qualityGate';
 import type { SecurityScanSummary, ScannerResult } from '../security/types';
+import type { EvaluatedMetric, MetricStatus } from './summaryTypes';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -334,6 +335,88 @@ function countBySeverity(
     counts[f.severity] = (counts[f.severity] ?? 0) + 1;
   }
   return counts;
+}
+
+// ─── Evaluated-metric helpers (PASS / FAIL / SKIPPED / N/A) ──────────────────
+
+/**
+ * Render the status cell for a metric row in the coverage summary table.
+ * These are the only four valid statuses — ⚠️ PASS does not exist.
+ */
+export function metricStatusCell(status: MetricStatus): string {
+  switch (status) {
+    case 'PASS':    return '✅ PASS';
+    case 'FAIL':    return '❌ FAIL';
+    case 'SKIPPED': return '⏭ SKIPPED';
+    case 'N/A':     return '— N/A';
+  }
+}
+
+/**
+ * Render the "Summary Interpretation" section that explains what each metric
+ * status means in plain language.  Suitable for AI agents and humans alike.
+ */
+export function renderInterpretationSection(metrics: EvaluatedMetric[]): string {
+  const passed   = metrics.filter((m) => m.status === 'PASS');
+  const failed   = metrics.filter((m) => m.status === 'FAIL');
+  const skipped  = metrics.filter((m) => m.status === 'SKIPPED');
+  const na       = metrics.filter((m) => m.status === 'N/A');
+  const executed = metrics.filter((m) => m.executed);
+
+  const lines: string[] = [];
+  lines.push('## Summary Interpretation');
+  lines.push('');
+
+  if (executed.length > 0) {
+    lines.push(`**Analyzed:** ${executed.map((m) => m.category).join(', ')}`);
+  }
+  if (passed.length > 0) {
+    lines.push(`**Passed:** ${passed.map((m) => m.category).join(', ')}`);
+  }
+  if (failed.length > 0) {
+    lines.push(`**Failed:** ${failed.map((m) => m.category).join(', ')}`);
+  }
+  if (na.length > 0) {
+    lines.push(`**Not applicable:** ${na.map((m) => m.category).join(', ')}`);
+  }
+  if (skipped.length > 0) {
+    lines.push(`**Skipped (did not run):** ${skipped.map((m) => m.category).join(', ')}`);
+  }
+  lines.push('');
+
+  // Top gaps from failed metrics
+  const allGaps: string[] = failed.flatMap((m) => m.topGaps);
+  if (allGaps.length > 0) {
+    lines.push('### Top Gaps');
+    lines.push('');
+    for (const gap of allGaps.slice(0, 5)) {
+      lines.push(`- ${gap}`);
+    }
+    lines.push('');
+  }
+
+  // Recommended next actions
+  lines.push('### Recommended Next Actions');
+  lines.push('');
+  if (failed.length > 0) {
+    for (const m of failed) {
+      const gap = (m.threshold! - m.coveragePercent).toFixed(2);
+      lines.push(
+        `- Increase **${m.category}** coverage by ${gap}% ` +
+        `(currently ${m.coveragePercent.toFixed(2)}%, required ${m.threshold!.toFixed(2)}%)`,
+      );
+    }
+  } else if (executed.length > 0) {
+    lines.push('- All configured gates passed. Consider raising thresholds toward 100%.');
+  }
+  if (skipped.length > 0) {
+    lines.push(
+      `- Consider running: ${skipped.map((m) => m.category).join(', ')} analyzers to expand coverage visibility.`,
+    );
+  }
+  lines.push('');
+
+  return lines.join('\n');
 }
 
 /**

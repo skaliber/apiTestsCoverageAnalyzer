@@ -1,0 +1,233 @@
+name: Kotlin Healthcare API - Coverage Analysis
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run full coverage analysis every Monday at 8 AM UTC
+    - cron: "0 8 * * 1"
+
+env:
+  JAVA_VERSION: "17"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.caching=true"
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Grant Gradle wrapper permissions
+        run: chmod +x ./gradlew
+        working-directory: examples/kotlin-ktor-complex
+
+      - name: Build project
+        run: ./gradlew build -x test
+        working-directory: examples/kotlin-ktor-complex
+
+      - name: Run tests
+        run: ./gradlew test
+        working-directory: examples/kotlin-ktor-complex
+
+      - name: Generate JaCoCo coverage report
+        run: ./gradlew jacocoTestReport
+        working-directory: examples/kotlin-ktor-complex
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: examples/kotlin-ktor-complex/build/reports/tests/
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: examples/kotlin-ktor-complex/build/reports/jacoco/
+
+  coverage-analysis-initial:
+    name: API Coverage Analysis (Initial Tests)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install API Coverage Analyzer
+        run: pip install -r requirements.txt
+        working-directory: .
+
+      - name: Run coverage analysis (initial test suite)
+        run: |
+          python -m apiTestsCoverageAnalyzer \
+            --config examples/kotlin-ktor-complex/config.yaml \
+            --project examples/kotlin-ktor-complex \
+            --test-suite tests-initial \
+            --output reports/coverage-initial \
+            --format html,json
+        env:
+          ANALYZER_LOG_LEVEL: INFO
+
+      - name: Upload initial coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage-initial
+          path: reports/coverage-initial/
+
+  coverage-analysis-complete:
+    name: API Coverage Analysis (Complete Tests)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install API Coverage Analyzer
+        run: pip install -r requirements.txt
+
+      - name: Run coverage analysis (complete test suite)
+        run: |
+          python -m apiTestsCoverageAnalyzer \
+            --config examples/kotlin-ktor-complex/config.yaml \
+            --project examples/kotlin-ktor-complex \
+            --test-suite tests-complete \
+            --output reports/coverage-complete \
+            --format html,json
+
+      - name: Check coverage thresholds
+        run: |
+          python -m apiTestsCoverageAnalyzer \
+            --config examples/kotlin-ktor-complex/config.yaml \
+            --project examples/kotlin-ktor-complex \
+            --test-suite tests-complete \
+            --check-threshold \
+            --min-coverage 80
+
+      - name: Upload complete coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage-complete
+          path: reports/coverage-complete/
+
+  coverage-comparison:
+    name: Compare Initial vs Complete Coverage
+    runs-on: ubuntu-latest
+    needs:
+      - coverage-analysis-initial
+      - coverage-analysis-complete
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download initial coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: api-coverage-initial
+          path: reports/coverage-initial/
+
+      - name: Download complete coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: api-coverage-complete
+          path: reports/coverage-complete/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Generate comparison report
+        run: |
+          python -m apiTestsCoverageAnalyzer \
+            --compare \
+            --baseline reports/coverage-initial/coverage.json \
+            --target reports/coverage-complete/coverage.json \
+            --output reports/coverage-comparison \
+            --format html,markdown
+
+      - name: Post coverage comparison as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'reports/coverage-comparison/summary.md';
+            if (fs.existsSync(reportPath)) {
+              const report = fs.readFileSync(reportPath, 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## API Coverage Analysis\n\n${report}`
+              });
+            }
+
+      - name: Upload comparison report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-comparison-report
+          path: reports/coverage-comparison/
+
+  business-rules-coverage:
+    name: Business Rules Coverage Report
+    runs-on: ubuntu-latest
+    needs: coverage-analysis-complete
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install API Coverage Analyzer
+        run: pip install -r requirements.txt
+
+      - name: Analyze business rules coverage
+        run: |
+          python -m apiTestsCoverageAnalyzer \
+            --config examples/kotlin-ktor-complex/config.yaml \
+            --project examples/kotlin-ktor-complex \
+            --business-rules examples/kotlin-ktor-complex/business-rules.yaml \
+            --integration-flows examples/kotlin-ktor-complex/integration-flows.yaml \
+            --test-suite tests-complete \
+            --output reports/business-rules-coverage \
+            --format html,json
+
+      - name: Upload business rules coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: business-rules-coverage
+          path: reports/business-rules-coverage/

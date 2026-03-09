@@ -1,0 +1,84 @@
+# trivy.yaml
+# Trivy configuration for vulnerability scanning of this Node.js project.
+# Documentation: https://aquasecurity.github.io/trivy/latest/docs/configuration/
+
+# ── Scan targets ─────────────────────────────────────────────────────────────
+# Run: trivy fs --config trivy.yaml .
+
+# Severity levels to report
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+
+# Only fail (exit code 1) on CRITICAL and HIGH
+exit-code: 1
+exit-on-eol: false
+
+# Ignore vulnerabilities with no available fix
+ignore-unfixed: true
+
+# ── Output format ─────────────────────────────────────────────────────────────
+format: table   # use 'sarif' in CI pipelines
+
+# ── Cache configuration ───────────────────────────────────────────────────────
+cache:
+  dir: /tmp/trivy-cache
+
+# ── Scanner types ─────────────────────────────────────────────────────────────
+# Enable vulnerability and secret scanning
+scanners:
+  - vuln
+  - secret
+  - misconfig
+
+# ── Filesystem scan ───────────────────────────────────────────────────────────
+# Files/directories to skip
+skip-dirs:
+  - node_modules
+  - .git
+  - coverage
+  - reports
+
+skip-files:
+  - "**/*.test.js"
+  - "**/*.spec.js"
+
+# ── Vulnerability database ────────────────────────────────────────────────────
+db:
+  # Update DB before each scan
+  no-update: false
+
+# ── Secret scanning ───────────────────────────────────────────────────────────
+secret:
+  config: trivy-secret.yaml
+
+# ── Misconfiguration scanning ─────────────────────────────────────────────────
+misconfiguration:
+  include-non-failures: false
+
+# ── License scanning ──────────────────────────────────────────────────────────
+# Enable license checking for dependencies
+license:
+  full:   false
+  ignored:
+    - MIT
+    - Apache-2.0
+    - ISC
+    - BSD-2-Clause
+    - BSD-3-Clause
+  forbidden:
+    - GPL-2.0
+    - GPL-3.0
+    - AGPL-3.0
+
+# ── Compliance ────────────────────────────────────────────────────────────────
+# Report against standard compliance frameworks
+compliance:
+  - spec: soc2
+
+# ── Ignore specific CVEs ──────────────────────────────────────────────────────
+# Add CVE IDs to suppress known false positives or accepted risks
+# ignorefile: .trivyignore
+# Example .trivyignore content:
+# CVE-2021-XXXXX  # Accepted risk: not exploitable in our use case

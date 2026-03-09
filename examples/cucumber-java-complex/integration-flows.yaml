@@ -1,0 +1,217 @@
+##
+## End-to-end integration flows that span multiple API endpoints.
+##
+## Each flow describes the ordered sequence of API calls that together
+## implement a meaningful banking business process.  The analyzer uses
+## these to verify that the BDD suite covers not just individual endpoints
+## but complete customer journeys.
+##
+
+flows:
+
+  - id: FLOW001
+    name: Account Opening to First Transaction
+    description: >
+      A new customer opens a checking account, makes an initial deposit, and
+      then performs the first withdrawal.  This flow validates the core
+      account lifecycle from creation to active use.
+    steps:
+      - order: 1
+        description: Create checking account with initial deposit
+        method: POST
+        path: /api/v1/accounts
+        expectedStatus: 201
+
+      - order: 2
+        description: Verify balance reflects the initial deposit
+        method: GET
+        path: /api/v1/accounts/{id}/balance
+        expectedStatus: 200
+
+      - order: 3
+        description: Record first deposit transaction
+        method: POST
+        path: /api/v1/transactions
+        expectedStatus: 201
+
+      - order: 4
+        description: Retrieve transaction history to confirm deposit
+        method: GET
+        path: /api/v1/transactions
+        expectedStatus: 200
+
+      - order: 5
+        description: Make first withdrawal
+        method: POST
+        path: /api/v1/transactions
+        expectedStatus: 201
+
+      - order: 6
+        description: Verify updated balance after withdrawal
+        method: GET
+        path: /api/v1/accounts/{id}/balance
+        expectedStatus: 200
+
+    coveredBy:
+      feature: account_management.feature
+      scenarios:
+        - "Create a new checking account"
+        - "Check account balance"
+    tags: [onboarding, happy-path]
+
+  - id: FLOW002
+    name: Loan Application and First Payment
+    description: >
+      Customer applies for a personal loan, receives an approved offer, and
+      makes the first scheduled payment.  Validates the complete loan
+      origination and repayment cycle.
+    steps:
+      - order: 1
+        description: Submit loan application
+        method: POST
+        path: /api/v1/loans
+        expectedStatus: 201
+
+      - order: 2
+        description: Retrieve loan details and amortization schedule
+        method: GET
+        path: /api/v1/loans/{id}
+        expectedStatus: 200
+
+      - order: 3
+        description: Make the first scheduled payment
+        method: POST
+        path: /api/v1/loans/{id}/payment
+        expectedStatus: 200
+
+      - order: 4
+        description: Confirm reduced remaining balance
+        method: GET
+        path: /api/v1/loans/{id}
+        expectedStatus: 200
+
+    coveredBy:
+      feature: loans.feature
+      scenarios:
+        - "Apply for a personal loan with good credit"
+        - "Make a scheduled loan payment"
+    tags: [loan, payment, happy-path]
+
+  - id: FLOW003
+    name: International Wire Transfer
+    description: >
+      Customer adds an international beneficiary, initiates a wire transfer,
+      and tracks the transfer status through to completion.  Validates the
+      international payment workflow including SWIFT routing.
+    steps:
+      - order: 1
+        description: Register international beneficiary
+        method: POST
+        path: /api/v1/beneficiaries
+        expectedStatus: 201
+
+      - order: 2
+        description: List beneficiaries to confirm registration
+        method: GET
+        path: /api/v1/beneficiaries
+        expectedStatus: 200
+
+      - order: 3
+        description: Initiate international wire transfer
+        method: POST
+        path: /api/v1/transfers
+        expectedStatus: 201
+
+      - order: 4
+        description: Poll transfer status until COMPLETED or FAILED
+        method: GET
+        path: /api/v1/transfers/{id}
+        expectedStatus: 200
+
+    coveredBy:
+      feature: transfers.feature
+      scenarios:
+        - "International wire transfer"
+        - "Check transfer status after initiation"
+    tags: [transfer, international, wire]
+
+  - id: FLOW004
+    name: Savings Account Interest Calculation
+    description: >
+      Opens a savings account, deposits funds, and triggers the monthly
+      interest calculation.  Validates that interest is correctly applied
+      and reflected in the balance.
+    steps:
+      - order: 1
+        description: Open savings account with minimum balance
+        method: POST
+        path: /api/v1/savings
+        expectedStatus: 201
+
+      - order: 2
+        description: Retrieve savings account details
+        method: GET
+        path: /api/v1/savings/{id}
+        expectedStatus: 200
+
+      - order: 3
+        description: Trigger monthly interest calculation
+        method: POST
+        path: /api/v1/savings/{id}/interest
+        expectedStatus: 200
+
+      - order: 4
+        description: Verify balance increased after interest
+        method: GET
+        path: /api/v1/savings/{id}
+        expectedStatus: 200
+
+    coveredBy:
+      feature: account_management.feature
+      scenarios:
+        - "Create a savings account with minimum balance requirement"
+    tags: [savings, interest, calculation]
+
+  - id: FLOW005
+    name: Account Closure Process
+    description: >
+      Customer requests to close an account.  The system validates there are
+      no pending transfers or outstanding loans, withdraws remaining funds,
+      and marks the account as CLOSED.
+    steps:
+      - order: 1
+        description: Retrieve account to verify it is eligible for closure
+        method: GET
+        path: /api/v1/accounts/{id}
+        expectedStatus: 200
+
+      - order: 2
+        description: Withdraw remaining balance
+        method: POST
+        path: /api/v1/transactions
+        expectedStatus: 201
+
+      - order: 3
+        description: Confirm zero balance
+        method: GET
+        path: /api/v1/accounts/{id}/balance
+        expectedStatus: 200
+
+      - order: 4
+        description: Download final statement before closure
+        method: GET
+        path: /api/v1/statements/{accountId}
+        expectedStatus: 200
+
+      - order: 5
+        description: Close the account
+        method: DELETE
+        path: /api/v1/accounts/{id}
+        expectedStatus: 204
+
+    coveredBy:
+      feature: account_management.feature
+      scenarios:
+        - "Close an account"
+        - "Request account statement"
+    tags: [account, closure, offboarding]

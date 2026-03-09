@@ -1,0 +1,149 @@
+version: 1
+description: "Business rules for the Financial Accounts & Transactions API"
+
+rules:
+  - id: BR-001
+    name: account-ownership
+    description: |
+      Users can only read or modify their own accounts.
+      Admin users may access any account.
+    severity: critical
+    endpoints:
+      - GET /accounts/{account_id}
+      - PUT /accounts/{account_id}
+      - DELETE /accounts/{account_id}
+      - GET /accounts/{account_id}/balance
+      - GET /accounts/{account_id}/summary
+      - GET /limits/{account_id}
+      - PUT /limits/{account_id}
+      - GET /statements/{account_id}
+      - GET /statements/{account_id}/{month}
+    verification:
+      - condition: "account.owner_id == current_user.id OR 'admin' in current_user.scopes"
+        errorCode: "FORBIDDEN"
+        httpStatus: 403
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_accounts.py::TestGetAccount::test_get_others_account_returns_403
+        - tests/tests-complete/test_security.py::TestCrossUserIsolation::test_alice_cannot_read_bobs_account
+        - tests/tests-complete/test_error_scenarios.py::TestForbiddenErrors::test_alice_cannot_access_bobs_account
+
+  - id: BR-002
+    name: transfer-sufficient-funds
+    description: |
+      The source account must have sufficient available balance to cover
+      the full transfer amount before the transfer is approved.
+    severity: critical
+    endpoints:
+      - POST /transfers
+    verification:
+      - condition: "source_account.available_balance >= transfer.amount"
+        errorCode: "INSUFFICIENT_FUNDS"
+        httpStatus: 400
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_insufficient_funds_returns_400
+        - tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum
+
+  - id: BR-003
+    name: daily-transfer-limit
+    description: |
+      The sum of all outgoing transfers from an account within a calendar day
+      must not exceed the account's configured daily_transfer limit.
+    severity: high
+    endpoints:
+      - POST /transfers
+    verification:
+      - condition: "limits.daily_transfer.used_today + transfer.amount <= limits.daily_transfer.amount"
+        errorCode: "DAILY_LIMIT_EXCEEDED"
+        httpStatus: 400
+
+  - id: BR-004
+    name: card-activation-required
+    description: |
+      A card must be in ACTIVE status before it can be used to process
+      purchases or ATM withdrawals.  Cards start in INACTIVE state.
+    severity: high
+    endpoints:
+      - PUT /cards/{card_id}/status
+    verification:
+      - condition: "card.status != 'cancelled'"
+        errorCode: "CARD_OPERATION_BLOCKED"
+        httpStatus: 400
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_activate_card
+        - tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_cannot_modify_cancelled_card
+
+  - id: BR-005
+    name: account-closure-zero-balance
+    description: |
+      An account can only be closed (deleted) when its current_balance is
+      exactly $0.00.  Any outstanding balance must be transferred or withdrawn
+      before closure is permitted.
+    severity: critical
+    endpoints:
+      - DELETE /accounts/{account_id}
+    verification:
+      - condition: "account.current_balance == 0"
+        errorCode: "NON_ZERO_BALANCE"
+        httpStatus: 400
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_nonzero_balance_returns_400
+        - tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_zero_balance_returns_204
+        - tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_close_account_with_balance
+
+  - id: BR-006
+    name: duplicate-transaction-prevention
+    description: |
+      If a transaction is submitted with an idempotency_key that was already
+      used for a previous successful transaction, the original transaction is
+      returned instead of creating a new one.
+    severity: high
+    endpoints:
+      - POST /transactions
+    verification:
+      - condition: "no existing transaction with same idempotency_key"
+        errorCode: "DUPLICATE_TRANSACTION"
+        httpStatus: 200  # returns existing
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_transactions.py::TestCreateTransaction::test_idempotency_key_prevents_duplicate
+
+  - id: BR-007
+    name: minimum-transfer-amount
+    description: |
+      The minimum allowed transfer amount is $1.00 USD (or equivalent in
+      the account's currency).  Transfers below this threshold are rejected.
+    severity: medium
+    endpoints:
+      - POST /transfers
+    verification:
+      - condition: "transfer.amount >= 1.00"
+        errorCode: "BELOW_MINIMUM_TRANSFER"
+        httpStatus: 400
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_minimum_transfer_amount_enforced
+        - tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum
+
+  - id: BR-008
+    name: suspended-account-no-transactions
+    description: |
+      Accounts in SUSPENDED status must reject all incoming and outgoing
+      transactions and transfers.  The account holder should be directed
+      to contact support.
+    severity: critical
+    endpoints:
+      - POST /transactions
+      - POST /transfers
+    verification:
+      - condition: "account.status != 'suspended'"
+        errorCode: "ACCOUNT_SUSPENDED"
+        httpStatus: 400
+    testCoverage:
+      tests-complete:
+        - tests/tests-complete/test_transactions.py::TestCreateTransaction::test_suspended_account_returns_400
+        - tests/tests-complete/test_transfers.py::TestCreateTransfer::test_suspended_source_returns_400
+        - tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transaction_on_suspended_account

@@ -1,0 +1,60 @@
+# API Tests Coverage Analyzer Configuration
+# Ruby on Rails Complex Example - User Management & Subscription Billing API
+
+language: ruby
+framework: rails
+testFramework: rspec
+
+# Test directory configuration
+testDir: spec/requests/spec-complete
+specPattern: "**/*_spec.rb"
+
+# API configuration
+api:
+  baseUrl: http://localhost:3000
+  version: v1
+  prefix: /api/v1
+
+# OpenAPI specification
+openapi:
+  file: openapi.yaml
+  version: "3.0.3"
+
+# Coverage analysis settings
+coverage:
+  thresholds:
+    endpoints: 100
+    businessRules: 100
+    errorScenarios: 90
+    authFlows: 100
+
+  reportFormats:
+    - html
+    - json
+    - markdown
+
+# Business rules file
+businessRules:
+  file: business-rules.yaml
+
+# Integration flows file
+integrationFlows:
+  file: integration-flows.yaml
+
+# Paths to ignore in analysis
+ignorePatterns:
+  - "spec/support/**"
+  - "spec/factories/**"
+  - "spec/shared_examples/**"
+
+# Authentication configuration
+authentication:
+  type: bearer_token
+  headerName: Authorization
+  headerFormat: "Bearer {token}"
+
+# Output configuration
+output:
+  dir: coverage-reports
+  filename: coverage-report
+  openOnComplete: false

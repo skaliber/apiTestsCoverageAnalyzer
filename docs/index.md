@@ -57,6 +57,7 @@ features:
 - [CI/CD Integration](./guide/ci-cd.md) — GitHub Actions and Jenkins workflows
 - [Security Scanning](./guide/security-scanning.md) — Semgrep, Trivy, and ZAP integration
 - [Multi-Language Support](./guide/multi-language.md) — Java, Kotlin, Python, Ruby, Cucumber
+- [Example Projects](./guide/examples.md) — 8 realistic multi-language examples with CI and 100% coverage journeys
 - [MCP Integration](./guide/mcp-integration.md) — AI-assisted analysis via Model Context Protocol
 - [Architecture](./reference/architecture.md) — Module overview and data flow
 - [Contributing](./reference/contributing.md) — How to add docs pages or extend the tool

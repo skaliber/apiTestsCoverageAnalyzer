@@ -1,0 +1,216 @@
+version: 1
+flows:
+  - id: FLOW001
+    name: Complete Order Lifecycle
+    description: >
+      The primary happy-path flow for a customer placing and receiving an order.
+      Covers user registration, product browsing, order creation, item addition,
+      payment authorization + capture, and shipment tracking.
+    steps:
+      - step: 1
+        name: Register user
+        method: POST
+        path: /users
+        description: Customer creates an account
+      - step: 2
+        name: Browse products
+        method: GET
+        path: /products
+        description: Customer browses the product catalog
+      - step: 3
+        name: View product detail
+        method: GET
+        path: /products/{id}
+        description: Customer views a specific product
+      - step: 4
+        name: Create order
+        method: POST
+        path: /orders
+        description: Customer creates an empty order (with Idempotency-Key header)
+      - step: 5
+        name: Add item to order
+        method: POST
+        path: /orders/{id}/items
+        description: Customer adds a product to the order; triggers inventory check
+      - step: 6
+        name: Initiate payment
+        method: POST
+        path: /payments
+        description: Customer initiates payment (authorizes the charge)
+      - step: 7
+        name: Capture payment
+        method: POST
+        path: /payments/{id}/capture
+        description: Payment gateway confirms funds; order moves to PROCESSING
+      - step: 8
+        name: Ship order (admin)
+        method: PUT
+        path: /shipments/{id}/status
+        description: Admin marks shipment as SHIPPED with tracking number
+      - step: 9
+        name: Track shipment
+        method: GET
+        path: /shipments/{id}
+        description: Customer tracks their shipment
+      - step: 10
+        name: Deliver order (admin)
+        method: PUT
+        path: /shipments/{id}/status
+        description: Admin marks shipment as DELIVERED
+    expectedOutcome: Order reaches DELIVERED status with captured payment
+
+  - id: FLOW002
+    name: Order Cancellation and Refund
+    description: >
+      Customer cancels an order after payment and requests a refund.
+      Tests the refund window business rule and refund processing.
+    steps:
+      - step: 1
+        name: Create order
+        method: POST
+        path: /orders
+      - step: 2
+        name: Add item
+        method: POST
+        path: /orders/{id}/items
+      - step: 3
+        name: Initiate and capture payment
+        method: POST
+        path: /payments
+      - step: 4
+        name: Capture payment
+        method: POST
+        path: /payments/{id}/capture
+      - step: 5
+        name: Update order status to cancelled
+        method: PUT
+        path: /orders/{id}/status
+        description: Customer or admin cancels the order
+      - step: 6
+        name: Request refund
+        method: POST
+        path: /refunds
+        description: Customer submits refund request within 30-day window
+      - step: 7
+        name: Check refund status
+        method: GET
+        path: /refunds/{id}
+    expectedOutcome: Refund in PROCESSING or COMPLETED status
+
+  - id: FLOW003
+    name: Product Inventory Management
+    description: >
+      Admin manages the product catalog — creates products, updates stock levels,
+      and tests inventory enforcement during order placement.
+    steps:
+      - step: 1
+        name: Create product
+        method: POST
+        path: /products
+        description: Admin creates a new product with initial stock
+      - step: 2
+        name: Update product details
+        method: PUT
+        path: /products/{id}
+        description: Admin updates price or description
+      - step: 3
+        name: Customer adds item to order
+        method: POST
+        path: /orders/{id}/items
+        description: Tests that stock is decremented
+      - step: 4
+        name: Attempt to over-order
+        method: POST
+        path: /orders/{id}/items
+        description: Tests inventory-check-before-order rule (expects 422)
+      - step: 5
+        name: Remove item (restore stock)
+        method: DELETE
+        path: /orders/{id}/items/{itemId}
+        description: Tests that stock is restored on item removal
+      - step: 6
+        name: Delete product
+        method: DELETE
+        path: /products/{id}
+        description: Admin soft-deletes the product
+    expectedOutcome: Inventory correctly maintained throughout lifecycle
+
+  - id: FLOW004
+    name: User Registration and First Purchase
+    description: >
+      New user registers, completes a purchase, and leaves a review.
+      Validates review-requires-completed-order business rule.
+    steps:
+      - step: 1
+        name: Register
+        method: POST
+        path: /users
+      - step: 2
+        name: Create order and add item
+        method: POST
+        path: /orders
+      - step: 3
+        name: Add item
+        method: POST
+        path: /orders/{id}/items
+      - step: 4
+        name: Pay and complete order
+        method: POST
+        path: /payments
+      - step: 5
+        name: Capture payment
+        method: POST
+        path: /payments/{id}/capture
+      - step: 6
+        name: Attempt review before delivery (expects 403)
+        method: POST
+        path: /reviews
+        description: Tests review-requires-completed-order rule
+      - step: 7
+        name: Mark order delivered
+        method: PUT
+        path: /orders/{id}/status
+      - step: 8
+        name: Submit review (after delivery)
+        method: POST
+        path: /reviews
+        description: Now allowed because order is DELIVERED
+    expectedOutcome: Review submitted successfully after order delivery
+
+  - id: FLOW005
+    name: Admin Operations
+    description: >
+      Admin performs privileged operations including user management,
+      system health checks, and metrics retrieval.
+    steps:
+      - step: 1
+        name: List all users
+        method: GET
+        path: /users
+        description: Admin retrieves user list
+      - step: 2
+        name: Get specific user
+        method: GET
+        path: /users/{id}
+      - step: 3
+        name: Update user details
+        method: PUT
+        path: /users/{id}
+      - step: 4
+        name: Delete user
+        method: DELETE
+        path: /users/{id}
+        description: Tests user-deletion-requires-admin rule
+      - step: 5
+        name: Create product
+        method: POST
+        path: /products
+      - step: 6
+        name: Check system health
+        method: GET
+        path: /admin/health
+      - step: 7
+        name: Retrieve metrics
+        method: GET
+        path: /admin/metrics
+    expectedOutcome: All admin operations succeed; non-admin access returns 403

@@ -1,0 +1,202 @@
+#!/usr/bin/env groovy
+/**
+ * Jenkinsfile – Banking Platform API Coverage Analysis Pipeline
+ *
+ * Stages:
+ *   1. Checkout
+ *   2. Build & Run Cucumber BDD tests (Java 21 + Gradle)
+ *   3. Run API Tests Coverage Analyzer
+ *   4. Archive reports and enforce minimum coverage gate
+ */
+
+pipeline {
+
+    agent {
+        docker {
+            // Use an image that has both Java 21 and Node 20 available.
+            image 'eclipse-temurin:21-jdk'
+            args  '-v /root/.gradle:/root/.gradle -v /root/.npm:/root/.npm'
+        }
+    }
+
+    environment {
+        BANKING_BASE_URL  = "${params.BANKING_BASE_URL ?: 'http://banking-api:8080'}"
+        REPORT_DIR        = 'examples/cucumber-java-complex/build/reports'
+        ANALYSIS_DIR      = "${REPORT_DIR}/coverage-analysis"
+        CUCUMBER_REPORT   = "${REPORT_DIR}/cucumber"
+        BANKING_TEST_TOKEN = credentials('banking-test-token')
+    }
+
+    parameters {
+        string(
+            name:         'BANKING_BASE_URL',
+            defaultValue: 'http://banking-api:8080',
+            description:  'Base URL of the Banking Platform API under test'
+        )
+        booleanParam(
+            name:         'SKIP_COVERAGE_GATE',
+            defaultValue: false,
+            description:  'Skip the minimum coverage threshold check (emergency use only)'
+        )
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '5'))
+        ansiColor('xterm')
+        timestamps()
+    }
+
+    stages {
+
+        // -----------------------------------------------------------------------
+        stage('Checkout') {
+        // -----------------------------------------------------------------------
+            steps {
+                checkout scm
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Commit: ${env.GIT_COMMIT}"
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Install Node (analyzer dependency)') {
+        // -----------------------------------------------------------------------
+            steps {
+                sh '''
+                    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+                    apt-get install -y nodejs
+                    node --version
+                    npm --version
+                '''
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Install Coverage Analyzer') {
+        // -----------------------------------------------------------------------
+            steps {
+                sh 'npm install -g api-tests-coverage-analyzer'
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Run Cucumber BDD Tests') {
+        // -----------------------------------------------------------------------
+            steps {
+                dir('examples/cucumber-java-complex') {
+                    sh """
+                        chmod +x gradlew
+                        ./gradlew test \\
+                            -Dbanking.base-url=${BANKING_BASE_URL} \\
+                            -Dbanking.test.token=${BANKING_TEST_TOKEN} \\
+                            --continue \\
+                            --info
+                    """
+                }
+            }
+            post {
+                always {
+                    // Publish Cucumber HTML report via the Cucumber Reports Jenkins plugin.
+                    cucumber(
+                        fileIncludePattern:  '**/cucumber/results.json',
+                        jsonReportDirectory: 'examples/cucumber-java-complex/build/reports/cucumber'
+                    )
+                    junit(
+                        testResults:         'examples/cucumber-java-complex/build/test-results/**/*.xml',
+                        allowEmptyResults:   true
+                    )
+                }
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Analyze API Test Coverage') {
+        // -----------------------------------------------------------------------
+            steps {
+                dir('examples/cucumber-java-complex') {
+                    sh """
+                        api-tests-coverage-analyzer \\
+                            --config config.yaml \\
+                            --output build/reports/coverage-analysis
+                    """
+                }
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Coverage Gate') {
+        // -----------------------------------------------------------------------
+            when {
+                not { expression { return params.SKIP_COVERAGE_GATE } }
+            }
+            steps {
+                script {
+                    def summaryFile = "${ANALYSIS_DIR}/summary.json"
+                    if (!fileExists(summaryFile)) {
+                        echo "WARNING: summary.json not found – skipping gate."
+                        return
+                    }
+                    def summary  = readJSON file: summaryFile
+                    def pct      = summary.coveragePercent ?: 0
+                    def covered  = summary.coveredEndpoints ?: 'N/A'
+                    def total    = summary.totalEndpoints   ?: 'N/A'
+
+                    echo "API Coverage: ${pct}%  (${covered} / ${total} endpoints)"
+
+                    if (pct < 80) {
+                        error("Coverage ${pct}% is below the required 80% threshold.")
+                    }
+                }
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        stage('Archive Reports') {
+        // -----------------------------------------------------------------------
+            steps {
+                archiveArtifacts(
+                    artifacts: [
+                        'examples/cucumber-java-complex/build/reports/cucumber/**',
+                        'examples/cucumber-java-complex/build/reports/coverage-analysis/**'
+                    ].join(','),
+                    allowEmptyArchive: true,
+                    fingerprint:       true
+                )
+                publishHTML([
+                    reportDir:    "${CUCUMBER_REPORT}",
+                    reportFiles:  'index.html',
+                    reportName:   'Cucumber BDD Report',
+                    keepAll:      true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: true
+                ])
+                publishHTML([
+                    reportDir:    "${ANALYSIS_DIR}",
+                    reportFiles:  'index.html',
+                    reportName:   'API Coverage Analysis',
+                    keepAll:      true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: true
+                ])
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully. All coverage thresholds met."
+        }
+        failure {
+            echo "Pipeline failed. Check the archived reports for details."
+            emailext(
+                to:      "${env.CHANGE_AUTHOR_EMAIL ?: 'platform-team@example.com'}",
+                subject: "[FAILED] Banking API Coverage – ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body:    "Build ${env.BUILD_URL} failed. Please review test and coverage reports."
+            )
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

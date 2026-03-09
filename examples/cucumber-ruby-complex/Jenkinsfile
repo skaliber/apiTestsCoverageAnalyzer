@@ -1,0 +1,234 @@
+// Jenkinsfile - Declarative Pipeline for Payment Platform BDD + Coverage Analysis
+//
+// Pipeline stages:
+//   1. Checkout & Install dependencies
+//   2. Start test server (Sinatra)
+//   3. Run Cucumber BDD feature suite
+//   4. Stop test server
+//   5. Run api-test-coverage-analyzer
+//   6. Publish reports to Jenkins
+//   7. Fail build if coverage threshold is not met
+
+pipeline {
+    agent {
+        docker {
+            image 'ruby:3.3-slim'
+            args  '-v /usr/local/nvm:/usr/local/nvm'
+        }
+    }
+
+    environment {
+        API_BASE_URL           = 'http://localhost:4567'
+        TEST_MERCHANT_ID       = 'MERCH-TEST-001'
+        TEST_API_KEY           = credentials('payment-platform-test-api-key')
+        CLEANUP_AFTER_SCENARIO = 'true'
+        BUNDLE_PATH            = 'vendor/bundle'
+        NODE_VERSION           = '20'
+        COVERAGE_THRESHOLD     = '80'
+    }
+
+    options {
+        timeout(time: 45, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    stages {
+
+        // ── Stage 1: Install Ruby and Node.js dependencies ──────────────────
+        stage('Install Dependencies') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    sh '''
+                        echo "=== Installing Ruby gems ==="
+                        bundle install --jobs 4 --retry 3
+
+                        echo "=== Installing Node.js for analyzer ==="
+                        curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+                        apt-get install -y nodejs
+                        cd ../../ && npm ci
+                    '''
+                }
+            }
+        }
+
+        // ── Stage 2: Start Sinatra test server ───────────────────────────────
+        stage('Start Test Server') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    sh '''
+                        echo "=== Starting Sinatra payment server ==="
+                        bundle exec ruby app/routes.rb &
+                        echo $! > .server_pid
+
+                        # Wait for server to become available
+                        for i in $(seq 1 30); do
+                            if curl -sf http://localhost:4567/admin/health > /dev/null; then
+                                echo "Server is ready after ${i}s"
+                                break
+                            fi
+                            echo "Waiting for server... (${i}/30)"
+                            sleep 1
+                        done
+
+                        curl -sf http://localhost:4567/admin/health || {
+                            echo "ERROR: Server failed to start"
+                            exit 1
+                        }
+                    '''
+                }
+            }
+        }
+
+        // ── Stage 3: Run full Cucumber BDD suite ─────────────────────────────
+        stage('Run Cucumber Tests') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    sh '''
+                        mkdir -p reports
+
+                        echo "=== Running Cucumber feature suite ==="
+                        bundle exec cucumber \
+                            --format json   --out reports/cucumber_results.json \
+                            --format html   --out reports/cucumber_report.html \
+                            --format junit  --out reports/junit/ \
+                            --format pretty \
+                            --tags "not @wip" \
+                            features/ || CUCUMBER_EXIT=$?
+
+                        echo "Cucumber exited with code: ${CUCUMBER_EXIT:-0}"
+                        exit ${CUCUMBER_EXIT:-0}
+                    '''
+                }
+            }
+            post {
+                always {
+                    // Publish JUnit test results to Jenkins
+                    junit 'examples/cucumber-ruby-complex/reports/junit/**/*.xml'
+
+                    // Archive Cucumber HTML report
+                    publishHTML(target: [
+                        allowMissing:        false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll:             true,
+                        reportDir:           'examples/cucumber-ruby-complex/reports',
+                        reportFiles:         'cucumber_report.html',
+                        reportName:          'Cucumber BDD Report',
+                        reportTitles:        'Cucumber BDD Test Results'
+                    ])
+                }
+            }
+        }
+
+        // ── Stage 4: Stop Sinatra test server ────────────────────────────────
+        stage('Stop Test Server') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    sh '''
+                        if [ -f .server_pid ]; then
+                            kill $(cat .server_pid) 2>/dev/null || true
+                            rm -f .server_pid
+                            echo "Test server stopped"
+                        fi
+                    '''
+                }
+            }
+        }
+
+        // ── Stage 5: Run api-test-coverage-analyzer ──────────────────────────
+        stage('API Coverage Analysis') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    sh '''
+                        echo "=== Running api-test-coverage-analyzer ==="
+                        mkdir -p reports/coverage
+
+                        npx api-test-coverage-analyzer \
+                            --config config.yaml \
+                            --output-dir reports/coverage \
+                            --format json,html,markdown \
+                            --fail-under ${COVERAGE_THRESHOLD}
+
+                        echo "=== Coverage Analysis Complete ==="
+                        cat reports/coverage/summary.md || true
+                    '''
+                }
+            }
+            post {
+                always {
+                    // Archive coverage JSON for downstream processing
+                    archiveArtifacts artifacts: 'examples/cucumber-ruby-complex/reports/coverage/**',
+                                     allowEmptyArchive: true
+
+                    // Publish HTML coverage report
+                    publishHTML(target: [
+                        allowMissing:          true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll:               true,
+                        reportDir:             'examples/cucumber-ruby-complex/reports/coverage',
+                        reportFiles:           'index.html',
+                        reportName:            'API Coverage Analysis',
+                        reportTitles:          'API Endpoint Coverage'
+                    ])
+                }
+            }
+        }
+
+        // ── Stage 6: Coverage gate check ─────────────────────────────────────
+        stage('Coverage Gate') {
+            steps {
+                dir('examples/cucumber-ruby-complex') {
+                    script {
+                        def coverageJson = readJSON file: 'reports/coverage/coverage.json'
+                        def coverage = coverageJson.summary.endpoint_coverage_percent
+
+                        echo "Endpoint coverage: ${coverage}%  (threshold: ${COVERAGE_THRESHOLD}%)"
+
+                        if (coverage < COVERAGE_THRESHOLD.toFloat()) {
+                            error("Coverage gate FAILED: ${coverage}% is below the required ${COVERAGE_THRESHOLD}%")
+                        } else {
+                            echo "Coverage gate PASSED: ${coverage}% meets the ${COVERAGE_THRESHOLD}% threshold"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Ensure server is stopped even if pipeline was aborted
+            sh '''
+                cd examples/cucumber-ruby-complex
+                if [ -f .server_pid ]; then
+                    kill $(cat .server_pid) 2>/dev/null || true
+                    rm -f .server_pid
+                fi
+            '''
+
+            // Clean up vendor bundle to avoid inter-build pollution
+            cleanWs(patterns: [[pattern: 'examples/cucumber-ruby-complex/vendor/**', type: 'INCLUDE']])
+        }
+
+        success {
+            echo "Pipeline PASSED - All BDD scenarios green and coverage threshold met"
+        }
+
+        failure {
+            mail(
+                to:      'platform-team@example.com',
+                subject: "FAILED: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                body:    """
+                    Build failed: ${env.BUILD_URL}
+
+                    Check the Cucumber BDD report and API Coverage Analysis report for details.
+                """.stripIndent()
+            )
+        }
+
+        unstable {
+            echo "Pipeline UNSTABLE - Some scenarios may have failed; review the report"
+        }
+    }
+}

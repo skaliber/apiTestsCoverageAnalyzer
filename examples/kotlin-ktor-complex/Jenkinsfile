@@ -1,0 +1,288 @@
+#!/usr/bin/env groovy
+// Jenkinsfile for Healthcare API - Kotlin/Ktor
+// CI/CD Pipeline with API Coverage Analysis
+
+pipeline {
+    agent {
+        docker {
+            image 'gradle:8.5-jdk17'
+            args '-v $HOME/.gradle:/root/.gradle'
+        }
+    }
+
+    options {
+        timeout(time: 45, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    environment {
+        JAVA_HOME         = '/opt/java/openjdk'
+        GRADLE_OPTS       = '-Dorg.gradle.daemon=false -Dorg.gradle.caching=true'
+        PROJECT_DIR       = 'examples/kotlin-ktor-complex'
+        REPORTS_BASE      = 'reports'
+        // Analyzer config
+        ANALYZER_CONFIG   = "${PROJECT_DIR}/config.yaml"
+    }
+
+    parameters {
+        booleanParam(name: 'RUN_FULL_ANALYSIS', defaultValue: true,
+            description: 'Run full API coverage analysis (both test suites)')
+        booleanParam(name: 'FAIL_ON_COVERAGE_THRESHOLD', defaultValue: false,
+            description: 'Fail build if coverage is below threshold')
+        string(name: 'MIN_COVERAGE', defaultValue: '70',
+            description: 'Minimum required API coverage percentage')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Building branch: ${env.BRANCH_NAME}"
+                echo "Commit: ${env.GIT_COMMIT?.take(8)}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir(env.PROJECT_DIR) {
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew clean build -x test --parallel'
+                }
+            }
+            post {
+                failure {
+                    echo 'Build failed!'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                dir(env.PROJECT_DIR) {
+                    sh './gradlew test'
+                }
+            }
+            post {
+                always {
+                    junit "${env.PROJECT_DIR}/build/test-results/**/*.xml"
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "${env.PROJECT_DIR}/build/reports/tests/test",
+                        reportFiles: 'index.html',
+                        reportName: 'Unit Test Report'
+                    ])
+                }
+            }
+        }
+
+        stage('JaCoCo Coverage') {
+            steps {
+                dir(env.PROJECT_DIR) {
+                    sh './gradlew jacocoTestReport'
+                }
+            }
+            post {
+                always {
+                    jacoco(
+                        execPattern: "${env.PROJECT_DIR}/build/jacoco/*.exec",
+                        classPattern: "${env.PROJECT_DIR}/build/classes",
+                        sourcePattern: "${env.PROJECT_DIR}/src/main/kotlin",
+                        exclusionPattern: '**/model/**,**/Application*'
+                    )
+                }
+            }
+        }
+
+        stage('API Coverage Analysis') {
+            when {
+                expression { params.RUN_FULL_ANALYSIS }
+            }
+
+            parallel {
+                stage('Initial Test Coverage') {
+                    steps {
+                        script {
+                            sh """
+                                python3 -m apiTestsCoverageAnalyzer \\
+                                    --config ${env.ANALYZER_CONFIG} \\
+                                    --project ${env.PROJECT_DIR} \\
+                                    --test-suite tests-initial \\
+                                    --output ${env.REPORTS_BASE}/coverage-initial \\
+                                    --format html,json
+                            """
+                        }
+                    }
+                    post {
+                        always {
+                            publishHTML([
+                                allowMissing: true,
+                                alwaysLinkToLastBuild: true,
+                                keepAll: true,
+                                reportDir: "${env.REPORTS_BASE}/coverage-initial",
+                                reportFiles: 'index.html',
+                                reportName: 'API Coverage - Initial Tests'
+                            ])
+                            archiveArtifacts(
+                                artifacts: "${env.REPORTS_BASE}/coverage-initial/**",
+                                allowEmptyArchive: true
+                            )
+                        }
+                    }
+                }
+
+                stage('Complete Test Coverage') {
+                    steps {
+                        script {
+                            sh """
+                                python3 -m apiTestsCoverageAnalyzer \\
+                                    --config ${env.ANALYZER_CONFIG} \\
+                                    --project ${env.PROJECT_DIR} \\
+                                    --test-suite tests-complete \\
+                                    --output ${env.REPORTS_BASE}/coverage-complete \\
+                                    --format html,json
+                            """
+
+                            if (params.FAIL_ON_COVERAGE_THRESHOLD) {
+                                sh """
+                                    python3 -m apiTestsCoverageAnalyzer \\
+                                        --config ${env.ANALYZER_CONFIG} \\
+                                        --project ${env.PROJECT_DIR} \\
+                                        --test-suite tests-complete \\
+                                        --check-threshold \\
+                                        --min-coverage ${params.MIN_COVERAGE}
+                                """
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            publishHTML([
+                                allowMissing: true,
+                                alwaysLinkToLastBuild: true,
+                                keepAll: true,
+                                reportDir: "${env.REPORTS_BASE}/coverage-complete",
+                                reportFiles: 'index.html',
+                                reportName: 'API Coverage - Complete Tests'
+                            ])
+                            archiveArtifacts(
+                                artifacts: "${env.REPORTS_BASE}/coverage-complete/**",
+                                allowEmptyArchive: true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Business Rules Coverage') {
+            when {
+                expression { params.RUN_FULL_ANALYSIS }
+            }
+            steps {
+                sh """
+                    python3 -m apiTestsCoverageAnalyzer \\
+                        --config ${env.ANALYZER_CONFIG} \\
+                        --project ${env.PROJECT_DIR} \\
+                        --business-rules ${env.PROJECT_DIR}/business-rules.yaml \\
+                        --integration-flows ${env.PROJECT_DIR}/integration-flows.yaml \\
+                        --test-suite tests-complete \\
+                        --output ${env.REPORTS_BASE}/business-rules \\
+                        --format html,json
+                """
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "${env.REPORTS_BASE}/business-rules",
+                        reportFiles: 'index.html',
+                        reportName: 'Business Rules Coverage'
+                    ])
+                }
+            }
+        }
+
+        stage('Coverage Comparison') {
+            when {
+                expression {
+                    params.RUN_FULL_ANALYSIS &&
+                    fileExists("${env.REPORTS_BASE}/coverage-initial/coverage.json") &&
+                    fileExists("${env.REPORTS_BASE}/coverage-complete/coverage.json")
+                }
+            }
+            steps {
+                sh """
+                    python3 -m apiTestsCoverageAnalyzer \\
+                        --compare \\
+                        --baseline ${env.REPORTS_BASE}/coverage-initial/coverage.json \\
+                        --target ${env.REPORTS_BASE}/coverage-complete/coverage.json \\
+                        --output ${env.REPORTS_BASE}/comparison \\
+                        --format html,markdown
+                """
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "${env.REPORTS_BASE}/comparison",
+                        reportFiles: 'index.html',
+                        reportName: 'Coverage Comparison Report'
+                    ])
+                }
+            }
+        }
+
+        stage('Package') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
+            }
+            steps {
+                dir(env.PROJECT_DIR) {
+                    sh './gradlew buildFatJar'
+                }
+                archiveArtifacts(
+                    artifacts: "${env.PROJECT_DIR}/build/libs/healthcare-api.jar",
+                    fingerprint: true
+                )
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline complete. Status: ${currentBuild.currentResult}"
+        }
+        success {
+            echo 'All stages passed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs above.'
+        }
+        unstable {
+            echo 'Pipeline completed with warnings.'
+        }
+        cleanup {
+            cleanWs(
+                cleanWhenNotBuilt: false,
+                deleteDirs: true,
+                disableDeferredWipeout: true,
+                notFailBuild: true,
+                patterns: [
+                    [pattern: 'build/**', type: 'INCLUDE'],
+                    [pattern: '.gradle/**', type: 'EXCLUDE']
+                ]
+            )
+        }
+    }
+}

@@ -1,0 +1,194 @@
+#!/usr/bin/env groovy
+/**
+ * Jenkinsfile — Financial Accounts & Transactions API
+ *
+ * Demonstrates the coverage improvement journey:
+ *   Stage 1 — Run initial tests (~55% coverage) and show gaps
+ *   Stage 2 — Run complete tests (100% coverage) and enforce quality gate
+ */
+
+pipeline {
+    agent {
+        docker {
+            image 'python:3.11-slim'
+            args  '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        PYTHONDONTWRITEBYTECODE = '1'
+        PYTHONUNBUFFERED        = '1'
+        PROJECT_DIR             = 'examples/python-fastapi-complex'
+        NODE_VERSION            = '20'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Python + Node setup
+        // ----------------------------------------------------------------
+        stage('Setup: Python') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh '''
+                        python3 -m pip install --upgrade pip
+                        pip install -r requirements.txt
+                        echo "Python dependencies installed successfully"
+                    '''
+                }
+            }
+        }
+
+        stage('Setup: Node.js') {
+            steps {
+                sh '''
+                    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+                    apt-get install -y nodejs
+                    node --version
+                    npm --version
+                '''
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Initial tests (~55% coverage) — expected to show gaps
+        // ----------------------------------------------------------------
+        stage('Test: Initial Suite') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh '''
+                        python3 -m pytest tests/tests-initial/ \
+                            -v \
+                            --tb=short \
+                            --junitxml=test-results-initial.xml \
+                            || true
+                    '''
+                }
+            }
+            post {
+                always {
+                    junit "${PROJECT_DIR}/test-results-initial.xml"
+                }
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Coverage analysis of initial suite — show coverage gaps
+        // ----------------------------------------------------------------
+        stage('Analyze: Initial Coverage (Gap Report)') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh '''
+                        npx apiTestsCoverageAnalyzer \
+                            --config config.yaml \
+                            --test-dir tests/tests-initial \
+                            --output-dir reports/analysis-initial \
+                            --no-fail-on-threshold \
+                        || true
+
+                        echo "=== Initial Coverage Report ==="
+                        cat reports/analysis-initial/summary.json 2>/dev/null || echo "No summary file generated"
+                    '''
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: "${PROJECT_DIR}/reports/analysis-initial/**",
+                                     allowEmptyArchive: true
+                    publishHTML(target: [
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : "${PROJECT_DIR}/reports/analysis-initial",
+                        reportFiles          : 'index.html',
+                        reportName           : 'Initial Coverage Report',
+                    ])
+                }
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Complete tests — full coverage suite
+        // ----------------------------------------------------------------
+        stage('Test: Complete Suite') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh '''
+                        python3 -m pytest tests/tests-complete/ \
+                            -v \
+                            --tb=short \
+                            --junitxml=test-results-complete.xml
+                    '''
+                }
+            }
+            post {
+                always {
+                    junit "${PROJECT_DIR}/test-results-complete.xml"
+                }
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Coverage analysis with quality gate — must pass 100%
+        // ----------------------------------------------------------------
+        stage('Analyze: Complete Coverage (Quality Gate)') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    sh '''
+                        npx apiTestsCoverageAnalyzer \
+                            --config config.yaml \
+                            --test-dir tests/tests-complete \
+                            --output-dir reports/analysis-complete
+                    '''
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: "${PROJECT_DIR}/reports/analysis-complete/**",
+                                     allowEmptyArchive: true
+                    publishHTML(target: [
+                        allowMissing         : false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : "${PROJECT_DIR}/reports/analysis-complete",
+                        reportFiles          : 'index.html',
+                        reportName           : 'Complete Coverage Report',
+                    ])
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline complete. Reports archived.'
+        }
+        success {
+            echo 'All stages passed. Coverage quality gate satisfied.'
+        }
+        failure {
+            echo 'Pipeline failed. Check test results and coverage reports.'
+        }
+        cleanup {
+            cleanWs(
+                cleanWhenNotBuilt: false,
+                deleteDirs: true,
+                disableDeferredWipeout: true,
+                notFailBuild: true,
+                patterns: [[pattern: '**/__pycache__', type: 'INCLUDE'],
+                           [pattern: '**/*.pyc', type: 'INCLUDE']]
+            )
+        }
+    }
+}

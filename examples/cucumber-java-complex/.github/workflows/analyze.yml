@@ -1,0 +1,188 @@
+name: Banking API Coverage Analysis
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Nightly run at 02:00 UTC to catch regressions early.
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      base-url:
+        description: "Banking API base URL"
+        required: false
+        default: "http://localhost:8080"
+
+env:
+  JAVA_VERSION: "21"
+  BANKING_BASE_URL: ${{ github.event.inputs.base-url || 'http://localhost:8080' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Build and run Cucumber BDD tests
+  # ---------------------------------------------------------------------------
+  test:
+    name: Run BDD Tests (Java ${{ env.JAVA_VERSION }})
+    runs-on: ubuntu-latest
+
+    services:
+      # Spin up the banking API under test (replace with a real image).
+      banking-api:
+        image: example/banking-api:latest
+        ports:
+          - 8080:8080
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        options: >-
+          --health-cmd "curl -sf http://localhost:8080/api/v1/admin/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v3
+
+      - name: Run Cucumber tests
+        working-directory: examples/cucumber-java-complex
+        run: |
+          ./gradlew test \
+            -Dbanking.base-url=${{ env.BANKING_BASE_URL }} \
+            --continue \
+            --info
+        env:
+          BANKING_TEST_TOKEN: ${{ secrets.BANKING_TEST_TOKEN }}
+
+      - name: Upload Cucumber HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: examples/cucumber-java-complex/build/reports/cucumber/
+          retention-days: 30
+
+      - name: Upload Cucumber JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json
+          path: examples/cucumber-java-complex/build/reports/cucumber/results.json
+          retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # 2. Run the API Tests Coverage Analyzer
+  # ---------------------------------------------------------------------------
+  coverage-analysis:
+    name: Analyze API Test Coverage
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+
+      - name: Set up Node.js (for analyzer CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install API Tests Coverage Analyzer
+        run: npm install -g api-tests-coverage-analyzer
+
+      - name: Download Cucumber JSON results
+        uses: actions/download-artifact@v4
+        with:
+          name: cucumber-json
+          path: examples/cucumber-java-complex/build/reports/cucumber/
+
+      - name: Run coverage analysis
+        working-directory: examples/cucumber-java-complex
+        run: |
+          api-tests-coverage-analyzer \
+            --config config.yaml \
+            --output build/reports/coverage-analysis
+
+      - name: Upload coverage analysis report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-analysis-report
+          path: examples/cucumber-java-complex/build/reports/coverage-analysis/
+          retention-days: 90
+
+      - name: Comment coverage summary on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summaryPath = 'examples/cucumber-java-complex/build/reports/coverage-analysis/summary.json';
+            if (fs.existsSync(summaryPath)) {
+              const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+              const covered   = summary.coveredEndpoints ?? 'N/A';
+              const total     = summary.totalEndpoints   ?? 'N/A';
+              const pct       = summary.coveragePercent  ?? 'N/A';
+              const body = [
+                '## API Test Coverage Report',
+                '',
+                `| Metric | Value |`,
+                `|--------|-------|`,
+                `| Covered endpoints | ${covered} / ${total} |`,
+                `| Coverage | ${pct}% |`,
+                '',
+                'See the full report in the **coverage-analysis-report** artifact.',
+              ].join('\n');
+              await github.rest.issues.createComment({
+                owner:    context.repo.owner,
+                repo:     context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+  # ---------------------------------------------------------------------------
+  # 3. Enforce minimum coverage gate
+  # ---------------------------------------------------------------------------
+  coverage-gate:
+    name: Coverage Gate (>= 80%)
+    runs-on: ubuntu-latest
+    needs: coverage-analysis
+
+    steps:
+      - name: Download coverage analysis report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-analysis-report
+          path: coverage-report
+
+      - name: Check minimum coverage threshold
+        run: |
+          SUMMARY="coverage-report/summary.json"
+          if [ ! -f "$SUMMARY" ]; then
+            echo "WARNING: summary.json not found – skipping gate check."
+            exit 0
+          fi
+          PCT=$(jq '.coveragePercent' "$SUMMARY")
+          echo "Coverage: ${PCT}%"
+          if (( $(echo "$PCT < 80" | bc -l) )); then
+            echo "FAIL: Coverage ${PCT}% is below the 80% threshold."
+            exit 1
+          fi
+          echo "PASS: Coverage ${PCT}% meets the 80% threshold."

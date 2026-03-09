@@ -1,0 +1,1217 @@
+openapi: 3.0.3
+info:
+  title: Banking Platform API
+  description: |
+    Core banking platform REST API exposing account management, transactions,
+    fund transfers, loan products, savings, beneficiaries, statements, and
+    administrative operations.
+  version: 1.0.0
+  contact:
+    name: Banking Platform Team
+    email: platform@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local developer sandbox
+  - url: https://api-staging.example-bank.com
+    description: Staging environment
+  - url: https://api.example-bank.com
+    description: Production
+
+tags:
+  - name: Auth
+    description: Authentication and session management
+  - name: Accounts
+    description: Bank account lifecycle operations
+  - name: Transactions
+    description: Deposits, withdrawals, and transaction history
+  - name: Transfers
+    description: Internal and external fund transfers
+  - name: Loans
+    description: Loan applications and repayments
+  - name: Savings
+    description: Savings account and interest operations
+  - name: Beneficiaries
+    description: Transfer beneficiary management
+  - name: Statements
+    description: Official account statements
+  - name: Admin
+    description: Platform health, metrics, and audit (admin-only)
+
+paths:
+
+  # ---------------------------------------------------------------------------
+  # Authentication
+  # ---------------------------------------------------------------------------
+  /api/v1/auth/token:
+    post:
+      tags: [Auth]
+      summary: Obtain a bearer access token
+      operationId: obtainToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Invalidate the current session token
+      operationId: logout
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        '204':
+          description: Logout successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------------------
+  # Accounts
+  # ---------------------------------------------------------------------------
+  /api/v1/accounts:
+    post:
+      tags: [Accounts]
+      summary: Open a new bank account
+      operationId: createAccount
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [Accounts]
+      summary: List all accounts for the current user
+      operationId: listAccounts
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Account list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Account'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/accounts/{id}:
+    get:
+      tags: [Accounts]
+      summary: Get account details by ID
+      operationId: getAccount
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Accounts]
+      summary: Update account metadata
+      operationId: updateAccount
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Accounts]
+      summary: Close a bank account
+      operationId: closeAccount
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '204':
+          description: Account closed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/accounts/{id}/balance:
+    get:
+      tags: [Accounts]
+      summary: Get current balance for an account
+      operationId: getAccountBalance
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          description: Balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/accounts/{id}/statement:
+    get:
+      tags: [Accounts]
+      summary: Get transaction statement for an account
+      operationId: getAccountStatement
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Account statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Transactions
+  # ---------------------------------------------------------------------------
+  /api/v1/transactions:
+    post:
+      tags: [Transactions]
+      summary: Record a new transaction (deposit or withdrawal)
+      operationId: createTransaction
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transaction recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+    get:
+      tags: [Transactions]
+      summary: List transactions, optionally filtered by account
+      operationId: listTransactions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: accountId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/transactions/{id}:
+    get:
+      tags: [Transactions]
+      summary: Get transaction details by ID
+      operationId: getTransaction
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Transfers
+  # ---------------------------------------------------------------------------
+  /api/v1/transfers:
+    post:
+      tags: [Transfers]
+      summary: Initiate a fund transfer
+      operationId: initiateTransfer
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransferRequest'
+      responses:
+        '201':
+          description: Transfer initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/transfers/{id}:
+    get:
+      tags: [Transfers]
+      summary: Get transfer status by ID
+      operationId: getTransfer
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Loans
+  # ---------------------------------------------------------------------------
+  /api/v1/loans:
+    post:
+      tags: [Loans]
+      summary: Submit a loan application
+      operationId: applyForLoan
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequest'
+      responses:
+        '201':
+          description: Loan application submitted and evaluated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/loans/{id}:
+    get:
+      tags: [Loans]
+      summary: Get loan details by ID
+      operationId: getLoan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Loan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/loans/{id}/payment:
+    post:
+      tags: [Loans]
+      summary: Make a payment against an existing loan
+      operationId: makeLoanPayment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanPaymentRequest'
+      responses:
+        '200':
+          description: Payment accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanPaymentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  # ---------------------------------------------------------------------------
+  # Savings
+  # ---------------------------------------------------------------------------
+  /api/v1/savings:
+    post:
+      tags: [Savings]
+      summary: Open a new savings account
+      operationId: openSavingsAccount
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSavingsRequest'
+      responses:
+        '201':
+          description: Savings account opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/savings/{id}:
+    get:
+      tags: [Savings]
+      summary: Get savings account details
+      operationId: getSavingsAccount
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Savings account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/savings/{id}/interest:
+    post:
+      tags: [Savings]
+      summary: Trigger interest calculation for a savings account
+      operationId: calculateSavingsInterest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterestCalculationRequest'
+      responses:
+        '200':
+          description: Interest calculated and applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterestCalculationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Beneficiaries
+  # ---------------------------------------------------------------------------
+  /api/v1/beneficiaries:
+    post:
+      tags: [Beneficiaries]
+      summary: Register a new transfer beneficiary
+      operationId: addBeneficiary
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBeneficiaryRequest'
+      responses:
+        '201':
+          description: Beneficiary registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Beneficiary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [Beneficiaries]
+      summary: List all registered beneficiaries
+      operationId: listBeneficiaries
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Beneficiary list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  beneficiaries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Beneficiary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------------------
+  # Statements
+  # ---------------------------------------------------------------------------
+  /api/v1/statements/{accountId}:
+    get:
+      tags: [Statements]
+      summary: Download an official bank statement for an account
+      operationId: getStatement
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: month
+          in: query
+          schema:
+            type: string
+            example: "2024-01"
+      responses:
+        '200':
+          description: Official statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementResponse'
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Admin
+  # ---------------------------------------------------------------------------
+  /api/v1/admin/health:
+    get:
+      tags: [Admin]
+      summary: Platform health check (public)
+      operationId: checkHealth
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/admin/metrics:
+    get:
+      tags: [Admin]
+      summary: Platform performance metrics (admin-only)
+      operationId: getMetrics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Metrics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: Retrieve platform audit log entries (admin-only)
+      operationId: getAuditLogs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+# =============================================================================
+# Components
+# =============================================================================
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    AccountId:
+      name: id
+      in: path
+      required: true
+      description: Unique account identifier
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated but not authorised for this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnprocessableEntity:
+      description: Business rule violation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+
+    # --- Auth ---
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+
+    # --- Accounts ---
+    CreateAccountRequest:
+      type: object
+      required: [type, initialDeposit, currency]
+      properties:
+        type:
+          type: string
+          enum: [CHECKING, SAVINGS]
+        initialDeposit:
+          type: number
+          format: double
+          minimum: 0
+        currency:
+          type: string
+          example: USD
+        displayName:
+          type: string
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [CHECKING, SAVINGS]
+        status:
+          type: string
+          enum: [ACTIVE, DORMANT, CLOSED]
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+        displayName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    BalanceResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+
+    StatementResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+        period:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date
+            to:
+              type: string
+              format: date
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        openingBalance:
+          type: number
+        closingBalance:
+          type: number
+
+    # --- Transactions ---
+    CreateTransactionRequest:
+      type: object
+      required: [accountId, type, amount, currency]
+      properties:
+        accountId:
+          type: string
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL]
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        currency:
+          type: string
+        description:
+          type: string
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        accountId:
+          type: string
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, INTEREST, FEE]
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        runningBalance:
+          type: number
+          format: double
+
+    # --- Transfers ---
+    CreateTransferRequest:
+      type: object
+      required: [sourceAccountId, beneficiaryId, amount, currency]
+      properties:
+        sourceAccountId:
+          type: string
+        beneficiaryId:
+          type: string
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        currency:
+          type: string
+        type:
+          type: string
+          enum: [DOMESTIC, INTERNATIONAL_WIRE]
+          default: DOMESTIC
+        swift:
+          type: string
+        reference:
+          type: string
+
+    Transfer:
+      type: object
+      properties:
+        id:
+          type: string
+        sourceAccountId:
+          type: string
+        beneficiaryId:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED, CANCELLED]
+        reference:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    # --- Loans ---
+    LoanApplicationRequest:
+      type: object
+      required: [type, amount, termMonths, currency, creditScore]
+      properties:
+        type:
+          type: string
+          enum: [PERSONAL, MORTGAGE, AUTO, BUSINESS]
+        amount:
+          type: number
+          format: double
+        termMonths:
+          type: integer
+        currency:
+          type: string
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+        purpose:
+          type: string
+
+    Loan:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        amount:
+          type: number
+          format: double
+        termMonths:
+          type: integer
+        interestRate:
+          type: number
+          format: double
+        monthlyPayment:
+          type: number
+          format: double
+        remainingBalance:
+          type: number
+          format: double
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, ACTIVE, PAID_OFF, DEFAULTED]
+        reason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    LoanPaymentRequest:
+      type: object
+      required: [amount, currency, paymentMethod]
+      properties:
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [ACH, DEBIT_CARD, WIRE]
+
+    LoanPaymentResponse:
+      type: object
+      properties:
+        loanId:
+          type: string
+        paymentAmount:
+          type: number
+          format: double
+        remainingBalance:
+          type: number
+          format: double
+        nextPaymentDate:
+          type: string
+          format: date
+        status:
+          type: string
+
+    # --- Savings ---
+    CreateSavingsRequest:
+      type: object
+      required: [type, minimumBalance, currency]
+      properties:
+        type:
+          type: string
+          enum: [SAVINGS]
+        minimumBalance:
+          type: number
+          format: double
+        currency:
+          type: string
+        interestRate:
+          type: number
+          format: double
+
+    SavingsAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        balance:
+          type: number
+          format: double
+        minimumBalance:
+          type: number
+          format: double
+        interestRate:
+          type: number
+          format: double
+        currency:
+          type: string
+        status:
+          type: string
+
+    InterestCalculationRequest:
+      type: object
+      properties:
+        period:
+          type: string
+          example: "2024-01"
+
+    InterestCalculationResponse:
+      type: object
+      properties:
+        savingsId:
+          type: string
+        interestEarned:
+          type: number
+          format: double
+        newBalance:
+          type: number
+          format: double
+        period:
+          type: string
+
+    # --- Beneficiaries ---
+    CreateBeneficiaryRequest:
+      type: object
+      required: [name, accountNumber, bankCode]
+      properties:
+        name:
+          type: string
+        accountNumber:
+          type: string
+        bankCode:
+          type: string
+        verified:
+          type: boolean
+          default: false
+
+    Beneficiary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        accountNumber:
+          type: string
+        bankCode:
+          type: string
+        verified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    # --- Admin ---
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [UP, DOWN, DEGRADED]
+        timestamp:
+          type: string
+          format: date-time
+        components:
+          type: object
+          additionalProperties:
+            type: string
+
+    MetricsResponse:
+      type: object
+      properties:
+        requestsPerSecond:
+          type: number
+        averageResponseTimeMs:
+          type: number
+        errorRate:
+          type: number
+        activeConnections:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    AuditLogResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              actor:
+                type: string
+              action:
+                type: string
+              resource:
+                type: string
+              outcome:
+                type: string
+
+    # --- Shared ---
+    ErrorResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string

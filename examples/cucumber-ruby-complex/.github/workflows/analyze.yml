@@ -1,0 +1,185 @@
+name: "BDD Tests + API Coverage Analysis"
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run nightly against staging to detect drift
+    - cron: "0 2 * * *"
+
+env:
+  RUBY_VERSION: "3.3"
+  API_BASE_URL: "http://localhost:4567"
+  TEST_MERCHANT_ID: "MERCH-TEST-001"
+  CLEANUP_AFTER_SCENARIO: "true"
+
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 1: Start the local Sinatra test server and run Cucumber feature suite
+  # ─────────────────────────────────────────────────────────────────────────────
+  cucumber_tests:
+    name: "Cucumber BDD Tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ env.RUBY_VERSION }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+          working-directory: examples/cucumber-ruby-complex
+
+      - name: Install dependencies
+        working-directory: examples/cucumber-ruby-complex
+        run: bundle install --jobs 4 --retry 3
+
+      - name: Start Sinatra test server
+        working-directory: examples/cucumber-ruby-complex
+        run: |
+          bundle exec ruby app/routes.rb &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+          # Wait for server to be ready
+          for i in {1..20}; do
+            curl -sf http://localhost:4567/admin/health && break || sleep 1
+          done
+
+      - name: Run Cucumber feature suite
+        working-directory: examples/cucumber-ruby-complex
+        run: |
+          bundle exec cucumber \
+            --format json   --out reports/cucumber_results.json \
+            --format html   --out reports/cucumber_report.html \
+            --format pretty \
+            --tags "not @wip" \
+            features/
+        env:
+          API_BASE_URL: ${{ env.API_BASE_URL }}
+          TEST_MERCHANT_ID: ${{ env.TEST_MERCHANT_ID }}
+          TEST_API_KEY: ${{ secrets.TEST_API_KEY || 'sk_test_merchant_live_key_abc123' }}
+          CLEANUP_AFTER_SCENARIO: ${{ env.CLEANUP_AFTER_SCENARIO }}
+
+      - name: Stop Sinatra test server
+        if: always()
+        run: kill "$SERVER_PID" 2>/dev/null || true
+
+      - name: Upload Cucumber reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-reports
+          path: examples/cucumber-ruby-complex/reports/
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 2: Run api-test-coverage-analyzer against the feature suite
+  #         Depends on cucumber_tests to ensure tests exist before analysis
+  # ─────────────────────────────────────────────────────────────────────────────
+  coverage_analysis:
+    name: "API Coverage Analysis"
+    runs-on: ubuntu-latest
+    needs: cucumber_tests
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (for the analyzer)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install api-test-coverage-analyzer
+        run: npm ci
+
+      - name: Download Cucumber test results
+        uses: actions/download-artifact@v4
+        with:
+          name: cucumber-reports
+          path: examples/cucumber-ruby-complex/reports/
+
+      - name: Run API coverage analysis
+        working-directory: examples/cucumber-ruby-complex
+        run: |
+          npx api-test-coverage-analyzer \
+            --config config.yaml \
+            --output-dir reports/coverage \
+            --format json,html,markdown \
+            --fail-under 80
+        env:
+          ANALYZER_LOG_LEVEL: info
+
+      - name: Upload coverage analysis reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-analysis-reports
+          path: examples/cucumber-ruby-complex/reports/coverage/
+          retention-days: 30
+
+      - name: Comment coverage summary on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'examples/cucumber-ruby-complex/reports/coverage/summary.md';
+            if (fs.existsSync(reportPath)) {
+              const summary = fs.readFileSync(reportPath, 'utf8');
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## API Coverage Analysis\n\n${summary}`
+              });
+            }
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Job 3: Smoke tests only (fast feedback on PRs - parallel to full suite)
+  # ─────────────────────────────────────────────────────────────────────────────
+  smoke_tests:
+    name: "Smoke Tests (fast feedback)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ env.RUBY_VERSION }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+          working-directory: examples/cucumber-ruby-complex
+
+      - name: Install dependencies
+        working-directory: examples/cucumber-ruby-complex
+        run: bundle install --jobs 4 --retry 3
+
+      - name: Start Sinatra server and run smoke tests
+        working-directory: examples/cucumber-ruby-complex
+        run: |
+          bundle exec ruby app/routes.rb &
+          SERVER_PID=$!
+          sleep 2
+
+          bundle exec cucumber \
+            --tags "@smoke" \
+            --format pretty \
+            features/
+
+          kill "$SERVER_PID" 2>/dev/null || true
+        env:
+          API_BASE_URL: ${{ env.API_BASE_URL }}
+          TEST_API_KEY: ${{ secrets.TEST_API_KEY || 'sk_test_merchant_live_key_abc123' }}

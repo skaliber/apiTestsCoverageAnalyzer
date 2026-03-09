@@ -1,0 +1,150 @@
+---
+# Business Rules for User Management & Subscription Billing API
+# These rules are enforced by the API and tested in the spec suite
+
+version: "1.0"
+domain: subscription-billing
+
+rules:
+  - id: user-deletion-requires-admin
+    name: User Deletion Requires Admin
+    description: Only users with the admin role can delete other user accounts.
+    severity: critical
+    endpoints:
+      - "DELETE /api/v1/users/:id"
+    validation: |
+      Current user must have role = 'admin'.
+      Admin cannot delete their own account.
+    error_response:
+      status: 403
+      body: { "error": "Admin privileges required" }
+    tests:
+      - non-admin attempting user deletion returns 403
+      - admin can delete other users successfully
+      - admin cannot delete their own account
+
+  - id: active-subscription-required
+    name: Active Subscription Required
+    description: Certain features require the user to have an active or trialing subscription.
+    severity: high
+    endpoints:
+      - "GET /api/v1/usage/:subscription_id"
+      - "POST /api/v1/usage/record"
+    validation: |
+      Subscription status must be 'active' or 'trialing'.
+      Cancelled, expired, and past_due subscriptions do not qualify.
+    error_response:
+      status: 402
+      body: { "error": "Active subscription required" }
+    tests:
+      - usage endpoint returns 402 when subscription is cancelled
+      - usage endpoint returns 402 when subscription is expired
+      - usage endpoint succeeds when subscription is active
+      - usage endpoint succeeds when subscription is trialing
+
+  - id: seat-limit-per-plan
+    name: Seat Limit Per Plan
+    description: The number of seats in a subscription cannot exceed the plan's defined seat limit.
+    severity: high
+    endpoints:
+      - "POST /api/v1/subscriptions/:subscription_id/seats"
+    validation: |
+      seats.active.count < plan.seat_limit must be true before adding a seat.
+    error_response:
+      status: 422
+      body:
+        error: "Seat limit reached"
+        seats_used: <current_count>
+        seats_limit: <plan_limit>
+        upgrade_url: "/api/v1/subscriptions/:id/upgrade"
+    tests:
+      - adding a seat at limit returns 422 with upgrade URL
+      - adding a seat below limit succeeds
+      - seat count in response meta is accurate
+
+  - id: invoice-payment-window
+    name: Invoice Payment Window (30 Days)
+    description: Invoices must be paid within 30 days of their due date. Overdue invoices cannot be paid via the standard endpoint.
+    severity: high
+    endpoints:
+      - "POST /api/v1/invoices/:id/pay"
+    validation: |
+      invoice.due_date must be >= Time.current (not overdue).
+      invoice.status must not be 'paid'.
+    error_response:
+      status: 422
+      body: { "error": "Invoice is overdue and cannot be paid through this endpoint" }
+    tests:
+      - paying an overdue invoice returns 422
+      - paying an already-paid invoice returns 422
+      - paying a valid pending invoice within window succeeds
+
+  - id: coupon-single-use
+    name: Coupon Single Use Per Account
+    description: Coupons marked as single_use can only be applied once per user account.
+    severity: medium
+    endpoints:
+      - "POST /api/v1/coupons/validate"
+    validation: |
+      If coupon.single_use? is true:
+        coupon.redemptions.where(user_id: current_user.id).exists? must be false
+    error_response:
+      status: 422
+      body: { "error": "Coupon has already been used by this account" }
+    tests:
+      - single-use coupon returns 422 on second use by same user
+      - single-use coupon can be used by a different user
+      - non-single-use coupon can be used multiple times
+
+  - id: subscription-cancellation-period
+    name: Subscription Cancellation Period
+    description: |
+      When a user cancels via POST /cancel, the subscription remains active until the
+      end of the current billing period. Immediate cancellation is only available via DELETE.
+    severity: medium
+    endpoints:
+      - "POST /api/v1/subscriptions/:id/cancel"
+      - "DELETE /api/v1/subscriptions/:id"
+    validation: |
+      POST /cancel: sets cancel_at_period_end = true, does not immediately change status.
+      DELETE: immediately sets status = 'cancelled'.
+    tests:
+      - POST cancel sets cancel_at_period_end to true
+      - POST cancel returns the period_end date in the response
+      - POST cancel does not immediately change subscription status
+      - DELETE immediately cancels subscription
+
+  - id: usage-quota-enforcement
+    name: Usage Quota Enforcement
+    description: Usage events cannot be recorded if they would exceed the plan's usage quota for the current billing period.
+    severity: high
+    endpoints:
+      - "POST /api/v1/usage/record"
+    validation: |
+      (current_period_usage + new_quantity) <= plan.usage_quota
+    error_response:
+      status: 422
+      body:
+        error: "Usage quota exceeded for {metric}"
+        quota: <plan_quota>
+        current_usage: <current_period_total>
+    tests:
+      - recording usage that would exceed quota returns 422 with quota info
+      - recording usage within quota succeeds
+      - quota enforcement is per billing period, not cumulative
+
+  - id: subscription-downgrade-seats
+    name: Subscription Downgrade Adjusts Seats
+    description: |
+      When downgrading to a plan with a lower seat limit, if the current seat count
+      exceeds the new plan's limit, the oldest seats are automatically deactivated.
+    severity: medium
+    endpoints:
+      - "GET /api/v1/subscriptions/:id/upgrade"
+    validation: |
+      If new_plan.seat_limit < current_seat_count:
+        Automatically deactivate (current_seat_count - new_plan.seat_limit) oldest seats.
+    tests:
+      - downgrade with excess seats auto-removes oldest seats
+      - downgrade without excess seats does not remove seats
+      - upgrade does not remove any seats

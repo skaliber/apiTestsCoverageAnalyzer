@@ -1,0 +1,31 @@
+version: 1
+project:
+  name: java-spring-complex
+  language: java
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./src/test/java/com/example/orders/tests-complete
+  language: java
+
+thresholds:
+  endpoint: 100
+  parameter: 80
+  business: 100
+  integration: 100
+  error: 80
+  security: 80
+
+qualityGate:
+  enabled: true
+  failBuildOnThresholdMiss: true
+
+businessRules:
+  file: ./business-rules.yaml
+
+integrationFlows:
+  file: ./integration-flows.yaml
+
+reports:
+  outputDir: ./reports
+  formats: [json, html]

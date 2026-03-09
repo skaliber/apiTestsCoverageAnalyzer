@@ -28,7 +28,6 @@ function getArg(flag, defaultVal) {
 const testsDir   = getArg('--tests',     'tests-complete');
 const format     = getArg('--format',    'html');
 const threshold  = getArg('--threshold', '0');
-const outputDir  = getArg('--output',    './reports');
 
 // ─── Locate analyzer binary ───────────────────────────────────────────────
 
@@ -37,56 +36,50 @@ const repoRoot    = path.resolve(__dirname, '../../..');
 
 // Try to find the binary in multiple locations
 const candidatePaths = [
-  path.join(repoRoot,    'node_modules/.bin/api-coverage'),
-  path.join(repoRoot,    'bin/api-coverage.js'),
-  path.join(projectRoot, 'node_modules/.bin/api-coverage'),
+  // Development: built dist in the monorepo root
+  { bin: path.join(repoRoot, 'dist/src/index.js'), prefix: 'node' },
+  // Installed as a local bin symlink
+  { bin: path.join(repoRoot,    'node_modules/.bin/api-coverage'), prefix: '' },
+  { bin: path.join(projectRoot, 'node_modules/.bin/api-coverage'), prefix: '' },
 ];
 
-let analyzerBin = null;
-for (const p of candidatePaths) {
-  if (fs.existsSync(p)) {
-    analyzerBin = p;
+let analyzerBin  = null;
+let analyzerPrefix = '';
+for (const candidate of candidatePaths) {
+  if (fs.existsSync(candidate.bin)) {
+    analyzerBin    = candidate.bin;
+    analyzerPrefix = candidate.prefix;
     break;
   }
 }
 
+if (!analyzerBin) {
+  console.error('[run-analyzer] Could not locate the analyzer binary.');
+  console.error('  Expected one of:');
+  candidatePaths.forEach(c => console.error('   •', c.bin));
+  console.error('  Run `npm run build` from the repository root, then retry.');
+  process.exit(1);
+}
+
 // ─── Build command ─────────────────────────────────────────────────────────
 
-let cmd;
+const binInvocation = analyzerPrefix ? `${analyzerPrefix} "${analyzerBin}"` : `"${analyzerBin}"`;
 
-if (analyzerBin) {
-  // Use locally installed binary
-  cmd = [
-    analyzerBin,
-    'endpoint-coverage',
-    '--spec',      './openapi.yaml',
-    '--tests',     `./tests/${testsDir}`,
-    '--language',  'javascript',
-    '--config',    './config.yaml',
-    '--format',    format,
-    '--output',    outputDir,
-    '--threshold', threshold,
-  ].join(' ');
-} else {
-  // Fallback: use npx for ad-hoc runs
-  console.log('[run-analyzer] Binary not found locally, falling back to npx...');
-  cmd = [
-    'npx api-coverage endpoint-coverage',
-    '--spec',      './openapi.yaml',
-    '--tests',     `./tests/${testsDir}`,
-    '--language',  'javascript',
-    '--config',    './config.yaml',
-    '--format',    format,
-    '--output',    outputDir,
-    '--threshold', threshold,
-  ].join(' ');
-}
+const cmd = [
+  binInvocation,
+  'endpoint-coverage',
+  '--spec',               './openapi.yaml',
+  '--tests',              `"./tests/${testsDir}/**/*.js"`,
+  '--language',           'javascript',
+  '--format',             format,
+  '--threshold-endpoint', threshold,
+].join(' ');
 
 // ─── Execute ──────────────────────────────────────────────────────────────
 
 console.log('[run-analyzer] Working directory:', projectRoot);
 console.log('[run-analyzer] Tests directory:  ', `tests/${testsDir}`);
-console.log('[run-analyzer] Output directory: ', outputDir);
+console.log('[run-analyzer] Output directory: ', path.join(projectRoot, 'reports'));
 console.log('[run-analyzer] Command:', cmd);
 console.log('');
 

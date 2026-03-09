@@ -1,0 +1,939 @@
+openapi: 3.0.3
+info:
+  title: Healthcare Appointments & Patient Management API
+  description: |
+    A comprehensive REST API for managing healthcare appointments, patients, doctors,
+    prescriptions, billing, and medical records.
+
+    ## Business Rules
+    This API enforces several critical business rules:
+    - **patient-data-privacy**: Patients can only access their own records
+    - **appointment-advance-booking**: Appointments must be booked at least 24h in advance
+    - **prescription-controlled-substance**: Controlled substances require two-factor confirmation
+    - **billing-insurance-first**: Insurance must be processed before patient billing
+    - **appointment-cancellation-fee**: Late cancellations incur a $50 fee
+    - **duplicate-appointment-prevention**: No overlapping patient appointments
+    - **medical-record-access-control**: Confidential records restricted to authorized doctors
+  version: "1.0.0"
+  contact:
+    name: Healthcare API Team
+    email: api@healthcare.example.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.healthcare.example.com
+    description: Production server
+
+tags:
+  - name: Patients
+    description: Patient management operations
+  - name: Doctors
+    description: Doctor information and availability
+  - name: Appointments
+    description: Appointment scheduling and management
+  - name: Prescriptions
+    description: Prescription management
+  - name: Billing
+    description: Invoice and payment operations
+  - name: Medical Records
+    description: Patient medical records
+  - name: Admin
+    description: Administrative and monitoring endpoints
+
+paths:
+  /patients:
+    get:
+      tags: [Patients]
+      summary: List all patients
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated list of patients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatients'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+    post:
+      tags: [Patients]
+      summary: Create a new patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientRequest'
+      responses:
+        "201":
+          description: Patient created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "409":
+          $ref: '#/components/responses/Conflict'
+
+  /patients/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Patients]
+      summary: Get a patient by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: X-User-Id
+          in: header
+          schema: { type: string }
+      responses:
+        "200":
+          description: Patient details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Patients]
+      summary: Update a patient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePatientRequest'
+      responses:
+        "200":
+          description: Updated patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Patients]
+      summary: Soft-delete a patient
+      responses:
+        "204":
+          description: Patient deleted
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /doctors:
+    get:
+      tags: [Doctors]
+      summary: List all doctors
+      parameters:
+        - name: specialization
+          in: query
+          schema:
+            type: string
+            enum: [GENERAL_PRACTICE, CARDIOLOGY, DERMATOLOGY, ENDOCRINOLOGY, GASTROENTEROLOGY,
+                   NEUROLOGY, ONCOLOGY, ORTHOPEDICS, PEDIATRICS, PSYCHIATRY, PULMONOLOGY,
+                   RADIOLOGY, SURGERY, UROLOGY]
+        - name: acceptingPatients
+          in: query
+          schema: { type: boolean }
+        - name: department
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of doctors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DoctorSummary'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+  /doctors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Doctors]
+      summary: Get doctor by ID
+      responses:
+        "200":
+          description: Doctor details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /doctors/{id}/availability:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Doctors]
+      summary: Get doctor availability
+      parameters:
+        - name: date
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Doctor availability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorAvailability'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /appointments:
+    get:
+      tags: [Appointments]
+      summary: List appointments
+      parameters:
+        - name: patientId
+          in: query
+          schema: { type: string }
+        - name: doctorId
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [SCHEDULED, CONFIRMED, CHECKED_IN, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW, RESCHEDULED]
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Paginated list of appointments
+        "400":
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags: [Appointments]
+      summary: Book an appointment
+      description: |
+        Creates a new appointment. Business rules enforced:
+        - Must be booked at least 24 hours in advance
+        - Patient must not have overlapping appointments
+        - Doctor must be available at the requested time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+      responses:
+        "201":
+          description: Appointment created
+        "400":
+          description: Validation error (e.g., less than 24h advance booking)
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          description: Conflict (overlapping appointment or doctor unavailable)
+          $ref: '#/components/responses/Conflict'
+
+  /appointments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Appointments]
+      summary: Get appointment by ID
+      responses:
+        "200":
+          description: Appointment details
+        "404":
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Appointments]
+      summary: Update an appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppointmentRequest'
+      responses:
+        "200":
+          description: Updated appointment
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Appointments]
+      summary: Cancel an appointment
+      description: |
+        Cancels an appointment. If cancelled within 24 hours of scheduled time,
+        a $50 cancellation fee is applied (business rule: appointment-cancellation-fee).
+      parameters:
+        - name: reason
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Cancelled appointment (may include cancellationFee)
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /appointments/{id}/check-in:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Appointments]
+      summary: Check in for an appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckInRequest'
+      responses:
+        "200":
+          description: Appointment updated to CHECKED_IN status
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /appointments/{id}/complete:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Appointments]
+      summary: Mark appointment as complete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteAppointmentRequest'
+      responses:
+        "200":
+          description: Appointment marked as COMPLETED
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /prescriptions:
+    post:
+      tags: [Prescriptions]
+      summary: Create a prescription
+      description: |
+        Creates a prescription. For controlled substances, the prescription
+        enters AWAITING_TWO_FACTOR status and returns 202 Accepted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePrescriptionRequest'
+      responses:
+        "201":
+          description: Standard prescription created
+        "202":
+          description: Controlled substance prescription awaiting two-factor confirmation
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+  /prescriptions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Prescriptions]
+      summary: Get prescription by ID
+      responses:
+        "200":
+          description: Prescription details
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /prescriptions/{id}/fulfill:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      tags: [Prescriptions]
+      summary: Fulfill a prescription
+      description: |
+        Marks a prescription as fulfilled. For controlled substances,
+        a valid 6-digit two-factor confirmation code is required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FulfillPrescriptionRequest'
+      responses:
+        "200":
+          description: Prescription fulfilled
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "403":
+          description: Two-factor confirmation required
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          description: Already fulfilled
+          $ref: '#/components/responses/Conflict'
+        "410":
+          description: Prescription expired
+
+  /billing/invoices:
+    post:
+      tags: [Billing]
+      summary: Create an invoice
+      description: Invoice starts in PENDING_INSURANCE status (billing-insurance-first rule)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        "201":
+          description: Invoice created
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+  /billing/invoices/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Billing]
+      summary: Get invoice by ID
+      responses:
+        "200":
+          description: Invoice details
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /billing/invoices/{id}/pay:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Billing]
+      summary: Pay an invoice
+      description: |
+        Process payment for an invoice. Insurance must be processed first
+        (billing-insurance-first rule). Returns 400 if insurance not yet processed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayInvoiceRequest'
+      responses:
+        "200":
+          description: Payment processed
+        "400":
+          description: Payment not allowed (e.g., insurance not yet processed)
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /medical-records/{patientId}:
+    parameters:
+      - name: patientId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Medical Records]
+      summary: Get patient medical records
+      description: |
+        Returns medical records for the specified patient.
+        Confidential records filtered based on X-User-Id and X-Doctor-Id headers.
+      parameters:
+        - name: X-User-Id
+          in: header
+          schema: { type: string }
+        - name: X-Doctor-Id
+          in: header
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of accessible medical records
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /medical-records:
+    post:
+      tags: [Medical Records]
+      summary: Create a medical record
+      description: |
+        Creates a new medical record. Requires X-Doctor-Id authentication header.
+      parameters:
+        - name: X-Doctor-Id
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMedicalRecordRequest'
+      responses:
+        "201":
+          description: Medical record created
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          description: X-Doctor-Id header required
+
+  /admin/health:
+    get:
+      tags: [Admin]
+      summary: System health check
+      responses:
+        "200":
+          description: System health status
+
+  /admin/metrics:
+    get:
+      tags: [Admin]
+      summary: System metrics
+      responses:
+        "200":
+          description: System metrics data
+
+  /admin/audit-log:
+    get:
+      tags: [Admin]
+      summary: Get audit log
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 50 }
+        - name: userId
+          in: query
+          schema: { type: string }
+        - name: resource
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated audit log
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: "NOT_FOUND"
+        message:
+          type: string
+        details:
+          type: string
+
+    Patient:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        dateOfBirth: { type: string, format: date }
+        email: { type: string, format: email }
+        phone: { type: string }
+        address:
+          $ref: '#/components/schemas/Address'
+        insuranceInfo:
+          $ref: '#/components/schemas/InsuranceInfo'
+        emergencyContact:
+          $ref: '#/components/schemas/EmergencyContact'
+        allergies:
+          type: array
+          items: { type: string }
+        isActive: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CreatePatientRequest:
+      type: object
+      required: [name, dateOfBirth, email, phone, address]
+      properties:
+        name: { type: string }
+        dateOfBirth: { type: string, format: date }
+        email: { type: string, format: email }
+        phone: { type: string }
+        address:
+          $ref: '#/components/schemas/Address'
+        insuranceInfo:
+          $ref: '#/components/schemas/InsuranceInfo'
+        emergencyContact:
+          $ref: '#/components/schemas/EmergencyContact'
+        allergies:
+          type: array
+          items: { type: string }
+
+    UpdatePatientRequest:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        address:
+          $ref: '#/components/schemas/Address'
+
+    PaginatedPatients:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientSummary'
+        totalCount: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer }
+
+    PatientSummary:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        dateOfBirth: { type: string }
+        email: { type: string }
+        isActive: { type: boolean }
+
+    Address:
+      type: object
+      required: [street, city, state, zipCode]
+      properties:
+        street: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zipCode: { type: string }
+        country: { type: string, default: "US" }
+
+    InsuranceInfo:
+      type: object
+      required: [provider, policyNumber, expiryDate, coverageType]
+      properties:
+        provider: { type: string }
+        policyNumber: { type: string }
+        groupNumber: { type: string }
+        expiryDate: { type: string, format: date }
+        coverageType:
+          type: string
+          enum: [HMO, PPO, EPO, HDHP, MEDICARE, MEDICAID]
+
+    EmergencyContact:
+      type: object
+      required: [name, relationship, phone]
+      properties:
+        name: { type: string }
+        relationship: { type: string }
+        phone: { type: string }
+
+    Doctor:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        specialization:
+          type: string
+          enum: [GENERAL_PRACTICE, CARDIOLOGY, DERMATOLOGY, ENDOCRINOLOGY, GASTROENTEROLOGY,
+                 NEUROLOGY, ONCOLOGY, ORTHOPEDICS, PEDIATRICS, PSYCHIATRY, PULMONOLOGY,
+                 RADIOLOGY, SURGERY, UROLOGY]
+        licenseNumber: { type: string }
+        email: { type: string }
+        department: { type: string }
+        consultationFee: { type: number }
+        rating: { type: number }
+        isAcceptingPatients: { type: boolean }
+        education:
+          type: array
+          items:
+            $ref: '#/components/schemas/Education'
+
+    DoctorSummary:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        specialization: { type: string }
+        department: { type: string }
+        isAcceptingPatients: { type: boolean }
+        consultationFee: { type: number }
+        rating: { type: number }
+
+    Education:
+      type: object
+      properties:
+        degree: { type: string }
+        institution: { type: string }
+        year: { type: integer }
+
+    DoctorAvailability:
+      type: object
+      properties:
+        doctorId: { type: string }
+        doctorName: { type: string }
+        availableSlots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+        nextAvailableDate: { type: string }
+
+    TimeSlot:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        startTime: { type: string }
+        endTime: { type: string }
+        isAvailable: { type: boolean }
+
+    CreateAppointmentRequest:
+      type: object
+      required: [patientId, doctorId, scheduledAt, reasonForVisit]
+      properties:
+        patientId: { type: string }
+        doctorId: { type: string }
+        scheduledAt: { type: string, format: date-time }
+        duration: { type: integer, minimum: 15, maximum: 240, default: 30 }
+        type:
+          type: string
+          enum: [IN_PERSON, TELEMEDICINE, FOLLOW_UP, EMERGENCY, ROUTINE_CHECKUP, SPECIALIST_REFERRAL]
+        reasonForVisit: { type: string }
+
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        scheduledAt: { type: string, format: date-time }
+        duration: { type: integer }
+        reasonForVisit: { type: string }
+        status: { type: string }
+        cancellationReason: { type: string }
+
+    CheckInRequest:
+      type: object
+      required: [arrivalTime]
+      properties:
+        arrivalTime: { type: string, format: date-time }
+        notes: { type: string }
+
+    CompleteAppointmentRequest:
+      type: object
+      required: [diagnosis, treatmentPlan]
+      properties:
+        diagnosis: { type: string }
+        treatmentPlan: { type: string }
+        followUpRequired: { type: boolean }
+        followUpDate: { type: string }
+        notes: { type: string }
+
+    CreatePrescriptionRequest:
+      type: object
+      required: [patientId, doctorId, medications, validUntil]
+      properties:
+        patientId: { type: string }
+        doctorId: { type: string }
+        appointmentId: { type: string }
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+        validUntil: { type: string, format: date-time }
+        notes: { type: string }
+        refillsAllowed: { type: integer, default: 0 }
+
+    FulfillPrescriptionRequest:
+      type: object
+      required: [pharmacyId, fulfilledAt]
+      properties:
+        pharmacyId: { type: string }
+        fulfilledAt: { type: string, format: date-time }
+        twoFactorCode:
+          type: string
+          pattern: '^\d{6}$'
+          description: Required for controlled substance prescriptions
+        notes: { type: string }
+
+    Medication:
+      type: object
+      required: [name, dosage, frequency, duration, instructions]
+      properties:
+        name: { type: string }
+        dosage: { type: string }
+        frequency: { type: string }
+        duration: { type: string }
+        instructions: { type: string }
+        isControlledSubstance: { type: boolean, default: false }
+        dea_schedule: { type: string }
+
+    CreateInvoiceRequest:
+      type: object
+      required: [patientId, lineItems, dueDate]
+      properties:
+        patientId: { type: string }
+        appointmentId: { type: string }
+        prescriptionId: { type: string }
+        lineItems:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/InvoiceLineItem'
+        dueDate: { type: string, format: date-time }
+        notes: { type: string }
+
+    PayInvoiceRequest:
+      type: object
+      required: [paymentMethod, amount]
+      properties:
+        paymentMethod:
+          type: string
+          enum: [CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, CASH, HSA, FSA, INSURANCE]
+        amount: { type: number, minimum: 0.01 }
+        paymentReference: { type: string }
+        notes: { type: string }
+
+    InvoiceLineItem:
+      type: object
+      required: [description, code, quantity, unitPrice, total]
+      properties:
+        description: { type: string }
+        code: { type: string }
+        quantity: { type: integer }
+        unitPrice: { type: number }
+        total: { type: number }
+        insuranceCovered: { type: boolean }
+
+    CreateMedicalRecordRequest:
+      type: object
+      required: [patientId, recordType, title, content]
+      properties:
+        patientId: { type: string }
+        appointmentId: { type: string }
+        recordType:
+          type: string
+          enum: [CONSULTATION_NOTES, LAB_REPORT, IMAGING, SURGERY_REPORT, DISCHARGE_SUMMARY,
+                 REFERRAL, VACCINATION, ALLERGY_RECORD, PROGRESS_NOTES, ANNUAL_PHYSICAL]
+        title: { type: string }
+        content: { type: string }
+        diagnosis:
+          type: array
+          items:
+            $ref: '#/components/schemas/Diagnosis'
+        vitals:
+          $ref: '#/components/schemas/Vitals'
+        isConfidential: { type: boolean, default: false }
+
+    Diagnosis:
+      type: object
+      required: [icdCode, description, severity]
+      properties:
+        icdCode: { type: string }
+        description: { type: string }
+        severity: { type: string }
+        isPrimary: { type: boolean }
+
+    Vitals:
+      type: object
+      properties:
+        bloodPressureSystolic: { type: integer }
+        bloodPressureDiastolic: { type: integer }
+        heartRate: { type: integer }
+        temperature: { type: number }
+        weight: { type: number }
+        height: { type: number }
+        oxygenSaturation: { type: integer }
+        respiratoryRate: { type: integer }

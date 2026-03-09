@@ -1,0 +1,71 @@
+##
+## Analyzer configuration for the Cucumber + Java banking platform example.
+##
+## The analyzer uses this file to locate the test source, resolve the OpenAPI
+## spec, and understand which BDD framework and helper patterns are in use.
+##
+
+language: java
+framework: cucumber
+
+# Directory (relative to this config file) that contains the BDD test source.
+testDir: src/test
+
+# Path to the OpenAPI specification that defines the API surface.
+openapiSpec: openapi.yaml
+
+# Optional supplementary rule and flow definitions.
+businessRules: business-rules.yaml
+integrationFlows: integration-flows.yaml
+
+# Base URL used when tests are run locally.
+baseUrl: http://localhost:8080
+
+## ---------------------------------------------------------------------------
+## Resolver configuration
+##
+## The analyzer must trace endpoint usage through multiple layers of
+## indirection:
+##
+##   Feature file  ->  Step definition  ->  BankingApiHelper  ->  PathConstants
+##
+## The settings below tell the analyzer which files to inspect and what
+## patterns to look for when resolving path constants to literal strings.
+## ---------------------------------------------------------------------------
+resolver:
+  # Fully-qualified class containing path constant declarations.
+  pathConstantsClass: com.example.banking.support.PathConstants
+
+  # Class that wraps RestAssured and delegates to PathConstants values.
+  apiHelperClass: com.example.banking.support.BankingApiHelper
+
+  # Low-level HTTP client that performs the actual RestAssured calls.
+  httpClientClass: com.example.banking.support.ApiClient
+
+  # Step definition packages to scan for @Given/@When/@Then annotations.
+  stepPackages:
+    - com.example.banking.steps
+
+  # RestAssured method signatures that indicate an HTTP call.
+  httpCallPatterns:
+    - "given().*.get("
+    - "given().*.post("
+    - "given().*.put("
+    - "given().*.delete("
+    - "apiClient.get("
+    - "apiClient.post("
+    - "apiClient.put("
+    - "apiClient.delete("
+
+## ---------------------------------------------------------------------------
+## Report configuration
+## ---------------------------------------------------------------------------
+reporting:
+  outputDir: build/reports/coverage-analysis
+  formats:
+    - html
+    - json
+    - markdown
+  includeUncoveredEndpoints: true
+  groupByFeature: true
+  groupByTag: true

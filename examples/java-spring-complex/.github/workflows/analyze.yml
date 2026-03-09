@@ -1,0 +1,152 @@
+name: API Coverage Analysis
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+  pull_request:
+    branches: ["main", "develop"]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  build-test-analyze:
+    runs-on: ubuntu-latest
+    name: Build, Test & Analyze Coverage
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Set up Node.js (for API coverage analyzer)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Grant execute permission to Gradlew
+        run: chmod +x examples/java-spring-complex/gradlew
+        working-directory: ${{ github.workspace }}
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+        working-directory: examples/java-spring-complex
+
+      - name: Run tests
+        run: ./gradlew test
+        working-directory: examples/java-spring-complex
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: JUnit Test Results
+          path: examples/java-spring-complex/build/test-results/test/*.xml
+          reporter: java-junit
+
+      - name: Install API Test Coverage Analyzer
+        run: npm install -g api-test-coverage-analyzer
+
+      - name: Run API Coverage Analysis (complete tests)
+        id: coverage-analysis
+        run: |
+          api-coverage analyze \
+            --config config.yaml \
+            --testDir src/test/java/com/example/orders/tests-complete \
+            --outputDir reports/complete \
+            --format json,html
+        working-directory: examples/java-spring-complex
+        continue-on-error: false
+
+      - name: Run API Coverage Analysis (initial tests - for comparison)
+        run: |
+          api-coverage analyze \
+            --config config.yaml \
+            --testDir src/test/java/com/example/orders/tests-initial \
+            --outputDir reports/initial \
+            --format json,html \
+            --no-fail-on-threshold
+        working-directory: examples/java-spring-complex
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-coverage-reports
+          path: examples/java-spring-complex/reports/
+          retention-days: 30
+
+      - name: Publish coverage summary to GitHub Step Summary
+        if: always()
+        run: |
+          REPORT_FILE="examples/java-spring-complex/reports/complete/coverage-report.json"
+          if [ -f "$REPORT_FILE" ]; then
+            echo "## API Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### E-Commerce Orders API — java-spring-complex" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Dimension | Score | Threshold | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----------|-------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const report = require('./$REPORT_FILE');
+              const scores = report.scores || {};
+              const thresholds = report.thresholds || {};
+              const rows = [
+                ['Endpoint', scores.endpoint, thresholds.endpoint],
+                ['Parameter', scores.parameter, thresholds.parameter],
+                ['Business Rules', scores.business, thresholds.business],
+                ['Integration Flows', scores.integration, thresholds.integration],
+                ['Error Paths', scores.error, thresholds.error],
+                ['Security', scores.security, thresholds.security],
+              ];
+              rows.forEach(([dim, score, threshold]) => {
+                const pct = Math.round((score || 0) * 100);
+                const thr = Math.round((threshold || 0) * 100);
+                const status = pct >= thr ? ':white_check_mark: PASS' : ':x: FAIL';
+                console.log('| ' + dim + ' | ' + pct + '% | ' + thr + '% | ' + status + ' |');
+              });
+            " >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## API Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "Report file not found. Check analyzer output above." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Post coverage comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'examples/java-spring-complex/reports/complete/coverage-report.json';
+            if (fs.existsSync(reportPath)) {
+              const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+              const scores = report.scores || {};
+              const body = [
+                '## API Coverage Analysis Results',
+                '',
+                '| Dimension | Coverage |',
+                '|-----------|----------|',
+                `| Endpoints | ${Math.round((scores.endpoint || 0) * 100)}% |`,
+                `| Business Rules | ${Math.round((scores.business || 0) * 100)}% |`,
+                `| Error Paths | ${Math.round((scores.error || 0) * 100)}% |`,
+                `| Security | ${Math.round((scores.security || 0) * 100)}% |`,
+                '',
+                `Quality Gate: ${report.qualityGatePassed ? '✅ PASSED' : '❌ FAILED'}`,
+              ].join('\n');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body,
+              });
+            }

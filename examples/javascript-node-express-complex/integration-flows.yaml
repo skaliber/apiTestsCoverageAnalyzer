@@ -1,0 +1,330 @@
+# integration-flows.yaml
+# End-to-end integration flows that describe multi-step API interactions.
+# These flows are used by the coverage analyzer to identify integration-level
+# coverage gaps beyond unit-level endpoint coverage.
+
+version: "1.0"
+domain: logistics-tracking
+
+flows:
+  - id: FLOW001
+    name: Shipment Creation to Delivery
+    description: >
+      Complete lifecycle of a shipment from creation through dispatch
+      to final delivery, including tracking event generation.
+    priority: critical
+    steps:
+      - step: 1
+        name: Validate address (pre-shipment)
+        description: Address validation should happen before shipment creation in production
+        note: "This is handled externally; set addressValidated=true in payload"
+
+      - step: 2
+        name: Create shipment
+        method: POST
+        path: /shipments
+        payload:
+          carrierId: CAR-001
+          warehouseId: WH-001
+          weightKg: 25
+          declaredValueUsd: 800
+          addressValidated: true
+          isHazmat: false
+          insured: false
+        expectedStatus: 201
+        captures:
+          - name: shipmentId
+            from: "response.data.id"
+          - name: trackingNumber
+            from: "response.data.trackingNumber"
+
+      - step: 3
+        name: Dispatch shipment
+        method: POST
+        path: /shipments/{shipmentId}/dispatch
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'dispatched'"
+
+      - step: 4
+        name: Post in-transit tracking event
+        method: POST
+        path: /tracking/events
+        payload:
+          trackingNumber: "{trackingNumber}"
+          status: in_transit
+          location:
+            city: Nashville
+            state: TN
+            country: US
+          description: "Arrived at sorting facility"
+        expectedStatus: 201
+
+      - step: 5
+        name: Mark as delivered
+        method: POST
+        path: /shipments/{shipmentId}/deliver
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'delivered'"
+          - "response.data.deliveredAt !== null"
+
+      - step: 6
+        name: Verify tracking history
+        method: GET
+        path: /tracking/history/{trackingNumber}
+        expectedStatus: 200
+        asserts:
+          - "response.data.events.length >= 2"
+          - "response.data.currentStatus === 'delivered'"
+
+  - id: FLOW002
+    name: Order Fulfillment from Warehouse
+    description: >
+      Creates an order, transitions it through processing to fulfilled,
+      and verifies warehouse inventory is accounted for.
+    priority: high
+    steps:
+      - step: 1
+        name: Check warehouse availability
+        method: GET
+        path: /warehouses/WH-001
+        expectedStatus: 200
+        asserts:
+          - "response.data.currentOccupancy < response.data.capacity"
+
+      - step: 2
+        name: Create order
+        method: POST
+        path: /orders
+        payload:
+          customerId: CUST-001
+          items:
+            - sku: WIDGET-A
+              quantity: 5
+              unitPriceUsd: 29.99
+              weightKg: 0.5
+          shippingAddress:
+            street: "123 Main St"
+            city: Springfield
+            state: IL
+            zip: "62701"
+            country: US
+        expectedStatus: 201
+        captures:
+          - name: orderId
+            from: "response.data.id"
+
+      - step: 3
+        name: Start processing order
+        method: PUT
+        path: /orders/{orderId}/status
+        payload:
+          status: processing
+        expectedStatus: 200
+
+      - step: 4
+        name: Create shipment for order
+        method: POST
+        path: /shipments
+        payload:
+          carrierId: CAR-001
+          warehouseId: WH-001
+          weightKg: 2.5
+          addressValidated: true
+        expectedStatus: 201
+        captures:
+          - name: shipmentId
+            from: "response.data.id"
+
+      - step: 5
+        name: Dispatch shipment
+        method: POST
+        path: /shipments/{shipmentId}/dispatch
+        expectedStatus: 200
+
+      - step: 6
+        name: Mark order fulfilled
+        method: PUT
+        path: /orders/{orderId}/status
+        payload:
+          status: fulfilled
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'fulfilled'"
+
+  - id: FLOW003
+    name: Return Processing
+    description: >
+      Customer initiates a return for a delivered shipment.
+      Operator reviews and approves it with notification.
+    priority: high
+    steps:
+      - step: 1
+        name: Verify shipment is delivered
+        method: GET
+        path: /shipments/{shipmentId}
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'delivered'"
+
+      - step: 2
+        name: Create return request
+        method: POST
+        path: /returns
+        payload:
+          shipmentId: "{shipmentId}"
+          customerId: CUST-001
+          reason: "Item arrived damaged"
+          items:
+            - sku: WIDGET-A
+              quantity: 2
+        expectedStatus: 201
+        captures:
+          - name: returnId
+            from: "response.data.id"
+
+      - step: 3
+        name: Retrieve return for review
+        method: GET
+        path: /returns/{returnId}
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'requested'"
+
+      - step: 4
+        name: Approve the return
+        method: PUT
+        path: /returns/{returnId}/approve
+        payload:
+          approved: true
+        expectedStatus: 200
+        asserts:
+          - "response.data.status === 'approved'"
+          - "response.data.approvedAt !== null"
+
+  - id: FLOW004
+    name: Carrier Rate Comparison
+    description: >
+      Retrieve rates from multiple carriers for the same shipment
+      weight to enable cost comparison before carrier selection.
+    priority: medium
+    steps:
+      - step: 1
+        name: List active carriers
+        method: GET
+        path: /carriers?active=true
+        expectedStatus: 200
+        captures:
+          - name: carrierIds
+            from: "response.data[*].id"
+
+      - step: 2
+        name: Get rates from carrier 1 (FastFreight)
+        method: GET
+        path: /carriers/CAR-001/rates?weightKg=50&service=ground
+        expectedStatus: 200
+        captures:
+          - name: rate1
+            from: "response.data.rates[0].total"
+
+      - step: 3
+        name: Get rates from carrier 2 (BudgetShip)
+        method: GET
+        path: /carriers/CAR-002/rates?weightKg=50&service=ground
+        expectedStatus: 200
+        captures:
+          - name: rate2
+            from: "response.data.rates[0].total"
+
+      - step: 4
+        name: Select cheapest carrier and create shipment
+        description: >
+          After comparing rate1 and rate2, select the cheapest carrier.
+          In this scenario, CAR-002 with baseRatePerKg=1.2 will be cheaper.
+        method: POST
+        path: /shipments
+        payload:
+          carrierId: CAR-002
+          warehouseId: WH-001
+          weightKg: 50
+          origin:
+            city: Atlanta
+            state: GA
+            country: US
+          destination:
+            city: Dallas
+            state: TX
+            country: US
+          addressValidated: true
+        expectedStatus: 201
+
+  - id: FLOW005
+    name: Real-time Tracking Update
+    description: >
+      Carrier webhook pushes multiple status updates for a shipment in transit.
+      System deduplicates events and maintains chronological history.
+    priority: medium
+    steps:
+      - step: 1
+        name: Post picked-up event
+        method: POST
+        path: /tracking/events
+        payload:
+          trackingNumber: "{trackingNumber}"
+          status: picked_up
+          timestamp: "2024-06-01T08:00:00Z"
+          location:
+            city: Atlanta
+            state: GA
+        expectedStatus: 201
+
+      - step: 2
+        name: Post in-transit event
+        method: POST
+        path: /tracking/events
+        payload:
+          trackingNumber: "{trackingNumber}"
+          status: in_transit
+          timestamp: "2024-06-01T14:00:00Z"
+          location:
+            city: Birmingham
+            state: AL
+        expectedStatus: 201
+
+      - step: 3
+        name: Attempt duplicate event (idempotency test)
+        method: POST
+        path: /tracking/events
+        payload:
+          trackingNumber: "{trackingNumber}"
+          status: in_transit
+          timestamp: "2024-06-01T14:00:00Z"
+          location:
+            city: Birmingham
+            state: AL
+        expectedStatus: 409
+        asserts:
+          - "response.rule === 'duplicate-tracking-prevention'"
+
+      - step: 4
+        name: Post out-for-delivery event
+        method: POST
+        path: /tracking/events
+        payload:
+          trackingNumber: "{trackingNumber}"
+          status: out_for_delivery
+          timestamp: "2024-06-02T09:00:00Z"
+          location:
+            city: Nashville
+            state: TN
+        expectedStatus: 201
+
+      - step: 5
+        name: Verify chronological history
+        method: GET
+        path: /tracking/history/{trackingNumber}
+        expectedStatus: 200
+        asserts:
+          - "response.data.total === 3"
+          - "events are sorted chronologically"

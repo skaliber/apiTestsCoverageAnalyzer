@@ -1,0 +1,128 @@
+# semgrep.yaml
+# Semgrep configuration for the Logistics Tracking API.
+# Extends standard JavaScript/Express rulesets with project-specific patterns.
+# Run: semgrep --config=semgrep.yaml src/
+
+rules:
+  # ── Authentication checks ────────────────────────────────────────────────
+
+  - id: express-route-missing-auth
+    patterns:
+      - pattern: |
+          $ROUTER.$METHOD($PATH, ..., (req, res) => { ... })
+      - pattern-not: |
+          $ROUTER.$METHOD($PATH, ..., requireAuth, ..., (req, res) => { ... })
+      - pattern-not: |
+          $ROUTER.$METHOD($PATH, ..., optionalAuth, ..., (req, res) => { ... })
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: "^(post|put|patch|delete)$"
+    message: >
+      Route '$PATH' uses a write method ($METHOD) but does not include
+      requireAuth middleware. All write endpoints must be authenticated.
+    languages: [javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-306: Missing Authentication for Critical Function"
+      owasp: "A07:2021 - Identification and Authentication Failures"
+
+  - id: hardcoded-token-value
+    pattern: |
+      const $VAR = "token-..."
+    message: >
+      Hardcoded token value '$VAR' found. These are acceptable in
+      test files but must never appear in production source.
+    paths:
+      exclude:
+        - "src/middleware/auth.js"   # This file intentionally defines test tokens
+        - "tests/**"
+    languages: [javascript]
+    severity: INFO
+    metadata:
+      category: security
+
+  # ── Injection prevention ─────────────────────────────────────────────────
+
+  - id: no-unvalidated-req-body-field
+    pattern: |
+      req.body.$X
+    pattern-not-inside: |
+      const { ... } = req.body
+    pattern-not-inside: |
+      if (req.body.$X) { ... }
+    message: >
+      Direct field access on req.body without destructuring or validation
+      may allow unexpected properties. Use destructuring with explicit
+      field lists or a validation middleware.
+    languages: [javascript]
+    severity: INFO
+    metadata:
+      category: security
+      cwe: "CWE-20: Improper Input Validation"
+
+  # ── Error handling ───────────────────────────────────────────────────────
+
+  - id: catch-block-exposes-stack-trace
+    pattern: |
+      res.status(...).json({ ..., stack: $ERR.stack, ... })
+    message: >
+      Returning err.stack in JSON responses exposes internal implementation
+      details to clients. Strip stack traces from production error responses.
+    languages: [javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      owasp: "A05:2021 - Security Misconfiguration"
+
+  - id: missing-catch-on-async-route
+    pattern: |
+      $ROUTER.$METHOD($PATH, async (req, res) => {
+        $BODY
+      })
+    pattern-not: |
+      $ROUTER.$METHOD($PATH, async (req, res) => {
+        try { ... } catch (...) { ... }
+      })
+    message: >
+      Async route handler at '$PATH' is missing a try/catch block.
+      Unhandled promise rejections in Express routes will not be passed
+      to the error middleware in Express 4.x.
+    languages: [javascript]
+    severity: WARNING
+    metadata:
+      category: reliability
+
+  # ── Rate limiting ────────────────────────────────────────────────────────
+
+  - id: route-missing-rate-limit
+    patterns:
+      - pattern: |
+          $ROUTER.post($PATH, requireAuth, ...)
+      - pattern-not: |
+          $ROUTER.post($PATH, ..., $LIMIT, ...)
+      - metavariable-regex:
+          metavariable: $LIMIT
+          regex: "Limit$"
+    message: >
+      POST route '$PATH' lacks rate limiting middleware. Add standardLimit,
+      strictLimit, or a custom createRateLimiter() instance.
+    languages: [javascript]
+    severity: INFO
+    metadata:
+      category: security
+      owasp: "A04:2021 - Insecure Design"
+
+  # ── Secrets in code ──────────────────────────────────────────────────────
+
+  - id: no-process-env-secret-logging
+    pattern: |
+      console.log(..., process.env.$SECRET, ...)
+    message: >
+      Logging environment variables may expose secrets. Avoid logging
+      process.env values directly.
+    languages: [javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"

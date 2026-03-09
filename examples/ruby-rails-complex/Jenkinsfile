@@ -1,0 +1,185 @@
+#!/usr/bin/env groovy
+
+// Jenkinsfile for Ruby on Rails API Example
+// User Management & Subscription Billing API
+
+pipeline {
+    agent {
+        docker {
+            image 'ruby:3.2-alpine'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
+
+    environment {
+        RAILS_ENV         = 'test'
+        WEBHOOK_SECRET    = credentials('webhook-secret')
+        GEM_HOME          = "${WORKSPACE}/.gems"
+        PATH              = "${GEM_HOME}/bin:${PATH}"
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        ansiColor('xterm')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'ruby --version'
+                sh 'gem --version'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    apk add --no-cache build-base postgresql-dev git nodejs npm
+                    gem install bundler --no-document
+                    bundle install --jobs 4 --retry 3
+                '''
+            }
+        }
+
+        stage('Database Setup') {
+            steps {
+                withCredentials([string(credentialsId: 'db-url', variable: 'DATABASE_URL')]) {
+                    sh '''
+                        bundle exec rails db:create
+                        bundle exec rails db:schema:load
+                    '''
+                }
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh 'bundle exec rubocop --format progress || true'
+            }
+            post {
+                always {
+                    sh 'bundle exec rubocop --format json --out reports/rubocop.json || true'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    mkdir -p reports
+                    bundle exec rspec spec/models \
+                        --format documentation \
+                        --format json \
+                        --out reports/unit-tests.json
+                '''
+            }
+            post {
+                always {
+                    junit 'reports/unit-tests.xml'
+                }
+            }
+        }
+
+        stage('API Request Tests (spec-complete)') {
+            steps {
+                sh '''
+                    bundle exec rspec spec/requests/spec-complete \
+                        --format documentation \
+                        --format json \
+                        --out reports/request-tests.json \
+                        --format RspecJunitFormatter \
+                        --out reports/request-tests.xml
+                '''
+            }
+            post {
+                always {
+                    junit 'reports/request-tests.xml'
+                    archiveArtifacts artifacts: 'reports/request-tests.json', fingerprint: true
+                }
+            }
+        }
+
+        stage('Coverage Analysis - Baseline (spec-initial ~50%)') {
+            steps {
+                sh '''
+                    npm install -g @skaliber/api-tests-coverage-analyzer
+                    api-coverage analyze \
+                        --config config.yaml \
+                        --test-dir spec/requests/spec-initial \
+                        --output-dir coverage-reports/initial \
+                        --format html,json \
+                        || true
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'coverage-reports/initial/**', fingerprint: true
+                    publishHTML(target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'coverage-reports/initial',
+                        reportFiles: 'index.html',
+                        reportName: 'API Coverage Report (Initial ~50%)'
+                    ])
+                }
+            }
+        }
+
+        stage('Coverage Analysis - Complete (spec-complete 100%)') {
+            steps {
+                sh '''
+                    api-coverage analyze \
+                        --config config.yaml \
+                        --test-dir spec/requests/spec-complete \
+                        --output-dir coverage-reports/complete \
+                        --format html,json
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'coverage-reports/complete/**', fingerprint: true
+                    publishHTML(target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'coverage-reports/complete',
+                        reportFiles: 'index.html',
+                        reportName: 'API Coverage Report (Complete 100%)'
+                    ])
+                }
+            }
+        }
+
+        stage('Coverage Gate') {
+            steps {
+                script {
+                    def report = readJSON(file: 'coverage-reports/complete/coverage-report.json')
+                    def coverage = report.summary.endpointCoverage
+
+                    echo "Endpoint Coverage: ${coverage}%"
+
+                    if (coverage < 100) {
+                        error("Coverage gate failed: ${coverage}% is below the required 100%")
+                    }
+
+                    currentBuild.description = "Coverage: ${coverage}%"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs(cleanWhenNotBuilt: false, cleanWhenFailure: false)
+        }
+        failure {
+            echo 'Pipeline failed. Check test reports and coverage analysis.'
+        }
+        success {
+            echo 'Pipeline succeeded. All tests pass and coverage is at 100%.'
+        }
+    }
+}

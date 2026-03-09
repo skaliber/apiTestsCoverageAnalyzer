@@ -1,0 +1,917 @@
+openapi: "3.0.3"
+info:
+  title: Payment Processing Platform API
+  version: "1.0.0"
+  description: |
+    RESTful API for a payment processing platform supporting payment authorization,
+    capture, void, refund, dispute management, webhook notifications, and account
+    balance management.
+
+    This OpenAPI spec is used by the api-test-coverage-analyzer to validate that
+    all declared endpoints are exercised by the Cucumber feature suite.
+  contact:
+    name: Platform Engineering
+    email: platform@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:4567
+    description: Local development server (Sinatra)
+  - url: https://api.payments-staging.example.com
+    description: Staging environment
+  - url: https://api.payments.example.com
+    description: Production environment
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Payments
+    description: Payment authorization, capture, void, and refund operations
+  - name: Refunds
+    description: Standalone refund management
+  - name: Disputes
+    description: Chargeback and dispute resolution
+  - name: Accounts
+    description: Merchant account management and balance enquiry
+  - name: Webhooks
+    description: Webhook endpoint registration and management
+  - name: Admin
+    description: Platform administration and observability
+
+paths:
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PAYMENT PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /payments:
+    post:
+      operationId: createPayment
+      summary: Create a new payment authorization
+      description: |
+        Initiates a payment authorization. The payment must subsequently be
+        captured to move funds. Supports idempotency via the Idempotency-Key header.
+      tags: [Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Payment authorized successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          $ref: "#/components/responses/InsufficientFunds"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    get:
+      operationId: listPayments
+      summary: List payments
+      description: Returns a paginated list of payments for the authenticated merchant.
+      tags: [Payments]
+      parameters:
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Page"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/PaymentStatus"
+      responses:
+        "200":
+          description: Paginated payment list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPayments"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Retrieve a payment
+      tags: [Payments]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /payments/{id}/capture:
+    post:
+      operationId: capturePayment
+      summary: Capture an authorized payment
+      description: |
+        Moves funds from the customer to the merchant. Can capture the full
+        authorized amount or a partial amount. Payment must be in "authorized" status.
+      tags: [Payments]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  description: Partial capture amount; defaults to full authorized amount
+      responses:
+        "200":
+          description: Payment captured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /payments/{id}/void:
+    post:
+      operationId: voidPayment
+      summary: Void an authorized payment
+      description: |
+        Cancels an authorized payment before capture. Only payments in
+        "authorized" status can be voided. Captured payments must be refunded instead.
+      tags: [Payments]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Payment voided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /payments/{id}/refund:
+    post:
+      operationId: refundPayment
+      summary: Create a refund via payment resource
+      description: |
+        Alternative refund endpoint accessible via the payment resource.
+        Functionally equivalent to POST /refunds with payment_id in the body.
+      tags: [Payments]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRefundViaPaymentRequest"
+      responses:
+        "201":
+          description: Refund created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REFUND PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /refunds:
+    post:
+      operationId: createRefund
+      summary: Create a standalone refund
+      description: |
+        Creates a refund for a previously captured payment. Partial refunds are
+        supported; the total of all refunds cannot exceed the original payment amount.
+      tags: [Refunds]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRefundRequest"
+      responses:
+        "201":
+          description: Refund initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /refunds/{id}:
+    get:
+      operationId: getRefund
+      summary: Retrieve a refund
+      tags: [Refunds]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Refund details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DISPUTE PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /disputes:
+    post:
+      operationId: createDispute
+      summary: Open a new dispute
+      tags: [Disputes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDisputeRequest"
+      responses:
+        "201":
+          description: Dispute opened
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dispute"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    get:
+      operationId: listDisputes
+      summary: List disputes
+      tags: [Disputes]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/DisputeStatus"
+      responses:
+        "200":
+          description: List of disputes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DisputeList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /disputes/{id}:
+    get:
+      operationId: getDispute
+      summary: Retrieve a dispute
+      tags: [Disputes]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Dispute details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dispute"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /disputes/{id}/respond:
+    put:
+      operationId: respondToDispute
+      summary: Submit a dispute response
+      description: |
+        Submits merchant evidence and a response to an open dispute.
+        Must be submitted within the 7-day response window.
+      tags: [Disputes]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisputeResponseRequest"
+      responses:
+        "200":
+          description: Response submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dispute"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ACCOUNT PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /accounts/{id}:
+    get:
+      operationId: getAccount
+      summary: Retrieve account details
+      tags: [Accounts]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /accounts/{id}/balance:
+    get:
+      operationId: getAccountBalance
+      summary: Get account balance
+      description: Returns the current available balance for the merchant account.
+      tags: [Accounts]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Account balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountBalance"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /accounts/{id}/limits:
+    patch:
+      operationId: updateAccountLimits
+      summary: Update account transaction limits
+      tags: [Accounts]
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountLimitsRequest"
+      responses:
+        "200":
+          description: Limits updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountLimits"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # WEBHOOK PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /webhooks:
+    post:
+      operationId: createWebhook
+      summary: Register a webhook endpoint
+      tags: [Webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebhookRequest"
+      responses:
+        "201":
+          description: Webhook registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ADMIN PATHS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /admin/health:
+    get:
+      operationId: getHealth
+      summary: Platform health check
+      description: Returns the current health status of all platform services.
+      tags: [Admin]
+      security: []
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      summary: Platform statistics
+      description: Returns aggregated platform-wide statistics. Requires admin access.
+      tags: [Admin]
+      responses:
+        "200":
+          description: Platform statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# COMPONENTS
+# ═══════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Authentication required or token invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Insufficient permissions for this operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Duplicate request (idempotency conflict)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InsufficientFunds:
+      description: Card declined due to insufficient funds
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Business rule violation or invalid state transition
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    PaymentStatus:
+      type: string
+      enum: [authorized, captured, voided, refunded, failed, disputed]
+
+    DisputeStatus:
+      type: string
+      enum: [open, under_review, disputed, won, lost, closed]
+
+    RefundStatus:
+      type: string
+      enum: [pending, processing, completed, failed]
+
+    CreatePaymentRequest:
+      type: object
+      required: [amount, currency, order_id]
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+          example: 100.00
+        currency:
+          type: string
+          pattern: "^[A-Z]{3}$"
+          example: USD
+        order_id:
+          type: string
+          example: ORD-001
+        customer_id:
+          type: string
+        card_number:
+          type: string
+          description: Test card number (PCI tokenized in production)
+        idempotency_key:
+          type: string
+          description: Client-supplied key to prevent duplicate payments
+
+    Payment:
+      type: object
+      properties:
+        payment_id:
+          type: string
+          example: PAY-ABC123
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        order_id:
+          type: string
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        captured_amount:
+          type: number
+          format: float
+          nullable: true
+        total_refunded:
+          type: number
+          format: float
+        merchant_id:
+          type: string
+        flags:
+          type: array
+          items:
+            type: string
+        funds_on_hold:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedPayments:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+        pagination:
+          type: object
+          properties:
+            total:
+              type: integer
+            page:
+              type: integer
+            per_page:
+              type: integer
+
+    CreateRefundRequest:
+      type: object
+      required: [payment_id, amount]
+      properties:
+        payment_id:
+          type: string
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+        reason:
+          type: string
+          enum: [customer_request, product_defect, duplicate_charge, fraudulent]
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+    CreateRefundViaPaymentRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          format: float
+        reason:
+          type: string
+
+    Refund:
+      type: object
+      properties:
+        refund_id:
+          type: string
+          example: REF-DEF456
+        payment_id:
+          type: string
+        amount:
+          type: number
+          format: float
+        reason:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+        created_at:
+          type: string
+          format: date-time
+
+    CreateDisputeRequest:
+      type: object
+      required: [payment_id, reason]
+      properties:
+        payment_id:
+          type: string
+        reason:
+          type: string
+          enum: [item_not_received, item_not_as_described, unauthorized, duplicate, subscription_cancelled]
+
+    Dispute:
+      type: object
+      properties:
+        dispute_id:
+          type: string
+          example: DSP-GHI789
+        payment_id:
+          type: string
+        reason:
+          type: string
+        status:
+          $ref: "#/components/schemas/DisputeStatus"
+        response_deadline:
+          type: string
+          format: date-time
+        response:
+          type: object
+          nullable: true
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    DisputeList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dispute"
+
+    DisputeResponseRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [rebuttal, full_counter_claim, accept]
+        description:
+          type: string
+        file_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    Account:
+      type: object
+      properties:
+        merchant_id:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended, under_review, closed]
+        currency:
+          type: string
+        limits:
+          $ref: "#/components/schemas/AccountLimits"
+        created_at:
+          type: string
+          format: date-time
+
+    AccountBalance:
+      type: object
+      properties:
+        merchant_id:
+          type: string
+        available_balance:
+          type: number
+          format: float
+        currency:
+          type: string
+        last_updated:
+          type: string
+          format: date-time
+
+    AccountLimitsRequest:
+      type: object
+      properties:
+        daily_limit:
+          type: number
+          format: float
+        per_transaction:
+          type: number
+          format: float
+        monthly_limit:
+          type: number
+          format: float
+
+    AccountLimits:
+      type: object
+      properties:
+        limits:
+          $ref: "#/components/schemas/AccountLimitsRequest"
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateWebhookRequest:
+      type: object
+      required: [url, events]
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+          example: ["payment.captured", "refund.created"]
+        merchant_id:
+          type: string
+
+    Webhook:
+      type: object
+      properties:
+        webhook_id:
+          type: string
+          example: WH-JKL012
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, inactive, failed]
+        secret:
+          type: string
+          description: HMAC-SHA256 signing secret; shown only once at creation
+        created_at:
+          type: string
+          format: date-time
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        services:
+          type: object
+          additionalProperties:
+            type: string
+
+    AdminStats:
+      type: object
+      properties:
+        total_payments_processed:
+          type: integer
+        total_refunds_issued:
+          type: integer
+        total_disputes_opened:
+          type: integer
+        active_webhooks:
+          type: integer
+        generated_at:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [error_code, message, request_id, timestamp]
+      properties:
+        error_code:
+          type: string
+          example: PAYMENT_NOT_FOUND
+        message:
+          type: string
+          example: The requested payment could not be found
+        request_id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        errors:
+          type: array
+          description: Field-level validation errors
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string

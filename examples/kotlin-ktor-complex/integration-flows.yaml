@@ -1,0 +1,302 @@
+# Integration Flows for Healthcare Appointments & Patient Management API
+# These flows describe end-to-end scenarios that span multiple endpoints
+# The analyzer uses these to assess cross-endpoint test coverage
+
+integration_flows:
+
+  - id: "FLOW001"
+    name: "Patient Registration and First Appointment"
+    description: >
+      A new patient registers in the system, verifies their record,
+      searches for an available doctor, checks availability, and books
+      their first appointment. Upon success they receive a confirmation.
+    category: "onboarding"
+    business_rules:
+      - "appointment-advance-booking"
+      - "doctor-availability-check"
+      - "duplicate-appointment-prevention"
+    steps:
+      - step: 1
+        name: "Register new patient"
+        method: POST
+        path: "/patients"
+        description: "Create patient record with personal and insurance information"
+        expected_status: 201
+        produces: "patient.id"
+
+      - step: 2
+        name: "Verify patient record"
+        method: GET
+        path: "/patients/{id}"
+        description: "Retrieve the newly created patient to confirm data"
+        expected_status: 200
+        consumes: "patient.id"
+
+      - step: 3
+        name: "Search available doctors"
+        method: GET
+        path: "/doctors"
+        description: "List doctors by specialization (e.g., GENERAL_PRACTICE)"
+        expected_status: 200
+        produces: "doctor.id"
+
+      - step: 4
+        name: "Check doctor availability"
+        method: GET
+        path: "/doctors/{id}/availability"
+        description: "Get available time slots for selected doctor"
+        expected_status: 200
+        consumes: "doctor.id"
+        produces: "available_slot"
+
+      - step: 5
+        name: "Book appointment"
+        method: POST
+        path: "/appointments"
+        description: "Book appointment at chosen available slot"
+        expected_status: 201
+        consumes:
+          - "patient.id"
+          - "doctor.id"
+          - "available_slot"
+        produces: "appointment.id"
+
+      - step: 6
+        name: "Verify appointment"
+        method: GET
+        path: "/appointments/{id}"
+        description: "Confirm appointment details and SCHEDULED status"
+        expected_status: 200
+        consumes: "appointment.id"
+
+  - id: "FLOW002"
+    name: "Appointment Check-in and Prescription"
+    description: >
+      Patient arrives for their appointment, checks in, doctor examines
+      and completes the appointment with a diagnosis, then issues a
+      prescription. Patient is notified when prescription is ready.
+    category: "clinical"
+    business_rules:
+      - "prescription-controlled-substance"
+    steps:
+      - step: 1
+        name: "Patient checks in"
+        method: POST
+        path: "/appointments/{id}/check-in"
+        description: "Record patient arrival time and check-in notes"
+        expected_status: 200
+        produces: "appointment_checked_in"
+
+      - step: 2
+        name: "Complete appointment"
+        method: POST
+        path: "/appointments/{id}/complete"
+        description: "Doctor completes appointment with diagnosis and treatment plan"
+        expected_status: 200
+        consumes: "appointment_checked_in"
+        produces: "appointment_completed"
+
+      - step: 3
+        name: "Issue prescription"
+        method: POST
+        path: "/prescriptions"
+        description: "Doctor prescribes medications (may trigger two-factor for controlled substances)"
+        expected_status: [201, 202]
+        produces: "prescription.id"
+
+      - step: 4
+        name: "Verify prescription"
+        method: GET
+        path: "/prescriptions/{id}"
+        description: "Check prescription details and current status"
+        expected_status: 200
+        consumes: "prescription.id"
+
+      - step: 5
+        name: "Fulfill prescription"
+        method: PUT
+        path: "/prescriptions/{id}/fulfill"
+        description: "Pharmacy fulfills prescription (two-factor required for controlled substances)"
+        expected_status: 200
+        consumes: "prescription.id"
+
+      - step: 6
+        name: "Create appointment medical record"
+        method: POST
+        path: "/medical-records"
+        description: "Doctor creates consultation notes for the appointment"
+        expected_status: 201
+
+  - id: "FLOW003"
+    name: "Medical Billing and Payment"
+    description: >
+      After an appointment, the billing department creates an invoice,
+      submits it to insurance, and once insurance is processed, the
+      patient pays their remaining balance.
+    category: "billing"
+    business_rules:
+      - "billing-insurance-first"
+    steps:
+      - step: 1
+        name: "Create invoice"
+        method: POST
+        path: "/billing/invoices"
+        description: "Create invoice for completed appointment with procedure codes"
+        expected_status: 201
+        produces: "invoice.id"
+
+      - step: 2
+        name: "Verify invoice status"
+        method: GET
+        path: "/billing/invoices/{id}"
+        description: "Confirm invoice is in PENDING_INSURANCE status"
+        expected_status: 200
+        consumes: "invoice.id"
+        assert: "status == PENDING_INSURANCE"
+
+      - step: 3
+        name: "Verify payment blocked before insurance"
+        method: POST
+        path: "/billing/invoices/{id}/pay"
+        description: "Attempt payment before insurance is processed (must be rejected)"
+        expected_status: 400
+        consumes: "invoice.id"
+        assert: "billing-insurance-first rule enforced"
+
+      - step: 4
+        name: "Process insurance (simulated)"
+        description: "Insurance claim submitted and approved (external process)"
+        note: "In integration tests, this may be simulated by directly updating invoice status"
+
+      - step: 5
+        name: "Patient pays balance"
+        method: POST
+        path: "/billing/invoices/{id}/pay"
+        description: "Patient pays their responsibility amount after insurance"
+        expected_status: 200
+        consumes: "invoice.id"
+
+      - step: 6
+        name: "Verify payment complete"
+        method: GET
+        path: "/billing/invoices/{id}"
+        description: "Confirm invoice status is PAID"
+        expected_status: 200
+        consumes: "invoice.id"
+        assert: "status == PAID"
+
+  - id: "FLOW004"
+    name: "Doctor Availability and Booking"
+    description: >
+      Testing the complete scheduling workflow - finding doctors,
+      checking availability, booking, and handling scheduling conflicts.
+    category: "scheduling"
+    business_rules:
+      - "appointment-advance-booking"
+      - "doctor-availability-check"
+      - "duplicate-appointment-prevention"
+    steps:
+      - step: 1
+        name: "List all doctors"
+        method: GET
+        path: "/doctors"
+        description: "Retrieve all doctors, optionally filtered by specialization"
+        expected_status: 200
+        produces: "doctor_list"
+
+      - step: 2
+        name: "Get doctor details"
+        method: GET
+        path: "/doctors/{id}"
+        description: "Get full doctor profile including consultation fee"
+        expected_status: 200
+        produces: "doctor.id"
+
+      - step: 3
+        name: "Check doctor availability"
+        method: GET
+        path: "/doctors/{id}/availability"
+        description: "Get available time slots for specific date"
+        expected_status: 200
+        produces: "available_slots"
+
+      - step: 4
+        name: "Book appointment in available slot"
+        method: POST
+        path: "/appointments"
+        description: "Successfully book in an available slot"
+        expected_status: 201
+        produces: "appointment.id"
+
+      - step: 5
+        name: "Attempt double-booking"
+        method: POST
+        path: "/appointments"
+        description: "Try to book doctor at same time (must fail)"
+        expected_status: 409
+        assert: "doctor-availability-check enforced"
+
+      - step: 6
+        name: "Cancel appointment"
+        method: DELETE
+        path: "/appointments/{id}"
+        description: "Cancel the appointment"
+        expected_status: 200
+        consumes: "appointment.id"
+
+  - id: "FLOW005"
+    name: "Medical Record Access"
+    description: >
+      Testing the medical record lifecycle - creation by doctor,
+      access control enforcement, and patient visibility rules.
+    category: "clinical"
+    business_rules:
+      - "patient-data-privacy"
+      - "medical-record-access-control"
+    steps:
+      - step: 1
+        name: "Doctor creates medical record"
+        method: POST
+        path: "/medical-records"
+        description: "Authorized doctor creates consultation notes with X-Doctor-Id header"
+        expected_status: 201
+        produces: "record.id"
+        assert: "requires X-Doctor-Id header"
+
+      - step: 2
+        name: "Verify record creation without auth fails"
+        method: POST
+        path: "/medical-records"
+        description: "Attempt without X-Doctor-Id returns 401"
+        expected_status: 401
+        assert: "medical-record-access-control enforced"
+
+      - step: 3
+        name: "Retrieve patient records as doctor"
+        method: GET
+        path: "/medical-records/{patientId}"
+        description: "Authorized doctor can see patient's records"
+        expected_status: 200
+
+      - step: 4
+        name: "Patient accesses own non-confidential records"
+        method: GET
+        path: "/medical-records/{patientId}"
+        description: "Patient with X-User-Id matching patientId sees non-confidential records"
+        expected_status: 200
+        assert: "patient-data-privacy enforced for non-confidential"
+
+      - step: 5
+        name: "Create confidential record"
+        method: POST
+        path: "/medical-records"
+        description: "Doctor creates a confidential record (isConfidential: true)"
+        expected_status: 201
+
+      - step: 6
+        name: "Verify confidential record hidden from other patients"
+        method: GET
+        path: "/medical-records/{patientId}"
+        description: "Another patient cannot see the confidential record"
+        expected_status: 200
+        assert: "confidential record not included in response for other patients"

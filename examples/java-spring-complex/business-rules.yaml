@@ -1,0 +1,124 @@
+version: 1
+rules:
+  - id: only-authenticated-users-can-place-orders
+    description: >
+      Only authenticated users with a valid JWT may create orders.
+      Anonymous/unauthenticated requests receive HTTP 401.
+    endpoints:
+      - POST /orders
+      - POST /orders/{id}/items
+    validation:
+      type: authentication
+      mechanism: jwt-bearer
+    testKeywords:
+      - unauthorized
+      - 401
+      - no token
+      - missing token
+      - invalid token
+
+  - id: inventory-check-before-order
+    description: >
+      An order item cannot be added if the product's stockQuantity is 0 or
+      less than the requested quantity. Returns HTTP 422 with a descriptive error.
+    endpoints:
+      - POST /orders/{id}/items
+    validation:
+      type: business-logic
+      condition: product.stockQuantity >= requestedQuantity
+    testKeywords:
+      - insufficient stock
+      - out of stock
+      - inventory
+      - 422
+      - stock
+
+  - id: payment-required-before-shipment
+    description: >
+      A shipment status cannot be moved to SHIPPED unless the linked payment
+      has status CAPTURED. Prevents shipping unpaid orders.
+    endpoints:
+      - PUT /shipments/{id}/status
+    validation:
+      type: business-logic
+      condition: payment.status == 'CAPTURED'
+    testKeywords:
+      - payment not captured
+      - unpaid
+      - shipment
+      - 422
+
+  - id: refund-window-30-days
+    description: >
+      Refunds must be requested within 30 calendar days of the payment capture date.
+      Requests outside the window receive HTTP 422.
+    endpoints:
+      - POST /refunds
+    validation:
+      type: business-logic
+      condition: daysSinceCapture <= 30
+    testKeywords:
+      - refund window
+      - expired
+      - 30 days
+      - 422
+
+  - id: user-deletion-requires-admin
+    description: >
+      Only users with the ADMIN role may delete user accounts.
+      Authenticated non-admin users receive HTTP 403.
+    endpoints:
+      - DELETE /users/{id}
+    validation:
+      type: authorization
+      role: ADMIN
+    testKeywords:
+      - forbidden
+      - 403
+      - admin
+      - role
+
+  - id: duplicate-order-prevention
+    description: >
+      If an order is submitted with an Idempotency-Key header that has already
+      been used, the API returns HTTP 409 Conflict instead of creating a duplicate.
+    endpoints:
+      - POST /orders
+    validation:
+      type: idempotency
+      header: Idempotency-Key
+    testKeywords:
+      - idempotency
+      - duplicate
+      - conflict
+      - 409
+
+  - id: max-order-amount-10000
+    description: >
+      A single order's totalAmount must not exceed $10,000. Adding an item that
+      would breach this limit returns HTTP 422.
+    endpoints:
+      - POST /orders/{id}/items
+    validation:
+      type: business-logic
+      condition: order.totalAmount <= 10000
+    testKeywords:
+      - max amount
+      - 10000
+      - limit exceeded
+      - 422
+
+  - id: review-requires-completed-order
+    description: >
+      A user may only submit a review for a product if they have at least one
+      DELIVERED order containing that product. Otherwise HTTP 403 is returned.
+    endpoints:
+      - POST /reviews
+    validation:
+      type: business-logic
+      condition: user.hasCompletedOrderWithProduct(productId)
+    testKeywords:
+      - completed order
+      - forbidden
+      - review
+      - 403

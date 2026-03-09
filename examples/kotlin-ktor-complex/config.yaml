@@ -1,0 +1,82 @@
+# API Tests Coverage Analyzer Configuration
+# Healthcare Appointments & Patient Management API
+
+project:
+  name: "kotlin-ktor-complex"
+  description: "Healthcare Appointments & Patient Management REST API"
+  version: "1.0.0"
+
+analyzer:
+  language: "kotlin"
+  framework: "ktor"
+  build_tool: "gradle"
+
+  source:
+    main_paths:
+      - "src/main/kotlin"
+    test_paths:
+      - "src/test/kotlin"
+
+  api_detection:
+    # Direct route registration patterns
+    route_patterns:
+      - pattern: "get\\((ApiPaths\\.\\w+)\\)"
+        type: "indirect_constant"
+      - pattern: "post\\((ApiPaths\\.\\w+)\\)"
+        type: "indirect_constant"
+      - pattern: "put\\((ApiPaths\\.\\w+)\\)"
+        type: "indirect_constant"
+      - pattern: "delete\\((ApiPaths\\.\\w+)\\)"
+        type: "indirect_constant"
+      - pattern: "route\\(ApiPaths\\.\\w+\\)"
+        type: "indirect_constant"
+      - pattern: "get\\([\"'](/[^\"']+)[\"']\\)"
+        type: "direct_string"
+      - pattern: "post\\([\"'](/[^\"']+)[\"']\\)"
+        type: "direct_string"
+      - pattern: "put\\([\"'](/[^\"']+)[\"']\\)"
+        type: "direct_string"
+      - pattern: "delete\\([\"'](/[^\"']+)[\"']\\)"
+        type: "direct_string"
+
+    # Indirect resolution: ApiPaths constants file
+    constant_resolution:
+      enabled: true
+      files:
+        - "src/main/kotlin/com/example/healthcare/helpers/ApiPaths.kt"
+      pattern: "const val (\\w+) = \"([^\"]+)\""
+
+  test_detection:
+    patterns:
+      - pattern: "client\\.(get|post|put|delete|patch)\\([\"'](/[^\"']+)[\"']\\)"
+        type: "direct_http_call"
+      - pattern: "client\\.(get|post|put|delete|patch)\\(ApiPaths\\.\\w+\\)"
+        type: "indirect_constant"
+      # HealthcareApiClient wrapper method detection
+      - pattern: "apiClient\\.(\\w+)\\("
+        type: "wrapper_method"
+      - pattern: "HealthcareApiClient.*\\.(\\w+)\\("
+        type: "wrapper_method"
+
+    wrapper_resolution:
+      enabled: true
+      files:
+        - "src/main/kotlin/com/example/healthcare/helpers/RequestBuilder.kt"
+      class_name: "HealthcareApiClient"
+
+  http_method_inference:
+    # For wrapper methods, infer HTTP method from client.get/post etc in implementation
+    enabled: true
+
+  coverage:
+    initial_test_suite: "tests-initial"
+    complete_test_suite: "tests-complete"
+
+  report:
+    format: ["html", "json", "markdown"]
+    output_dir: "reports/coverage"
+    include_business_rules: true
+    include_integration_flows: true
+    threshold:
+      warning: 60
+      error: 40

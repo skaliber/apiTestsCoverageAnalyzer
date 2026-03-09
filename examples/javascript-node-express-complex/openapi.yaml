@@ -1,0 +1,1045 @@
+openapi: "3.1.0"
+info:
+  title: Logistics & Shipment Tracking API
+  version: "1.0.0"
+  description: |
+    REST API for managing shipments, orders, warehouses, carriers,
+    returns, real-time tracking, customers, and administrative operations.
+  contact:
+    name: Platform Engineering
+    email: platform@example.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://api.logistics.example.com
+    description: Production
+
+tags:
+  - name: Shipments
+    description: Shipment lifecycle management
+  - name: Orders
+    description: Order creation and fulfillment
+  - name: Warehouses
+    description: Warehouse inventory management
+  - name: Carriers
+    description: Carrier management and rate queries
+  - name: Returns
+    description: Return request processing
+  - name: Tracking
+    description: Real-time shipment tracking events
+  - name: Customers
+    description: Customer account management
+  - name: Admin
+    description: Operational health, metrics, and audit
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Address:
+      type: object
+      properties:
+        street:  { type: string }
+        city:    { type: string }
+        state:   { type: string }
+        zip:     { type: string }
+        country: { type: string, default: "US" }
+
+    Shipment:
+      type: object
+      required: [id, carrierId, warehouseId, status, weightKg]
+      properties:
+        id:              { type: string, example: "SHP-1700000000000-1001" }
+        orderId:         { type: string, nullable: true }
+        carrierId:       { type: string, example: "CAR-001" }
+        warehouseId:     { type: string, example: "WH-001" }
+        trackingNumber:  { type: string, example: "TRK-1700000000000-1001" }
+        status:
+          type: string
+          enum: [pending, dispatched, in_transit, delivered, cancelled]
+        origin:      { $ref: '#/components/schemas/Address' }
+        destination: { $ref: '#/components/schemas/Address' }
+        weightKg:         { type: number, minimum: 0.001, maximum: 1000 }
+        declaredValueUsd: { type: number, minimum: 0 }
+        isHazmat:         { type: boolean, default: false }
+        insured:          { type: boolean, default: false }
+        addressValidated: { type: boolean, default: false }
+        dispatchedAt:     { type: string, format: date-time, nullable: true }
+        deliveredAt:      { type: string, format: date-time, nullable: true }
+        cancelledAt:      { type: string, format: date-time, nullable: true }
+        createdAt:        { type: string, format: date-time }
+        updatedAt:        { type: string, format: date-time }
+
+    Order:
+      type: object
+      properties:
+        id:           { type: string }
+        customerId:   { type: string }
+        warehouseId:  { type: string, nullable: true }
+        items:
+          type: array
+          items:
+            type: object
+            required: [sku, quantity, unitPriceUsd]
+            properties:
+              sku:          { type: string }
+              quantity:     { type: integer, minimum: 1 }
+              unitPriceUsd: { type: number, minimum: 0 }
+              weightKg:     { type: number }
+        status:
+          type: string
+          enum: [pending, processing, fulfilled, cancelled]
+        totalWeightKg:    { type: number }
+        totalValueUsd:    { type: number }
+        shippingAddress:  { $ref: '#/components/schemas/Address' }
+        shipmentId:       { type: string, nullable: true }
+        createdAt:        { type: string, format: date-time }
+        updatedAt:        { type: string, format: date-time }
+
+    Warehouse:
+      type: object
+      properties:
+        id:               { type: string }
+        name:             { type: string }
+        location:         { $ref: '#/components/schemas/Address' }
+        capacity:         { type: integer }
+        currentOccupancy: { type: integer }
+        utilizationPct:   { type: number }
+        active:           { type: boolean }
+        inventory:
+          type: object
+          additionalProperties: { type: integer }
+
+    Carrier:
+      type: object
+      properties:
+        id:              { type: string }
+        name:            { type: string }
+        code:            { type: string }
+        active:          { type: boolean }
+        hazmatCertified: { type: boolean }
+        services:
+          type: array
+          items:
+            type: string
+            enum: [ground, air, overnight, international]
+        baseRatePerKg:   { type: number }
+
+    Return:
+      type: object
+      properties:
+        id:          { type: string }
+        shipmentId:  { type: string }
+        customerId:  { type: string }
+        reason:      { type: string }
+        status:
+          type: string
+          enum: [requested, approved, rejected, completed]
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              sku:      { type: string }
+              quantity: { type: integer }
+        requestedAt: { type: string, format: date-time }
+        approvedAt:  { type: string, format: date-time, nullable: true }
+        rejectedAt:  { type: string, format: date-time, nullable: true }
+
+    TrackingEvent:
+      type: object
+      properties:
+        id:             { type: string }
+        trackingNumber: { type: string }
+        shipmentId:     { type: string, nullable: true }
+        status:         { type: string }
+        location:       { $ref: '#/components/schemas/Address' }
+        description:    { type: string }
+        timestamp:      { type: string, format: date-time }
+
+    Customer:
+      type: object
+      properties:
+        id:      { type: string }
+        name:    { type: string }
+        email:   { type: string, format: email }
+        phone:   { type: string }
+        address: { $ref: '#/components/schemas/Address' }
+        tier:
+          type: string
+          enum: [standard, enterprise]
+        active:    { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:   { type: string }
+        message: { type: string }
+        rule:    { type: string }
+        details:
+          type: array
+          items: { type: string }
+
+    PaginatedResponse:
+      type: object
+      properties:
+        data:  { type: array, items: {} }
+        total: { type: integer }
+        page:  { type: integer }
+        limit: { type: integer }
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid auth token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Insufficient role
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BusinessRuleViolation:
+      description: Business rule violated
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: State conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ── Shipments ──────────────────────────────────────────────────────────────
+  /shipments:
+    post:
+      operationId: createShipment
+      tags: [Shipments]
+      summary: Create a new shipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [carrierId, warehouseId, origin, destination, weightKg]
+              properties:
+                carrierId:        { type: string }
+                warehouseId:      { type: string }
+                origin:           { $ref: '#/components/schemas/Address' }
+                destination:      { $ref: '#/components/schemas/Address' }
+                weightKg:         { type: number, maximum: 1000 }
+                declaredValueUsd: { type: number }
+                isHazmat:         { type: boolean }
+                insured:          { type: boolean }
+                addressValidated: { type: boolean }
+      responses:
+        "201":
+          description: Shipment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+        "400": { $ref: '#/components/responses/BusinessRuleViolation' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+    get:
+      operationId: listShipments
+      tags: [Shipments]
+      summary: List shipments with optional filters
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [pending, dispatched, in_transit, delivered, cancelled] }
+        - in: query
+          name: carrierId
+          schema: { type: string }
+        - in: query
+          name: warehouseId
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Paginated list of shipments
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Shipment' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
+  /shipments/{id}:
+    get:
+      operationId: getShipment
+      tags: [Shipments]
+      summary: Get a shipment by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Shipment details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+    put:
+      operationId: updateShipment
+      tags: [Shipments]
+      summary: Update an existing shipment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carrierId:        { type: string }
+                warehouseId:      { type: string }
+                destination:      { $ref: '#/components/schemas/Address' }
+                declaredValueUsd: { type: number }
+                insured:          { type: boolean }
+                isHazmat:         { type: boolean }
+      responses:
+        "200":
+          description: Updated shipment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+    delete:
+      operationId: deleteShipment
+      tags: [Shipments]
+      summary: Delete a pending shipment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Shipment deleted
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+
+  /shipments/{id}/dispatch:
+    post:
+      operationId: dispatchShipment
+      tags: [Shipments]
+      summary: Dispatch a shipment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Shipment dispatched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+                  message: { type: string }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/BusinessRuleViolation' }
+
+  /shipments/{id}/deliver:
+    post:
+      operationId: deliverShipment
+      tags: [Shipments]
+      summary: Mark a shipment as delivered
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Shipment delivered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+
+  /shipments/{id}/cancel:
+    post:
+      operationId: cancelShipment
+      tags: [Shipments]
+      summary: Cancel a shipment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string }
+      responses:
+        "200":
+          description: Shipment cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Shipment' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+
+  /shipments/{id}/tracking:
+    get:
+      operationId: getShipmentTracking
+      tags: [Shipments]
+      summary: Get tracking info for a shipment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Tracking information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      shipmentId:     { type: string }
+                      trackingNumber: { type: string }
+                      currentStatus:  { type: string }
+                      events:
+                        type: array
+                        items: { $ref: '#/components/schemas/TrackingEvent' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── Orders ─────────────────────────────────────────────────────────────────
+  /orders:
+    post:
+      operationId: createOrder
+      tags: [Orders]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, items, shippingAddress]
+              properties:
+                customerId:      { type: string }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [sku, quantity, unitPriceUsd]
+                    properties:
+                      sku:          { type: string }
+                      quantity:     { type: integer }
+                      unitPriceUsd: { type: number }
+                      weightKg:     { type: number }
+                shippingAddress: { $ref: '#/components/schemas/Address' }
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Order' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+    get:
+      operationId: listOrders
+      tags: [Orders]
+      summary: List orders
+      parameters:
+        - in: query
+          name: customerId
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Paginated list of orders
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginatedResponse' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [Orders]
+      summary: Get an order by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Order' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+    delete:
+      operationId: deleteOrder
+      tags: [Orders]
+      summary: Delete a pending order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Order deleted
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+
+  /orders/{id}/status:
+    put:
+      operationId: updateOrderStatus
+      tags: [Orders]
+      summary: Update order status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [pending, processing, fulfilled, cancelled]
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Order' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+  # ── Warehouses ─────────────────────────────────────────────────────────────
+  /warehouses:
+    get:
+      operationId: listWarehouses
+      tags: [Warehouses]
+      summary: List all warehouses
+      parameters:
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: List of warehouses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Warehouse' }
+                  total: { type: integer }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
+  /warehouses/{id}:
+    get:
+      operationId: getWarehouse
+      tags: [Warehouses]
+      summary: Get a warehouse by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Warehouse details with utilization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Warehouse' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  /warehouses/{id}/inventory:
+    post:
+      operationId: updateWarehouseInventory
+      tags: [Warehouses]
+      summary: Update warehouse inventory
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items, operation]
+              properties:
+                operation:
+                  type: string
+                  enum: [add, remove, set]
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sku:   { type: string }
+                      units: { type: integer }
+      responses:
+        "200":
+          description: Updated inventory
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/BusinessRuleViolation' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+  # ── Carriers ───────────────────────────────────────────────────────────────
+  /carriers:
+    get:
+      operationId: listCarriers
+      tags: [Carriers]
+      summary: List carriers
+      parameters:
+        - in: query
+          name: active
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: List of carriers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Carrier' }
+                  total: { type: integer }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
+  /carriers/{id}:
+    get:
+      operationId: getCarrier
+      tags: [Carriers]
+      summary: Get a carrier by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Carrier details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Carrier' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  /carriers/{id}/rates:
+    get:
+      operationId: getCarrierRates
+      tags: [Carriers]
+      summary: Get shipping rates for a carrier
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: weightKg
+          schema: { type: number }
+        - in: query
+          name: service
+          schema: { type: string }
+      responses:
+        "200":
+          description: Rate calculations
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+  # ── Returns ────────────────────────────────────────────────────────────────
+  /returns:
+    post:
+      operationId: createReturn
+      tags: [Returns]
+      summary: Create a return request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shipmentId, customerId, reason, items]
+              properties:
+                shipmentId:  { type: string }
+                customerId:  { type: string }
+                reason:      { type: string }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sku:      { type: string }
+                      quantity: { type: integer }
+      responses:
+        "201":
+          description: Return request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Return' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/BusinessRuleViolation' }
+
+  /returns/{id}:
+    get:
+      operationId: getReturn
+      tags: [Returns]
+      summary: Get a return by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Return details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Return' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  /returns/{id}/approve:
+    put:
+      operationId: approveReturn
+      tags: [Returns]
+      summary: Approve or reject a return request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approved]
+              properties:
+                approved:        { type: boolean }
+                rejectionReason: { type: string }
+      responses:
+        "200":
+          description: Return updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Return' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "409": { $ref: '#/components/responses/Conflict' }
+
+  # ── Tracking ───────────────────────────────────────────────────────────────
+  /tracking/events:
+    post:
+      operationId: createTrackingEvent
+      tags: [Tracking]
+      summary: Create a real-time tracking event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [trackingNumber, status]
+              properties:
+                trackingNumber: { type: string }
+                shipmentId:     { type: string }
+                status:         { type: string }
+                location:       { $ref: '#/components/schemas/Address' }
+                description:    { type: string }
+                timestamp:      { type: string, format: date-time }
+      responses:
+        "201":
+          description: Tracking event created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/TrackingEvent' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "409": { $ref: '#/components/responses/Conflict' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+  /tracking/history/{trackingNumber}:
+    get:
+      operationId: getTrackingHistory
+      tags: [Tracking]
+      summary: Get tracking history by tracking number
+      parameters:
+        - in: path
+          name: trackingNumber
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Tracking history
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+  # ── Customers ──────────────────────────────────────────────────────────────
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [Customers]
+      summary: Get a customer by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Customer' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+
+    put:
+      operationId: updateCustomer
+      tags: [Customers]
+      summary: Update customer information
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:    { type: string }
+                email:   { type: string, format: email }
+                phone:   { type: string }
+                address: { $ref: '#/components/schemas/Address' }
+      responses:
+        "200":
+          description: Updated customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/Customer' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "404": { $ref: '#/components/responses/NotFound' }
+        "422": { $ref: '#/components/responses/ValidationError' }
+
+  # ── Admin ──────────────────────────────────────────────────────────────────
+  /admin/health:
+    get:
+      operationId: getAdminHealth
+      tags: [Admin]
+      summary: Application health check
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:      { type: string, enum: [ok, degraded] }
+                  version:     { type: string }
+                  uptime:      { type: number }
+                  environment: { type: string }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+
+  /admin/metrics:
+    get:
+      operationId: getAdminMetrics
+      tags: [Admin]
+      summary: Operational metrics summary
+      responses:
+        "200":
+          description: Metrics
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+
+  /admin/audit:
+    get:
+      operationId: getAdminAudit
+      tags: [Admin]
+      summary: Paginated audit log
+      parameters:
+        - in: query
+          name: action
+          schema: { type: string }
+        - in: query
+          name: resourceId
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Audit log entries
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }

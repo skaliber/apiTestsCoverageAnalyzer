@@ -1,0 +1,66 @@
+# config.yaml
+# Configuration for the API Coverage Analyzer tool.
+# Referenced by npm run analyze and CI pipelines.
+
+project:
+  name: logistics-tracking-api
+  version: "1.0.0"
+  description: Logistics & Shipment Tracking Platform
+
+# Language configuration
+language: javascript
+
+# OpenAPI specification location
+spec: ./openapi.yaml
+
+# Test directories
+testDir: ./tests/tests-complete
+testInitialDir: ./tests/tests-initial
+
+# Output configuration
+output:
+  format:
+    - html
+    - json
+    - markdown
+  directory: ./reports
+  filename: coverage-report
+
+# Coverage thresholds — build fails below these
+thresholds:
+  endpoints: 100    # all endpoints must have at least one test
+  methods:   95     # 95% of HTTP methods covered
+  scenarios: 80     # 80% of documented response codes tested
+
+# Analyzer options
+analyzer:
+  # Follow ROUTES constants for indirect resolution
+  resolveIndirectRoutes: true
+  # Trace through apiClient.js wrapper methods
+  resolveApiClientWrappers: true
+  # Include wrapper file patterns in indirect analysis
+  wrapperPatterns:
+    - "src/helpers/apiClient.js"
+    - "tests/helpers/testClient.js"
+  # Route constant file location
+  routeConstantsFile: "src/helpers/routes.js"
+  # Parse test assertions to map to endpoints
+  parseAssertions: true
+
+# Reporting integration
+reporting:
+  # GitHub step summary
+  githubStepSummary: true
+  # Post comment on PR
+  githubPrComment: true
+  # Slack webhook (override with SLACK_WEBHOOK env var)
+  slackWebhook: ""
+
+# File patterns to include/exclude
+include:
+  - "tests/**/*.test.js"
+
+exclude:
+  - "node_modules/**"
+  - "tests/helpers/**"
+  - "reports/**"

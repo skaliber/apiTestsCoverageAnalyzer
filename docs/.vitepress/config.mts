@@ -39,10 +39,16 @@ export default defineConfig({
             { text: 'Security Scanning', link: '/guide/security-scanning' },
             { text: 'MCP Integration', link: '/guide/mcp-integration' },
             { text: 'Coverage Intelligence', link: '/guide/coverage-intelligence' },
-            { text: 'TypeScript Example Project', link: '/guide/typescript-example' },
             { text: 'Interpreting Reports', link: '/guide/interpreting-reports' },
             { text: 'Writing Effective Tests', link: '/guide/writing-tests' },
             { text: 'Extending via Plugins', link: '/guide/plugins' },
+          ],
+        },
+        {
+          text: 'Example Projects',
+          items: [
+            { text: 'All Examples Overview', link: '/guide/examples' },
+            { text: 'TypeScript — Wallets & Payments', link: '/guide/typescript-example' },
           ],
         },
         {

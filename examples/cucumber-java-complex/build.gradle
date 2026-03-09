@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+}
+
+group   = 'com.example.banking'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    cucumberVersion     = '7.18.0'
+    restAssuredVersion  = '5.4.0'
+    jacksonVersion      = '2.17.1'
+    assertjVersion      = '3.26.0'
+    springVersion       = '6.1.10'
+    junitPlatformVersion = '1.11.0'
+}
+
+dependencies {
+
+    // Cucumber core
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
+
+    // JUnit 5 Platform (required by cucumber-junit-platform-engine)
+    testImplementation "org.junit.platform:junit-platform-suite:${junitPlatformVersion}"
+    testImplementation "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+
+    // RestAssured
+    testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+    testImplementation "io.rest-assured:json-path:${restAssuredVersion}"
+    testImplementation "io.rest-assured:xml-path:${restAssuredVersion}"
+
+    // Jackson (JSON serialisation for request bodies)
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    // AssertJ (fluent assertions in step definitions)
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+
+    // Spring Context (for @ScenarioScope DI between step classes)
+    testImplementation "org.springframework:spring-context:${springVersion}"
+    testImplementation "org.springframework:spring-test:${springVersion}"
+
+    // Logging
+    testImplementation 'org.slf4j:slf4j-simple:2.0.13'
+}
+
+test {
+    useJUnitPlatform()
+
+    // Pass the base URL as a system property so ApiClient can pick it up.
+    systemProperty 'banking.base-url',
+            System.getProperty('banking.base-url', 'http://localhost:8080')
+
+    // Cucumber options (also configurable via @ConfigurationParameter in runner)
+    systemProperty 'cucumber.publish.quiet', 'true'
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        showStandardStreams = false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Coverage analysis task
+// ---------------------------------------------------------------------------
+task analyzeApiCoverage(type: Exec, dependsOn: test) {
+    group       = 'verification'
+    description = 'Run the API Tests Coverage Analyzer against Cucumber results'
+
+    // Adjust the command to match however the analyzer is installed.
+    commandLine 'npx', 'api-tests-coverage-analyzer',
+            '--config', 'config.yaml',
+            '--output', 'build/reports/coverage-analysis'
+
+    doFirst {
+        println "Running API coverage analysis…"
+    }
+
+    doLast {
+        println "Coverage report written to build/reports/coverage-analysis/"
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Convenience tasks
+// ---------------------------------------------------------------------------
+task runFeature(type: Test) {
+    group       = 'verification'
+    description = 'Run a single feature file. Pass -Dcucumber.features=<path>'
+    useJUnitPlatform()
+    systemProperty 'cucumber.features',
+            System.getProperty('cucumber.features', 'src/test/resources/features')
+}

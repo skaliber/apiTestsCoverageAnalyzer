@@ -1,0 +1,263 @@
+---
+# Integration Flows for User Management & Subscription Billing API
+# End-to-end user journeys that span multiple API endpoints
+
+version: "1.0"
+domain: subscription-billing
+
+flows:
+  - id: FLOW001
+    name: User Registration and Subscription
+    description: |
+      A new user signs up, receives their account, selects a plan,
+      and creates their first subscription (potentially with a free trial).
+    actor: New User
+    preconditions:
+      - Plans are available in the system
+    steps:
+      - step: 1
+        action: Create user account
+        endpoint: "POST /api/v1/users"
+        payload:
+          email: "newuser@example.com"
+          password: "SecurePass123!"
+          first_name: "Jane"
+          last_name: "Doe"
+        expected_status: 201
+        validates: User is created with role=member, status=active
+
+      - step: 2
+        action: Authenticate and get JWT token
+        endpoint: "POST /api/v1/auth/login"
+        payload:
+          email: "newuser@example.com"
+          password: "SecurePass123!"
+        expected_status: 200
+        notes: Token used in subsequent requests
+
+      - step: 3
+        action: Browse available plans
+        endpoint: "GET /api/v1/plans"
+        expected_status: 200
+        validates: Returns active plans sorted by price
+
+      - step: 4
+        action: Select and subscribe to Professional plan
+        endpoint: "POST /api/v1/subscriptions"
+        payload:
+          plan_id: "<professional_plan_id>"
+          billing_cycle: "monthly"
+        expected_status: 201
+        validates:
+          - Subscription created with status=trialing (first subscription)
+          - trial_end_date set to 14 days from now
+          - No invoice created during trial
+
+    postconditions:
+      - User has one subscription in trialing status
+      - Audit log entry created for user_created and subscription_created
+    related_business_rules:
+      - active-subscription-required
+
+  - id: FLOW002
+    name: Plan Upgrade Flow
+    description: |
+      An existing subscriber upgrades from Starter to Professional plan.
+      If they have more seats than the new plan allows, excess seats are removed.
+    actor: Subscribed User
+    preconditions:
+      - User has an active subscription on Starter plan
+      - User has already invited team members (seats)
+    steps:
+      - step: 1
+        action: Check current subscription and seat usage
+        endpoint: "GET /api/v1/subscriptions/:id"
+        expected_status: 200
+        validates: Returns seats_used and seats_limit
+
+      - step: 2
+        action: Browse available plans to find upgrade target
+        endpoint: "GET /api/v1/plans"
+        expected_status: 200
+
+      - step: 3
+        action: Upgrade to Professional plan
+        endpoint: "GET /api/v1/subscriptions/:id/upgrade"
+        query_params:
+          plan_id: "<professional_plan_id>"
+        expected_status: 200
+        validates:
+          - Subscription plan updated
+          - Pro-rated invoice created for remaining period
+          - If seats exceeded new limit, oldest seats auto-removed
+
+      - step: 4
+        action: Verify updated subscription details
+        endpoint: "GET /api/v1/subscriptions/:id"
+        expected_status: 200
+        validates:
+          - plan.name = "Professional"
+          - seats_limit reflects new plan
+
+      - step: 5
+        action: Review invoice for upgrade proration
+        endpoint: "GET /api/v1/invoices"
+        expected_status: 200
+        validates: New invoice created for upgrade
+
+    related_business_rules:
+      - seat-limit-per-plan
+      - subscription-downgrade-seats
+
+  - id: FLOW003
+    name: Invoice Payment
+    description: |
+      A user receives an invoice for their subscription renewal
+      and pays it using a saved payment method.
+    actor: Subscribed User
+    preconditions:
+      - User has an active subscription
+      - An unpaid invoice exists within the 30-day payment window
+    steps:
+      - step: 1
+        action: List invoices to find pending ones
+        endpoint: "GET /api/v1/invoices"
+        expected_status: 200
+        validates: Returns paginated invoices, most recent first
+
+      - step: 2
+        action: View invoice details
+        endpoint: "GET /api/v1/invoices/:id"
+        expected_status: 200
+        validates:
+          - Invoice status is pending
+          - due_date is in the future or within allowed window
+          - line_items are populated
+
+      - step: 3
+        action: Pay the invoice
+        endpoint: "POST /api/v1/invoices/:id/pay"
+        payload:
+          payment_method_id: "pm_test_card_visa"
+        expected_status: 200
+        validates:
+          - Invoice status changes to paid
+          - paid_at is set to current time
+          - Audit log entry created
+
+    error_paths:
+      - scenario: Invoice is overdue
+        step: 3
+        expected_status: 422
+        expected_error: "Invoice is overdue and cannot be paid through this endpoint"
+
+      - scenario: Invoice already paid
+        step: 3
+        expected_status: 422
+        expected_error: "Invoice is already paid"
+
+    related_business_rules:
+      - invoice-payment-window
+
+  - id: FLOW004
+    name: Seat Management
+    description: |
+      An account owner adds team members to their subscription, reaching the seat limit,
+      then attempts to add another (should fail), upgrades their plan, then adds the additional seat.
+    actor: Account Owner (Subscribed)
+    preconditions:
+      - User has active Professional plan (5 seat limit)
+      - 4 seats already in use
+    steps:
+      - step: 1
+        action: View current seat usage
+        endpoint: "GET /api/v1/subscriptions/:subscription_id/seats"
+        expected_status: 200
+        validates:
+          - seats_used: 4
+          - seats_available: 1
+
+      - step: 2
+        action: Add a seat (within limit)
+        endpoint: "POST /api/v1/subscriptions/:subscription_id/seats"
+        payload:
+          email: "colleague@example.com"
+          role: "member"
+        expected_status: 201
+
+      - step: 3
+        action: Attempt to add another seat (at limit now)
+        endpoint: "POST /api/v1/subscriptions/:subscription_id/seats"
+        payload:
+          email: "another@example.com"
+        expected_status: 422
+        validates:
+          - error: "Seat limit reached"
+          - upgrade_url is present in response
+
+      - step: 4
+        action: Remove a seat to free up space
+        endpoint: "DELETE /api/v1/subscriptions/:subscription_id/seats/:id"
+        expected_status: 200
+        validates: Seat status changes to deactivated
+
+    related_business_rules:
+      - seat-limit-per-plan
+      - subscription-downgrade-seats
+
+  - id: FLOW005
+    name: Subscription Cancellation
+    description: |
+      A user decides to cancel their subscription. The cancellation is scheduled
+      for end of billing period. The subscription remains active until then.
+    actor: Subscribed User
+    preconditions:
+      - User has an active subscription
+    steps:
+      - step: 1
+        action: View subscription to confirm current period end
+        endpoint: "GET /api/v1/subscriptions/:id"
+        expected_status: 200
+        validates:
+          - cancel_at_period_end: false
+          - current_period_end is set
+
+      - step: 2
+        action: Request cancellation
+        endpoint: "POST /api/v1/subscriptions/:id/cancel"
+        expected_status: 200
+        validates:
+          - cancel_at_period_end: true
+          - status remains active (not cancelled yet)
+          - Response includes period end date
+
+      - step: 3
+        action: Verify subscription still active during period
+        endpoint: "GET /api/v1/subscriptions/:id"
+        expected_status: 200
+        validates:
+          - status: active
+          - cancel_at_period_end: true
+
+      - step: 4
+        action: Check audit log for cancellation record
+        endpoint: "GET /api/v1/audit-logs"
+        query_params:
+          action: "subscription_cancellation_scheduled"
+          resource_type: "Subscription"
+        expected_status: 200
+        validates: Audit log entry exists for the cancellation
+
+    error_paths:
+      - scenario: Cancelling an already cancelled subscription
+        step: 2
+        expected_status: 422
+        expected_error: "Subscription is already cancelled"
+
+    postconditions:
+      - Subscription cancel_at_period_end = true
+      - Subscription will be cancelled by background job at period end
+      - User retains access until period end
+    related_business_rules:
+      - subscription-cancellation-period
+      - active-subscription-required

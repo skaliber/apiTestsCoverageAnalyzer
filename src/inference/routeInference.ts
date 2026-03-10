@@ -97,6 +97,12 @@ const HANDLER_SCAN_WINDOW_MULTILINE = 25;
  * Code-based patterns take priority over JSDoc annotations for the same method+path.
  */
 export function inferRoutesFromFile(filePath: string): InferredRoute[] {
+  // Dispatch to language-specific parsers before falling back to the generic (Node/Express) path
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.java' || ext === '.kt' || ext === '.kts') {
+    return inferRoutesFromJavaFile(filePath);
+  }
+
   let content: string;
   try {
     content = fs.readFileSync(filePath, 'utf-8');
@@ -192,7 +198,102 @@ function findHandlerFunction(lines: string[], startLine: number, maxLines: numbe
   return undefined;
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
+// ─── Java / Spring inference ──────────────────────────────────────────────────
+
+/**
+ * Matches class-level @RequestMapping (sets the base path for all methods).
+ *   @RequestMapping(path = "/articles/{slug}")
+ *   @RequestMapping("/articles")
+ *   @RequestMapping("tags")          ← no leading slash
+ */
+const SPRING_CLASS_BASE_PATH =
+  /@RequestMapping\s*\(\s*(?:path\s*=\s*)?["']([^"']+)["']/;
+
+/**
+ * Matches any Spring method-mapping annotation and an optional path argument.
+ *   @GetMapping                       → GET, no sub-path
+ *   @GetMapping(path = "feed")        → GET, sub-path "feed"
+ *   @GetMapping("feed")               → GET, sub-path "feed"
+ *   @PostMapping(path = "follow")     → POST, sub-path "follow"
+ *   @RequestMapping(path = "{id}", method = RequestMethod.DELETE)
+ *   @RequestMapping(path = "/users", method = POST)
+ */
+const SPRING_METHOD_MAPPING =
+  /@(Get|Post|Put|Patch|Delete)Mapping(?:\s*\(\s*(?:path\s*=\s*)?["']([^"']*)["'])?/i;
+
+/** Matches @RequestMapping with explicit method= (used when special HTTP method needed) */
+const SPRING_REQUEST_MAPPING_EXPLICIT =
+  /@RequestMapping\s*\((?:[^)]*?\bpath\s*=\s*["']([^"']+)["'][^)]*?\bmethod\s*=\s*(?:RequestMethod\.)?([A-Z]+)|(?:[^)]*?\bmethod\s*=\s*(?:RequestMethod\.)?([A-Z]+)[^)]*?\bpath\s*=\s*["']([^"']+)["']))/;
+
+/**
+ * Infer Spring routes from a  Java or Kotlin source file.
+ * Works in two passes:
+ *  1. Scan for class-level @RequestMapping to capture the base path.
+ *  2. Scan for method-level @xMapping annotations and combine with the base.
+ */
+function inferRoutesFromJavaFile(filePath: string): InferredRoute[] {
+  let content: string;
+  try {
+    content = fs.readFileSync(filePath, 'utf-8');
+  } catch {
+    return [];
+  }
+
+  const lines = content.split('\n');
+  const byKey = new Map<string, InferredRoute>();
+
+  const addRoute = (method: HttpMethod, routePath: string, lineNumber: number) => {
+    const key = `${method}:${routePath}`;
+    if (!byKey.has(key)) {
+      byKey.set(key, { method, path: routePath, sourceFile: filePath, lineNumber, discoveredVia: 'code' });
+    }
+  };
+
+  // ── Pass 1: find class-level base path ──────────────────────────────────────
+  let basePath = '';
+  for (const line of lines) {
+    const bm = line.match(SPRING_CLASS_BASE_PATH);
+    if (bm) {
+      basePath = bm[1].startsWith('/') ? bm[1] : '/' + bm[1];
+      break;
+    }
+  }
+
+  // ── Pass 2: find method-level annotations ───────────────────────────────────
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // @GetMapping / @PostMapping / @PutMapping / @PatchMapping / @DeleteMapping
+    const mm = line.match(SPRING_METHOD_MAPPING);
+    if (mm) {
+      const httpMethod = mm[1].toLowerCase() as HttpMethod;
+      const subPath = mm[2] ?? '';
+      const fullPath = subPath
+        ? basePath + (subPath.startsWith('/') ? subPath : '/' + subPath)
+        : basePath || '/';
+      addRoute(httpMethod, fullPath, i + 1);
+      continue;
+    }
+
+    // @RequestMapping(path = "...", method = REQUEST_METHOD_...)
+    const em = line.match(SPRING_REQUEST_MAPPING_EXPLICIT);
+    if (em) {
+      // Two capture group orderings depending on which comes first
+      const rawPath = em[1] ?? em[4] ?? '';
+      const rawMethod = (em[2] ?? em[3] ?? '').toLowerCase();
+      if (rawPath && rawMethod && HTTP_METHODS.includes(rawMethod as HttpMethod)) {
+        const fullPath = rawPath.startsWith('/')
+          ? rawPath
+          : basePath + '/' + rawPath;
+        addRoute(rawMethod as HttpMethod, fullPath, i + 1);
+      }
+    }
+  }
+
+  return [...byKey.values()];
+}
+
+
 
 /**
  * Infer routes from a set of service source files.

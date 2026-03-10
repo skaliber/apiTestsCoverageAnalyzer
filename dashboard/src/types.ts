@@ -5,6 +5,15 @@ export interface SummaryItem {
   coveragePercent: number;
 }
 
+/** One step within an integration flow, with its coverage status. */
+export interface FlowStepDetail {
+  stepNumber: number;
+  name: string;
+  method?: string;
+  path?: string;
+  covered: boolean;
+}
+
 export interface DetailItem {
   id: string;
   covered: boolean;
@@ -12,6 +21,10 @@ export interface DetailItem {
   steps?: number;
   coveredSteps?: number;
   threshold?: string;
+  /** Human-readable name for integration flows (e.g. "Shipment Creation to Delivery") */
+  flowName?: string;
+  /** Detailed step-level data for integration flows */
+  rawSteps?: FlowStepDetail[];
 }
 
 export interface DetailSection {

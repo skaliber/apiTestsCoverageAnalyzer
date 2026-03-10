@@ -5,7 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import type { CoverageReport, DetailSection, DetailItem } from '../types';
+import type { CoverageReport, DetailSection, DetailItem, FlowStepDetail } from '../types';
 
 interface CoverageContextValue {
   report: CoverageReport | null;
@@ -92,19 +92,49 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
       return { id: legacyId, covered: Boolean(raw.covered), tests };
     }
     case 'integration': {
-      // Raw format: { flow: { id, name, steps, ... }, status, testFiles, steps }
+      // Raw format: { flow: { id, name, description, steps }, status, testFiles, steps: [{step, covered, matchedTests}] }
       const flowData = (raw.flow ?? {}) as { id?: string; name?: string; steps?: unknown[] };
-      const stepsArr = (raw.steps ?? flowData.steps ?? []) as unknown[];
-      const coveredStepsCount = stepsArr.filter(
-        (s) => (s as Record<string, unknown>).covered === true,
-      ).length;
+      // raw.steps = array of { step: { step, name, method, path, ... }, covered, matchedTests }
+      // flowData.steps = array of step definition objects (no coverage info)
+      const stepsArr = (raw.steps ?? []) as unknown[];
+
+      // Build rich step details preserving names, methods, paths and per-step coverage
+      const rawSteps: FlowStepDetail[] = stepsArr.map((s) => {
+        const sr = s as Record<string, unknown>;
+        const stepDef = (sr.step ?? {}) as Record<string, unknown>;
+        return {
+          stepNumber: (stepDef.step as number) ?? 0,
+          name: ((stepDef.name ?? sr.name ?? '') as string),
+          method: (stepDef.method ?? sr.method) as string | undefined,
+          path: (stepDef.path ?? sr.path) as string | undefined,
+          covered: Boolean(sr.covered),
+        };
+      });
+
+      // Fall back to flowData.steps when raw.steps is absent (demo data)
+      const effectiveSteps = rawSteps.length > 0
+        ? rawSteps
+        : (flowData.steps ?? []).map((s, i) => {
+            const sd = s as Record<string, unknown>;
+            return {
+              stepNumber: (sd.step as number) ?? i + 1,
+              name: (sd.name as string) ?? `Step ${i + 1}`,
+              method: sd.method as string | undefined,
+              path: sd.path as string | undefined,
+              covered: false,
+            } satisfies FlowStepDetail;
+          });
+
+      const coveredStepsCount = effectiveSteps.filter((s) => s.covered).length;
       const tests = (raw.testFiles ?? raw.matchedTests ?? []) as string[];
       return {
         id: flowData.id || (raw.id as string) || `flow-${idx}`,
+        flowName: (flowData.name as string) || undefined,
         covered: raw.status === 'covered' || coveredStepsCount > 0,
         tests,
-        steps: stepsArr.length,
+        steps: effectiveSteps.length,
         coveredSteps: coveredStepsCount,
+        rawSteps: effectiveSteps,
       };
     }
     case 'security': {

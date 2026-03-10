@@ -1845,18 +1845,30 @@ program
     // These are reused for endpoint, error, and business-rule coverage matching
     // (avoids multiple glob expansions which can hang on large projects).
     const TEST_DECL_RE = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
-    interface TestFileEntry { file: string; contentLower: string; descriptions: string[] }
+    // Java/Kotlin JUnit: @Test followed by a method declaration
+    const JAVA_TEST_RE = /@Test\b[^{]*?(?:public|protected|private|default)?\s+(?:\w+\s+)?(\w+)\s*\(\s*\)/g;
+    interface TestFileEntry { file: string; contentLower: string; descriptions: string[]; isJavaLike: boolean }
     const testEntries: TestFileEntry[] = artifacts.testFiles.flatMap((tf) => {
       let content = '';
       try { content = fsMod.readFileSync(tf, 'utf-8'); } catch { return []; }
       const descriptions: string[] = [];
       const contentLower = content.toLowerCase();
+      const ext = path.extname(tf).toLowerCase();
+      const isJavaLike = ext === '.java' || ext === '.kt' || ext === '.kts';
       let m: RegExpExecArray | null;
-      TEST_DECL_RE.lastIndex = 0;
-      while ((m = TEST_DECL_RE.exec(content)) !== null) {
-        descriptions.push(m[2].toLowerCase());
+      if (isJavaLike) {
+        // Extract @Test-annotated method names; convert snake_case to spaces for keyword matching
+        JAVA_TEST_RE.lastIndex = 0;
+        while ((m = JAVA_TEST_RE.exec(content)) !== null) {
+          descriptions.push(m[1].replace(/_/g, ' ').toLowerCase());
+        }
+      } else {
+        TEST_DECL_RE.lastIndex = 0;
+        while ((m = TEST_DECL_RE.exec(content)) !== null) {
+          descriptions.push(m[2].toLowerCase());
+        }
       }
-      return [{ file: tf, contentLower, descriptions }];
+      return [{ file: tf, contentLower, descriptions, isJavaLike }];
     });
 
     if (artifacts.specs.length > 0) {
@@ -2036,7 +2048,7 @@ program
 
             const errorItems = errorCandidateRules.map((rule) => {
               const matchedTestDescriptions: string[] = [];
-              for (const { file, descriptions } of testEntries) {
+              for (const { file, descriptions, isJavaLike, contentLower } of testEntries) {
                 // Match at TEST DESCRIPTION level, not file level
                 // Require: description contains an error indicator + at least one specific keyword
                 const specificKws = rule.specificKeywords ?? [];
@@ -2052,6 +2064,27 @@ program
                 });
                 if (matchingDescs.length > 0) {
                   matchedTestDescriptions.push(...matchingDescs.map((d) => `[${path.basename(file)}] ${d}`));
+                } else if (isJavaLike) {
+                  // Java/Kotlin: test method names rarely contain exception class names.
+                  // Check file body for specific long keywords (≥8 chars, e.g. "authorization")
+                  // combined with HTTP 4xx status checks or exception throws.
+                  const specificLongKws = specificKws
+                    .filter((k) => k.length >= 8)
+                    .map((k) => k.toLowerCase());
+                  if (specificLongKws.length > 0 && specificLongKws.some((kw) => contentLower.includes(kw))) {
+                    const hasErrorInContent =
+                      /\.statuscode\s*\(\s*[45]\d{2}|throw\s+new\s+\w*exception/i.test(contentLower);
+                    if (hasErrorInContent) {
+                      // Prefer test methods that look like error/boundary tests
+                      const errorDescs = descriptions.filter((d) =>
+                        /\b(4\d\d|error|fail|forbidden|unauthorized|invalid|exception|not.?found)\b/.test(d),
+                      );
+                      const descsToReport = errorDescs.length > 0 ? errorDescs : descriptions.slice(0, 1);
+                      matchedTestDescriptions.push(
+                        ...descsToReport.map((d) => `[${path.basename(file)}] ${d}`),
+                      );
+                    }
+                  }
                 }
               }
               return {
@@ -2153,13 +2186,26 @@ program
           const kwsLower = rule.keywords.map((k) => k.toLowerCase());
           const matchedDescs: string[] = [];
           const matchedFileSet = new Set<string>();
-          for (const { file, descriptions } of testEntries) {
+          for (const { file, descriptions, isJavaLike, contentLower } of testEntries) {
             const hitting = descriptions.filter((desc) =>
               kwsLower.length > 0 && kwsLower.some((kw) => desc.includes(kw)),
             );
             if (hitting.length > 0) {
               matchedDescs.push(...hitting);
               matchedFileSet.add(file);
+            } else if (isJavaLike) {
+              // Java/Kotlin: test method names may not contain exception class names.
+              // Fall back to checking the file body for specific long keywords (≥8 chars).
+              const specificLongKws = kwsLower.filter((k) => k.length >= 8);
+              if (specificLongKws.length > 0 && specificLongKws.some((kw) => contentLower.includes(kw))) {
+                // Prefer tests that look like error/boundary tests; otherwise include all
+                const relevantDescs = descriptions.filter((d) =>
+                  /\b(4\d\d|error|fail|forbidden|unauthorized|invalid|exception|not.?found)\b/.test(d),
+                );
+                const descsToAdd = relevantDescs.length > 0 ? relevantDescs : descriptions;
+                matchedDescs.push(...descsToAdd);
+                matchedFileSet.add(file);
+              }
             }
           }
           return {
@@ -2276,6 +2322,32 @@ program
       }
 
       console.log(`\nReports written to: ${reportsDir}`);
+
+      // ── 4f-intel. Run coverage intelligence automatically ─────────────────
+      try {
+        const coverageResultsForIntel = allCoverageResults.map((r) => ({
+          type: r.type,
+          totalItems: r.totalItems,
+          coveredItems: r.coveredItems,
+          coveragePercent: r.coveragePercent,
+          details: normalizeDetailsForIntelligence(r.type, r.details),
+        }));
+        const intelReport = runIntelligenceEngine({
+          coverageResults: coverageResultsForIntel,
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          projectName: path.basename(rootDir),
+          outDir: reportsDir,
+        });
+        console.log(`\nCoverage Intelligence: ${intelReport.summary.totalFindings} findings, ` +
+          `${intelReport.summary.totalRecommendations} recommendations ` +
+          `(${intelReport.summary.criticalUncoveredItems} critical uncovered)`);
+        if (intelReport.summary.recommendationsByPriority.P0 > 0) {
+          console.log(`⚠️  P0 Recommendations: ${intelReport.summary.recommendationsByPriority.P0} — immediate action required`);
+        }
+      } catch (intelErr) {
+        warnings.push(`Coverage intelligence failed: ${intelErr instanceof Error ? intelErr.message : String(intelErr)}`);
+      }
     }
 
     // ── 4f. Write scan manifest ────────────────────────────────────────────

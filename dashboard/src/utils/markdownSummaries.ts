@@ -1,8 +1,10 @@
-import type { CoverageReport, DetailSection, DetailItem } from '../types';
+import type { CoverageReport, DetailSection, DetailItem, FlowStepDetail } from '../types';
 
 interface FlowItem extends DetailItem {
   steps?: number;
   coveredSteps?: number;
+  flowName?: string;
+  rawSteps?: FlowStepDetail[];
 }
 
 function coveragePercent(section: DetailSection | undefined): number {
@@ -99,22 +101,77 @@ ${formatGapList(gaps)}
 `;
 }
 
-export function generateMermaidFlowchart(items: FlowItem[]): string {
-  if (items.length === 0) return '';
-  const lines: string[] = ['graph TD'];
-  items.forEach((item) => {
-    const nodeId = item.id.replace(/[^a-zA-Z0-9]/g, '_');
-    const cssClass = item.covered ? 'covered' : 'uncovered';
-    lines.push(`  ${nodeId}["${item.id}"]`);
-    lines.push(`  class ${nodeId} ${cssClass}`);
+/** Sanitise a string so it is safe inside Mermaid double-quoted node labels. */
+function safeMermaidLabel(text: string): string {
+  return text
+    .replace(/"/g, "'")   // no unescaped double-quotes inside labels
+    .replace(/</g, '‹')   // no raw < to avoid HTML injection in some renderers
+    .replace(/>/g, '›')
+    .replace(/\r?\n/g, ' ');
+}
+
+/**
+ * Generate a Mermaid flowchart for a single integration flow.
+ * Each step is a node; covered steps are green, uncovered red.
+ * Returns an empty string when no step data is available.
+ */
+export function generateFlowMermaid(item: FlowItem): string {
+  const steps = item.rawSteps;
+  if (!steps || steps.length === 0) return '';
+
+  const lines: string[] = ['flowchart LR'];
+  const coveredNodes: string[] = [];
+  const uncoveredNodes: string[] = [];
+
+  steps.forEach((step, i) => {
+    const nodeId = `S${i + 1}`;
+    const stepName = safeMermaidLabel(step.name || `Step ${step.stepNumber || i + 1}`);
+    const endpoint = step.method && step.path
+      ? `<br/>${step.method} ${safeMermaidLabel(step.path)}`
+      : '';
+    lines.push(`  ${nodeId}["${i + 1}. ${stepName}${endpoint}"]`);
+    if (step.covered) {
+      coveredNodes.push(nodeId);
+    } else {
+      uncoveredNodes.push(nodeId);
+    }
   });
-  // Link consecutive items
-  for (let i = 0; i < items.length - 1; i++) {
-    const a = items[i].id.replace(/[^a-zA-Z0-9]/g, '_');
-    const b = items[i + 1].id.replace(/[^a-zA-Z0-9]/g, '_');
-    lines.push(`  ${a} --> ${b}`);
+
+  // Connect steps sequentially
+  for (let i = 0; i < steps.length - 1; i++) {
+    lines.push(`  S${i + 1} --> S${i + 2}`);
+  }
+
+  if (coveredNodes.length > 0) {
+    lines.push(`  class ${coveredNodes.join(',')} covered`);
+  }
+  if (uncoveredNodes.length > 0) {
+    lines.push(`  class ${uncoveredNodes.join(',')} uncovered`);
   }
   lines.push('  classDef covered fill:#22c55e,color:#fff,stroke:#16a34a');
+  lines.push('  classDef uncovered fill:#ef4444,color:#fff,stroke:#dc2626');
+  return lines.join('\n');
+}
+
+/**
+ * High-level overview chart showing all flows as labelled nodes.
+ * Used in the AI summary markdown; per-flow detail diagrams are rendered in the page itself.
+ */
+export function generateMermaidFlowchart(items: FlowItem[]): string {
+  if (items.length === 0) return '';
+  const lines: string[] = ['flowchart TD'];
+  items.forEach((item) => {
+    const nodeId = item.id.replace(/[^a-zA-Z0-9]/g, '_');
+    const label = safeMermaidLabel(item.flowName || item.id);
+    const pct = item.steps && item.steps > 0
+      ? Math.round(((item.coveredSteps ?? 0) / item.steps) * 100)
+      : (item.covered ? 100 : 0);
+    const stepSuffix = item.steps ? `<br/>${item.coveredSteps ?? 0}/${item.steps} steps` : '';
+    lines.push(`  ${nodeId}["${label}${stepSuffix}"]`);
+    lines.push(`  class ${nodeId} ${pct === 100 ? 'covered' : pct > 0 ? 'partial' : 'uncovered'}`);
+  });
+  lines.push('  classDef covered fill:#22c55e,color:#fff,stroke:#16a34a');
+  lines.push('  classDef partial fill:#f59e0b,color:#fff,stroke:#d97706');
   lines.push('  classDef uncovered fill:#ef4444,color:#fff,stroke:#dc2626');
   return lines.join('\n');
 }

@@ -40,19 +40,35 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
 
   switch (sectionKey) {
     case 'endpoint': {
-      const ep = (raw.endpoint ?? {}) as { method?: string; path?: string };
-      const tests = (raw.matchedTests ?? []) as string[];
+      // Real analyzer format: { method, path, covered, testFiles, ... }
+      // Demo/legacy format:   { endpoint: { method, path }, covered, ... }
+      const epNested = (raw.endpoint ?? {}) as { method?: string; path?: string };
+      const method = ((raw.method as string) || epNested.method || '') as string;
+      const pathStr = ((raw.path as string) || epNested.path || '') as string;
+      const tests = (raw.testFiles ?? raw.matchedTests ?? []) as string[];
       return {
-        id: `${ep.method ?? ''} ${ep.path ?? ''}`.trim() || `endpoint-${idx}`,
+        id: `${method} ${pathStr}`.trim() || `endpoint-${idx}`,
         covered: Boolean(raw.covered),
         tests,
       };
     }
+    case 'parameter': {
+      // Raw format: { parameter: { name, location, method, path, ... }, ratio, validValue, ... }
+      const param = (raw.parameter ?? {}) as { name?: string; location?: string; in?: string; method?: string; path?: string };
+      const location = param.location ?? param.in ?? 'query';
+      const name = param.name ?? `param-${idx}`;
+      const ratio = (raw.ratio as number) ?? 0;
+      const tests = (raw.matchedTests ?? raw.testFiles ?? []) as string[];
+      return {
+        id: `${param.method ? param.method + ' ' : ''}${param.path ? param.path + ':' : ''}${location}.${name}`,
+        covered: ratio > 0,
+        tests,
+      };
+    }
     case 'business': {
-      // Handle BusinessRuleCoverage format: { rule: { id, ... }, covered, matchedTests }
-      // AND inferred/direct format: { id, covered, matchedTests }
-      const ruleData = (raw.rule ?? {}) as { id?: string; description?: string };
-      const tests = (raw.matchedTests ?? []) as string[];
+      // Raw format: { rule: { id, name, description, ... }, covered, matchedTests }
+      const ruleData = (raw.rule ?? {}) as { id?: string; name?: string; description?: string };
+      const tests = (raw.matchedTests ?? raw.testFiles ?? []) as string[];
       return {
         id: ruleData.id || (raw.name as string) || (raw.id as string) || `rule-${idx}`,
         covered: Boolean(raw.covered),
@@ -60,22 +76,35 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
       };
     }
     case 'error': {
-      // Handle inferred error format: { id, description, covered, matchedTests }
-      // AND OpenAPI-derived format: { endpoint: { method, path }, errorCodes, covered }
-      if (typeof raw.id === 'string') {
-        return {
-          id: raw.id,
-          covered: Boolean(raw.covered),
-          tests: (raw.matchedTests ?? raw.tests) as string[] | undefined,
-        };
+      // Real analyzer format: { scenario: { id, endpoint, statusCode, ... }, covered, matchedTests }
+      // Demo/legacy format:   { endpoint: { method, path }, errorCodes, covered }
+      const scenario = (raw.scenario ?? {}) as { id?: string; endpoint?: string; statusCode?: number };
+      const epNested = (raw.endpoint ?? {}) as { method?: string; path?: string };
+      const tests = (raw.matchedTests ?? raw.testFiles ?? []) as string[];
+      if (scenario.id) {
+        return { id: scenario.id, covered: Boolean(raw.covered), tests };
       }
-      const ep = (raw.endpoint ?? {}) as { method?: string; path?: string };
+      // Legacy: build id from endpoint + error codes
       const codes = (raw.errorCodes ?? []) as string[];
-      const codeStr = codes.length ? ` (${codes.join(', ')})` : '';
+      const codeStr = codes.length ? `:${codes.join(',')}` : '';
+      const legacyId =
+        `${epNested.method ?? ''} ${epNested.path ?? ''}${codeStr}`.trim() || `error-${idx}`;
+      return { id: legacyId, covered: Boolean(raw.covered), tests };
+    }
+    case 'integration': {
+      // Raw format: { flow: { id, name, steps, ... }, status, testFiles, steps }
+      const flowData = (raw.flow ?? {}) as { id?: string; name?: string; steps?: unknown[] };
+      const stepsArr = (raw.steps ?? flowData.steps ?? []) as unknown[];
+      const coveredStepsCount = stepsArr.filter(
+        (s) => (s as Record<string, unknown>).covered === true,
+      ).length;
+      const tests = (raw.testFiles ?? raw.matchedTests ?? []) as string[];
       return {
-        id: (`${ep.method ?? ''} ${ep.path ?? ''}${codeStr}`).trim() || `error-${idx}`,
-        covered: Boolean(raw.covered),
-        tests: [],
+        id: flowData.id || (raw.id as string) || `flow-${idx}`,
+        covered: raw.status === 'covered' || coveredStepsCount > 0,
+        tests,
+        steps: stepsArr.length,
+        coveredSteps: coveredStepsCount,
       };
     }
     case 'security': {
@@ -100,6 +129,17 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
   }
 }
 
+// Maps each coverage type to the array property that holds its items
+const SECTION_ARRAY_KEY: Record<string, string> = {
+  endpoint: 'endpoints',
+  parameter: 'parameters',
+  error: 'scenarios',
+  integration: 'flows',
+  security: 'controls',
+  performance: 'results',
+  resilience: 'results',
+};
+
 export function normalizeSection(value: unknown, sectionKey: string): DetailSection {
   if (Array.isArray(value)) {
     return {
@@ -119,6 +159,21 @@ export function normalizeSection(value: unknown, sectionKey: string): DetailSect
       return {
         ...obj,
         items: (obj.rules as unknown[]).map((item, idx) =>
+          normalizeItem(item as Record<string, unknown>, sectionKey, idx),
+        ),
+      } as DetailSection;
+    }
+    // Use the preferred array key for this section type, or fall back to the first array found.
+    // Covers endpoint→endpoints, parameter→parameters, error→scenarios, integration→flows, etc.
+    const preferredKey = SECTION_ARRAY_KEY[sectionKey];
+    const arrayKey =
+      preferredKey && Array.isArray(obj[preferredKey])
+        ? preferredKey
+        : Object.keys(obj).find((k) => Array.isArray(obj[k]));
+    if (arrayKey) {
+      return {
+        ...obj,
+        items: (obj[arrayKey] as unknown[]).map((item, idx) =>
           normalizeItem(item as Record<string, unknown>, sectionKey, idx),
         ),
       } as DetailSection;

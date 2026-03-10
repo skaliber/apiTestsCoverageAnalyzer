@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-09T13:35:36.199Z",
+  "generatedAt": "2026-03-10T09:42:20.288Z",
   "summary": [
     {
       "type": "endpoint",
@@ -5349,5 +5349,21 @@
       "otlpEndpoint": null,
       "note": "Tracing not enabled (use --trace to enable)"
     }
+  },
+  "discoveryInfo": {
+    "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex",
+    "analyzedAt": "2026-03-10T09:42:20.289Z",
+    "languages": [
+      "javascript",
+      "typescript"
+    ],
+    "frameworks": [
+      "jest",
+      "cucumber"
+    ],
+    "serviceFilesCount": 24,
+    "testFilesCount": 12,
+    "specFilesCount": 1,
+    "analysisMode": "explicit-spec"
   }
 }

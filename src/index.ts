@@ -1404,12 +1404,23 @@ function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] 
 
   switch (type) {
     case 'endpoint': {
-      const eps = obj.endpoints;
+      // Spec-based: { endpoints: [{ method, path, covered }] }
+      // Inferred:   { items: [{ id: "GET /path", covered, matchedTests, source_file }] }
+      const eps = (obj.endpoints ?? obj.items) as Array<Record<string, unknown>> | undefined;
       if (!Array.isArray(eps)) return [];
-      return (eps as Array<Record<string, unknown>>).map((e) => ({
-        endpoint: { method: e.method, path: e.path },
-        covered: e.covered ?? false,
-      }));
+      return eps.map((e) => {
+        let method = e.method as string | undefined;
+        let epPath = e.path as string | undefined;
+        // Inferred format stores id as "METHOD /path"
+        if (!method && !epPath && typeof e.id === 'string') {
+          const parts = (e.id as string).split(' ');
+          if (parts.length >= 2) { method = parts[0]; epPath = parts.slice(1).join(' '); }
+        }
+        return {
+          endpoint: { method, path: epPath },
+          covered: e.covered ?? false,
+        };
+      });
     }
     case 'parameter': {
       const params = obj.parameters;
@@ -1456,15 +1467,46 @@ function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] 
       });
     }
     case 'error': {
-      const scenarios = obj.scenarios;
-      if (!Array.isArray(scenarios)) return [];
-      return (scenarios as Array<Record<string, unknown>>).map((s) => {
+      // Spec-based: { scenarios: [{ scenario: { method, path, errorCode }, covered }] }
+      // Inferred:   { items: [{ id, description, covered, source_location, code_snippet }] }
+      const rawItems = (obj.scenarios ?? obj.items) as Array<Record<string, unknown>> | undefined;
+      if (!Array.isArray(rawItems)) return [];
+      return rawItems.map((s) => {
         const sc = s.scenario as Record<string, unknown> | undefined;
+        if (sc) {
+          // Spec-based format
+          return {
+            endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+            covered: s.covered ?? false,
+            errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
+            name: sc?.id,
+          };
+        }
+        // Inferred format — synthesize errorCodes from exception/condition patterns
+        const desc = ((s.description as string) ?? '').toLowerCase();
+        const id = (s.id as string) ?? '';
+        const syntheticCodes: string[] = [];
+        if (/unauthorized|no.*authorization|forbidden/.test(desc + id)) syntheticCodes.push('403');
+        else if (/authentication|invalid.*auth|invalid_auth/.test(desc + id)) syntheticCodes.push('401');
+        else if (/not.*found|resource.*not/.test(desc + id)) syntheticCodes.push('404');
+        else if (/illegal.*argument|invalid.*param|bad.*request/.test(desc + id)) syntheticCodes.push('400');
+        else if (/null.*check|npe|null_check/.test(desc + id)) syntheticCodes.push('500');
+        // Fall back to a generic code so the intelligence engine generates a finding
+        if (syntheticCodes.length === 0) syntheticCodes.push('exception');
+        // Extract a rough endpoint path from source_location (e.g. "...api/ArticleApi.java:54")
+        // Handle Api, Controller, Resource, Handler, Mutation, Datafetcher, Filter, Service
+        const sourceLocation = (s.source_location as string) ?? '';
+        const fileMatch = sourceLocation.match(
+          /\/([A-Z][a-zA-Z]+?)(?:Api|Controller|Resource|Handler|Mutation|Datafetcher|Filter|QueryService|Repository)\.java/i,
+        );
+        const endpointPath = fileMatch
+          ? `/${fileMatch[1].toLowerCase()}`
+          : undefined;
         return {
-          endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+          endpoint: endpointPath ? { path: endpointPath } : undefined,
           covered: s.covered ?? false,
-          errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
-          name: sc?.id,
+          errorCodes: syntheticCodes,
+          name: id,
         };
       });
     }

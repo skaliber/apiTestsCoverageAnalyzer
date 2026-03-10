@@ -49,14 +49,26 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
       };
     }
     case 'business': {
+      // Handle BusinessRuleCoverage format: { rule: { id, ... }, covered, matchedTests }
+      // AND inferred/direct format: { id, covered, matchedTests }
+      const ruleData = (raw.rule ?? {}) as { id?: string; description?: string };
       const tests = (raw.matchedTests ?? []) as string[];
       return {
-        id: (raw.name as string) || (raw.id as string) || `rule-${idx}`,
+        id: ruleData.id || (raw.name as string) || (raw.id as string) || `rule-${idx}`,
         covered: Boolean(raw.covered),
         tests,
       };
     }
     case 'error': {
+      // Handle inferred error format: { id, description, covered, matchedTests }
+      // AND OpenAPI-derived format: { endpoint: { method, path }, errorCodes, covered }
+      if (typeof raw.id === 'string') {
+        return {
+          id: raw.id,
+          covered: Boolean(raw.covered),
+          tests: (raw.matchedTests ?? raw.tests) as string[] | undefined,
+        };
+      }
       const ep = (raw.endpoint ?? {}) as { method?: string; path?: string };
       const codes = (raw.errorCodes ?? []) as string[];
       const codeStr = codes.length ? ` (${codes.join(', ')})` : '';
@@ -96,8 +108,21 @@ export function normalizeSection(value: unknown, sectionKey: string): DetailSect
       ),
     };
   }
-  if (value && typeof value === 'object' && 'items' in value) {
-    return value as DetailSection;
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    if ('items' in obj && Array.isArray(obj.items)) {
+      // Already has an items array — preserve all extra keys (e.g. inferred_details, source)
+      return obj as DetailSection;
+    }
+    // Handle business coverage format: { rules: [...], inferred_details: {...}, ... }
+    if ('rules' in obj && Array.isArray(obj.rules)) {
+      return {
+        ...obj,
+        items: (obj.rules as unknown[]).map((item, idx) =>
+          normalizeItem(item as Record<string, unknown>, sectionKey, idx),
+        ),
+      } as DetailSection;
+    }
   }
   return { items: [] };
 }

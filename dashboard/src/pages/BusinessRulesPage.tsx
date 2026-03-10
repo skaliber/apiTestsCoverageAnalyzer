@@ -85,7 +85,7 @@ export default function BusinessRulesPage() {
                       </p>
                     )}
                     {(() => {
-                      const inferred = (section as Record<string, unknown>)['inferred_details'] as
+                      const inferred = section['inferred_details'] as
                         | Record<string, InferredRuleDetail>
                         | undefined;
                       const detail = inferred?.[item.id];
@@ -123,9 +123,17 @@ export default function BusinessRulesPage() {
                             </div>
                           )}
                           {!item.covered && (
-                            <p className="text-amber-600 dark:text-amber-400 text-xs mt-1">
-                              ⚠ Gap: No tests found matching this rule's keywords. Add a test that covers the condition above.
-                            </p>
+                            <div className="text-amber-600 dark:text-amber-400 text-xs mt-2">
+                              <p className="font-medium">⚠ Gap: No tests covering this rule were found.</p>
+                              {detail.specificKeywords && detail.specificKeywords.length > 0 && (
+                                <p className="mt-1">
+                                  To cover this rule, add a test whose name contains:{' '}
+                                  <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">
+                                    {detail.specificKeywords.join(', ')}
+                                  </code>
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
                       );

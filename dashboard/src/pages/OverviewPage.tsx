@@ -151,6 +151,64 @@ export default function OverviewPage() {
         </table>
       </div>
 
+      {/* Discovery Info (shown when analyze command was run without YAML spec) */}
+      {(report as unknown as Record<string, unknown>).discoveryInfo && (() => {
+        const di = (report as unknown as Record<string, unknown>).discoveryInfo as {
+          projectRoot?: string;
+          languages?: string[];
+          frameworks?: string[];
+          serviceFilesCount?: number;
+          testFilesCount?: number;
+          specFilesCount?: number;
+          analysisMode?: string;
+        };
+        return (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
+            <h2 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
+              🔍 Scan Discovery Info
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs text-blue-700 dark:text-blue-400">
+              {di.analysisMode && (
+                <div>
+                  <span className="font-medium block">Mode</span>
+                  <span>{di.analysisMode === 'inferred' ? 'Zero-config (inferred)' : 'Explicit spec'}</span>
+                </div>
+              )}
+              {di.languages && di.languages.length > 0 && (
+                <div>
+                  <span className="font-medium block">Languages</span>
+                  <span>{di.languages.join(', ')}</span>
+                </div>
+              )}
+              {di.frameworks && di.frameworks.length > 0 && (
+                <div>
+                  <span className="font-medium block">Frameworks</span>
+                  <span>{di.frameworks.join(', ')}</span>
+                </div>
+              )}
+              {di.serviceFilesCount !== undefined && (
+                <div>
+                  <span className="font-medium block">Source Files</span>
+                  <span>{di.serviceFilesCount}</span>
+                </div>
+              )}
+              {di.testFilesCount !== undefined && (
+                <div>
+                  <span className="font-medium block">Test Files</span>
+                  <span>{di.testFilesCount}</span>
+                </div>
+              )}
+              {di.specFilesCount !== undefined && (
+                <div>
+                  <span className="font-medium block">API Specs</span>
+                  <span>{di.specFilesCount}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Bar Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Coverage by Type</h2>

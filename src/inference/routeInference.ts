@@ -7,8 +7,13 @@
  *
  * Patterns supported:
  *  - Express/Koa: router.get('/path', ...) / app.post('/path', ...)
+ *  - Multi-line: router.get(\n  '/path', ...) — path on next line
  *  - Chained: router.route('/path').get(...).post(...)
- *  - JSDoc route annotations: @route {GET} /path
+ *  - JSDoc route annotations: @route {GET} /path (used only when no code pattern found)
+ *
+ * Deduplication:
+ *  - Routes are deduplicated by method:path within each file.
+ *  - Actual code patterns take priority over JSDoc annotations.
  */
 
 import * as fs from 'fs';
@@ -22,8 +27,12 @@ export type HttpMethod = typeof HTTP_METHODS[number];
 export interface InferredRoute {
   method: HttpMethod;
   path: string;
+  /** Primary service function called in the route handler, if detectable */
+  handlerFunction?: string;
   sourceFile: string;
   lineNumber: number;
+  /** How this route was discovered */
+  discoveredVia: 'code' | 'jsdoc';
 }
 
 export interface RouteInferenceResult {
@@ -34,21 +43,58 @@ export interface RouteInferenceResult {
 
 // ─── Patterns ─────────────────────────────────────────────────────────────────
 
-/** Matches: router.get('/path', ...) or app.post('/path', ...) */
-const ROUTER_METHOD_PATTERN =
+/** Matches: router.get('/path', ...) or app.post('/path', ...) — on a single line */
+const ROUTER_METHOD_INLINE =
   /(?:router|app|server)\s*\.\s*(get|post|put|patch|delete|head|options)\s*\(\s*['"`]([^'"`]+)['"`]/i;
 
-/** Matches: .route('/path').get(...) — chained route definition */
+/**
+ * Matches the beginning of a router.method( call that spans multiple lines.
+ * Group 1 = method name (get|post|...).
+ * The route path is expected on the same or next line.
+ */
+const ROUTER_METHOD_MULTILINE_START =
+  /(?:router|app|server)\s*\.\s*(get|post|put|patch|delete|head|options)\s*\(\s*$/i;
+
+/** Matches a standalone route path string (first arg in multi-line route) */
+const ROUTE_PATH_LINE = /^\s*['"`]([^'"`]+)['"`]\s*,?\s*$/;
+
+/** Matches: router.route('/path').get(...) — chained route definition */
 const CHAINED_ROUTE_PATTERN = /(?:router|app)\s*\.\s*route\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/i;
 const CHAINED_METHOD_PATTERN = /\.\s*(get|post|put|patch|delete|head|options)\s*\(/gi;
 
 /** Matches JSDoc @route {GET} /path */
 const JSDOC_ROUTE_PATTERN = /@route\s+\{(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\}\s+(\S+)/i;
 
+/**
+ * Matches the primary async service function call within a route handler body.
+ * e.g. `await deleteComment(...)` or `const result = await getArticles(...)`.
+ * Group 1 = function name.
+ *
+ * Note: This only detects `await`-based async calls. Synchronous handlers
+ * (e.g. `res.json(getUsers())`) are not matched by this pattern.
+ */
+const HANDLER_FUNCTION_PATTERN = /(?:await|const\s+\w+\s*=\s*await)\s+([a-zA-Z][a-zA-Z0-9]*)\s*\(/;
+
+/**
+ * Number of source lines scanned ahead to find the primary handler function
+ * when the route is defined on a single line (router.method('/path', ...)).
+ * The inline form starts the handler function close to the route definition.
+ */
+const HANDLER_SCAN_WINDOW_INLINE = 20;
+
+/**
+ * Number of source lines scanned ahead to find the primary handler function
+ * when the route is defined with the path on the next line. The multi-line
+ * form has more preamble (middleware, auth, etc.) before the handler function.
+ */
+const HANDLER_SCAN_WINDOW_MULTILINE = 25;
+
 // ─── Core inference function ──────────────────────────────────────────────────
 
 /**
  * Infer routes from a single source file.
+ * Routes are deduplicated by method:path within the file.
+ * Code-based patterns take priority over JSDoc annotations for the same method+path.
  */
 export function inferRoutesFromFile(filePath: string): InferredRoute[] {
   let content: string;
@@ -59,35 +105,59 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
   }
 
   const lines = content.split('\n');
-  const routes: InferredRoute[] = [];
-  const seen = new Set<string>();
+  // key = "method:path" → route (code-found routes win over jsdoc)
+  const byKey = new Map<string, InferredRoute>();
+
+  const addRoute = (
+    method: HttpMethod,
+    routePath: string,
+    lineNumber: number,
+    discoveredVia: 'code' | 'jsdoc',
+    handlerFunction?: string,
+  ) => {
+    const key = `${method}:${routePath}`;
+    const existing = byKey.get(key);
+    // Prefer code-discovered over jsdoc; if same source, first occurrence wins
+    if (!existing || (discoveredVia === 'code' && existing.discoveredVia === 'jsdoc')) {
+      byKey.set(key, { method, path: routePath, handlerFunction, sourceFile: filePath, lineNumber, discoveredVia });
+    }
+  };
 
   for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
     const line = lines[lineIdx];
 
-    // 1. Direct router.method('/path', ...) pattern
-    const directMatch = line.match(ROUTER_METHOD_PATTERN);
-    if (directMatch) {
-      const method = directMatch[1].toLowerCase() as HttpMethod;
-      const routePath = directMatch[2];
-      const key = `${method}:${routePath}:${filePath}:${lineIdx}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        routes.push({ method, path: routePath, sourceFile: filePath, lineNumber: lineIdx + 1 });
-      }
+    // 1a. router.method('/path', ...) — all on one line
+    const inlineMatch = line.match(ROUTER_METHOD_INLINE);
+    if (inlineMatch) {
+      const method = inlineMatch[1].toLowerCase() as HttpMethod;
+      const routePath = inlineMatch[2];
+      // Scan up to HANDLER_SCAN_WINDOW_INLINE following lines for the primary await function call
+      const handlerFn = findHandlerFunction(lines, lineIdx, HANDLER_SCAN_WINDOW_INLINE);
+      addRoute(method, routePath, lineIdx + 1, 'code', handlerFn);
       continue;
     }
 
-    // 2. JSDoc @route annotation
+    // 1b. router.method(\n  '/path', ...) — method and path on separate lines
+    const multilineStart = line.match(ROUTER_METHOD_MULTILINE_START);
+    if (multilineStart && lineIdx + 1 < lines.length) {
+      const nextLine = lines[lineIdx + 1];
+      const pathMatch = nextLine.match(ROUTE_PATH_LINE);
+      if (pathMatch) {
+        const method = multilineStart[1].toLowerCase() as HttpMethod;
+        const routePath = pathMatch[1];
+        const handlerFn = findHandlerFunction(lines, lineIdx, HANDLER_SCAN_WINDOW_MULTILINE);
+        addRoute(method, routePath, lineIdx + 1, 'code', handlerFn);
+        lineIdx++; // skip the path line
+        continue;
+      }
+    }
+
+    // 2. JSDoc @route annotation (only added if no code pattern found for same route)
     const jsDocMatch = line.match(JSDOC_ROUTE_PATTERN);
     if (jsDocMatch) {
       const method = jsDocMatch[1].toLowerCase() as HttpMethod;
       const routePath = jsDocMatch[2];
-      const key = `${method}:${routePath}:${filePath}:${lineIdx}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        routes.push({ method, path: routePath, sourceFile: filePath, lineNumber: lineIdx + 1 });
-      }
+      addRoute(method, routePath, lineIdx + 1, 'jsdoc');
       continue;
     }
 
@@ -95,23 +165,31 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
     const chainedPathMatch = line.match(CHAINED_ROUTE_PATTERN);
     if (chainedPathMatch) {
       const routePath = chainedPathMatch[1];
-      // Gather methods from subsequent lines (up to 5 lines ahead for chaining)
       const windowEnd = Math.min(lineIdx + 5, lines.length);
       const windowText = lines.slice(lineIdx, windowEnd).join(' ');
       let methodMatch: RegExpExecArray | null;
       CHAINED_METHOD_PATTERN.lastIndex = 0;
       while ((methodMatch = CHAINED_METHOD_PATTERN.exec(windowText)) !== null) {
         const method = methodMatch[1].toLowerCase() as HttpMethod;
-        const key = `${method}:${routePath}:${filePath}:${lineIdx}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          routes.push({ method, path: routePath, sourceFile: filePath, lineNumber: lineIdx + 1 });
-        }
+        addRoute(method, routePath, lineIdx + 1, 'code');
       }
     }
   }
 
-  return routes;
+  return [...byKey.values()];
+}
+
+/**
+ * Scan ahead in the source lines from `startLine` to find the first awaited
+ * service function call in the route handler body.
+ */
+function findHandlerFunction(lines: string[], startLine: number, maxLines: number): string | undefined {
+  const end = Math.min(startLine + maxLines, lines.length);
+  for (let i = startLine; i < end; i++) {
+    const m = lines[i].match(HANDLER_FUNCTION_PATTERN);
+    if (m) return m[1];
+  }
+  return undefined;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────

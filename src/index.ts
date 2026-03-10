@@ -1928,21 +1928,70 @@ program
 
           console.log(`\nAnalyzing endpoint coverage (from inferred routes)...`);
 
-          // For each route, check if any test file references the route path and/or method
+          // Read test file contents for matching
           const testContents = artifacts.testFiles.map((tf) => {
-            try { return { file: tf, content: fsMod.readFileSync(tf, 'utf-8').toLowerCase() }; }
+            try { return { file: tf, content: fsMod.readFileSync(tf, 'utf-8') }; }
             catch { return { file: tf, content: '' }; }
           });
 
+          // Extract test descriptions for fine-grained matching
+          const TEST_DECL_PATTERN = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
+          interface TestFileEntries { file: string; contentLower: string; descriptions: string[] }
+          const testEntries: TestFileEntries[] = testContents.map(({ file, content }) => {
+            const descriptions: string[] = [];
+            const contentLower = content.toLowerCase();
+            let m: RegExpExecArray | null;
+            TEST_DECL_PATTERN.lastIndex = 0;
+            while ((m = TEST_DECL_PATTERN.exec(content)) !== null) {
+              descriptions.push(m[2].toLowerCase());
+            }
+            return { file, contentLower, descriptions };
+          });
+
           const endpointItems = routeResult.routes.map((route) => {
-            const pathSegments = route.path.split('/').filter((s) => s.length > 0 && !s.startsWith(':'));
+            const pathSegments = route.path.split('/').filter(
+              (s) => s.length > 1 && !s.startsWith(':'),
+            );
             const method = route.method.toLowerCase();
+            // Leaf path segment is the most specific identifier (e.g., "comments", "favorite", "feed")
+            const leafSegment = pathSegments[pathSegments.length - 1] ?? '';
             const matchedTests: string[] = [];
 
-            for (const { file, content } of testContents) {
-              const hasMethod = content.includes(method);
-              const hasPath = pathSegments.some((seg) => content.includes(seg));
-              if (hasMethod && hasPath) {
+            for (const { file, contentLower, descriptions } of testEntries) {
+              let matched = false;
+
+              // Priority 1: handler function name appears in test file imports/calls
+              if (route.handlerFunction) {
+                const fnLower = route.handlerFunction.toLowerCase();
+                if (contentLower.includes(fnLower)) {
+                  matched = true;
+                }
+              }
+
+              // Priority 2: test description mentions method + leaf path segment
+              if (!matched && leafSegment.length > 2) {
+                matched = descriptions.some((desc) =>
+                  desc.includes(method) && desc.includes(leafSegment),
+                );
+              }
+
+              // Priority 3: test description mentions the exact path
+              if (!matched && route.path.length >= 1) {
+                matched = descriptions.some((desc) => desc.includes(route.path.toLowerCase()));
+              }
+
+              // Priority 4: test file directly calls the URL path (e.g., axios.get('/articles'))
+              if (!matched && pathSegments.length > 0) {
+                // Check for full path string in file (e.g., axios.get('/articles/feed'))
+                const quotedPathPattern = new RegExp(
+                  `['"\`]${route.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"\`]`,
+                );
+                if (quotedPathPattern.test(contentLower)) {
+                  matched = true;
+                }
+              }
+
+              if (matched) {
                 matchedTests.push(path.basename(file));
               }
             }
@@ -1951,7 +2000,8 @@ program
             return {
               id: `${route.method.toUpperCase()} ${route.path}`,
               covered,
-              tests: matchedTests,
+              matchedTests,
+              handler_function: route.handlerFunction,
               source_file: route.sourceFile,
               line_number: route.lineNumber,
             };
@@ -1984,21 +2034,32 @@ program
             );
 
             const errorItems = errorCandidateRules.map((rule) => {
-              const matchedTests: string[] = [];
-              for (const { file, content } of testContents) {
-                const hasErrorKeyword = ERROR_TEST_KEYWORDS.some((kw) => content.includes(kw));
-                const hasSpecificKw = rule.specificKeywords.length === 0 ||
-                  rule.specificKeywords.some((kw) => content.includes(kw.toLowerCase()));
-                if (hasErrorKeyword && hasSpecificKw) {
-                  matchedTests.push(path.basename(file));
+              const matchedTestDescriptions: string[] = [];
+              for (const { file, descriptions } of testEntries) {
+                // Match at TEST DESCRIPTION level, not file level
+                // Require: description contains an error indicator + at least one specific keyword
+                const specificKws = rule.specificKeywords ?? [];
+                const matchingDescs = descriptions.filter((desc) => {
+                  const hasErrorKeyword = ERROR_TEST_KEYWORDS.some((kw) => desc.includes(kw));
+                  if (!hasErrorKeyword) return false;
+                  // If we have specific keywords, at least one must match in the description
+                  if (specificKws.length > 0) {
+                    return specificKws.some((kw) => desc.includes(kw.toLowerCase()));
+                  }
+                  // No specific keywords — use handler function name as fallback
+                  return true;
+                });
+                if (matchingDescs.length > 0) {
+                  matchedTestDescriptions.push(...matchingDescs.map((d) => `[${path.basename(file)}] ${d}`));
                 }
               }
               return {
                 id: rule.id,
-                description: rule.name,
-                covered: matchedTests.length > 0,
-                tests: matchedTests,
+                description: rule.condition,
+                covered: matchedTestDescriptions.length > 0,
+                matchedTests: matchedTestDescriptions,
                 source_location: rule.source_location,
+                code_snippet: rule.code_snippet,
               };
             });
 
@@ -2097,6 +2158,7 @@ program
                 condition: r.condition,
                 code_snippet: r.code_snippet,
                 type: r.type,
+                specificKeywords: r.specificKeywords,
               };
               return acc;
             }, {} as Record<string, unknown>),
@@ -2166,6 +2228,26 @@ program
     if (allCoverageResults.length > 0) {
       const observabilityInfo = buildObservabilityInfo(metricsPort);
       generateMultiFormatReports(allCoverageResults, ['json'], reportsDir, {}, observabilityInfo);
+
+      // Append discoveryInfo to coverage-summary.json for the dashboard
+      const summaryPath = path.join(reportsDir, 'coverage-summary.json');
+      try {
+        const summaryJson = JSON.parse(fsMod.readFileSync(summaryPath, 'utf-8')) as Record<string, unknown>;
+        summaryJson.discoveryInfo = {
+          projectRoot: rootDir,
+          analyzedAt: new Date().toISOString(),
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          serviceFilesCount: artifacts.serviceFiles.length,
+          testFilesCount: artifacts.testFiles.length,
+          specFilesCount: artifacts.specs.length,
+          analysisMode: artifacts.specs.length > 0 ? 'explicit-spec' : 'inferred',
+        };
+        fsMod.writeFileSync(summaryPath, JSON.stringify(summaryJson, null, 2), 'utf-8');
+      } catch {
+        // Non-fatal — discovery info is also in scan-manifest.json
+      }
+
       console.log(`\nReports written to: ${reportsDir}`);
     }
 
@@ -2178,7 +2260,9 @@ program
         itemsCovered: r.coveredItems,
         coveragePercent: r.coveragePercent,
       }));
-      // Add skipped types
+      // Add skipped types (exclude 'business' and 'integration' since these are always attempted
+      // via rule/flow inference regardless of whether a spec file is present; their absence from
+      // allCoverageResults means no rules or flows were discovered, which is informative on its own.)
       const coveredTypes = new Set(allCoverageResults.map((r) => r.type));
       for (const skippedType of KNOWN_METRIC_TYPES.filter((t) => t !== 'business' && t !== 'integration')) {
         if (!coveredTypes.has(skippedType as CoverageResult['type'])) {

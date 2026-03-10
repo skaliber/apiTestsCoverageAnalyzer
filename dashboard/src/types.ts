@@ -16,6 +16,8 @@ export interface DetailItem {
 
 export interface DetailSection {
   items: DetailItem[];
+  /** Preserved extra properties from the raw report (e.g. inferred_details) */
+  [key: string]: unknown;
 }
 
 export interface CoverageReport {
@@ -53,4 +55,5 @@ export interface InferredRuleDetail {
   condition?: string;
   code_snippet?: string;
   type?: string;
+  specificKeywords?: string[];
 }

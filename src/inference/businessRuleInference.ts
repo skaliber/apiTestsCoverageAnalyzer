@@ -318,6 +318,8 @@ export function extractSpecificKeywords(condition: string): string[] {
   const kwSet = new Set<string>();
 
   // 1. Extract contents of quoted strings (field names, messages)
+  // Minimum length of 2 prevents single-character tokens like punctuation or abbreviations
+  // from polluting the keyword set (e.g. single-char matches from `{ e: [...] }`).
   const quotedMatches = condition.match(/['"]([^'"]{2,})['"]/g) ?? [];
   for (const q of quotedMatches) {
     const inner = q.slice(1, -1);

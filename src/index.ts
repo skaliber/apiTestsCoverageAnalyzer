@@ -1833,10 +1833,31 @@ program
     // ── 4. Full coverage analysis → coverage-summary.json ─────────────────
     const allCoverageResults: CoverageResult[] = [];
     const fsMod = require('fs') as typeof import('fs');
+    // When test files are explicitly discovered, use them directly.
+    // Otherwise fall back to a test-file-pattern glob (avoids scanning node_modules
+    // or the entire project tree, which can hang on large repositories).
     const testsGlob = artifacts.testFiles.length > 0
       ? '{' + artifacts.testFiles.join(',') + '}'
-      : path.join(rootDir, '**', '*');
+      : path.join(rootDir, '**', '*.{test,spec}.{js,ts,jsx,tsx,mjs,cjs,py,rb}');
     const detectedLanguages = artifacts.languages as SupportedLanguage[];
+
+    // Pre-compute test entries once from the discovered test files.
+    // These are reused for endpoint, error, and business-rule coverage matching
+    // (avoids multiple glob expansions which can hang on large projects).
+    const TEST_DECL_RE = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
+    interface TestFileEntry { file: string; contentLower: string; descriptions: string[] }
+    const testEntries: TestFileEntry[] = artifacts.testFiles.flatMap((tf) => {
+      let content = '';
+      try { content = fsMod.readFileSync(tf, 'utf-8'); } catch { return []; }
+      const descriptions: string[] = [];
+      const contentLower = content.toLowerCase();
+      let m: RegExpExecArray | null;
+      TEST_DECL_RE.lastIndex = 0;
+      while ((m = TEST_DECL_RE.exec(content)) !== null) {
+        descriptions.push(m[2].toLowerCase());
+      }
+      return [{ file: tf, contentLower, descriptions }];
+    });
 
     if (artifacts.specs.length > 0) {
       for (const specPath of artifacts.specs) {
@@ -1927,26 +1948,6 @@ program
           console.log(`  Written to: ${routesPath}`);
 
           console.log(`\nAnalyzing endpoint coverage (from inferred routes)...`);
-
-          // Read test file contents for matching
-          const testContents = artifacts.testFiles.map((tf) => {
-            try { return { file: tf, content: fsMod.readFileSync(tf, 'utf-8') }; }
-            catch { return { file: tf, content: '' }; }
-          });
-
-          // Extract test descriptions for fine-grained matching
-          const TEST_DECL_PATTERN = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
-          interface TestFileEntries { file: string; contentLower: string; descriptions: string[] }
-          const testEntries: TestFileEntries[] = testContents.map(({ file, content }) => {
-            const descriptions: string[] = [];
-            const contentLower = content.toLowerCase();
-            let m: RegExpExecArray | null;
-            TEST_DECL_PATTERN.lastIndex = 0;
-            while ((m = TEST_DECL_PATTERN.exec(content)) !== null) {
-              descriptions.push(m[2].toLowerCase());
-            }
-            return { file, contentLower, descriptions };
-          });
 
           const endpointItems = routeResult.routes.map((route) => {
             const pathSegments = route.path.split('/').filter(
@@ -2116,7 +2117,9 @@ program
         );
       }
     } else if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
-      // Auto-inferred: use specificKeywords from rule for accurate test matching
+      // Auto-inferred: use specificKeywords from rule for accurate test matching.
+      // Reuse the testEntries already computed for endpoint coverage — avoids
+      // a second glob expansion (which can be slow/hang on large projects).
       try {
         console.log(`\nAnalyzing business rules coverage (from inferred rules)...`);
         const syntheticRules = inferredRulesResult.rules.map((r) => {
@@ -2143,7 +2146,31 @@ program
             scenarios: [],
           };
         });
-        const bizCoverages = await analyzeBusinessCoverage(syntheticRules, testsGlob);
+
+        // Match rules against the testEntries already built for endpoint coverage.
+        // This avoids a second glob expansion and is safe when there are no test files.
+        const bizCoverages = syntheticRules.map((rule) => {
+          const kwsLower = rule.keywords.map((k) => k.toLowerCase());
+          const matchedDescs: string[] = [];
+          const matchedFileSet = new Set<string>();
+          for (const { file, descriptions } of testEntries) {
+            const hitting = descriptions.filter((desc) =>
+              kwsLower.length > 0 && kwsLower.some((kw) => desc.includes(kw)),
+            );
+            if (hitting.length > 0) {
+              matchedDescs.push(...hitting);
+              matchedFileSet.add(file);
+            }
+          }
+          return {
+            rule,
+            covered: matchedDescs.length > 0,
+            testFiles: [...matchedFileSet],
+            matchedTests: matchedDescs,
+            scenarios: [],
+          };
+        });
+
         const bizReport    = buildBusinessCoverageReport(bizCoverages);
         const bizResult: CoverageResult = {
           type: 'business',

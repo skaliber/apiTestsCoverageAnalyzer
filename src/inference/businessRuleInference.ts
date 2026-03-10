@@ -45,6 +45,8 @@ export interface InferredBusinessRule {
   source_location: string;
   /** Raw matched code snippet */
   code_snippet: string;
+  /** Most specific identifiable terms from the condition, for accurate test matching */
+  specificKeywords: string[];
 }
 
 export interface BusinessRuleInferenceResult {
@@ -235,6 +237,7 @@ export function inferRulesFromFile(filePath: string): InferredBusinessRule[] {
         expected_behavior: ip.behaviorTemplate(match),
         source_location: sourceLocation,
         code_snippet: line.trim().slice(0, 200),
+        specificKeywords: extractSpecificKeywords(condition),
       });
     }
   }
@@ -298,6 +301,58 @@ export function writeInferredBusinessRules(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+export const KEYWORD_STOP_WORDS = new Set([
+  'http', 'exception', 'error', 'errors', 'throw', 'throws', 'raise', 'raises',
+  'new', 'return', 'returns', 'status', 'response', 'request', 'abort',
+  'the', 'and', 'for', 'with', 'that', 'this', 'from', 'not', 'has',
+  'can', 'cant', 'be', 'been', 'must', 'will', 'was', 'are', 'have',
+  'its', 'too', 'also', 'just', 'only', 'than', 'then', 'when',
+]);
+
+/**
+ * Extract the most specific identifiable terms from a rule condition string.
+ * Prioritises quoted field names and message fragments over generic identifiers.
+ */
+export function extractSpecificKeywords(condition: string): string[] {
+  const kwSet = new Set<string>();
+
+  // 1. Extract contents of quoted strings (field names, messages)
+  const quotedMatches = condition.match(/['"]([^'"]{2,})['"]/g) ?? [];
+  for (const q of quotedMatches) {
+    const inner = q.slice(1, -1);
+    // Split on common separators and add each non-trivial token
+    inner.toLowerCase().split(/[\s\-_.,!?:;/\\]+/).forEach((tok) => {
+      if (tok.length >= 2 && !KEYWORD_STOP_WORDS.has(tok) && /[a-z]/.test(tok)) {
+        kwSet.add(tok);
+      }
+    });
+  }
+
+  // 2. Extract object key identifiers from patterns like { fieldName: [...] }
+  const objKeyMatches = condition.match(/\{\s*(?:'([^']+)'|"([^"]+)"|(\w+))\s*:/g) ?? [];
+  for (const m of objKeyMatches) {
+    const inner = m.replace(/^\{\s*/, '').replace(/\s*:$/, '').replace(/['"]/g, '').toLowerCase();
+    if (inner.length >= 2 && !KEYWORD_STOP_WORDS.has(inner)) {
+      kwSet.add(inner);
+    }
+  }
+
+  // 3. Camel-case parts of exception / class names (e.g. "HttpException" → "http")
+  //    but only non-stop identifiers of reasonable length
+  const identifiers = condition.match(/\b[A-Za-z][A-Za-z0-9]{2,}\b/g) ?? [];
+  for (const id of identifiers) {
+    // Split camelCase into parts
+    const parts = id.replace(/([A-Z])/g, ' $1').toLowerCase().trim().split(/\s+/);
+    for (const part of parts) {
+      if (part.length >= 3 && !KEYWORD_STOP_WORDS.has(part)) {
+        kwSet.add(part);
+      }
+    }
+  }
+
+  return [...kwSet];
+}
 
 function toSnakeCase(str: string): string {
   return str

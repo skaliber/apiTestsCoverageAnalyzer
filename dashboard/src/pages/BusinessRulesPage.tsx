@@ -5,7 +5,7 @@ import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
 import IntelligenceSection from '../components/IntelligenceSection';
-import type { DetailItem } from '../types';
+import type { DetailItem, InferredRuleDetail } from '../types';
 import { generateBusinessRulesSummary } from '../utils/markdownSummaries';
 
 export default function BusinessRulesPage() {
@@ -84,6 +84,52 @@ export default function BusinessRulesPage() {
                         {item.tests.join(', ')}
                       </p>
                     )}
+                    {(() => {
+                      const inferred = (section as Record<string, unknown>)['inferred_details'] as
+                        | Record<string, InferredRuleDetail>
+                        | undefined;
+                      const detail = inferred?.[item.id];
+                      if (!detail) return null;
+                      return (
+                        <div className="mt-2 space-y-1">
+                          {detail.type && (
+                            <p>
+                              <span className="font-medium">Rule type: </span>
+                              <span className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1 rounded">
+                                {detail.type}
+                              </span>
+                            </p>
+                          )}
+                          {detail.source_location && (
+                            <p>
+                              <span className="font-medium">Source: </span>
+                              <span className="font-mono text-xs break-all">{detail.source_location}</span>
+                            </p>
+                          )}
+                          {detail.condition && (
+                            <p>
+                              <span className="font-medium">Condition: </span>
+                              <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1 rounded break-all">
+                                {detail.condition}
+                              </code>
+                            </p>
+                          )}
+                          {detail.code_snippet && (
+                            <div>
+                              <span className="font-medium">Code snippet:</span>
+                              <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-700 p-2 rounded overflow-x-auto whitespace-pre-wrap break-all">
+                                {detail.code_snippet}
+                              </pre>
+                            </div>
+                          )}
+                          {!item.covered && (
+                            <p className="text-amber-600 dark:text-amber-400 text-xs mt-1">
+                              ⚠ Gap: No tests found matching this rule's keywords. Add a test that covers the condition above.
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

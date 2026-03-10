@@ -46,3 +46,11 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   performance: 75,
   resilience: 50,
 };
+
+/** Extra detail attached to inferred business rules from the `analyze` command. */
+export interface InferredRuleDetail {
+  source_location?: string;
+  condition?: string;
+  code_snippet?: string;
+  type?: string;
+}

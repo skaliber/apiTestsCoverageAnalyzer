@@ -99,15 +99,22 @@ import { recordIntelligenceMetrics } from './observability';
 import { generateBuildSummary } from './summary/buildSummary';
 import { generatePrSummary } from './summary/prSummary';
 import type { SummaryInput } from './summary/markdownRenderer';
+import { KNOWN_METRIC_TYPES } from './summary/summaryTypes';
 import { registerAllAnalyzers } from './ast/astAnalysisOrchestrator';
 import { discoverProject } from './discovery/projectDiscovery';
-import { inferBusinessRules, writeInferredBusinessRules } from './inference/businessRuleInference';
+import { inferBusinessRules, writeInferredBusinessRules, KEYWORD_STOP_WORDS } from './inference/businessRuleInference';
 import { inferIntegrationFlows, writeInferredIntegrationFlows } from './inference/integrationFlowInference';
+import { inferRoutes, writeInferredRoutes } from './inference/routeInference';
+import { writeScanManifest } from './inference/scanManifest';
+import type { ScanTypeEntry } from './inference/scanManifest';
 import { serveDashboard } from './serveDashboard';
 
 // Register all language AST analyzers at startup.
 // This side-effect import ensures each language module's registerAnalyzer() call runs.
 registerAllAnalyzers();
+
+/** Keywords that indicate a test is exercising an error/failure path. */
+const ERROR_TEST_KEYWORDS = ['error', 'fail', 'throw', 'exception', 'reject', 'invalid', 'blank', 'missing'] as const;
 
 const program = new Command();
 
@@ -1908,7 +1915,120 @@ program
         }
       }
     } else {
-      warnings.push('No API spec files found; endpoint/parameter/error coverage analysis skipped.');
+      warnings.push('No API spec files found; attempting route inference for endpoint/error coverage.');
+
+      // ── 4a-alt. Inferred route endpoint coverage ──────────────────────────
+      try {
+        const routeResult = inferRoutes(artifacts.serviceFiles);
+        if (routeResult.routes.length > 0) {
+          const routesPath = writeInferredRoutes(routeResult, reportsDir);
+          console.log(`\nRoute Inference`);
+          console.log(`  Routes detected in service code: ${routeResult.routes.length}`);
+          console.log(`  Written to: ${routesPath}`);
+
+          console.log(`\nAnalyzing endpoint coverage (from inferred routes)...`);
+
+          // For each route, check if any test file references the route path and/or method
+          const testContents = artifacts.testFiles.map((tf) => {
+            try { return { file: tf, content: fsMod.readFileSync(tf, 'utf-8').toLowerCase() }; }
+            catch { return { file: tf, content: '' }; }
+          });
+
+          const endpointItems = routeResult.routes.map((route) => {
+            const pathSegments = route.path.split('/').filter((s) => s.length > 0 && !s.startsWith(':'));
+            const method = route.method.toLowerCase();
+            const matchedTests: string[] = [];
+
+            for (const { file, content } of testContents) {
+              const hasMethod = content.includes(method);
+              const hasPath = pathSegments.some((seg) => content.includes(seg));
+              if (hasMethod && hasPath) {
+                matchedTests.push(path.basename(file));
+              }
+            }
+
+            const covered = matchedTests.length > 0;
+            return {
+              id: `${route.method.toUpperCase()} ${route.path}`,
+              covered,
+              tests: matchedTests,
+              source_file: route.sourceFile,
+              line_number: route.lineNumber,
+            };
+          });
+
+          const coveredCount = endpointItems.filter((i) => i.covered).length;
+          const pct = endpointItems.length > 0 ? Math.round((coveredCount / endpointItems.length) * 100) : 0;
+
+          const endpointResult: CoverageResult = {
+            type: 'endpoint',
+            totalItems: endpointItems.length,
+            coveredItems: coveredCount,
+            coveragePercent: pct,
+            details: {
+              total: endpointItems.length,
+              covered: coveredCount,
+              percentage: pct,
+              items: endpointItems,
+              source: 'inferred',
+            },
+          };
+          allCoverageResults.push(endpointResult);
+          console.log(`  ${coveredCount}/${endpointItems.length} inferred routes have test coverage (${pct}%)`);
+
+          // ── 4c-alt. Error coverage from inferred routes + rules ──────────
+          if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
+            console.log(`\nAnalyzing error coverage (from inferred business rules)...`);
+            const errorCandidateRules = inferredRulesResult.rules.filter(
+              (r) => r.type === 'validation' || r.type === 'business_logic',
+            );
+
+            const errorItems = errorCandidateRules.map((rule) => {
+              const matchedTests: string[] = [];
+              for (const { file, content } of testContents) {
+                const hasErrorKeyword = ERROR_TEST_KEYWORDS.some((kw) => content.includes(kw));
+                const hasSpecificKw = rule.specificKeywords.length === 0 ||
+                  rule.specificKeywords.some((kw) => content.includes(kw.toLowerCase()));
+                if (hasErrorKeyword && hasSpecificKw) {
+                  matchedTests.push(path.basename(file));
+                }
+              }
+              return {
+                id: rule.id,
+                description: rule.name,
+                covered: matchedTests.length > 0,
+                tests: matchedTests,
+                source_location: rule.source_location,
+              };
+            });
+
+            const errorCovered = errorItems.filter((i) => i.covered).length;
+            const errorPct = errorItems.length > 0 ? Math.round((errorCovered / errorItems.length) * 100) : 0;
+
+            const errorResult: CoverageResult = {
+              type: 'error',
+              totalItems: errorItems.length,
+              coveredItems: errorCovered,
+              coveragePercent: errorPct,
+              details: {
+                total: errorItems.length,
+                covered: errorCovered,
+                percentage: errorPct,
+                items: errorItems,
+                source: 'inferred',
+              },
+            };
+            allCoverageResults.push(errorResult);
+            console.log(`  ${errorCovered}/${errorItems.length} inferred error scenarios have test coverage (${errorPct}%)`);
+          }
+        } else {
+          warnings.push('No routes detected in service files; endpoint coverage skipped.');
+        }
+      } catch (err) {
+        warnings.push(
+          `Route/error inference failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
     }
 
     // ── 4d. Business rules coverage ─────────────────────────────────────────
@@ -1935,20 +2055,24 @@ program
         );
       }
     } else if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
-      // Auto-inferred: derive keywords from rule name, condition, and endpoint
+      // Auto-inferred: use specificKeywords from rule for accurate test matching
       try {
         console.log(`\nAnalyzing business rules coverage (from inferred rules)...`);
         const syntheticRules = inferredRulesResult.rules.map((r) => {
           const kwSet = new Set<string>();
-          // Words from the rule name (e.g. "amount-exceeds-balance" → ["amount", "exceeds", "balance"])
-          r.name.toLowerCase().split(/[-_\s]+/).forEach((w) => { if (w.length > 2) kwSet.add(w); });
-          // Identifiers from the condition expression
-          (r.condition.match(/\b[a-zA-Z][a-zA-Z0-9]{3,}\b/g) ?? [])
-            .forEach((w) => kwSet.add(w.toLowerCase()));
+          // Use specificKeywords extracted from the condition (most accurate)
+          if (r.specificKeywords && r.specificKeywords.length > 0) {
+            r.specificKeywords.forEach((kw) => { if (!KEYWORD_STOP_WORDS.has(kw)) kwSet.add(kw); });
+          } else {
+            // Fallback: words from rule name only (filter stop words)
+            r.name.toLowerCase().split(/[-_\s]+/).forEach((w) => {
+              if (w.length > 2 && !KEYWORD_STOP_WORDS.has(w)) kwSet.add(w);
+            });
+          }
           // Non-trivial path segments from endpoint
           if (r.endpoint) {
             r.endpoint.toLowerCase().split(/[/.\s:]+/)
-              .forEach((w) => { if (w.length > 2 && !/^(api|v\d)$/.test(w)) kwSet.add(w); });
+              .forEach((w) => { if (w.length > 2 && !/^(api|v\d)$/.test(w) && !KEYWORD_STOP_WORDS.has(w)) kwSet.add(w); });
           }
           return {
             id: r.id,
@@ -1965,7 +2089,18 @@ program
           totalItems: bizReport.total,
           coveredItems: bizReport.covered,
           coveragePercent: bizReport.percentage,
-          details: bizReport,
+          details: {
+            ...bizReport,
+            inferred_details: inferredRulesResult.rules.reduce((acc, r) => {
+              acc[r.id] = {
+                source_location: r.source_location,
+                condition: r.condition,
+                code_snippet: r.code_snippet,
+                type: r.type,
+              };
+              return acc;
+            }, {} as Record<string, unknown>),
+          },
         };
         allCoverageResults.push(bizResult);
         console.log(`  ${bizReport.covered}/${bizReport.total} inferred business rules have test coverage (${bizReport.percentage}%)`);
@@ -2032,6 +2167,49 @@ program
       const observabilityInfo = buildObservabilityInfo(metricsPort);
       generateMultiFormatReports(allCoverageResults, ['json'], reportsDir, {}, observabilityInfo);
       console.log(`\nReports written to: ${reportsDir}`);
+    }
+
+    // ── 4f. Write scan manifest ────────────────────────────────────────────
+    try {
+      const scanTypes: ScanTypeEntry[] = allCoverageResults.map((r) => ({
+        type: r.type,
+        source: artifacts.specs.length > 0 ? 'explicit' : 'inferred',
+        itemsFound: r.totalItems,
+        itemsCovered: r.coveredItems,
+        coveragePercent: r.coveragePercent,
+      }));
+      // Add skipped types
+      const coveredTypes = new Set(allCoverageResults.map((r) => r.type));
+      for (const skippedType of KNOWN_METRIC_TYPES.filter((t) => t !== 'business' && t !== 'integration')) {
+        if (!coveredTypes.has(skippedType as CoverageResult['type'])) {
+          scanTypes.push({
+            type: skippedType,
+            source: 'skipped',
+            reason: artifacts.specs.length === 0 ? 'No API spec and no routes detected' : 'No data available',
+            itemsFound: 0,
+            itemsCovered: 0,
+            coveragePercent: 0,
+          });
+        }
+      }
+      const manifestPath = writeScanManifest(
+        {
+          projectRoot: rootDir,
+          analyzedAt: new Date().toISOString(),
+          discoveredFiles: {
+            serviceFiles: artifacts.serviceFiles,
+            testFiles: artifacts.testFiles,
+            specFiles: artifacts.specs,
+          },
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          scanTypes,
+        },
+        reportsDir,
+      );
+      console.log(`Scan manifest written to: ${manifestPath}`);
+    } catch (err) {
+      warnings.push(`Scan manifest write failed: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     // ── 5. Emit warnings ───────────────────────────────────────────────────

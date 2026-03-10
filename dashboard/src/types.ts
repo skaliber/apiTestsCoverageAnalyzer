@@ -20,10 +20,21 @@ export interface DetailSection {
   [key: string]: unknown;
 }
 
+export interface DiscoveryInfo {
+  projectRoot?: string;
+  languages?: string[];
+  frameworks?: string[];
+  serviceFilesCount?: number;
+  testFilesCount?: number;
+  specFilesCount?: number;
+  analysisMode?: string;
+}
+
 export interface CoverageReport {
   generatedAt: string;
   summary: SummaryItem[];
   details: Record<string, DetailSection>;
+  discoveryInfo?: DiscoveryInfo;
 }
 
 export interface Thresholds {

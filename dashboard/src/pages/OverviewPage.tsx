@@ -152,16 +152,8 @@ export default function OverviewPage() {
       </div>
 
       {/* Discovery Info (shown when analyze command was run without YAML spec) */}
-      {(report as unknown as Record<string, unknown>).discoveryInfo && (() => {
-        const di = (report as unknown as Record<string, unknown>).discoveryInfo as {
-          projectRoot?: string;
-          languages?: string[];
-          frameworks?: string[];
-          serviceFilesCount?: number;
-          testFilesCount?: number;
-          specFilesCount?: number;
-          analysisMode?: string;
-        };
+      {report.discoveryInfo && (() => {
+        const di = report.discoveryInfo!;
         return (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
             <h2 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">

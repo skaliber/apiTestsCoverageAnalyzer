@@ -97,12 +97,12 @@ reports-clean: ## Remove all generated reports and summaries from reports/
 #  TESTING
 # =============================================================================
 
-test: ## Run all test suites (unit + integration + e2e)
+test: build ## Run all test suites (unit + integration + e2e)
 	$(NPM) test -- --no-coverage
 	$(MAKE) test-e2e-docs
 	$(MAKE) test-e2e-dashboard
 
-test-unit: ## Run unit tests only (excludes integration and smoke)
+test-unit: build ## Run unit tests only (excludes integration and smoke)
 	$(NPM) test -- --no-coverage --testPathIgnorePatterns="node_modules|dist|dashboard|examples|integration|smoke"
 
 test-integration: ## Run integration tests only

@@ -100,6 +100,10 @@ import { generateBuildSummary } from './summary/buildSummary';
 import { generatePrSummary } from './summary/prSummary';
 import type { SummaryInput } from './summary/markdownRenderer';
 import { registerAllAnalyzers } from './ast/astAnalysisOrchestrator';
+import { discoverProject } from './discovery/projectDiscovery';
+import { inferBusinessRules, writeInferredBusinessRules } from './inference/businessRuleInference';
+import { inferIntegrationFlows, writeInferredIntegrationFlows } from './inference/integrationFlowInference';
+import { serveDashboard } from './serveDashboard';
 
 // Register all language AST analyzers at startup.
 // This side-effect import ensures each language module's registerAnalyzer() call runs.
@@ -1718,6 +1722,372 @@ program
     console.log(`\nSummary reports written to: ${outDir}`);
 
     logger.info({ event: 'summary_report_complete' }, 'Coverage summary report generated');
+  });
+
+// ─── analyze command ─────────────────────────────────────────────────────────
+
+program
+  .command('analyze')
+  .description(
+    'Zero-config full analysis: discover project artifacts, infer missing rules/flows, compute coverage.',
+  )
+  .option('--root <dir>', 'Project root to analyze (default: current working directory)')
+  .option('--reports-dir <dir>', 'Directory to write reports to (default: reports/)')
+  .option('--export-inferred-rules', 'Export inferred rules/flows as editable YAML files')
+  .option('--no-infer-business-rules', 'Disable business rule inference')
+  .option('--no-infer-integration-flows', 'Disable integration flow inference')
+  .option('--dashboard', 'Start the coverage dashboard after analysis')
+  .option('--port <port>', 'Port for the dashboard server (requires --dashboard)', parseInt)
+  .option('--open', 'Open the dashboard in your browser automatically (requires --dashboard)')
+  .action(async (options: Record<string, unknown>) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+    const configPath = (program.opts()['config'] as string | undefined);
+    const analyzerCfg = loadCentralConfig(configPath);
+
+    const rootDir         = (options['root'] as string | undefined) ?? process.cwd();
+    const reportsDir      = (options['reportsDir'] as string | undefined) ??
+                            analyzerCfg.reports?.outputDir ?? 'reports';
+    const doInferRules    = options['inferBusinessRules'] !== false &&
+                            (analyzerCfg.analysis?.inferBusinessRules ?? true);
+    const doInferFlows    = options['inferIntegrationFlows'] !== false &&
+                            (analyzerCfg.analysis?.inferIntegrationFlows ?? true);
+    const agnosticDisc    = analyzerCfg.analysis?.agnosticDiscovery ?? true;
+
+    logger.info({ event: 'analyze_start', rootDir }, 'Starting agnostic project analysis');
+
+    // ── 1. Discover project artifacts ──────────────────────────────────────
+    const artifacts = discoverProject({ rootDir });
+
+    console.log('\n=== API Test Coverage Analyzer ===');
+    console.log(`Project root: ${rootDir}`);
+    console.log(`Languages detected: ${artifacts.languages.join(', ') || 'none'}`);
+    console.log(`Frameworks detected: ${artifacts.frameworks.join(', ') || 'none'}`);
+    console.log(`API specs found: ${artifacts.specs.length}`);
+    console.log(`Test files found: ${artifacts.testFiles.length}`);
+    console.log(`Service files found: ${artifacts.serviceFiles.length}`);
+
+    if (!agnosticDisc && artifacts.specs.length === 0) {
+      console.error('\n[ERROR] No API spec found and agnosticDiscovery is disabled. Aborting.');
+      process.exitCode = 1;
+      return;
+    }
+
+    const warnings: string[] = [];
+    let inferredRulesResult: ReturnType<typeof inferBusinessRules> | null = null;
+    let inferredFlowsResult: ReturnType<typeof inferIntegrationFlows> | null = null;
+
+    // ── 2. Business rule inference ─────────────────────────────────────────
+    if (doInferRules) {
+      inferredRulesResult = inferBusinessRules(artifacts.serviceFiles, warnings);
+      const rulesPath = writeInferredBusinessRules(inferredRulesResult, reportsDir);
+
+      console.log(`\nBusiness Rule Inference`);
+      console.log(`  Rules detected in service code: ${inferredRulesResult.rules.length}`);
+      console.log(`  Written to: ${rulesPath}`);
+
+      if (options['exportInferredRules']) {
+        const fsMod = require('fs') as typeof import('fs');
+        const yaml = inferredRulesResult.rules.map((r) => [
+          `- id: ${r.id}`,
+          `  name: ${r.name}`,
+          `  type: ${r.type}`,
+          r.endpoint ? `  endpoint: "${r.endpoint}"` : null,
+          `  condition: "${r.condition.replace(/"/g, "'")}"`,
+          `  source: ${r.source_location}`,
+        ].filter(Boolean).join('\n')).join('\n');
+        fsMod.writeFileSync(path.join(rootDir, 'generated-business-rules.yaml'), yaml, 'utf-8');
+        console.log('  Exported: generated-business-rules.yaml');
+      }
+    }
+
+    // ── 3. Integration flow inference ──────────────────────────────────────
+    if (doInferFlows) {
+      inferredFlowsResult = inferIntegrationFlows(artifacts.testFiles, warnings);
+      const flowsPath = writeInferredIntegrationFlows(inferredFlowsResult, reportsDir);
+
+      console.log(`\nIntegration Flow Inference`);
+      console.log(`  Multi-step flows detected in tests: ${inferredFlowsResult.flows.length}`);
+      console.log(`  Written to: ${flowsPath}`);
+
+      if (options['exportInferredRules']) {
+        const fs = require('fs') as typeof import('fs');
+        const yaml = inferredFlowsResult.flows.map((f) => [
+          `- id: ${f.id}`,
+          `  name: "${f.name}"`,
+          `  steps:`,
+          ...f.steps.map((s) => `    - { method: ${s.method}, path: "${s.path}" }`),
+        ].join('\n')).join('\n');
+        fs.writeFileSync(path.join(rootDir, 'generated-integration-flows.yaml'), yaml, 'utf-8');
+        console.log('  Exported: generated-integration-flows.yaml');
+      }
+    }
+
+    // ── 4. Full coverage analysis → coverage-summary.json ─────────────────
+    const allCoverageResults: CoverageResult[] = [];
+    const fsMod = require('fs') as typeof import('fs');
+    const testsGlob = artifacts.testFiles.length > 0
+      ? '{' + artifacts.testFiles.join(',') + '}'
+      : path.join(rootDir, '**', '*');
+    const detectedLanguages = artifacts.languages as SupportedLanguage[];
+
+    if (artifacts.specs.length > 0) {
+      for (const specPath of artifacts.specs) {
+        // ── 4a. Endpoint coverage ───────────────────────────────────────────
+        try {
+          console.log(`\nAnalyzing endpoint coverage for: ${path.basename(specPath)}`);
+          const endpoints  = await parseOpenApiSpec(specPath);
+          const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, detectedLanguages);
+          const report     = buildCoverageReport(coverageMap);
+          const result: CoverageResult = {
+            type: 'endpoint',
+            totalItems: report.total,
+            coveredItems: report.covered,
+            coveragePercent: report.percentage,
+            details: report,
+          };
+          allCoverageResults.push(result);
+          console.log(`  ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`);
+        } catch (err) {
+          warnings.push(
+            `Endpoint coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+
+        // ── 4b. Parameter coverage ──────────────────────────────────────────
+        try {
+          const parameters = await parseParameters(specPath);
+          const astParamOptions: AstParameterAnalysisOptions = {
+            astConfig: analyzerCfg.analysis?.ast ?? {},
+            deepConfig: undefined,
+          };
+          const paramCoverages = await analyzeParameterCoverage(parameters, testsGlob, astParamOptions);
+          const paramReport    = buildParameterCoverageReport(paramCoverages);
+          const paramResult: CoverageResult = {
+            type: 'parameter',
+            totalItems: paramReport.totalParameters,
+            coveredItems: paramCoverages.filter((c) => c.ratio > 0).length,
+            coveragePercent: paramReport.averageCoverage,
+            details: paramReport,
+          };
+          allCoverageResults.push(paramResult);
+          console.log(`  ${paramResult.coveredItems}/${paramResult.totalItems} parameters covered (${paramReport.averageCoverage}%)`);
+        } catch (err) {
+          warnings.push(
+            `Parameter coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+
+        // ── 4c. Error scenario coverage ─────────────────────────────────────
+        try {
+          const scenarios = await parseErrorScenarios(specPath);
+          if (scenarios.length > 0) {
+            const astErrorOptions: AstErrorAnalysisOptions = {
+              astConfig: analyzerCfg.analysis?.ast ?? {},
+              deepConfig: undefined,
+            };
+            const errorCoverages = await analyzeErrorCoverage(scenarios, testsGlob, astErrorOptions);
+            const errorReport    = buildErrorCoverageReport(errorCoverages);
+            const errorResult: CoverageResult = {
+              type: 'error',
+              totalItems: errorReport.total,
+              coveredItems: errorReport.covered,
+              coveragePercent: errorReport.percentage,
+              details: errorReport,
+            };
+            allCoverageResults.push(errorResult);
+            console.log(`  ${errorReport.covered}/${errorReport.total} error scenarios covered (${errorReport.percentage}%)`);
+          }
+        } catch (err) {
+          warnings.push(
+            `Error coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    } else {
+      warnings.push('No API spec files found; endpoint/parameter/error coverage analysis skipped.');
+    }
+
+    // ── 4d. Business rules coverage ─────────────────────────────────────────
+    const businessRulesYaml = path.join(rootDir, 'business-rules.yaml');
+    if (fsMod.existsSync(businessRulesYaml)) {
+      // Explicit YAML takes precedence
+      try {
+        console.log(`\nAnalyzing business rules coverage...`);
+        const rules         = parseBusinessRules(businessRulesYaml);
+        const bizCoverages  = await analyzeBusinessCoverage(rules, testsGlob);
+        const bizReport     = buildBusinessCoverageReport(bizCoverages);
+        const bizResult: CoverageResult = {
+          type: 'business',
+          totalItems: bizReport.total,
+          coveredItems: bizReport.covered,
+          coveragePercent: bizReport.percentage,
+          details: bizReport,
+        };
+        allCoverageResults.push(bizResult);
+        console.log(`  ${bizReport.covered}/${bizReport.total} business rules covered (${bizReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Business rules coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    } else if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
+      // Auto-inferred: derive keywords from rule name, condition, and endpoint
+      try {
+        console.log(`\nAnalyzing business rules coverage (from inferred rules)...`);
+        const syntheticRules = inferredRulesResult.rules.map((r) => {
+          const kwSet = new Set<string>();
+          // Words from the rule name (e.g. "amount-exceeds-balance" → ["amount", "exceeds", "balance"])
+          r.name.toLowerCase().split(/[-_\s]+/).forEach((w) => { if (w.length > 2) kwSet.add(w); });
+          // Identifiers from the condition expression
+          (r.condition.match(/\b[a-zA-Z][a-zA-Z0-9]{3,}\b/g) ?? [])
+            .forEach((w) => kwSet.add(w.toLowerCase()));
+          // Non-trivial path segments from endpoint
+          if (r.endpoint) {
+            r.endpoint.toLowerCase().split(/[/.\s:]+/)
+              .forEach((w) => { if (w.length > 2 && !/^(api|v\d)$/.test(w)) kwSet.add(w); });
+          }
+          return {
+            id: r.id,
+            description: r.name,
+            endpoints: r.endpoint ? [r.endpoint] : [],
+            keywords: [...kwSet],
+            scenarios: [],
+          };
+        });
+        const bizCoverages = await analyzeBusinessCoverage(syntheticRules, testsGlob);
+        const bizReport    = buildBusinessCoverageReport(bizCoverages);
+        const bizResult: CoverageResult = {
+          type: 'business',
+          totalItems: bizReport.total,
+          coveredItems: bizReport.covered,
+          coveragePercent: bizReport.percentage,
+          details: bizReport,
+        };
+        allCoverageResults.push(bizResult);
+        console.log(`  ${bizReport.covered}/${bizReport.total} inferred business rules have test coverage (${bizReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Business rules coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    // ── 4e. Integration flows coverage ──────────────────────────────────────
+    const integrationFlowsYaml = path.join(rootDir, 'integration-flows.yaml');
+    if (fsMod.existsSync(integrationFlowsYaml)) {
+      // Explicit YAML takes precedence
+      try {
+        console.log(`\nAnalyzing integration flows coverage...`);
+        const flows        = parseIntegrationFlows(integrationFlowsYaml);
+        const flowCoverages = await analyzeIntegrationCoverage(flows, testsGlob);
+        const flowReport   = buildIntegrationCoverageReport(flowCoverages);
+        const flowResult: CoverageResult = {
+          type: 'integration',
+          totalItems: flowReport.total,
+          coveredItems: flowReport.complete,
+          coveragePercent: flowReport.percentage,
+          details: flowReport,
+        };
+        allCoverageResults.push(flowResult);
+        console.log(`  ${flowReport.complete}/${flowReport.total} integration flows covered (${flowReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Integration flows coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    } else if (inferredFlowsResult && inferredFlowsResult.flows.length > 0) {
+      // Auto-inferred: flows are extracted FROM tests, so by definition they're all covered
+      console.log(`\nIntegration flows coverage (from inferred flows)...`);
+      const syntheticItems = inferredFlowsResult.flows.map((f) => ({
+        id: f.id,
+        name: f.name,
+        total: f.steps.length,
+        covered: f.steps.length,
+        complete: true,
+        percentage: 100,
+        uncoveredSteps: [] as string[],
+      }));
+      const syntheticReport = {
+        total: syntheticItems.length,
+        complete: syntheticItems.length,
+        percentage: 100,
+        items: syntheticItems,
+      };
+      const flowResult: CoverageResult = {
+        type: 'integration',
+        totalItems: syntheticReport.total,
+        coveredItems: syntheticReport.complete,
+        coveragePercent: syntheticReport.percentage,
+        details: syntheticReport,
+      };
+      allCoverageResults.push(flowResult);
+      console.log(`  ${syntheticReport.complete}/${syntheticReport.total} multi-step flows detected and covered (100%)`);
+    }
+
+    if (allCoverageResults.length > 0) {
+      const observabilityInfo = buildObservabilityInfo(metricsPort);
+      generateMultiFormatReports(allCoverageResults, ['json'], reportsDir, {}, observabilityInfo);
+      console.log(`\nReports written to: ${reportsDir}`);
+    }
+
+    // ── 5. Emit warnings ───────────────────────────────────────────────────
+    for (const w of warnings) {
+      console.warn(`[WARN] ${w}`);
+    }
+
+    // ── 6. Configuration override log ──────────────────────────────────────
+    if (options['inferBusinessRules'] === false) {
+      console.log('\nConfiguration override detected: business rule inference disabled via CLI');
+    }
+    if (options['inferIntegrationFlows'] === false) {
+      console.log('\nConfiguration override detected: integration flow inference disabled via CLI');
+    }
+
+    logger.info(
+      { event: 'analyze_complete', warnings: warnings.length },
+      'Agnostic project analysis complete',
+    );
+
+    await finaliseObservability(allCoverageResults, {}, metricsPort, serviceName);
+
+    // ── 7. Optionally launch the dashboard ─────────────────────────────────
+    if (options['dashboard']) {
+      serveDashboard({
+        reportsDir: reportsDir,
+        port: (options['port'] as number | undefined) ?? 4000,
+        open: Boolean(options['open']),
+      });
+      // Keep the process alive — the HTTP server holds the event loop open
+    }
+  });
+
+// ─── serve command ────────────────────────────────────────────────────────────
+
+program
+  .command('serve')
+  .description(
+    'Start the coverage dashboard UI and serve reports from your reports directory.',
+  )
+  .option('--reports-dir <dir>', 'Directory containing report JSON files (default: reports/)')
+  .option('--port <port>', 'Port to listen on (default: 4000)', parseInt)
+  .option('--open', 'Open the dashboard in your browser automatically')
+  .action((options: Record<string, unknown>) => {
+    const configPath  = (program.opts()['config'] as string | undefined);
+    const analyzerCfg = loadCentralConfig(configPath);
+    const reportsDir  = (options['reportsDir'] as string | undefined) ??
+                        analyzerCfg.reports?.outputDir ?? 'reports';
+    const port        = (options['port'] as number | undefined) ?? 4000;
+
+    serveDashboard({
+      reportsDir,
+      port,
+      open: Boolean(options['open']),
+    });
+    // Keep the process alive while the server runs
   });
 
 // Parse the command-line arguments

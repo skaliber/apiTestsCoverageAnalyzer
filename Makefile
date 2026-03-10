@@ -344,6 +344,17 @@ dashboard: self-analysis-all summary ## Run full analysis then open the live das
 	@echo "==========================================================="
 	cd dashboard && $(NPM) run dev -- --mode real
 
+dashboard-build: ## Build the static dashboard (required before running `api-tests-coverage serve`)
+	cd dashboard && $(NPM) run build
+	@echo "Dashboard built to dashboard/dist/"
+
+dashboard-serve: self-analysis-all summary dashboard-build ## Full analysis + serve built dashboard via CLI
+	@echo "==========================================================="
+	@echo "  Starting static dashboard on http://localhost:4000"
+	@echo "  Press Ctrl-C to stop."
+	@echo "==========================================================="
+	node dist/src/index.js serve --open
+
 # =============================================================================
 #  CI ENTRYPOINT
 # =============================================================================

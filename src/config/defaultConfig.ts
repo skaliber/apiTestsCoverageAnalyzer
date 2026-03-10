@@ -23,6 +23,9 @@ export const DEFAULT_CONFIG: AnalyzerConfig = {
     defaultMode: 'full',
     failOnConfigMissing: false,
     warnOnConfigMissing: true,
+    agnosticDiscovery: true,
+    inferBusinessRules: true,
+    inferIntegrationFlows: true,
     ast: {
       enabled: true,
       fallbackHeuristics: true,

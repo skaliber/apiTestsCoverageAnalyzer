@@ -1,0 +1,5353 @@
+{
+  "generatedAt": "2026-03-09T13:35:36.199Z",
+  "summary": [
+    {
+      "type": "endpoint",
+      "totalItems": 30,
+      "coveredItems": 30,
+      "coveragePercent": 100
+    },
+    {
+      "type": "parameter",
+      "totalItems": 74,
+      "coveredItems": 69,
+      "coveragePercent": 73.31
+    },
+    {
+      "type": "error",
+      "totalItems": 92,
+      "coveredItems": 8,
+      "coveragePercent": 8.7
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    }
+  ],
+  "details": {
+    "endpoint": {
+      "total": 30,
+      "covered": 30,
+      "percentage": 100,
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/shipments",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/error.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/shipments"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/shipments",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/error.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/shipments"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/shipments/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/shipments/SHP-NONE"
+            },
+            {
+              "resolutionType": "constant",
+              "confidence": "medium",
+              "rawCall": ""
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/shipments/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "constant",
+              "confidence": "medium",
+              "rawCall": ""
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/shipments/SHP-NONE"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/shipments/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/shipments/{id}/dispatch",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/shipments/{id}/deliver",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/shipments/{id}/cancel",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/shipments/{id}/tracking",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/orders",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/orders"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/orders",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/orders"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/orders/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "constant",
+              "confidence": "medium",
+              "rawCall": ""
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/orders/ORD-NONE"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/orders/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/orders/{id}/status",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/warehouses",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/warehouses.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/warehouses"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/warehouses/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/warehouses.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/warehouses/{id}/inventory",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/warehouses.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/warehouses/WH-001/inventory"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/carriers",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/error.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/carriers.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/carriers"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/carriers/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/carriers.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/carriers/{id}/rates",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/carriers.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/returns",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/returns.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/returns"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/returns/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/returns.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/returns/{id}/approve",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/returns.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "constant",
+              "confidence": "medium",
+              "rawCall": ""
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/tracking/events",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/tracking.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/tracking/events"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/tracking/history/{trackingNumber}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/tracking.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "constant",
+              "confidence": "medium",
+              "rawCall": ""
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/customers/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/customers.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/customers/CUST-001"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/customers/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/customers.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/customers/CUST-001"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/health",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/admin.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/admin/health"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/metrics",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/admin.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/audit",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/admin.test.js",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js"
+          ],
+          "languages": [
+            "javascript"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "direct",
+              "confidence": "high",
+              "rawCall": "/admin/audit"
+            }
+          ]
+        }
+      ]
+    },
+    "parameter": {
+      "totalParameters": 74,
+      "averageCoverage": 73.31,
+      "fullyCoveredPercentage": 51.35,
+      "uncoveredParameters": [
+        {
+          "endpoint": "PUT /shipments/{id}",
+          "method": "PUT",
+          "path": "/shipments/{id}",
+          "name": "declaredValueUsd",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "number"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}",
+          "method": "PUT",
+          "path": "/shipments/{id}",
+          "name": "insured",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}",
+          "method": "PUT",
+          "path": "/shipments/{id}",
+          "name": "isHazmat",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "endpoint": "POST /shipments/{id}/cancel",
+          "method": "POST",
+          "path": "/shipments/{id}/cancel",
+          "name": "reason",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /admin/audit",
+          "method": "GET",
+          "path": "/admin/audit",
+          "name": "resourceId",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "parameter": {
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "name": "status",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "dispatched",
+                "in_transit",
+                "delivered",
+                "cancelled"
+              ]
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "name": "carrierId",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "name": "warehouseId",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "name": "limit",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "carrierId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "warehouseId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "origin",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "destination",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "weightKg",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 1000
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "declaredValueUsd",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "isHazmat",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "insured",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "name": "addressValidated",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "carrierId",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "warehouseId",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "destination",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": true,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "declaredValueUsd",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "insured",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "name": "isHazmat",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /shipments/{id}",
+            "method": "DELETE",
+            "path": "/shipments/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments/{id}/deliver",
+            "method": "POST",
+            "path": "/shipments/{id}/deliver",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "name": "reason",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments/{id}/tracking",
+            "method": "GET",
+            "path": "/shipments/{id}/tracking",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "customerId",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "status",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "limit",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "customerId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "items",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "array"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "shippingAddress",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "name": "status",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "fulfilled",
+                "cancelled"
+              ]
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /warehouses",
+            "method": "GET",
+            "path": "/warehouses",
+            "name": "active",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /warehouses/{id}",
+            "method": "GET",
+            "path": "/warehouses/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "name": "operation",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "add",
+                "remove",
+                "set"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "name": "items",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "array"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /carriers",
+            "method": "GET",
+            "path": "/carriers",
+            "name": "active",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /carriers/{id}",
+            "method": "GET",
+            "path": "/carriers/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "name": "weightKg",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "name": "service",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "name": "shipmentId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "name": "customerId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "name": "reason",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "name": "items",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "array"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /returns/{id}",
+            "method": "GET",
+            "path": "/returns/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "constant",
+            "confidence": "medium"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "name": "approved",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "constant",
+            "confidence": "medium"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "name": "rejectionReason",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "constant",
+            "confidence": "medium"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "trackingNumber",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "shipmentId",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "status",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "location",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "description",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "name": "timestamp",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /tracking/history/{trackingNumber}",
+            "method": "GET",
+            "path": "/tracking/history/{trackingNumber}",
+            "name": "trackingNumber",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "constant",
+            "confidence": "medium"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /customers/{id}",
+            "method": "GET",
+            "path": "/customers/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": true,
+          "ratio": 1,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "name": "name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.75,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "name": "email",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "name": "phone",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "name": "address",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": true,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "name": "action",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "name": "resourceId",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": true,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0.25,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "name": "limit",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": true,
+          "boundaryValue": true,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0.5,
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        }
+      ]
+    },
+    "error": {
+      "total": 92,
+      "covered": 8,
+      "percentage": 8.7,
+      "scenarios": [
+        {
+          "scenario": {
+            "id": "GET /shipments:401",
+            "endpoint": "GET /shipments",
+            "method": "GET",
+            "path": "/shipments",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:400",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 400,
+            "description": "Business rule violated",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:401",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:403",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "readonly cannot POST /shipments (403)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:404",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "returns 404 for POST /v2/shipments (wrong version)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:409",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments:422",
+            "endpoint": "POST /shipments",
+            "method": "POST",
+            "path": "/shipments",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "returns sensible error for completely empty body on POST /shipments"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}:401",
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}:404",
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}:401",
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}:403",
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}:404",
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}:409",
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}:422",
+            "endpoint": "PUT /shipments/{id}",
+            "method": "PUT",
+            "path": "/shipments/{id}",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /shipments/{id}:401",
+            "endpoint": "DELETE /shipments/{id}",
+            "method": "DELETE",
+            "path": "/shipments/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /shipments/{id}:403",
+            "endpoint": "DELETE /shipments/{id}",
+            "method": "DELETE",
+            "path": "/shipments/{id}",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /shipments/{id}:404",
+            "endpoint": "DELETE /shipments/{id}",
+            "method": "DELETE",
+            "path": "/shipments/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /shipments/{id}:409",
+            "endpoint": "DELETE /shipments/{id}",
+            "method": "DELETE",
+            "path": "/shipments/{id}",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/dispatch:401",
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/dispatch:403",
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/dispatch:404",
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/dispatch:409",
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/dispatch:422",
+            "endpoint": "POST /shipments/{id}/dispatch",
+            "method": "POST",
+            "path": "/shipments/{id}/dispatch",
+            "statusCode": 422,
+            "description": "Business rule violated",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/deliver:401",
+            "endpoint": "POST /shipments/{id}/deliver",
+            "method": "POST",
+            "path": "/shipments/{id}/deliver",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/deliver:403",
+            "endpoint": "POST /shipments/{id}/deliver",
+            "method": "POST",
+            "path": "/shipments/{id}/deliver",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/deliver:404",
+            "endpoint": "POST /shipments/{id}/deliver",
+            "method": "POST",
+            "path": "/shipments/{id}/deliver",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/deliver:409",
+            "endpoint": "POST /shipments/{id}/deliver",
+            "method": "POST",
+            "path": "/shipments/{id}/deliver",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/cancel:401",
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/cancel:403",
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/cancel:404",
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /shipments/{id}/cancel:409",
+            "endpoint": "POST /shipments/{id}/cancel",
+            "method": "POST",
+            "path": "/shipments/{id}/cancel",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}/tracking:401",
+            "endpoint": "GET /shipments/{id}/tracking",
+            "method": "GET",
+            "path": "/shipments/{id}/tracking",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}/tracking:404",
+            "endpoint": "GET /shipments/{id}/tracking",
+            "method": "GET",
+            "path": "/shipments/{id}/tracking",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders:401",
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:401",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:403",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "readonly cannot POST /orders (403)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:404",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:422",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders/{id}:401",
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders/{id}:404",
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:401",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:403",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:404",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:409",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:401",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:403",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:404",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:409",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:422",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /warehouses:401",
+            "endpoint": "GET /warehouses",
+            "method": "GET",
+            "path": "/warehouses",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /warehouses/{id}:401",
+            "endpoint": "GET /warehouses/{id}",
+            "method": "GET",
+            "path": "/warehouses/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /warehouses/{id}:404",
+            "endpoint": "GET /warehouses/{id}",
+            "method": "GET",
+            "path": "/warehouses/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /warehouses/{id}/inventory:401",
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /warehouses/{id}/inventory:403",
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /warehouses/{id}/inventory:404",
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /warehouses/{id}/inventory:409",
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "statusCode": 409,
+            "description": "Business rule violated",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /warehouses/{id}/inventory:422",
+            "endpoint": "POST /warehouses/{id}/inventory",
+            "method": "POST",
+            "path": "/warehouses/{id}/inventory",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers:401",
+            "endpoint": "GET /carriers",
+            "method": "GET",
+            "path": "/carriers",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers/{id}:401",
+            "endpoint": "GET /carriers/{id}",
+            "method": "GET",
+            "path": "/carriers/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers/{id}:404",
+            "endpoint": "GET /carriers/{id}",
+            "method": "GET",
+            "path": "/carriers/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers/{id}/rates:401",
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers/{id}/rates:404",
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /carriers/{id}/rates:422",
+            "endpoint": "GET /carriers/{id}/rates",
+            "method": "GET",
+            "path": "/carriers/{id}/rates",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /returns:401",
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /returns:404",
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /returns:409",
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /returns:422",
+            "endpoint": "POST /returns",
+            "method": "POST",
+            "path": "/returns",
+            "statusCode": 422,
+            "description": "Business rule violated",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /returns/{id}:401",
+            "endpoint": "GET /returns/{id}",
+            "method": "GET",
+            "path": "/returns/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /returns/{id}:404",
+            "endpoint": "GET /returns/{id}",
+            "method": "GET",
+            "path": "/returns/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /returns/{id}/approve:401",
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /returns/{id}/approve:403",
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /returns/{id}/approve:404",
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /returns/{id}/approve:409",
+            "endpoint": "PUT /returns/{id}/approve",
+            "method": "PUT",
+            "path": "/returns/{id}/approve",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /tracking/events:401",
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /tracking/events:403",
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "readonly cannot POST /tracking/events (403)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "POST /tracking/events:409",
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "statusCode": 409,
+            "description": "State conflict",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /tracking/events:422",
+            "endpoint": "POST /tracking/events",
+            "method": "POST",
+            "path": "/tracking/events",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /tracking/history/{trackingNumber}:401",
+            "endpoint": "GET /tracking/history/{trackingNumber}",
+            "method": "GET",
+            "path": "/tracking/history/{trackingNumber}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /tracking/history/{trackingNumber}:404",
+            "endpoint": "GET /tracking/history/{trackingNumber}",
+            "method": "GET",
+            "path": "/tracking/history/{trackingNumber}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /customers/{id}:401",
+            "endpoint": "GET /customers/{id}",
+            "method": "GET",
+            "path": "/customers/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /customers/{id}:403",
+            "endpoint": "GET /customers/{id}",
+            "method": "GET",
+            "path": "/customers/{id}",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /customers/{id}:404",
+            "endpoint": "GET /customers/{id}",
+            "method": "GET",
+            "path": "/customers/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /customers/{id}:401",
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /customers/{id}:403",
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /customers/{id}:404",
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /customers/{id}:422",
+            "endpoint": "PUT /customers/{id}",
+            "method": "PUT",
+            "path": "/customers/{id}",
+            "statusCode": 422,
+            "description": "Request validation failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:401",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:403",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "operator cannot GET /admin/health (403)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/metrics:401",
+            "endpoint": "GET /admin/metrics",
+            "method": "GET",
+            "path": "/admin/metrics",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/metrics:403",
+            "endpoint": "GET /admin/metrics",
+            "method": "GET",
+            "path": "/admin/metrics",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "operator cannot GET /admin/metrics (403)"
+          ]
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/audit:401",
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "statusCode": 401,
+            "description": "Missing or invalid auth token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/audit:403",
+            "endpoint": "GET /admin/audit",
+            "method": "GET",
+            "path": "/admin/audit",
+            "statusCode": 403,
+            "description": "Insufficient role",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": true,
+          "matchedTests": [
+            "operator cannot GET /admin/audit (403)"
+          ],
+          "astMetadata": {
+            "sourceLanguage": "javascript",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        }
+      ],
+      "categorySummary": {
+        "missing-parameter": {
+          "total": 1,
+          "covered": 0
+        },
+        "invalid-value": {
+          "total": 11,
+          "covered": 1
+        },
+        "unauthorized": {
+          "total": 30,
+          "covered": 0
+        },
+        "forbidden": {
+          "total": 17,
+          "covered": 6
+        },
+        "not-found": {
+          "total": 22,
+          "covered": 1
+        },
+        "conflict": {
+          "total": 12,
+          "covered": 0
+        },
+        "server-error": {
+          "total": 0,
+          "covered": 0
+        }
+      }
+    },
+    "business": {
+      "total": 8,
+      "covered": 0,
+      "percentage": 0,
+      "uncoveredRules": [
+        {
+          "id": "shipment-weight-limit",
+          "name": "Single Shipment Weight Limit",
+          "description": "A single shipment cannot exceed 1000 kg gross weight. This limit exists due to carrier insurance maximums and warehouse loading dock constraints.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /shipments",
+              "field": "weightKg",
+              "condition": "weightKg > 1000",
+              "response": 400,
+              "errorCode": "WEIGHT_LIMIT_EXCEEDED"
+            },
+            {
+              "endpoint": "middleware/validation.js:validateCreateShipment"
+            }
+          ],
+          "testScenarios": [
+            "POST /shipments with weightKg=1001 returns 400",
+            "POST /shipments with weightKg=1000 succeeds"
+          ],
+          "priority": "critical",
+          "category": "safety",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "carrier-active-required",
+          "name": "Carrier Must Be Active",
+          "description": "A carrier must have active=true to be assigned to new shipments. Inactive carriers may have lapsed insurance or suspended operations.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /shipments",
+              "condition": "carrier.active === false",
+              "response": 409,
+              "errorCode": "CARRIER_INACTIVE"
+            },
+            {
+              "endpoint": "PUT /shipments/:id",
+              "condition": "carrier.active === false",
+              "response": 409
+            },
+            {
+              "endpoint": "POST /shipments/:id/dispatch",
+              "condition": "carrier.active === false",
+              "response": 422
+            }
+          ],
+          "testScenarios": [
+            "POST /shipments with inactive carrier (CAR-004) returns 409",
+            "POST /shipments with active carrier succeeds"
+          ],
+          "priority": "critical",
+          "category": "compliance",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "address-validation-required",
+          "name": "Address Must Be Validated Before Dispatch",
+          "description": "The destination shipping address must be validated (geocoded and confirmed deliverable) before a shipment can be dispatched. This reduces failed delivery attempts.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /shipments/:id/dispatch",
+              "condition": "shipment.addressValidated === false",
+              "response": 422,
+              "errorCode": "ADDRESS_NOT_VALIDATED"
+            }
+          ],
+          "testScenarios": [
+            "POST /shipments/:id/dispatch with addressValidated=false returns 422",
+            "POST /shipments/:id/dispatch with addressValidated=true succeeds"
+          ],
+          "priority": "high",
+          "category": "operations",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "return-window-30-days",
+          "name": "30-Day Return Window",
+          "description": "Returns can only be initiated within 30 days of the delivery date. After this window, returns must be approved through a manual exception process.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /returns",
+              "condition": "daysSinceDelivery > 30",
+              "response": 422,
+              "errorCode": "RETURN_WINDOW_EXPIRED"
+            }
+          ],
+          "testScenarios": [
+            "POST /returns within 30 days of delivery succeeds",
+            "POST /returns 45 days after delivery returns 422"
+          ],
+          "priority": "high",
+          "category": "customer-service",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "warehouse-capacity-check",
+          "name": "Warehouse Cannot Exceed Capacity",
+          "description": "Inventory additions to a warehouse are rejected if they would cause the currentOccupancy to exceed the warehouse's declared capacity.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /warehouses/:id/inventory",
+              "condition": "currentOccupancy + deltaUnits > capacity",
+              "response": 409,
+              "errorCode": "CAPACITY_EXCEEDED"
+            }
+          ],
+          "testScenarios": [
+            "POST /warehouses/:id/inventory that would exceed capacity returns 409",
+            "POST /warehouses/:id/inventory within capacity succeeds"
+          ],
+          "priority": "high",
+          "category": "operations",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "duplicate-tracking-prevention",
+          "name": "Unique Tracking Events",
+          "description": "A tracking event is considered a duplicate if a record with the same trackingNumber, status, and timestamp already exists. Prevents double-posting from carrier webhook integrations.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /tracking/events",
+              "condition": "duplicate event detected",
+              "response": 409,
+              "errorCode": "DUPLICATE_EVENT"
+            }
+          ],
+          "testScenarios": [
+            "POST /tracking/events with same payload twice returns 409 on second call",
+            "POST /tracking/events with different timestamps succeeds"
+          ],
+          "priority": "medium",
+          "category": "data-integrity",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "hazmat-special-carrier",
+          "name": "Hazardous Materials Require Certified Carrier",
+          "description": "Shipments containing hazardous materials (isHazmat=true) can only be assigned to carriers with hazmatCertified=true. This is a DOT compliance requirement.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /shipments",
+              "condition": "isHazmat && !carrier.hazmatCertified",
+              "response": 409,
+              "errorCode": "HAZMAT_CARRIER_REQUIRED"
+            }
+          ],
+          "testScenarios": [
+            "POST /shipments with isHazmat=true and non-certified carrier returns 409",
+            "POST /shipments with isHazmat=true and certified carrier succeeds"
+          ],
+          "priority": "critical",
+          "category": "compliance",
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "insurance-required-high-value",
+          "name": "High-Value Shipments Require Insurance",
+          "description": "Shipments with declaredValueUsd > 5000 must have insured=true before they can be dispatched. This protects against loss claims.\n",
+          "enforcement": [
+            {
+              "endpoint": "POST /shipments/:id/dispatch",
+              "condition": "declaredValueUsd > 5000 && !insured",
+              "response": 422,
+              "errorCode": "INSURANCE_REQUIRED"
+            }
+          ],
+          "testScenarios": [
+            "POST /shipments/:id/dispatch for $6000 uninsured shipment returns 422",
+            "POST /shipments/:id/dispatch for $6000 insured shipment succeeds",
+            "POST /shipments/:id/dispatch for $4000 uninsured shipment succeeds"
+          ],
+          "priority": "high",
+          "category": "financial",
+          "keywords": [],
+          "scenarios": []
+        }
+      ],
+      "rules": [
+        {
+          "rule": {
+            "id": "shipment-weight-limit",
+            "name": "Single Shipment Weight Limit",
+            "description": "A single shipment cannot exceed 1000 kg gross weight. This limit exists due to carrier insurance maximums and warehouse loading dock constraints.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /shipments",
+                "field": "weightKg",
+                "condition": "weightKg > 1000",
+                "response": 400,
+                "errorCode": "WEIGHT_LIMIT_EXCEEDED"
+              },
+              {
+                "endpoint": "middleware/validation.js:validateCreateShipment"
+              }
+            ],
+            "testScenarios": [
+              "POST /shipments with weightKg=1001 returns 400",
+              "POST /shipments with weightKg=1000 succeeds"
+            ],
+            "priority": "critical",
+            "category": "safety",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "carrier-active-required",
+            "name": "Carrier Must Be Active",
+            "description": "A carrier must have active=true to be assigned to new shipments. Inactive carriers may have lapsed insurance or suspended operations.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /shipments",
+                "condition": "carrier.active === false",
+                "response": 409,
+                "errorCode": "CARRIER_INACTIVE"
+              },
+              {
+                "endpoint": "PUT /shipments/:id",
+                "condition": "carrier.active === false",
+                "response": 409
+              },
+              {
+                "endpoint": "POST /shipments/:id/dispatch",
+                "condition": "carrier.active === false",
+                "response": 422
+              }
+            ],
+            "testScenarios": [
+              "POST /shipments with inactive carrier (CAR-004) returns 409",
+              "POST /shipments with active carrier succeeds"
+            ],
+            "priority": "critical",
+            "category": "compliance",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "address-validation-required",
+            "name": "Address Must Be Validated Before Dispatch",
+            "description": "The destination shipping address must be validated (geocoded and confirmed deliverable) before a shipment can be dispatched. This reduces failed delivery attempts.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /shipments/:id/dispatch",
+                "condition": "shipment.addressValidated === false",
+                "response": 422,
+                "errorCode": "ADDRESS_NOT_VALIDATED"
+              }
+            ],
+            "testScenarios": [
+              "POST /shipments/:id/dispatch with addressValidated=false returns 422",
+              "POST /shipments/:id/dispatch with addressValidated=true succeeds"
+            ],
+            "priority": "high",
+            "category": "operations",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "return-window-30-days",
+            "name": "30-Day Return Window",
+            "description": "Returns can only be initiated within 30 days of the delivery date. After this window, returns must be approved through a manual exception process.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /returns",
+                "condition": "daysSinceDelivery > 30",
+                "response": 422,
+                "errorCode": "RETURN_WINDOW_EXPIRED"
+              }
+            ],
+            "testScenarios": [
+              "POST /returns within 30 days of delivery succeeds",
+              "POST /returns 45 days after delivery returns 422"
+            ],
+            "priority": "high",
+            "category": "customer-service",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "warehouse-capacity-check",
+            "name": "Warehouse Cannot Exceed Capacity",
+            "description": "Inventory additions to a warehouse are rejected if they would cause the currentOccupancy to exceed the warehouse's declared capacity.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /warehouses/:id/inventory",
+                "condition": "currentOccupancy + deltaUnits > capacity",
+                "response": 409,
+                "errorCode": "CAPACITY_EXCEEDED"
+              }
+            ],
+            "testScenarios": [
+              "POST /warehouses/:id/inventory that would exceed capacity returns 409",
+              "POST /warehouses/:id/inventory within capacity succeeds"
+            ],
+            "priority": "high",
+            "category": "operations",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "duplicate-tracking-prevention",
+            "name": "Unique Tracking Events",
+            "description": "A tracking event is considered a duplicate if a record with the same trackingNumber, status, and timestamp already exists. Prevents double-posting from carrier webhook integrations.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /tracking/events",
+                "condition": "duplicate event detected",
+                "response": 409,
+                "errorCode": "DUPLICATE_EVENT"
+              }
+            ],
+            "testScenarios": [
+              "POST /tracking/events with same payload twice returns 409 on second call",
+              "POST /tracking/events with different timestamps succeeds"
+            ],
+            "priority": "medium",
+            "category": "data-integrity",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "hazmat-special-carrier",
+            "name": "Hazardous Materials Require Certified Carrier",
+            "description": "Shipments containing hazardous materials (isHazmat=true) can only be assigned to carriers with hazmatCertified=true. This is a DOT compliance requirement.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /shipments",
+                "condition": "isHazmat && !carrier.hazmatCertified",
+                "response": 409,
+                "errorCode": "HAZMAT_CARRIER_REQUIRED"
+              }
+            ],
+            "testScenarios": [
+              "POST /shipments with isHazmat=true and non-certified carrier returns 409",
+              "POST /shipments with isHazmat=true and certified carrier succeeds"
+            ],
+            "priority": "critical",
+            "category": "compliance",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "insurance-required-high-value",
+            "name": "High-Value Shipments Require Insurance",
+            "description": "Shipments with declaredValueUsd > 5000 must have insured=true before they can be dispatched. This protects against loss claims.\n",
+            "enforcement": [
+              {
+                "endpoint": "POST /shipments/:id/dispatch",
+                "condition": "declaredValueUsd > 5000 && !insured",
+                "response": 422,
+                "errorCode": "INSURANCE_REQUIRED"
+              }
+            ],
+            "testScenarios": [
+              "POST /shipments/:id/dispatch for $6000 uninsured shipment returns 422",
+              "POST /shipments/:id/dispatch for $6000 insured shipment succeeds",
+              "POST /shipments/:id/dispatch for $4000 uninsured shipment succeeds"
+            ],
+            "priority": "high",
+            "category": "financial",
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        }
+      ]
+    },
+    "integration": {
+      "total": 5,
+      "complete": 0,
+      "partial": 0,
+      "missing": 5,
+      "percentage": 0,
+      "flows": [
+        {
+          "flow": {
+            "id": "FLOW001",
+            "name": "Shipment Creation to Delivery",
+            "description": "Complete lifecycle of a shipment from creation through dispatch to final delivery, including tracking event generation.\n",
+            "priority": "critical",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Validate address (pre-shipment)",
+                "description": "Address validation should happen before shipment creation in production",
+                "note": "This is handled externally; set addressValidated=true in payload",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Create shipment",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-001",
+                  "warehouseId": "WH-001",
+                  "weightKg": 25,
+                  "declaredValueUsd": 800,
+                  "addressValidated": true,
+                  "isHazmat": false,
+                  "insured": false
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "shipmentId",
+                    "from": "response.data.id"
+                  },
+                  {
+                    "name": "trackingNumber",
+                    "from": "response.data.trackingNumber"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Dispatch shipment",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/dispatch",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'dispatched'"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Post in-transit tracking event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "location": {
+                    "city": "Nashville",
+                    "state": "TN",
+                    "country": "US"
+                  },
+                  "description": "Arrived at sorting facility"
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Mark as delivered",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/deliver",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'delivered'",
+                  "response.data.deliveredAt !== null"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Verify tracking history",
+                "method": "GET",
+                "path": "/tracking/history/{trackingNumber}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.events.length >= 2",
+                  "response.data.currentStatus === 'delivered'"
+                ],
+                "keywords": []
+              }
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Validate address (pre-shipment)",
+                "description": "Address validation should happen before shipment creation in production",
+                "note": "This is handled externally; set addressValidated=true in payload",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Create shipment",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-001",
+                  "warehouseId": "WH-001",
+                  "weightKg": 25,
+                  "declaredValueUsd": 800,
+                  "addressValidated": true,
+                  "isHazmat": false,
+                  "insured": false
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "shipmentId",
+                    "from": "response.data.id"
+                  },
+                  {
+                    "name": "trackingNumber",
+                    "from": "response.data.trackingNumber"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Dispatch shipment",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/dispatch",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'dispatched'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Post in-transit tracking event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "location": {
+                    "city": "Nashville",
+                    "state": "TN",
+                    "country": "US"
+                  },
+                  "description": "Arrived at sorting facility"
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Mark as delivered",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/deliver",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'delivered'",
+                  "response.data.deliveredAt !== null"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Verify tracking history",
+                "method": "GET",
+                "path": "/tracking/history/{trackingNumber}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.events.length >= 2",
+                  "response.data.currentStatus === 'delivered'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW002",
+            "name": "Order Fulfillment from Warehouse",
+            "description": "Creates an order, transitions it through processing to fulfilled, and verifies warehouse inventory is accounted for.\n",
+            "priority": "high",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Check warehouse availability",
+                "method": "GET",
+                "path": "/warehouses/WH-001",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.currentOccupancy < response.data.capacity"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "payload": {
+                  "customerId": "CUST-001",
+                  "items": [
+                    {
+                      "sku": "WIDGET-A",
+                      "quantity": 5,
+                      "unitPriceUsd": 29.99,
+                      "weightKg": 0.5
+                    }
+                  ],
+                  "shippingAddress": {
+                    "street": "123 Main St",
+                    "city": "Springfield",
+                    "state": "IL",
+                    "zip": "62701",
+                    "country": "US"
+                  }
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "orderId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Start processing order",
+                "method": "PUT",
+                "path": "/orders/{orderId}/status",
+                "payload": {
+                  "status": "processing"
+                },
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Create shipment for order",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-001",
+                  "warehouseId": "WH-001",
+                  "weightKg": 2.5,
+                  "addressValidated": true
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "shipmentId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Dispatch shipment",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/dispatch",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Mark order fulfilled",
+                "method": "PUT",
+                "path": "/orders/{orderId}/status",
+                "payload": {
+                  "status": "fulfilled"
+                },
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'fulfilled'"
+                ],
+                "keywords": []
+              }
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Check warehouse availability",
+                "method": "GET",
+                "path": "/warehouses/WH-001",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.currentOccupancy < response.data.capacity"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "payload": {
+                  "customerId": "CUST-001",
+                  "items": [
+                    {
+                      "sku": "WIDGET-A",
+                      "quantity": 5,
+                      "unitPriceUsd": 29.99,
+                      "weightKg": 0.5
+                    }
+                  ],
+                  "shippingAddress": {
+                    "street": "123 Main St",
+                    "city": "Springfield",
+                    "state": "IL",
+                    "zip": "62701",
+                    "country": "US"
+                  }
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "orderId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Start processing order",
+                "method": "PUT",
+                "path": "/orders/{orderId}/status",
+                "payload": {
+                  "status": "processing"
+                },
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Create shipment for order",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-001",
+                  "warehouseId": "WH-001",
+                  "weightKg": 2.5,
+                  "addressValidated": true
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "shipmentId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Dispatch shipment",
+                "method": "POST",
+                "path": "/shipments/{shipmentId}/dispatch",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Mark order fulfilled",
+                "method": "PUT",
+                "path": "/orders/{orderId}/status",
+                "payload": {
+                  "status": "fulfilled"
+                },
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'fulfilled'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW003",
+            "name": "Return Processing",
+            "description": "Customer initiates a return for a delivered shipment. Operator reviews and approves it with notification.\n",
+            "priority": "high",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Verify shipment is delivered",
+                "method": "GET",
+                "path": "/shipments/{shipmentId}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'delivered'"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Create return request",
+                "method": "POST",
+                "path": "/returns",
+                "payload": {
+                  "shipmentId": "{shipmentId}",
+                  "customerId": "CUST-001",
+                  "reason": "Item arrived damaged",
+                  "items": [
+                    {
+                      "sku": "WIDGET-A",
+                      "quantity": 2
+                    }
+                  ]
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "returnId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Retrieve return for review",
+                "method": "GET",
+                "path": "/returns/{returnId}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'requested'"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Approve the return",
+                "method": "PUT",
+                "path": "/returns/{returnId}/approve",
+                "payload": {
+                  "approved": true
+                },
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'approved'",
+                  "response.data.approvedAt !== null"
+                ],
+                "keywords": []
+              }
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Verify shipment is delivered",
+                "method": "GET",
+                "path": "/shipments/{shipmentId}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'delivered'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Create return request",
+                "method": "POST",
+                "path": "/returns",
+                "payload": {
+                  "shipmentId": "{shipmentId}",
+                  "customerId": "CUST-001",
+                  "reason": "Item arrived damaged",
+                  "items": [
+                    {
+                      "sku": "WIDGET-A",
+                      "quantity": 2
+                    }
+                  ]
+                },
+                "expectedStatus": 201,
+                "captures": [
+                  {
+                    "name": "returnId",
+                    "from": "response.data.id"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Retrieve return for review",
+                "method": "GET",
+                "path": "/returns/{returnId}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'requested'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Approve the return",
+                "method": "PUT",
+                "path": "/returns/{returnId}/approve",
+                "payload": {
+                  "approved": true
+                },
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.status === 'approved'",
+                  "response.data.approvedAt !== null"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW004",
+            "name": "Carrier Rate Comparison",
+            "description": "Retrieve rates from multiple carriers for the same shipment weight to enable cost comparison before carrier selection.\n",
+            "priority": "medium",
+            "steps": [
+              {
+                "step": 1,
+                "name": "List active carriers",
+                "method": "GET",
+                "path": "/carriers?active=true",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "carrierIds",
+                    "from": "response.data[*].id"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Get rates from carrier 1 (FastFreight)",
+                "method": "GET",
+                "path": "/carriers/CAR-001/rates?weightKg=50&service=ground",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "rate1",
+                    "from": "response.data.rates[0].total"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Get rates from carrier 2 (BudgetShip)",
+                "method": "GET",
+                "path": "/carriers/CAR-002/rates?weightKg=50&service=ground",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "rate2",
+                    "from": "response.data.rates[0].total"
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Select cheapest carrier and create shipment",
+                "description": "After comparing rate1 and rate2, select the cheapest carrier. In this scenario, CAR-002 with baseRatePerKg=1.2 will be cheaper.\n",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-002",
+                  "warehouseId": "WH-001",
+                  "weightKg": 50,
+                  "origin": {
+                    "city": "Atlanta",
+                    "state": "GA",
+                    "country": "US"
+                  },
+                  "destination": {
+                    "city": "Dallas",
+                    "state": "TX",
+                    "country": "US"
+                  },
+                  "addressValidated": true
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              }
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "List active carriers",
+                "method": "GET",
+                "path": "/carriers?active=true",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "carrierIds",
+                    "from": "response.data[*].id"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Get rates from carrier 1 (FastFreight)",
+                "method": "GET",
+                "path": "/carriers/CAR-001/rates?weightKg=50&service=ground",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "rate1",
+                    "from": "response.data.rates[0].total"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Get rates from carrier 2 (BudgetShip)",
+                "method": "GET",
+                "path": "/carriers/CAR-002/rates?weightKg=50&service=ground",
+                "expectedStatus": 200,
+                "captures": [
+                  {
+                    "name": "rate2",
+                    "from": "response.data.rates[0].total"
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Select cheapest carrier and create shipment",
+                "description": "After comparing rate1 and rate2, select the cheapest carrier. In this scenario, CAR-002 with baseRatePerKg=1.2 will be cheaper.\n",
+                "method": "POST",
+                "path": "/shipments",
+                "payload": {
+                  "carrierId": "CAR-002",
+                  "warehouseId": "WH-001",
+                  "weightKg": 50,
+                  "origin": {
+                    "city": "Atlanta",
+                    "state": "GA",
+                    "country": "US"
+                  },
+                  "destination": {
+                    "city": "Dallas",
+                    "state": "TX",
+                    "country": "US"
+                  },
+                  "addressValidated": true
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW005",
+            "name": "Real-time Tracking Update",
+            "description": "Carrier webhook pushes multiple status updates for a shipment in transit. System deduplicates events and maintains chronological history.\n",
+            "priority": "medium",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Post picked-up event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "picked_up",
+                  "timestamp": "2024-06-01T08:00:00Z",
+                  "location": {
+                    "city": "Atlanta",
+                    "state": "GA"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Post in-transit event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "timestamp": "2024-06-01T14:00:00Z",
+                  "location": {
+                    "city": "Birmingham",
+                    "state": "AL"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Attempt duplicate event (idempotency test)",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "timestamp": "2024-06-01T14:00:00Z",
+                  "location": {
+                    "city": "Birmingham",
+                    "state": "AL"
+                  }
+                },
+                "expectedStatus": 409,
+                "asserts": [
+                  "response.rule === 'duplicate-tracking-prevention'"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Post out-for-delivery event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "out_for_delivery",
+                  "timestamp": "2024-06-02T09:00:00Z",
+                  "location": {
+                    "city": "Nashville",
+                    "state": "TN"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Verify chronological history",
+                "method": "GET",
+                "path": "/tracking/history/{trackingNumber}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.total === 3",
+                  "events are sorted chronologically"
+                ],
+                "keywords": []
+              }
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Post picked-up event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "picked_up",
+                  "timestamp": "2024-06-01T08:00:00Z",
+                  "location": {
+                    "city": "Atlanta",
+                    "state": "GA"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Post in-transit event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "timestamp": "2024-06-01T14:00:00Z",
+                  "location": {
+                    "city": "Birmingham",
+                    "state": "AL"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Attempt duplicate event (idempotency test)",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "in_transit",
+                  "timestamp": "2024-06-01T14:00:00Z",
+                  "location": {
+                    "city": "Birmingham",
+                    "state": "AL"
+                  }
+                },
+                "expectedStatus": 409,
+                "asserts": [
+                  "response.rule === 'duplicate-tracking-prevention'"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Post out-for-delivery event",
+                "method": "POST",
+                "path": "/tracking/events",
+                "payload": {
+                  "trackingNumber": "{trackingNumber}",
+                  "status": "out_for_delivery",
+                  "timestamp": "2024-06-02T09:00:00Z",
+                  "location": {
+                    "city": "Nashville",
+                    "state": "TN"
+                  }
+                },
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Verify chronological history",
+                "method": "GET",
+                "path": "/tracking/history/{trackingNumber}",
+                "expectedStatus": 200,
+                "asserts": [
+                  "response.data.total === 3",
+                  "events are sorted chronologically"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "observability": {
+    "metricsUrl": null,
+    "note": "Prometheus metrics export not enabled (use --metrics-port to enable)",
+    "metricNames": {
+      "total": "api_coverage_total{service=\"<name>\",coverage_type=\"<type>\"}",
+      "covered": "api_coverage_covered{service=\"<name>\",coverage_type=\"<type>\"}",
+      "ratio": "api_coverage_ratio{service=\"<name>\",coverage_type=\"<type>\"}",
+      "thresholdFailure": "api_coverage_threshold_failure{service=\"<name>\",coverage_type=\"<type>\"}"
+    },
+    "tracing": {
+      "enabled": false,
+      "otlpEndpoint": null,
+      "note": "Tracing not enabled (use --trace to enable)"
+    }
+  }
+}

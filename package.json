@@ -1,12 +1,19 @@
 {
-  "name": "api-test-coverage-analyzer",
-  "version": "1.0.0",
+  "name": "api-tests-coverage",
+  "version": "1.0.5",
   "description": "CLI and library to measure how thoroughly your test suite exercises your API surface area",
   "main": "dist/src/lib/index.js",
   "types": "dist/src/lib/index.d.ts",
   "bin": {
-    "api-coverage": "./dist/src/index.js"
+    "api-tests-coverage": "./dist/src/index.js"
   },
+  "files": [
+    "dist/src/",
+    "dist/action/",
+    "dist/dashboard/",
+    "README.md",
+    "config.yaml.example"
+  ],
   "type": "commonjs",
   "engines": {
     "node": ">=18"
@@ -29,7 +36,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && cd dashboard && npm run build && cd .. && cp -r dashboard/dist dist/dashboard",
     "start": "node dist/src/index.js",
     "test": "jest",
     "coverage": "node scripts/run-coverage.js",
@@ -57,7 +64,9 @@
     "js-yaml": "^4.1.1",
     "openapi-types": "^12.1.3",
     "pino": "^10.3.1",
-    "prom-client": "^15.1.3",
+    "prom-client": "^15.1.3"
+  },
+  "optionalDependencies": {
     "tree-sitter": "^0.25.0",
     "tree-sitter-java": "^0.23.5",
     "tree-sitter-python": "^0.25.0",

@@ -1,0 +1,5317 @@
+{
+  "generatedAt": "2026-03-09T13:21:57.896Z",
+  "summary": [
+    {
+      "type": "endpoint",
+      "totalItems": 29,
+      "coveredItems": 29,
+      "coveragePercent": 100
+    },
+    {
+      "type": "parameter",
+      "totalItems": 73,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "totalItems": 81,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    }
+  ],
+  "details": {
+    "endpoint": {
+      "total": 29,
+      "covered": 29,
+      "percentage": 100,
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/UserControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/users",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/UserControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/UserControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/UserControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/UserControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/UserControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/UserControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/UserControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/products",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ProductControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/products",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ProductControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/products/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ProductControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/products/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ProductControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/products/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ProductControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/products/{id}/reviews",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ReviewControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/orders",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/OrderControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/orders",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/OrderControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/orders/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/OrderControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/orders/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-initial/OrderControllerTest.java",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/orders/{id}/status",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/orders/{id}/items",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/orders/{id}/items/{itemId}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/OrderControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/payments",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/PaymentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/payments/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/PaymentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/payments/{id}/capture",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/PaymentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/payments/{id}/void",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/PaymentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/refunds",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/RefundControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/refunds/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/RefundControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/shipments/{id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ShipmentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ShipmentControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/reviews",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/ReviewControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/health",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/AdminControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/metrics",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/test/java/com/example/orders/tests-complete/AdminControllerTest.java"
+          ],
+          "languages": [
+            "java"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        }
+      ]
+    },
+    "parameter": {
+      "totalParameters": 73,
+      "averageCoverage": 0,
+      "fullyCoveredPercentage": 0,
+      "uncoveredParameters": [
+        {
+          "endpoint": "GET /users",
+          "method": "GET",
+          "path": "/users",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /users",
+          "method": "GET",
+          "path": "/users",
+          "name": "size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /users",
+          "method": "GET",
+          "path": "/users",
+          "name": "email",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "email",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "password",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        {
+          "endpoint": "GET /users/{id}",
+          "method": "GET",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "email",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "password",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        {
+          "endpoint": "DELETE /users/{id}",
+          "method": "DELETE",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "category",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "search",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "minPrice",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "maxPrice",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "sortBy",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "name",
+              "price",
+              "createdAt"
+            ]
+          }
+        },
+        {
+          "endpoint": "GET /products",
+          "method": "GET",
+          "path": "/products",
+          "name": "sortDir",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "description",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "price",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.01
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "stockQuantity",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "category",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /products",
+          "method": "POST",
+          "path": "/products",
+          "name": "sku",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /products/{id}",
+          "method": "GET",
+          "path": "/products/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "description",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "price",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "stockQuantity",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "PUT /products/{id}",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "name": "category",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "DELETE /products/{id}",
+          "method": "DELETE",
+          "path": "/products/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "GET /products/{id}/reviews",
+          "method": "GET",
+          "path": "/products/{id}/reviews",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "GET /products/{id}/reviews",
+          "method": "GET",
+          "path": "/products/{id}/reviews",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /products/{id}/reviews",
+          "method": "GET",
+          "path": "/products/{id}/reviews",
+          "name": "size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /orders",
+          "method": "GET",
+          "path": "/orders",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /orders",
+          "method": "GET",
+          "path": "/orders",
+          "name": "size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /orders",
+          "method": "GET",
+          "path": "/orders",
+          "name": "status",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /orders",
+          "method": "POST",
+          "path": "/orders",
+          "name": "Idempotency-Key",
+          "location": "header",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "endpoint": "POST /orders",
+          "method": "POST",
+          "path": "/orders",
+          "name": "shippingAddress",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /orders",
+          "method": "POST",
+          "path": "/orders",
+          "name": "notes",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /orders/{id}",
+          "method": "GET",
+          "path": "/orders/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "DELETE /orders/{id}",
+          "method": "DELETE",
+          "path": "/orders/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /orders/{id}/status",
+          "method": "PUT",
+          "path": "/orders/{id}/status",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /orders/{id}/status",
+          "method": "PUT",
+          "path": "/orders/{id}/status",
+          "name": "status",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "REFUNDED"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /orders/{id}/items",
+          "method": "POST",
+          "path": "/orders/{id}/items",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /orders/{id}/items",
+          "method": "POST",
+          "path": "/orders/{id}/items",
+          "name": "productId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /orders/{id}/items",
+          "method": "POST",
+          "path": "/orders/{id}/items",
+          "name": "quantity",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        {
+          "endpoint": "DELETE /orders/{id}/items/{itemId}",
+          "method": "DELETE",
+          "path": "/orders/{id}/items/{itemId}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "DELETE /orders/{id}/items/{itemId}",
+          "method": "DELETE",
+          "path": "/orders/{id}/items/{itemId}",
+          "name": "itemId",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /payments",
+          "method": "POST",
+          "path": "/payments",
+          "name": "orderId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /payments",
+          "method": "POST",
+          "path": "/payments",
+          "name": "paymentMethod",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "CREDIT_CARD",
+              "DEBIT_CARD",
+              "PAYPAL",
+              "BANK_TRANSFER",
+              "CRYPTO"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /payments",
+          "method": "POST",
+          "path": "/payments",
+          "name": "cardToken",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /payments/{id}",
+          "method": "GET",
+          "path": "/payments/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /payments/{id}/capture",
+          "method": "POST",
+          "path": "/payments/{id}/capture",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /payments/{id}/void",
+          "method": "POST",
+          "path": "/payments/{id}/void",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /payments/{id}/void",
+          "method": "POST",
+          "path": "/payments/{id}/void",
+          "name": "reason",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /refunds",
+          "method": "POST",
+          "path": "/refunds",
+          "name": "paymentId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /refunds",
+          "method": "POST",
+          "path": "/refunds",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.01
+          }
+        },
+        {
+          "endpoint": "POST /refunds",
+          "method": "POST",
+          "path": "/refunds",
+          "name": "reason",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /refunds/{id}",
+          "method": "GET",
+          "path": "/refunds/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "GET /shipments/{id}",
+          "method": "GET",
+          "path": "/shipments/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}/status",
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}/status",
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "name": "status",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "READY_TO_SHIP",
+              "SHIPPED",
+              "IN_TRANSIT",
+              "OUT_FOR_DELIVERY",
+              "DELIVERED",
+              "FAILED",
+              "RETURNED"
+            ]
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}/status",
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "name": "trackingNumber",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}/status",
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "name": "carrier",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /shipments/{id}/status",
+          "method": "PUT",
+          "path": "/shipments/{id}/status",
+          "name": "estimatedDelivery",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "POST /reviews",
+          "method": "POST",
+          "path": "/reviews",
+          "name": "productId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /reviews",
+          "method": "POST",
+          "path": "/reviews",
+          "name": "orderId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        {
+          "endpoint": "POST /reviews",
+          "method": "POST",
+          "path": "/reviews",
+          "name": "rating",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        {
+          "endpoint": "POST /reviews",
+          "method": "POST",
+          "path": "/reviews",
+          "name": "comment",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "parameter": {
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "name": "size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "name": "email",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "email",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "password",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "email",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "password",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 8
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "category",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "search",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "minPrice",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "maxPrice",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "sortBy",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "price",
+                "createdAt"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products",
+            "method": "GET",
+            "path": "/products",
+            "name": "sortDir",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "description",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "price",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0.01
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "stockQuantity",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "category",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "name": "sku",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products/{id}",
+            "method": "GET",
+            "path": "/products/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "description",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "price",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "stockQuantity",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "name": "category",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /products/{id}",
+            "method": "DELETE",
+            "path": "/products/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products/{id}/reviews",
+            "method": "GET",
+            "path": "/products/{id}/reviews",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products/{id}/reviews",
+            "method": "GET",
+            "path": "/products/{id}/reviews",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /products/{id}/reviews",
+            "method": "GET",
+            "path": "/products/{id}/reviews",
+            "name": "size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "name": "status",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "PROCESSING",
+                "SHIPPED",
+                "DELIVERED",
+                "CANCELLED",
+                "REFUNDED"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "Idempotency-Key",
+            "location": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "shippingAddress",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "name": "notes",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "name": "status",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "PROCESSING",
+                "SHIPPED",
+                "DELIVERED",
+                "CANCELLED",
+                "REFUNDED"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "name": "productId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "name": "quantity",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /orders/{id}/items/{itemId}",
+            "method": "DELETE",
+            "path": "/orders/{id}/items/{itemId}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /orders/{id}/items/{itemId}",
+            "method": "DELETE",
+            "path": "/orders/{id}/items/{itemId}",
+            "name": "itemId",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "name": "orderId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "name": "paymentMethod",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CREDIT_CARD",
+                "DEBIT_CARD",
+                "PAYPAL",
+                "BANK_TRANSFER",
+                "CRYPTO"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "name": "cardToken",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /payments/{id}",
+            "method": "GET",
+            "path": "/payments/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments/{id}/capture",
+            "method": "POST",
+            "path": "/payments/{id}/capture",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments/{id}/void",
+            "method": "POST",
+            "path": "/payments/{id}/void",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /payments/{id}/void",
+            "method": "POST",
+            "path": "/payments/{id}/void",
+            "name": "reason",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "name": "paymentId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0.01
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "name": "reason",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /refunds/{id}",
+            "method": "GET",
+            "path": "/refunds/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "name": "status",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "READY_TO_SHIP",
+                "SHIPPED",
+                "IN_TRANSIT",
+                "OUT_FOR_DELIVERY",
+                "DELIVERED",
+                "FAILED",
+                "RETURNED"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "name": "trackingNumber",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "name": "carrier",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "name": "estimatedDelivery",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "name": "productId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "name": "orderId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "name": "rating",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "name": "comment",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        }
+      ]
+    },
+    "error": {
+      "total": 81,
+      "covered": 0,
+      "percentage": 0,
+      "scenarios": [
+        {
+          "scenario": {
+            "id": "GET /users:401",
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users:403",
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /users:400",
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "statusCode": 400,
+            "description": "Validation error or email already in use",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /users:409",
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "statusCode": 409,
+            "description": "Email already registered",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users/{id}:401",
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users/{id}:403",
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users/{id}:404",
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:400",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:401",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:403",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:404",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:401",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:403",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:404",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /products:400",
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /products:401",
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /products:403",
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /products:409",
+            "endpoint": "POST /products",
+            "method": "POST",
+            "path": "/products",
+            "statusCode": 409,
+            "description": "SKU already exists",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /products/{id}:404",
+            "endpoint": "GET /products/{id}",
+            "method": "GET",
+            "path": "/products/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /products/{id}:400",
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /products/{id}:401",
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /products/{id}:403",
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /products/{id}:404",
+            "endpoint": "PUT /products/{id}",
+            "method": "PUT",
+            "path": "/products/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /products/{id}:401",
+            "endpoint": "DELETE /products/{id}",
+            "method": "DELETE",
+            "path": "/products/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /products/{id}:403",
+            "endpoint": "DELETE /products/{id}",
+            "method": "DELETE",
+            "path": "/products/{id}",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /products/{id}:404",
+            "endpoint": "DELETE /products/{id}",
+            "method": "DELETE",
+            "path": "/products/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /products/{id}/reviews:404",
+            "endpoint": "GET /products/{id}/reviews",
+            "method": "GET",
+            "path": "/products/{id}/reviews",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders:401",
+            "endpoint": "GET /orders",
+            "method": "GET",
+            "path": "/orders",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:400",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:401",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders:409",
+            "endpoint": "POST /orders",
+            "method": "POST",
+            "path": "/orders",
+            "statusCode": 409,
+            "description": "Duplicate order (idempotency key already used)",
+            "categories": [
+              "conflict"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders/{id}:401",
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /orders/{id}:404",
+            "endpoint": "GET /orders/{id}",
+            "method": "GET",
+            "path": "/orders/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:401",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:404",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}:422",
+            "endpoint": "DELETE /orders/{id}",
+            "method": "DELETE",
+            "path": "/orders/{id}",
+            "statusCode": 422,
+            "description": "Order cannot be cancelled in current status",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:400",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:401",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:403",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:404",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /orders/{id}/status:422",
+            "endpoint": "PUT /orders/{id}/status",
+            "method": "PUT",
+            "path": "/orders/{id}/status",
+            "statusCode": 422,
+            "description": "Invalid status transition",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders/{id}/items:400",
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders/{id}/items:401",
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders/{id}/items:404",
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /orders/{id}/items:422",
+            "endpoint": "POST /orders/{id}/items",
+            "method": "POST",
+            "path": "/orders/{id}/items",
+            "statusCode": 422,
+            "description": "Insufficient stock or order amount limit exceeded",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}/items/{itemId}:401",
+            "endpoint": "DELETE /orders/{id}/items/{itemId}",
+            "method": "DELETE",
+            "path": "/orders/{id}/items/{itemId}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}/items/{itemId}:404",
+            "endpoint": "DELETE /orders/{id}/items/{itemId}",
+            "method": "DELETE",
+            "path": "/orders/{id}/items/{itemId}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /orders/{id}/items/{itemId}:422",
+            "endpoint": "DELETE /orders/{id}/items/{itemId}",
+            "method": "DELETE",
+            "path": "/orders/{id}/items/{itemId}",
+            "statusCode": 422,
+            "description": "Cannot remove item from order in current status",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments:400",
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments:401",
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments:404",
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments:422",
+            "endpoint": "POST /payments",
+            "method": "POST",
+            "path": "/payments",
+            "statusCode": 422,
+            "description": "Order already paid or cancelled",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /payments/{id}:401",
+            "endpoint": "GET /payments/{id}",
+            "method": "GET",
+            "path": "/payments/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /payments/{id}:404",
+            "endpoint": "GET /payments/{id}",
+            "method": "GET",
+            "path": "/payments/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/capture:401",
+            "endpoint": "POST /payments/{id}/capture",
+            "method": "POST",
+            "path": "/payments/{id}/capture",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/capture:404",
+            "endpoint": "POST /payments/{id}/capture",
+            "method": "POST",
+            "path": "/payments/{id}/capture",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/capture:422",
+            "endpoint": "POST /payments/{id}/capture",
+            "method": "POST",
+            "path": "/payments/{id}/capture",
+            "statusCode": 422,
+            "description": "Payment is not in AUTHORIZED state",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/void:401",
+            "endpoint": "POST /payments/{id}/void",
+            "method": "POST",
+            "path": "/payments/{id}/void",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/void:404",
+            "endpoint": "POST /payments/{id}/void",
+            "method": "POST",
+            "path": "/payments/{id}/void",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /payments/{id}/void:422",
+            "endpoint": "POST /payments/{id}/void",
+            "method": "POST",
+            "path": "/payments/{id}/void",
+            "statusCode": 422,
+            "description": "Payment cannot be voided in current state",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /refunds:400",
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /refunds:401",
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /refunds:404",
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /refunds:422",
+            "endpoint": "POST /refunds",
+            "method": "POST",
+            "path": "/refunds",
+            "statusCode": 422,
+            "description": "Refund window expired, amount exceeds payment, or payment not captured",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /refunds/{id}:401",
+            "endpoint": "GET /refunds/{id}",
+            "method": "GET",
+            "path": "/refunds/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /refunds/{id}:404",
+            "endpoint": "GET /refunds/{id}",
+            "method": "GET",
+            "path": "/refunds/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}:401",
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /shipments/{id}:404",
+            "endpoint": "GET /shipments/{id}",
+            "method": "GET",
+            "path": "/shipments/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}/status:400",
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}/status:401",
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}/status:403",
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}/status:404",
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /shipments/{id}/status:422",
+            "endpoint": "PUT /shipments/{id}/status",
+            "method": "PUT",
+            "path": "/shipments/{id}/status",
+            "statusCode": 422,
+            "description": "Payment not captured or invalid status transition",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /reviews:400",
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "statusCode": 400,
+            "description": "Invalid request data",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /reviews:401",
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /reviews:403",
+            "endpoint": "POST /reviews",
+            "method": "POST",
+            "path": "/reviews",
+            "statusCode": 403,
+            "description": "User has no completed order for this product",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:401",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:403",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:503",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 503,
+            "description": "System is degraded or down",
+            "categories": [
+              "server-error"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/metrics:401",
+            "endpoint": "GET /admin/metrics",
+            "method": "GET",
+            "path": "/admin/metrics",
+            "statusCode": 401,
+            "description": "Authentication required",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/metrics:403",
+            "endpoint": "GET /admin/metrics",
+            "method": "GET",
+            "path": "/admin/metrics",
+            "statusCode": 403,
+            "description": "Insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        }
+      ],
+      "categorySummary": {
+        "missing-parameter": {
+          "total": 1,
+          "covered": 0
+        },
+        "invalid-value": {
+          "total": 20,
+          "covered": 0
+        },
+        "unauthorized": {
+          "total": 25,
+          "covered": 0
+        },
+        "forbidden": {
+          "total": 12,
+          "covered": 0
+        },
+        "not-found": {
+          "total": 20,
+          "covered": 0
+        },
+        "conflict": {
+          "total": 3,
+          "covered": 0
+        },
+        "server-error": {
+          "total": 1,
+          "covered": 0
+        }
+      }
+    },
+    "business": {
+      "total": 8,
+      "covered": 0,
+      "percentage": 0,
+      "uncoveredRules": [
+        {
+          "id": "only-authenticated-users-can-place-orders",
+          "description": "Only authenticated users with a valid JWT may create orders. Anonymous/unauthenticated requests receive HTTP 401.\n",
+          "endpoints": [
+            "POST /orders",
+            "POST /orders/{id}/items"
+          ],
+          "validation": {
+            "type": "authentication",
+            "mechanism": "jwt-bearer"
+          },
+          "testKeywords": [
+            "unauthorized",
+            401,
+            "no token",
+            "missing token",
+            "invalid token"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "inventory-check-before-order",
+          "description": "An order item cannot be added if the product's stockQuantity is 0 or less than the requested quantity. Returns HTTP 422 with a descriptive error.\n",
+          "endpoints": [
+            "POST /orders/{id}/items"
+          ],
+          "validation": {
+            "type": "business-logic",
+            "condition": "product.stockQuantity >= requestedQuantity"
+          },
+          "testKeywords": [
+            "insufficient stock",
+            "out of stock",
+            "inventory",
+            422,
+            "stock"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "payment-required-before-shipment",
+          "description": "A shipment status cannot be moved to SHIPPED unless the linked payment has status CAPTURED. Prevents shipping unpaid orders.\n",
+          "endpoints": [
+            "PUT /shipments/{id}/status"
+          ],
+          "validation": {
+            "type": "business-logic",
+            "condition": "payment.status == 'CAPTURED'"
+          },
+          "testKeywords": [
+            "payment not captured",
+            "unpaid",
+            "shipment",
+            422
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "refund-window-30-days",
+          "description": "Refunds must be requested within 30 calendar days of the payment capture date. Requests outside the window receive HTTP 422.\n",
+          "endpoints": [
+            "POST /refunds"
+          ],
+          "validation": {
+            "type": "business-logic",
+            "condition": "daysSinceCapture <= 30"
+          },
+          "testKeywords": [
+            "refund window",
+            "expired",
+            "30 days",
+            422
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "user-deletion-requires-admin",
+          "description": "Only users with the ADMIN role may delete user accounts. Authenticated non-admin users receive HTTP 403.\n",
+          "endpoints": [
+            "DELETE /users/{id}"
+          ],
+          "validation": {
+            "type": "authorization",
+            "role": "ADMIN"
+          },
+          "testKeywords": [
+            "forbidden",
+            403,
+            "admin",
+            "role"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "duplicate-order-prevention",
+          "description": "If an order is submitted with an Idempotency-Key header that has already been used, the API returns HTTP 409 Conflict instead of creating a duplicate.\n",
+          "endpoints": [
+            "POST /orders"
+          ],
+          "validation": {
+            "type": "idempotency",
+            "header": "Idempotency-Key"
+          },
+          "testKeywords": [
+            "idempotency",
+            "duplicate",
+            "conflict",
+            409
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "max-order-amount-10000",
+          "description": "A single order's totalAmount must not exceed $10,000. Adding an item that would breach this limit returns HTTP 422.\n",
+          "endpoints": [
+            "POST /orders/{id}/items"
+          ],
+          "validation": {
+            "type": "business-logic",
+            "condition": "order.totalAmount <= 10000"
+          },
+          "testKeywords": [
+            "max amount",
+            10000,
+            "limit exceeded",
+            422
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "review-requires-completed-order",
+          "description": "A user may only submit a review for a product if they have at least one DELIVERED order containing that product. Otherwise HTTP 403 is returned.\n",
+          "endpoints": [
+            "POST /reviews"
+          ],
+          "validation": {
+            "type": "business-logic",
+            "condition": "user.hasCompletedOrderWithProduct(productId)"
+          },
+          "testKeywords": [
+            "completed order",
+            "forbidden",
+            "review",
+            403
+          ],
+          "keywords": [],
+          "scenarios": []
+        }
+      ],
+      "rules": [
+        {
+          "rule": {
+            "id": "only-authenticated-users-can-place-orders",
+            "description": "Only authenticated users with a valid JWT may create orders. Anonymous/unauthenticated requests receive HTTP 401.\n",
+            "endpoints": [
+              "POST /orders",
+              "POST /orders/{id}/items"
+            ],
+            "validation": {
+              "type": "authentication",
+              "mechanism": "jwt-bearer"
+            },
+            "testKeywords": [
+              "unauthorized",
+              401,
+              "no token",
+              "missing token",
+              "invalid token"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "inventory-check-before-order",
+            "description": "An order item cannot be added if the product's stockQuantity is 0 or less than the requested quantity. Returns HTTP 422 with a descriptive error.\n",
+            "endpoints": [
+              "POST /orders/{id}/items"
+            ],
+            "validation": {
+              "type": "business-logic",
+              "condition": "product.stockQuantity >= requestedQuantity"
+            },
+            "testKeywords": [
+              "insufficient stock",
+              "out of stock",
+              "inventory",
+              422,
+              "stock"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "payment-required-before-shipment",
+            "description": "A shipment status cannot be moved to SHIPPED unless the linked payment has status CAPTURED. Prevents shipping unpaid orders.\n",
+            "endpoints": [
+              "PUT /shipments/{id}/status"
+            ],
+            "validation": {
+              "type": "business-logic",
+              "condition": "payment.status == 'CAPTURED'"
+            },
+            "testKeywords": [
+              "payment not captured",
+              "unpaid",
+              "shipment",
+              422
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "refund-window-30-days",
+            "description": "Refunds must be requested within 30 calendar days of the payment capture date. Requests outside the window receive HTTP 422.\n",
+            "endpoints": [
+              "POST /refunds"
+            ],
+            "validation": {
+              "type": "business-logic",
+              "condition": "daysSinceCapture <= 30"
+            },
+            "testKeywords": [
+              "refund window",
+              "expired",
+              "30 days",
+              422
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "user-deletion-requires-admin",
+            "description": "Only users with the ADMIN role may delete user accounts. Authenticated non-admin users receive HTTP 403.\n",
+            "endpoints": [
+              "DELETE /users/{id}"
+            ],
+            "validation": {
+              "type": "authorization",
+              "role": "ADMIN"
+            },
+            "testKeywords": [
+              "forbidden",
+              403,
+              "admin",
+              "role"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "duplicate-order-prevention",
+            "description": "If an order is submitted with an Idempotency-Key header that has already been used, the API returns HTTP 409 Conflict instead of creating a duplicate.\n",
+            "endpoints": [
+              "POST /orders"
+            ],
+            "validation": {
+              "type": "idempotency",
+              "header": "Idempotency-Key"
+            },
+            "testKeywords": [
+              "idempotency",
+              "duplicate",
+              "conflict",
+              409
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "max-order-amount-10000",
+            "description": "A single order's totalAmount must not exceed $10,000. Adding an item that would breach this limit returns HTTP 422.\n",
+            "endpoints": [
+              "POST /orders/{id}/items"
+            ],
+            "validation": {
+              "type": "business-logic",
+              "condition": "order.totalAmount <= 10000"
+            },
+            "testKeywords": [
+              "max amount",
+              10000,
+              "limit exceeded",
+              422
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "review-requires-completed-order",
+            "description": "A user may only submit a review for a product if they have at least one DELIVERED order containing that product. Otherwise HTTP 403 is returned.\n",
+            "endpoints": [
+              "POST /reviews"
+            ],
+            "validation": {
+              "type": "business-logic",
+              "condition": "user.hasCompletedOrderWithProduct(productId)"
+            },
+            "testKeywords": [
+              "completed order",
+              "forbidden",
+              "review",
+              403
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        }
+      ]
+    },
+    "integration": {
+      "total": 5,
+      "complete": 0,
+      "partial": 0,
+      "missing": 5,
+      "percentage": 0,
+      "flows": [
+        {
+          "flow": {
+            "id": "FLOW001",
+            "name": "Complete Order Lifecycle",
+            "description": "The primary happy-path flow for a customer placing and receiving an order. Covers user registration, product browsing, order creation, item addition, payment authorization + capture, and shipment tracking.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Register user",
+                "method": "POST",
+                "path": "/users",
+                "description": "Customer creates an account",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Browse products",
+                "method": "GET",
+                "path": "/products",
+                "description": "Customer browses the product catalog",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "View product detail",
+                "method": "GET",
+                "path": "/products/{id}",
+                "description": "Customer views a specific product",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "description": "Customer creates an empty order (with Idempotency-Key header)",
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Add item to order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Customer adds a product to the order; triggers inventory check",
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Initiate payment",
+                "method": "POST",
+                "path": "/payments",
+                "description": "Customer initiates payment (authorizes the charge)",
+                "keywords": []
+              },
+              {
+                "step": 7,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "description": "Payment gateway confirms funds; order moves to PROCESSING",
+                "keywords": []
+              },
+              {
+                "step": 8,
+                "name": "Ship order (admin)",
+                "method": "PUT",
+                "path": "/shipments/{id}/status",
+                "description": "Admin marks shipment as SHIPPED with tracking number",
+                "keywords": []
+              },
+              {
+                "step": 9,
+                "name": "Track shipment",
+                "method": "GET",
+                "path": "/shipments/{id}",
+                "description": "Customer tracks their shipment",
+                "keywords": []
+              },
+              {
+                "step": 10,
+                "name": "Deliver order (admin)",
+                "method": "PUT",
+                "path": "/shipments/{id}/status",
+                "description": "Admin marks shipment as DELIVERED",
+                "keywords": []
+              }
+            ],
+            "expectedOutcome": "Order reaches DELIVERED status with captured payment"
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Register user",
+                "method": "POST",
+                "path": "/users",
+                "description": "Customer creates an account",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Browse products",
+                "method": "GET",
+                "path": "/products",
+                "description": "Customer browses the product catalog",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "View product detail",
+                "method": "GET",
+                "path": "/products/{id}",
+                "description": "Customer views a specific product",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "description": "Customer creates an empty order (with Idempotency-Key header)",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Add item to order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Customer adds a product to the order; triggers inventory check",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Initiate payment",
+                "method": "POST",
+                "path": "/payments",
+                "description": "Customer initiates payment (authorizes the charge)",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 7,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "description": "Payment gateway confirms funds; order moves to PROCESSING",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 8,
+                "name": "Ship order (admin)",
+                "method": "PUT",
+                "path": "/shipments/{id}/status",
+                "description": "Admin marks shipment as SHIPPED with tracking number",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 9,
+                "name": "Track shipment",
+                "method": "GET",
+                "path": "/shipments/{id}",
+                "description": "Customer tracks their shipment",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 10,
+                "name": "Deliver order (admin)",
+                "method": "PUT",
+                "path": "/shipments/{id}/status",
+                "description": "Admin marks shipment as DELIVERED",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW002",
+            "name": "Order Cancellation and Refund",
+            "description": "Customer cancels an order after payment and requests a refund. Tests the refund window business rule and refund processing.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Add item",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Initiate and capture payment",
+                "method": "POST",
+                "path": "/payments",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Update order status to cancelled",
+                "method": "PUT",
+                "path": "/orders/{id}/status",
+                "description": "Customer or admin cancels the order",
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Request refund",
+                "method": "POST",
+                "path": "/refunds",
+                "description": "Customer submits refund request within 30-day window",
+                "keywords": []
+              },
+              {
+                "step": 7,
+                "name": "Check refund status",
+                "method": "GET",
+                "path": "/refunds/{id}",
+                "keywords": []
+              }
+            ],
+            "expectedOutcome": "Refund in PROCESSING or COMPLETED status"
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Create order",
+                "method": "POST",
+                "path": "/orders",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Add item",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Initiate and capture payment",
+                "method": "POST",
+                "path": "/payments",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Update order status to cancelled",
+                "method": "PUT",
+                "path": "/orders/{id}/status",
+                "description": "Customer or admin cancels the order",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Request refund",
+                "method": "POST",
+                "path": "/refunds",
+                "description": "Customer submits refund request within 30-day window",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 7,
+                "name": "Check refund status",
+                "method": "GET",
+                "path": "/refunds/{id}",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW003",
+            "name": "Product Inventory Management",
+            "description": "Admin manages the product catalog — creates products, updates stock levels, and tests inventory enforcement during order placement.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Create product",
+                "method": "POST",
+                "path": "/products",
+                "description": "Admin creates a new product with initial stock",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Update product details",
+                "method": "PUT",
+                "path": "/products/{id}",
+                "description": "Admin updates price or description",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Customer adds item to order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Tests that stock is decremented",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Attempt to over-order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Tests inventory-check-before-order rule (expects 422)",
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Remove item (restore stock)",
+                "method": "DELETE",
+                "path": "/orders/{id}/items/{itemId}",
+                "description": "Tests that stock is restored on item removal",
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Delete product",
+                "method": "DELETE",
+                "path": "/products/{id}",
+                "description": "Admin soft-deletes the product",
+                "keywords": []
+              }
+            ],
+            "expectedOutcome": "Inventory correctly maintained throughout lifecycle"
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Create product",
+                "method": "POST",
+                "path": "/products",
+                "description": "Admin creates a new product with initial stock",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Update product details",
+                "method": "PUT",
+                "path": "/products/{id}",
+                "description": "Admin updates price or description",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Customer adds item to order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Tests that stock is decremented",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Attempt to over-order",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "description": "Tests inventory-check-before-order rule (expects 422)",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Remove item (restore stock)",
+                "method": "DELETE",
+                "path": "/orders/{id}/items/{itemId}",
+                "description": "Tests that stock is restored on item removal",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Delete product",
+                "method": "DELETE",
+                "path": "/products/{id}",
+                "description": "Admin soft-deletes the product",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW004",
+            "name": "User Registration and First Purchase",
+            "description": "New user registers, completes a purchase, and leaves a review. Validates review-requires-completed-order business rule.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "Register",
+                "method": "POST",
+                "path": "/users",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Create order and add item",
+                "method": "POST",
+                "path": "/orders",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Add item",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Pay and complete order",
+                "method": "POST",
+                "path": "/payments",
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Attempt review before delivery (expects 403)",
+                "method": "POST",
+                "path": "/reviews",
+                "description": "Tests review-requires-completed-order rule",
+                "keywords": []
+              },
+              {
+                "step": 7,
+                "name": "Mark order delivered",
+                "method": "PUT",
+                "path": "/orders/{id}/status",
+                "keywords": []
+              },
+              {
+                "step": 8,
+                "name": "Submit review (after delivery)",
+                "method": "POST",
+                "path": "/reviews",
+                "description": "Now allowed because order is DELIVERED",
+                "keywords": []
+              }
+            ],
+            "expectedOutcome": "Review submitted successfully after order delivery"
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "Register",
+                "method": "POST",
+                "path": "/users",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Create order and add item",
+                "method": "POST",
+                "path": "/orders",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Add item",
+                "method": "POST",
+                "path": "/orders/{id}/items",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Pay and complete order",
+                "method": "POST",
+                "path": "/payments",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Capture payment",
+                "method": "POST",
+                "path": "/payments/{id}/capture",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Attempt review before delivery (expects 403)",
+                "method": "POST",
+                "path": "/reviews",
+                "description": "Tests review-requires-completed-order rule",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 7,
+                "name": "Mark order delivered",
+                "method": "PUT",
+                "path": "/orders/{id}/status",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 8,
+                "name": "Submit review (after delivery)",
+                "method": "POST",
+                "path": "/reviews",
+                "description": "Now allowed because order is DELIVERED",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW005",
+            "name": "Admin Operations",
+            "description": "Admin performs privileged operations including user management, system health checks, and metrics retrieval.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "List all users",
+                "method": "GET",
+                "path": "/users",
+                "description": "Admin retrieves user list",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "Get specific user",
+                "method": "GET",
+                "path": "/users/{id}",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "Update user details",
+                "method": "PUT",
+                "path": "/users/{id}",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "Delete user",
+                "method": "DELETE",
+                "path": "/users/{id}",
+                "description": "Tests user-deletion-requires-admin rule",
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "Create product",
+                "method": "POST",
+                "path": "/products",
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "Check system health",
+                "method": "GET",
+                "path": "/admin/health",
+                "keywords": []
+              },
+              {
+                "step": 7,
+                "name": "Retrieve metrics",
+                "method": "GET",
+                "path": "/admin/metrics",
+                "keywords": []
+              }
+            ],
+            "expectedOutcome": "All admin operations succeed; non-admin access returns 403"
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "List all users",
+                "method": "GET",
+                "path": "/users",
+                "description": "Admin retrieves user list",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "Get specific user",
+                "method": "GET",
+                "path": "/users/{id}",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "Update user details",
+                "method": "PUT",
+                "path": "/users/{id}",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "Delete user",
+                "method": "DELETE",
+                "path": "/users/{id}",
+                "description": "Tests user-deletion-requires-admin rule",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "Create product",
+                "method": "POST",
+                "path": "/products",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "Check system health",
+                "method": "GET",
+                "path": "/admin/health",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 7,
+                "name": "Retrieve metrics",
+                "method": "GET",
+                "path": "/admin/metrics",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "observability": {
+    "metricsUrl": null,
+    "note": "Prometheus metrics export not enabled (use --metrics-port to enable)",
+    "metricNames": {
+      "total": "api_coverage_total{service=\"<name>\",coverage_type=\"<type>\"}",
+      "covered": "api_coverage_covered{service=\"<name>\",coverage_type=\"<type>\"}",
+      "ratio": "api_coverage_ratio{service=\"<name>\",coverage_type=\"<type>\"}",
+      "thresholdFailure": "api_coverage_threshold_failure{service=\"<name>\",coverage_type=\"<type>\"}"
+    },
+    "tracing": {
+      "enabled": false,
+      "otlpEndpoint": null,
+      "note": "Tracing not enabled (use --trace to enable)"
+    }
+  }
+}

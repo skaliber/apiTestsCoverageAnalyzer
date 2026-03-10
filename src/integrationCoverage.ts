@@ -92,7 +92,13 @@ export function parseIntegrationFlows(flowsPath: string): IntegrationFlow[] {
     );
   }
 
-  return (parsed as IntegrationFlowsFile).flows;
+  return (parsed as IntegrationFlowsFile).flows.map((flow) => ({
+    ...flow,
+    steps: (flow.steps ?? []).map((step) => ({
+      ...step,
+      keywords: step.keywords ?? [],
+    })),
+  }));
 }
 
 // ─── Coverage detection ───────────────────────────────────────────────────────

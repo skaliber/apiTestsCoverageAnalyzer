@@ -1,0 +1,319 @@
+{
+  "generated_at": "2026-03-09T13:21:57.793Z",
+  "rule_source": "inferred",
+  "files_analyzed": 25,
+  "rule_count": 31,
+  "rules": [
+    {
+      "id": "shipment_controller_http_422_response_45",
+      "name": "http_422_response",
+      "rule_source": "inferred",
+      "type": "validation",
+      "endpoint": "PUT /{id}/status",
+      "condition": "returns HTTP 422",
+      "expected_behavior": "Request rejected with HTTP 422",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/controller/ShipmentController.java:45",
+      "code_snippet": "return ResponseEntity.status(422).body(Map.of(\"error\", e.getMessage()));"
+    },
+    {
+      "id": "order_repository_unsupported_operation_exception_37",
+      "name": "unsupported_operation_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws UnsupportedOperationException(\"savePayment not implemented at repository level\")",
+      "expected_behavior": "Operation rejected: UnsupportedOperationException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/repository/OrderRepository.java:37",
+      "code_snippet": "throw new UnsupportedOperationException(\"savePayment not implemented at repository level\");"
+    },
+    {
+      "id": "order_repository_unsupported_operation_exception_41",
+      "name": "unsupported_operation_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws UnsupportedOperationException(\"saveRefund not implemented at repository level\")",
+      "expected_behavior": "Operation rejected: UnsupportedOperationException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/repository/OrderRepository.java:41",
+      "code_snippet": "throw new UnsupportedOperationException(\"saveRefund not implemented at repository level\");"
+    },
+    {
+      "id": "order_repository_unsupported_operation_exception_45",
+      "name": "unsupported_operation_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws UnsupportedOperationException(\"saveShipment not implemented at repository level\")",
+      "expected_behavior": "Operation rejected: UnsupportedOperationException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/repository/OrderRepository.java:45",
+      "code_snippet": "throw new UnsupportedOperationException(\"saveShipment not implemented at repository level\");"
+    },
+    {
+      "id": "inventory_service_illegal_argument_exception_26",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Product with SKU already exists: \" + product.getSku()",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/InventoryService.java:26",
+      "code_snippet": "throw new IllegalArgumentException(\"Product with SKU already exists: \" + product.getSku());"
+    },
+    {
+      "id": "order_service_illegal_state_exception_41",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Duplicate order: idempotency key already used\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:41",
+      "code_snippet": "throw new IllegalStateException(\"Duplicate order: idempotency key already used\");"
+    },
+    {
+      "id": "order_service_authorization__order_get_user__84",
+      "name": "authorization__order_get_user_",
+      "rule_source": "inferred",
+      "type": "authorization",
+      "condition": "!isAuthorized(&& !order.getUser()",
+      "expected_behavior": "Access denied — insufficient permissions",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:84",
+      "code_snippet": "if (!isAdmin && !order.getUser().getEmail().equals(currentUser.getUsername())) {"
+    },
+    {
+      "id": "order_service_illegal_argument_exception_85",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:85",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "order_service_illegal_argument_exception_93",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Invalid order status: \" + newStatus)",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:93",
+      "code_snippet": "throw new IllegalArgumentException(\"Invalid order status: \" + newStatus);"
+    },
+    {
+      "id": "order_service_illegal_argument_exception_102",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:102",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "order_service_illegal_state_exception_106",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Cannot cancel order in status: \" + order.getStatus()",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:106",
+      "code_snippet": "throw new IllegalStateException(\"Cannot cancel order in status: \" + order.getStatus());"
+    },
+    {
+      "id": "order_service_illegal_state_exception_117",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Cannot add items to order in status: \" + order.getStatus()",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:117",
+      "code_snippet": "throw new IllegalStateException(\"Cannot add items to order in status: \" + order.getStatus());"
+    },
+    {
+      "id": "order_service_illegal_state_exception_128",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Insufficient stock. Available: \" + product.getStockQuantity()",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:128",
+      "code_snippet": "throw new IllegalStateException(\"Insufficient stock. Available: \" + product.getStockQuantity());"
+    },
+    {
+      "id": "order_service_illegal_state_exception_140",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Order exceeds maximum allowed amount of $10,000\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:140",
+      "code_snippet": "throw new IllegalStateException(\"Order exceeds maximum allowed amount of $10,000\");"
+    },
+    {
+      "id": "order_service_illegal_state_exception_158",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Cannot remove items from order in status: \" + order.getStatus()",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:158",
+      "code_snippet": "throw new IllegalStateException(\"Cannot remove items from order in status: \" + order.getStatus());"
+    },
+    {
+      "id": "order_service_null_check_payment_187",
+      "name": "null_check_payment",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "payment == null",
+      "expected_behavior": "payment must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:187",
+      "code_snippet": "if (payment == null || payment.getStatus() != Payment.PaymentStatus.CAPTURED) {"
+    },
+    {
+      "id": "order_service_illegal_state_exception_188",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Payment must be captured before shipping\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:188",
+      "code_snippet": "throw new IllegalStateException(\"Payment must be captured before shipping\");"
+    },
+    {
+      "id": "order_service_illegal_argument_exception_196",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Invalid shipment status: \" + status)",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/OrderService.java:196",
+      "code_snippet": "throw new IllegalArgumentException(\"Invalid shipment status: \" + status);"
+    },
+    {
+      "id": "payment_service_illegal_argument_exception_36",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:36",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "payment_service_illegal_state_exception_39",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Cannot pay for a cancelled order\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:39",
+      "code_snippet": "throw new IllegalStateException(\"Cannot pay for a cancelled order\");"
+    },
+    {
+      "id": "payment_service_illegal_state_exception_42",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Order already has a payment\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:42",
+      "code_snippet": "throw new IllegalStateException(\"Order already has a payment\");"
+    },
+    {
+      "id": "payment_service_illegal_argument_exception_68",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:68",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "payment_service_illegal_state_exception_71",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Only AUTHORIZED payments can be captured\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:71",
+      "code_snippet": "throw new IllegalStateException(\"Only AUTHORIZED payments can be captured\");"
+    },
+    {
+      "id": "payment_service_illegal_argument_exception_91",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:91",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "payment_service_illegal_state_exception_94",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Captured payments cannot be voided; use refund instead\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:94",
+      "code_snippet": "throw new IllegalStateException(\"Captured payments cannot be voided; use refund instead\");"
+    },
+    {
+      "id": "payment_service_illegal_state_exception_98",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Payment cannot be voided in status: \" + payment.getStatus()",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/PaymentService.java:98",
+      "code_snippet": "throw new IllegalStateException(\"Payment cannot be voided in status: \" + payment.getStatus());"
+    },
+    {
+      "id": "refund_service_illegal_argument_exception_37",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Access denied\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/RefundService.java:37",
+      "code_snippet": "throw new IllegalArgumentException(\"Access denied\");"
+    },
+    {
+      "id": "refund_service_illegal_state_exception_40",
+      "name": "illegal_state_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalStateException(\"Only captured payments can be refunded\")",
+      "expected_behavior": "Operation rejected: IllegalStateException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/RefundService.java:40",
+      "code_snippet": "throw new IllegalStateException(\"Only captured payments can be refunded\");"
+    },
+    {
+      "id": "refund_service_illegal_argument_exception_53",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Refund amount cannot exceed payment amount\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/RefundService.java:53",
+      "code_snippet": "throw new IllegalArgumentException(\"Refund amount cannot exceed payment amount\");"
+    },
+    {
+      "id": "user_service_illegal_argument_exception_26",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Email already in use: \" + user.getEmail()",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/UserService.java:26",
+      "code_snippet": "throw new IllegalArgumentException(\"Email already in use: \" + user.getEmail());"
+    },
+    {
+      "id": "user_service_illegal_argument_exception_57",
+      "name": "illegal_argument_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "throws IllegalArgumentException(\"Email already in use\")",
+      "expected_behavior": "Operation rejected: IllegalArgumentException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/java-spring-complex/src/main/java/com/example/orders/service/UserService.java:57",
+      "code_snippet": "throw new IllegalArgumentException(\"Email already in use\");"
+    }
+  ]
+}

@@ -57,6 +57,22 @@ export interface AnalysisConfig {
   warnOnConfigMissing?: boolean;
   /** AST-based analysis configuration */
   ast?: AstAnalysisConfig;
+  /**
+   * When true, the analyzer will automatically discover API specs, tests,
+   * contracts, performance results, and security reports without explicit config.
+   * Default: true.
+   */
+  agnosticDiscovery?: boolean;
+  /**
+   * When true, if business rule files are absent the analyzer infers rules
+   * from service-code validation / conditional logic. Default: true.
+   */
+  inferBusinessRules?: boolean;
+  /**
+   * When true, if integration flow files are absent the analyzer constructs
+   * flows from test call sequences and Cucumber scenarios. Default: true.
+   */
+  inferIntegrationFlows?: boolean;
 }
 
 export type CoverageType =

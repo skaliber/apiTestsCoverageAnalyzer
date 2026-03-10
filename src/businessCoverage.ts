@@ -88,7 +88,14 @@ export function parseBusinessRules(rulesPath: string): BusinessRule[] {
     );
   }
 
-  return (parsed as BusinessRulesFile).rules;
+  return (parsed as BusinessRulesFile).rules.map((rule) => ({
+    ...rule,
+    keywords: rule.keywords ?? [],
+    scenarios: (rule.scenarios ?? []).map((s) => ({
+      ...s,
+      keywords: s.keywords ?? [],
+    })),
+  }));
 }
 
 // ─── Coverage detection ───────────────────────────────────────────────────────

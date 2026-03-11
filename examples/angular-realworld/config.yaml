@@ -1,0 +1,17 @@
+version: 1
+project:
+  name: angular-realworld
+  language: typescript
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./src/tests
+  language: typescript
+
+thresholds:
+  endpoint: 80
+  parameter: 60
+
+reports:
+  outputDir: ./reports
+  formats: [json]

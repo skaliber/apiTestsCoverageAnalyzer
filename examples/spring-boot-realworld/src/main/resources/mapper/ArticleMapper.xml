@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.conduit.infrastructure.persistence.ArticleMapper">
+
+  <resultMap id="articleMap" type="com.example.conduit.domain.model.Article">
+    <id property="id" column="id"/>
+    <result property="slug" column="slug"/>
+    <result property="title" column="title"/>
+    <result property="description" column="description"/>
+    <result property="body" column="body"/>
+    <result property="authorId" column="author_id"/>
+  </resultMap>
+
+  <select id="findBySlug" resultMap="articleMap">
+    SELECT * FROM articles WHERE slug = #{slug}
+  </select>
+
+  <select id="findByAuthorId" resultMap="articleMap">
+    SELECT * FROM articles WHERE author_id = #{authorId}
+    <if test="limit != null">LIMIT #{limit}</if>
+  </select>
+
+  <select id="findByTag" resultMap="articleMap">
+    SELECT a.* FROM articles a
+    JOIN article_tags at ON a.id = at.article_id
+    WHERE at.tag = #{tag}
+  </select>
+
+  <insert id="insert">
+    INSERT INTO articles (slug, title, description, body, author_id)
+    VALUES (#{slug}, #{title}, #{description}, #{body}, #{authorId})
+  </insert>
+
+  <update id="update">
+    UPDATE articles SET
+      title = #{title},
+      description = #{description},
+      body = #{body}
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM articles WHERE id = #{id}
+  </delete>
+
+</mapper>

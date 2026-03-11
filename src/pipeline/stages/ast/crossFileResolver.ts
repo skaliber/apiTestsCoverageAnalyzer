@@ -74,7 +74,16 @@ export function buildCrossFileSymbolTable(
     importGraph.set(filePath, resolvedPaths);
   }
 
-  return { models, exportedSymbols, classes, importGraph };
+  return {
+    models,
+    exportedSymbols,
+    classes,
+    importGraph,
+    routerMounts: new Map(),
+    injectionChains: new Map(),
+    interfaceImplementations: new Map(),
+    middlewareInheritance: new Map(),
+  };
 }
 
 /**

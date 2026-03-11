@@ -1,0 +1,16 @@
+version: 1
+project:
+  name: slim-php-realworld
+  language: php
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./tests
+  language: php
+
+thresholds:
+  endpoint: 80
+
+reports:
+  outputDir: ./reports
+  formats: [json]

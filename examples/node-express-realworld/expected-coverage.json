@@ -1,0 +1,9 @@
+{
+  "description": "Feature 27 coverage expectations for Express middleware auth + error handlers + Mongoose example",
+  "expectations": {
+    "totalEndpoints": { "operator": ">", "value": 0 },
+    "endpointsWithResolvedFullUrl": { "operator": ">=", "value": 0 },
+    "endpointsWithSecurityClassified": { "operator": ">", "value": 0 },
+    "parametersDetected": { "operator": ">", "value": 0 }
+  }
+}

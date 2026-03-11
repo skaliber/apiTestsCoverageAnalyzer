@@ -48,6 +48,7 @@ function buildDiscoveryResult(
     serviceFiles: [],
     languages,
     frameworks,
+    apiFrameworks: [],
     discoverySource: {
       specs: 'discovered' as const,
       testFiles: 'discovered' as const,

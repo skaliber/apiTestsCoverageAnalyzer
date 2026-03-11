@@ -22,6 +22,7 @@ import type {
 import type { ScaOutput } from '../sca/types';
 import { registerAllAnalyzers, analyzeFileDetailed, buildAnalysisContext } from '../../../ast/astAnalysisOrchestrator';
 import { buildCrossFileSymbolTable } from './crossFileResolver';
+import { runCrossFileResolution } from './crossFileResolutionPass';
 import { traverseInheritanceChain, resolveImportedHelper } from './abstractLayerTraversal';
 import { buildAstGraph } from './graphBuilder';
 import { isTestFile } from '../../../discovery/fileClassifier';
@@ -115,6 +116,14 @@ export class AstStage implements PipelineStage<AstStageOutput> {
     // Phase 2: Build cross-file symbol table
     const crossFileTable = buildCrossFileSymbolTable(models, context.projectRoot);
 
+    // Phase 2b: Run cross-file resolution pass (Feature 27)
+    const crossFileResolutionResult = runCrossFileResolution(
+      crossFileTable,
+      context.projectRoot,
+      artifacts.apiFrameworks,
+      allSourceFiles,
+    );
+
     // Phase 3: Run abstract layer traversal for test files
     const traversalResults = new Map<string, import('./types').TraversalResult>();
     const depthCap = context.config.traversalDepthCap;
@@ -187,6 +196,8 @@ export class AstStage implements PipelineStage<AstStageOutput> {
         traversalResultCount: traversalResults.size,
         graphNodesAdded: nodes.length,
         graphEdgesAdded: edges.length,
+        crossFileResolversRun: crossFileResolutionResult.resolverResults.length,
+        crossFileEntriesAdded: crossFileResolutionResult.totalEntriesAdded,
       },
     };
     context.diagnostics.set('ast', diagnostics);
@@ -198,6 +209,7 @@ export class AstStage implements PipelineStage<AstStageOutput> {
       traversalResults,
       analyzedFiles: filesScanned,
       skippedFiles: filesSkipped,
+      crossFileResolutionDiagnostics: crossFileResolutionResult.resolverResults,
     };
 
     context.stageOutputs.set('ast', output);

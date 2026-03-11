@@ -1,0 +1,134 @@
+{
+  "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex",
+  "analyzedAt": "2026-03-11T15:43:32.133Z",
+  "discoveredFiles": {
+    "serviceFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/admin_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/audit_logs_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/coupons_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/invoices_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/plans_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/webhooks_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/application_controller.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/helpers/api_helper.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/helpers/path_helper.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/audit_log.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/coupon.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/invoice.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/plan.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/role.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/seat.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/subscription.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/models/user.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/services/billing_service.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/services/subscription_service.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/services/usage_service.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/config/application.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/config/routes.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/rails_helper.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/spec_helper.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/support/api_spec_helpers.rb"
+    ],
+    "testFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/admin_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/audit_logs_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/coupons_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/error_scenarios_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/invoices_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/plans_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/roles_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/seats_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/security_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/subscriptions_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/usage_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/users_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/webhooks_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-initial/subscriptions_spec.rb",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-initial/users_spec.rb"
+    ],
+    "specFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/openapi.yaml"
+    ]
+  },
+  "languages": [
+    "ruby"
+  ],
+  "frameworks": [
+    "rspec",
+    "jest"
+  ],
+  "scanTypes": [
+    {
+      "type": "endpoint",
+      "source": "explicit",
+      "itemsFound": 26,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "parameter",
+      "source": "explicit",
+      "itemsFound": 57,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "source": "explicit",
+      "itemsFound": 68,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "source": "explicit",
+      "itemsFound": 8,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "source": "explicit",
+      "itemsFound": 5,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "security",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "performance",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "resilience",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "compatibility",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    }
+  ]
+}

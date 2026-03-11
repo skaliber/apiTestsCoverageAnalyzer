@@ -1,0 +1,216 @@
+{
+  "generated_at": "2026-03-11T15:43:32.078Z",
+  "flow_source": "inferred",
+  "files_analyzed": 15,
+  "flow_count": 12,
+  "flows": [
+    {
+      "id": "audit_logs_spec_returns_403_when_not_filtering_by_own_user_id",
+      "name": "Returns 403 when not filtering by own user id",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/audit-logs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/audit-logs"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/audit_logs_spec.rb:93",
+      "test_name": "returns 403 when not filtering by own user_id"
+    },
+    {
+      "id": "invoices_spec_returns_invoices_sorted_by_created_at_descending",
+      "name": "Returns invoices sorted by created at descending",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/invoices"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/invoices"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/invoices_spec.rb:34",
+      "test_name": "returns invoices sorted by created_at descending"
+    },
+    {
+      "id": "invoices_spec_returns_422_with_already_paid_message",
+      "name": "Returns 422 with already paid message",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/v1/invoices/#{invoice.id}/pay"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/invoices/#{invoice.id}/pay"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/invoices_spec.rb:158",
+      "test_name": "returns 422 with already paid message"
+    },
+    {
+      "id": "security_spec_returns_401_for_deleted_soft_deleted_user_token",
+      "name": "Returns 401 for deleted (soft-deleted) user token",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/users/#{user.id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/subscriptions/#{subscription.id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/invoices/#{invoice.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/security_spec.rb:60",
+      "test_name": "returns 401 for deleted (soft-deleted) user token"
+    },
+    {
+      "id": "subscriptions_spec_upgrades_to_a_higher_tier_plan",
+      "name": "Upgrades to a higher tier plan",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "PUT",
+          "path": "/api/v1/subscriptions/#{subscription.id}"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/subscriptions/#{subscription.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/subscriptions_spec.rb:156",
+      "test_name": "upgrades to a higher tier plan"
+    },
+    {
+      "id": "subscriptions_spec_returns_404",
+      "name": "Returns 404",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/subscriptions/#{subscription.id}/upgrade"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/subscriptions/#{subscription.id}/upgrade"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/subscriptions_spec.rb:244",
+      "test_name": "returns 404"
+    },
+    {
+      "id": "subscriptions_spec_returns_422",
+      "name": "Returns 422",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/v1/subscriptions/#{subscription.id}/cancel"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/subscriptions/#{subscription.id}/cancel"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/subscriptions_spec.rb:303",
+      "test_name": "returns 422"
+    },
+    {
+      "id": "subscriptions_spec_creates_an_audit_log_entry",
+      "name": "Creates an audit log entry",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "DELETE",
+          "path": "/api/v1/subscriptions/#{subscription.id}"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/v1/subscriptions/#{subscription.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/subscriptions_spec.rb:338",
+      "test_name": "creates an audit log entry"
+    },
+    {
+      "id": "usage_spec_returns_402_for_expired_subscription",
+      "name": "Returns 402 for expired subscription",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/usage/#{expired_sub.id}"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/usage/#{subscription.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/usage_spec.rb:54",
+      "test_name": "returns 402 for expired subscription"
+    },
+    {
+      "id": "webhooks_spec_returns_401",
+      "name": "Returns 401",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks"
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/webhooks"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-complete/webhooks_spec.rb:98",
+      "test_name": "returns 401"
+    },
+    {
+      "id": "subscriptions_spec_returns_404_for_non_existent_subscription",
+      "name": "Returns 404 for non-existent subscription",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/subscriptions/99999999"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/subscriptions/#{other_subscription.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-initial/subscriptions_spec.rb:94",
+      "test_name": "returns 404 for non-existent subscription"
+    },
+    {
+      "id": "users_spec_returns_404_for_non_existent_user",
+      "name": "Returns 404 for non-existent user",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/api/v1/users/99999999"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/users/#{regular_user.id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/spec/requests/spec-initial/users_spec.rb:125",
+      "test_name": "returns 404 for non-existent user"
+    }
+  ]
+}

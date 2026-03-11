@@ -1,0 +1,867 @@
+{
+  "generated_at": "2026-03-11T15:43:32.074Z",
+  "rule_source": "inferred",
+  "files_analyzed": 30,
+  "rule_count": 60,
+  "rules": [
+    {
+      "id": "admin_controller_rails_status_forbidden_64",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/admin_controller.rb:64",
+      "code_snippet": "render json: { error: \"Admin privileges required\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "audit_logs_controller_rails_status_forbidden_30",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/audit_logs_controller.rb:30",
+      "code_snippet": "render json: { error: \"Access denied\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "coupons_controller_null_check_coupon_13",
+      "name": "null_check_coupon",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "coupon == null",
+      "expected_behavior": "coupon must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/coupons_controller.rb:13",
+      "code_snippet": "if coupon.nil?",
+      "specificKeywords": [
+        "coupon",
+        "null"
+      ]
+    },
+    {
+      "id": "coupons_controller_rails_status_not_found_14",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/coupons_controller.rb:14",
+      "code_snippet": "render json: { error: \"Coupon not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "coupons_controller_rails_status_unprocessable_entity_33",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/coupons_controller.rb:33",
+      "code_snippet": "render json: { error: \"Coupon redemption limit reached\" }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "invoices_controller_rails_status_unprocessable_entity_41",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/invoices_controller.rb:41",
+      "code_snippet": "render json: { error: \"Invoice is already paid\" }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "invoices_controller_rails_status_payment_required_51",
+      "name": "rails_status_payment_required",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :payment_required",
+      "expected_behavior": "Request rejected with status :payment_required",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/invoices_controller.rb:51",
+      "code_snippet": "render json: { errors: result.errors }, status: :payment_required",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "invoices_controller_rails_status_not_found_60",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/invoices_controller.rb:60",
+      "code_snippet": "render json: { error: \"Invoice not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "invoices_controller_rails_status_forbidden_66",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/invoices_controller.rb:66",
+      "code_snippet": "render json: { error: \"Access denied\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "plans_controller_rails_status_not_found_22",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/plans_controller.rb:22",
+      "code_snippet": "render json: { error: \"Plan not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_not_found_23",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:23",
+      "code_snippet": "render json: { error: \"Role not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_created_32",
+      "name": "rails_status_created",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :created",
+      "expected_behavior": "Request rejected with status :created",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:32",
+      "code_snippet": "render json: { data: role_json(@role) }, status: :created",
+      "specificKeywords": [
+        "render",
+        "json",
+        "created"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_unprocessable_entity_34",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:34",
+      "code_snippet": "render json: { errors: @role.errors.full_messages }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_forbidden_43",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:43",
+      "code_snippet": "render json: { error: \"Cannot modify system roles\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_unprocessable_entity_51",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:51",
+      "code_snippet": "render json: { errors: @role.errors.full_messages }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_not_found_54",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:54",
+      "code_snippet": "render json: { error: \"Role not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_forbidden_62",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:62",
+      "code_snippet": "render json: { error: \"Cannot delete system roles\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_unprocessable_entity_67",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:67",
+      "code_snippet": "render json: { error: \"Cannot delete role with active users\" }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_not_found_75",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:75",
+      "code_snippet": "render json: { error: \"Role not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "roles_controller_rails_status_forbidden_83",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/roles_controller.rb:83",
+      "code_snippet": "render json: { error: \"Admin privileges required\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "seats_controller_null_check_invited_user_42",
+      "name": "null_check_invited_user",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "invited_user == null",
+      "expected_behavior": "invited_user must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:42",
+      "code_snippet": "if invited_user.nil?",
+      "specificKeywords": [
+        "null"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_not_found_43",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:43",
+      "code_snippet": "render json: { error: \"User not found with that email\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_created_51",
+      "name": "rails_status_created",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :created",
+      "expected_behavior": "Request rejected with status :created",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:51",
+      "code_snippet": "render json: { data: seat_json(@seat) }, status: :created",
+      "specificKeywords": [
+        "render",
+        "json",
+        "created"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_unprocessable_entity_53",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:53",
+      "code_snippet": "render json: { errors: @seat.errors.full_messages }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_forbidden_64",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:64",
+      "code_snippet": "render json: { error: \"Cannot remove your own seat\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_not_found_72",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:72",
+      "code_snippet": "render json: { error: \"Seat not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_not_found_80",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:80",
+      "code_snippet": "render json: { error: \"Subscription not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "seats_controller_rails_status_forbidden_86",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/seats_controller.rb:86",
+      "code_snippet": "render json: { error: \"Access denied\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_created_15",
+      "name": "rails_status_created",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :created",
+      "expected_behavior": "Request rejected with status :created",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:15",
+      "code_snippet": "render json: { data: subscription_json(result.subscription) }, status: :created",
+      "specificKeywords": [
+        "render",
+        "json",
+        "created"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_unprocessable_entity_17",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:17",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_unprocessable_entity_37",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:37",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_unprocessable_entity_52",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:52",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_unprocessable_entity_67",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:67",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_not_found_70",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:70",
+      "code_snippet": "render json: { error: \"Plan not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_unprocessable_entity_87",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:87",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_not_found_96",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:96",
+      "code_snippet": "render json: { error: \"Subscription not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "subscriptions_controller_rails_status_forbidden_102",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/subscriptions_controller.rb:102",
+      "code_snippet": "render json: { error: \"Access denied\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_forbidden_14",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:14",
+      "code_snippet": "render json: { error: \"Access denied\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_payment_required_19",
+      "name": "rails_status_payment_required",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :payment_required",
+      "expected_behavior": "Request rejected with status :payment_required",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:19",
+      "code_snippet": "render json: { error: \"Active subscription required\" }, status: :payment_required",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_not_found_30",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:30",
+      "code_snippet": "render json: { error: \"Subscription not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_payment_required_39",
+      "name": "rails_status_payment_required",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :payment_required",
+      "expected_behavior": "Request rejected with status :payment_required",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:39",
+      "code_snippet": "render json: { error: \"Active subscription required\" }, status: :payment_required",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_created_46",
+      "name": "rails_status_created",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :created",
+      "expected_behavior": "Request rejected with status :created",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:46",
+      "code_snippet": "render json: { data: result.usage_record }, status: :created",
+      "specificKeywords": [
+        "render",
+        "json",
+        "created"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_unprocessable_entity_54",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:54",
+      "code_snippet": "render json: { errors: result.errors }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "usage_controller_rails_status_not_found_57",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/usage_controller.rb:57",
+      "code_snippet": "render json: { error: \"Subscription not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_created_26",
+      "name": "rails_status_created",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :created",
+      "expected_behavior": "Request rejected with status :created",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:26",
+      "code_snippet": "render json: { data: user_json(@user) }, status: :created",
+      "specificKeywords": [
+        "render",
+        "json",
+        "created"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_unprocessable_entity_28",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:28",
+      "code_snippet": "render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_unprocessable_entity_43",
+      "name": "rails_status_unprocessable_entity",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unprocessable_entity",
+      "expected_behavior": "Request rejected with status :unprocessable_entity",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:43",
+      "code_snippet": "render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_forbidden_51",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:51",
+      "code_snippet": "render json: { error: \"Cannot delete your own account\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_ok_57",
+      "name": "rails_status_ok",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :ok",
+      "expected_behavior": "Request rejected with status :ok",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:57",
+      "code_snippet": "render json: { message: \"User deleted successfully\" }, status: :ok",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_not_found_65",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:65",
+      "code_snippet": "render json: { error: \"User not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "users_controller_rails_status_forbidden_78",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/users_controller.rb:78",
+      "code_snippet": "render json: { error: \"Admin privileges required\" }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "webhooks_controller_rails_status_ok_29",
+      "name": "rails_status_ok",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :ok",
+      "expected_behavior": "Request rejected with status :ok",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/webhooks_controller.rb:29",
+      "code_snippet": "render json: { received: true }, status: :ok",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "webhooks_controller_rails_status_internal_server_error_32",
+      "name": "rails_status_internal_server_error",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :internal_server_error",
+      "expected_behavior": "Request rejected with status :internal_server_error",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/webhooks_controller.rb:32",
+      "code_snippet": "render json: { error: \"Webhook processing failed\" }, status: :internal_server_error",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "webhooks_controller_rails_status_unauthorized_46",
+      "name": "rails_status_unauthorized",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unauthorized",
+      "expected_behavior": "Request rejected with status :unauthorized",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/api/v1/webhooks_controller.rb:46",
+      "code_snippet": "render json: { error: \"Invalid webhook signature\" }, status: :unauthorized",
+      "specificKeywords": [
+        "render",
+        "json",
+        "unauthorized"
+      ]
+    },
+    {
+      "id": "application_controller_rails_status_unauthorized_18",
+      "name": "rails_status_unauthorized",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unauthorized",
+      "expected_behavior": "Request rejected with status :unauthorized",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/controllers/application_controller.rb:18",
+      "code_snippet": "render json: { error: \"Unauthorized\" }, status: :unauthorized",
+      "specificKeywords": [
+        "render",
+        "json",
+        "unauthorized"
+      ]
+    },
+    {
+      "id": "api_helper_rails_status_not_found_17",
+      "name": "rails_status_not_found",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :not_found",
+      "expected_behavior": "Request rejected with status :not_found",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/helpers/api_helper.rb:17",
+      "code_snippet": "render json: { error: \"#{resource_name} not found\" }, status: :not_found",
+      "specificKeywords": [
+        "render",
+        "json"
+      ]
+    },
+    {
+      "id": "api_helper_rails_status_forbidden_21",
+      "name": "rails_status_forbidden",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :forbidden",
+      "expected_behavior": "Request rejected with status :forbidden",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/helpers/api_helper.rb:21",
+      "code_snippet": "render json: { error: message }, status: :forbidden",
+      "specificKeywords": [
+        "render",
+        "json",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "api_helper_rails_status_unauthorized_25",
+      "name": "rails_status_unauthorized",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "render json with status :unauthorized",
+      "expected_behavior": "Request rejected with status :unauthorized",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/helpers/api_helper.rb:25",
+      "code_snippet": "render json: { error: \"Unauthorized\" }, status: :unauthorized",
+      "specificKeywords": [
+        "render",
+        "json",
+        "unauthorized"
+      ]
+    },
+    {
+      "id": "billing_service_null_check_payment_method_id_12",
+      "name": "null_check_payment_method_id",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "payment_method_id == null",
+      "expected_behavior": "payment_method_id must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/services/billing_service.rb:12",
+      "code_snippet": "return Result.new(success: false, errors: [\"Payment method required\"]) if payment_method_id.blank?",
+      "specificKeywords": [
+        "null"
+      ]
+    },
+    {
+      "id": "subscription_service_null_check_code_89",
+      "name": "null_check_code",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "code == null",
+      "expected_behavior": "code must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex/app/services/subscription_service.rb:89",
+      "code_snippet": "return nil if code.blank?",
+      "specificKeywords": [
+        "code",
+        "null"
+      ]
+    }
+  ]
+}

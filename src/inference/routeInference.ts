@@ -135,6 +135,12 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
   if (ext === '.java' || ext === '.kt' || ext === '.kts') {
     return inferRoutesFromJavaFile(filePath);
   }
+  if (ext === '.py') {
+    return inferRoutesFromPythonFile(filePath);
+  }
+  if (ext === '.php') {
+    return inferRoutesFromPhpFile(filePath);
+  }
 
   let content: string;
   try {
@@ -219,7 +225,18 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
       }
     }
 
-    // 4. AngularJS / fetch / axios — { url: base + '/path', method: 'GET' }
+    // 4. HapiJS server.route({ method: 'GET', path: '/path', ... })
+    const hapiMethodMatch = line.match(/method\s*:\s*['"](\w+)['"]/);
+    const hapiPathMatch = line.match(/path\s*:\s*['"]([^'"]+)['"]/);
+    if (hapiMethodMatch && hapiPathMatch) {
+      const method = hapiMethodMatch[1].toLowerCase();
+      if (HTTP_METHODS.includes(method as HttpMethod)) {
+        addRoute(method as HttpMethod, hapiPathMatch[1], lineIdx + 1, 'code');
+        continue;
+      }
+    }
+
+    // 5. AngularJS / fetch / axios — { url: base + '/path', method: 'GET' }
     //    Only active when the file contains an HTTP-client signal.
     if (usesHttpClient) {
       const httpMethodKey = line.match(ANGULAR_HTTP_METHOD_KEY);
@@ -285,6 +302,24 @@ const SPRING_REQUEST_MAPPING_EXPLICIT =
   /@RequestMapping\s*\((?:[^)]*?\bpath\s*=\s*["']([^"']+)["'][^)]*?\bmethod\s*=\s*(?:RequestMethod\.)?([A-Z]+)|(?:[^)]*?\bmethod\s*=\s*(?:RequestMethod\.)?([A-Z]+)[^)]*?\bpath\s*=\s*["']([^"']+)["']))/;
 
 /**
+ * Matches DGS @DgsQuery and @DgsMutation annotations.
+ *   @DgsQuery                          → Query field (method name = field name)
+ *   @DgsQuery(field = "articles")      → Query field "articles"
+ *   @DgsMutation(field = "createArticle") → Mutation field "createArticle"
+ */
+const DGS_QUERY = /@DgsQuery(?:\s*\(\s*(?:field\s*=\s*)?["']?(\w+)["']?\s*\))?/;
+const DGS_MUTATION = /@DgsMutation(?:\s*\(\s*(?:field\s*=\s*)?["']?(\w+)["']?\s*\))?/;
+
+/**
+ * Matches Spring GraphQL @QueryMapping and @MutationMapping.
+ *   @QueryMapping                      → Query (method name)
+ *   @QueryMapping("articles")          → Query "articles"
+ *   @MutationMapping("createArticle")  → Mutation "createArticle"
+ */
+const SPRING_QUERY_MAPPING = /@QueryMapping(?:\s*\(\s*["']?(\w+)["']?\s*\))?/;
+const SPRING_MUTATION_MAPPING = /@MutationMapping(?:\s*\(\s*["']?(\w+)["']?\s*\))?/;
+
+/**
  * Infer Spring routes from a  Java or Kotlin source file.
  * Works in two passes:
  *  1. Scan for class-level @RequestMapping to capture the base path.
@@ -346,6 +381,229 @@ function inferRoutesFromJavaFile(filePath: string): InferredRoute[] {
           : basePath + '/' + rawPath;
         addRoute(rawMethod as HttpMethod, fullPath, i + 1);
       }
+    }
+
+    // DGS @DgsQuery / @DgsMutation — detect as POST /graphql (convention)
+    const dgsQ = line.match(DGS_QUERY);
+    if (dgsQ) {
+      const fieldName = dgsQ[1] || findNextMethodNameInJava(lines, i);
+      if (fieldName) {
+        addRoute('post', '/graphql', i + 1);
+      }
+      continue;
+    }
+    const dgsM = line.match(DGS_MUTATION);
+    if (dgsM) {
+      const fieldName = dgsM[1] || findNextMethodNameInJava(lines, i);
+      if (fieldName) {
+        addRoute('post', '/graphql', i + 1);
+      }
+      continue;
+    }
+
+    // Spring GraphQL @QueryMapping / @MutationMapping — detect as POST /graphql
+    const sqm = line.match(SPRING_QUERY_MAPPING);
+    if (sqm) {
+      addRoute('post', '/graphql', i + 1);
+      continue;
+    }
+    const smm = line.match(SPRING_MUTATION_MAPPING);
+    if (smm) {
+      addRoute('post', '/graphql', i + 1);
+      continue;
+    }
+  }
+
+  return [...byKey.values()];
+}
+
+/** Find the next method name after an annotation line (for DGS/GraphQL) */
+function findNextMethodNameInJava(javaLines: string[], fromLine: number): string | undefined {
+  for (let j = fromLine + 1; j < Math.min(fromLine + 5, javaLines.length); j++) {
+    const methodMatch = javaLines[j].match(/(?:public|private|protected|fun)\s+\S+\s+(\w+)\s*\(/);
+    if (methodMatch) return methodMatch[1];
+    const kotlinMatch = javaLines[j].match(/fun\s+(\w+)\s*\(/);
+    if (kotlinMatch) return kotlinMatch[1];
+  }
+  return undefined;
+}
+
+
+
+// ─── Python / Flask / FastAPI inference ───────────────────────────────────────
+
+/**
+ * Matches Flask @app.route() and @blueprint.route() decorators.
+ *   @app.route('/articles', methods=['GET', 'POST'])
+ *   @blueprint.route('/articles/<slug>', methods=['PUT'])
+ *   @app.route('/tags')   ← defaults to GET
+ */
+const FLASK_ROUTE =
+  /@(\w+)\.route\s*\(\s*['"]([^'"]+)['"](?:\s*,\s*methods\s*=\s*\[([^\]]+)\])?\s*\)/;
+
+/**
+ * Matches FastAPI decorators.
+ *   @app.get('/articles')
+ *   @router.post('/users')
+ *   @app.delete('/articles/{slug}')
+ */
+const FASTAPI_ROUTE =
+  /@(\w+)\.(get|post|put|patch|delete|head|options)\s*\(\s*['"]([^'"]+)['"]/i;
+
+/**
+ * Matches Flask Blueprint constructor.
+ *   articles = Blueprint('articles', __name__)
+ *   bp = Blueprint("users", __name__, url_prefix="/users")
+ */
+const FLASK_BLUEPRINT_CTOR =
+  /(\w+)\s*=\s*Blueprint\s*\(\s*['"][^'"]+['"](?:\s*,\s*[^,)]+)*?(?:\s*,\s*url_prefix\s*=\s*['"]([^'"]+)['"])?\s*\)/;
+
+/**
+ * Matches FastAPI APIRouter constructor with prefix.
+ *   router = APIRouter(prefix="/articles")
+ */
+const FASTAPI_APIROUTER =
+  /(\w+)\s*=\s*APIRouter\s*\([^)]*?prefix\s*=\s*['"]([^'"]+)['"]/;
+
+/**
+ * Infer routes from a Python (Flask/FastAPI) source file.
+ */
+function inferRoutesFromPythonFile(filePath: string): InferredRoute[] {
+  let content: string;
+  try {
+    content = fs.readFileSync(filePath, 'utf-8');
+  } catch {
+    return [];
+  }
+
+  const lines = content.split('\n');
+  const byKey = new Map<string, InferredRoute>();
+
+  const addRoute = (method: HttpMethod, routePath: string, lineNumber: number) => {
+    const key = `${method}:${routePath}`;
+    if (!byKey.has(key)) {
+      byKey.set(key, { method, path: routePath, sourceFile: filePath, lineNumber, discoveredVia: 'code' });
+    }
+  };
+
+  // Pass 1: Detect blueprint/router prefix for the file
+  let localPrefix = '';
+  for (const line of lines) {
+    const bpMatch = line.match(FLASK_BLUEPRINT_CTOR);
+    if (bpMatch && bpMatch[2]) {
+      localPrefix = bpMatch[2];
+      break;
+    }
+    const arMatch = line.match(FASTAPI_APIROUTER);
+    if (arMatch && arMatch[2]) {
+      localPrefix = arMatch[2];
+      break;
+    }
+  }
+
+  // Pass 2: Detect routes
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Flask @xxx.route('/path', methods=[...])
+    const flaskMatch = line.match(FLASK_ROUTE);
+    if (flaskMatch) {
+      const routePath = flaskMatch[2];
+      const methodsList = flaskMatch[3];
+      const fullPath = localPrefix + (routePath.startsWith('/') ? routePath : '/' + routePath);
+      // Normalize Flask <param> to {param}
+      const normalizedPath = fullPath.replace(/<(?:\w+:)?(\w+)>/g, '{$1}');
+
+      if (methodsList) {
+        // Parse methods=['GET', 'POST'] → individual routes
+        const methods = methodsList.replace(/['"]/g, '').split(',').map((m) => m.trim().toLowerCase());
+        for (const m of methods) {
+          if (HTTP_METHODS.includes(m as HttpMethod)) {
+            addRoute(m as HttpMethod, normalizedPath, i + 1);
+          }
+        }
+      } else {
+        // Default to GET
+        addRoute('get', normalizedPath, i + 1);
+      }
+      continue;
+    }
+
+    // FastAPI @xxx.get('/path'), @xxx.post('/path'), etc.
+    const fastapiMatch = line.match(FASTAPI_ROUTE);
+    if (fastapiMatch) {
+      const httpMethod = fastapiMatch[2].toLowerCase() as HttpMethod;
+      const routePath = fastapiMatch[3];
+      const fullPath = localPrefix + (routePath.startsWith('/') ? routePath : '/' + routePath);
+      // FastAPI uses {param} natively
+      addRoute(httpMethod, fullPath, i + 1);
+      continue;
+    }
+  }
+
+  return [...byKey.values()];
+}
+
+
+
+// ─── PHP / Slim inference ─────────────────────────────────────────────────────
+
+/**
+ * Matches Slim PHP route definitions:
+ *   $app->get('/articles', Controller::class . ':method')
+ *   $app->post('/articles/{slug}', 'Controller:method')
+ *   $group->get('/articles', ArticleController::class . ':list')
+ */
+const SLIM_ROUTE =
+  /\$\w+->(get|post|put|patch|delete|options|head)\s*\(\s*['"]([^'"]+)['"]/i;
+
+/**
+ * Matches Slim group definitions:
+ *   $app->group('/api', function($group) { ... })
+ *   $app->group('/api/articles', function(RouteCollectorProxy $group) { ... })
+ */
+const SLIM_GROUP = /\$\w+->group\s*\(\s*['"]([^'"]+)['"]/;
+
+function inferRoutesFromPhpFile(filePath: string): InferredRoute[] {
+  let content: string;
+  try {
+    content = fs.readFileSync(filePath, 'utf-8');
+  } catch {
+    return [];
+  }
+
+  const lines = content.split('\n');
+  const byKey = new Map<string, InferredRoute>();
+
+  const addRoute = (method: HttpMethod, routePath: string, lineNumber: number) => {
+    const key = `${method}:${routePath}`;
+    if (!byKey.has(key)) {
+      byKey.set(key, { method, path: routePath, sourceFile: filePath, lineNumber, discoveredVia: 'code' });
+    }
+  };
+
+  // Track group prefixes
+  let groupPrefix = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Group prefix
+    const groupMatch = line.match(SLIM_GROUP);
+    if (groupMatch) {
+      groupPrefix = groupMatch[1];
+      continue;
+    }
+
+    // Route definition
+    const routeMatch = line.match(SLIM_ROUTE);
+    if (routeMatch) {
+      const method = routeMatch[1].toLowerCase() as HttpMethod;
+      const path = routeMatch[2];
+      const fullPath = groupPrefix
+        ? groupPrefix + (path.startsWith('/') ? path : '/' + path)
+        : path;
+      addRoute(method, fullPath, i + 1);
     }
   }
 

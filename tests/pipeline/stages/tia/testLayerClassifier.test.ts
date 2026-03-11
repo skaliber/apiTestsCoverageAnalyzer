@@ -48,12 +48,44 @@ describe('classifyTestLayer', () => {
     expect(result.layer).toBe('api');
   });
 
+  it('should classify as api by content pattern (webtest TestApp)', () => {
+    const result = classifyTestLayer(
+      '/project/tests/test_api.py',
+      'testapp = TestApp(app)\nresponse = testapp.get("/api/articles")',
+    );
+    expect(result.layer).toBe('api');
+  });
+
+  it('should classify as api by content pattern (webtest post_json)', () => {
+    const result = classifyTestLayer(
+      '/project/tests/test_articles.py',
+      'response = testapp.post_json("/api/articles", {"title": "Hello"})',
+    );
+    expect(result.layer).toBe('api');
+  });
+
   // ─── integration ────────────────────────────────────────────────────────────
 
   it('should classify as integration by content pattern (@SpringBootTest)', () => {
     const result = classifyTestLayer(
       '/project/tests/db.test.ts',
       '@SpringBootTest',
+    );
+    expect(result.layer).toBe('integration');
+  });
+
+  it('should classify as integration by content pattern (Factory Boy)', () => {
+    const result = classifyTestLayer(
+      '/project/tests/test_models.py',
+      'class UserFactory(factory.DjangoModelFactory):\n    class Meta:\n        model = User',
+    );
+    expect(result.layer).toBe('integration');
+  });
+
+  it('should classify as integration by content pattern (SQLAlchemy DB setup)', () => {
+    const result = classifyTestLayer(
+      '/project/tests/conftest.py',
+      'engine = create_engine("sqlite://")\nSession = sessionmaker(bind=engine)',
     );
     expect(result.layer).toBe('integration');
   });

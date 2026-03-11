@@ -72,6 +72,8 @@ const CLASSIFICATION_RULES: ClassificationRule[] = [
       /httpx\.AsyncClient/i,                   // Python httpx
       /RestAssured|given\(\)\./i,              // REST Assured
       /\.pact\./i,                             // Pact
+      /TestApp\s*\(/,                          // Python webtest TestApp
+      /\.\s*(?:post_json|put_json|delete_json|patch_json)\s*\(/, // webtest JSON methods
     ],
     priority: 70,
   },
@@ -86,6 +88,9 @@ const CLASSIFICATION_RULES: ClassificationRule[] = [
       /@DataJpaTest/i,                         // Spring Data JPA
       /@WebMvcTest/i,                          // Spring MVC test
       /testcontainers/i,                       // Docker containers
+      /@pytest\.fixture.*scope\s*=\s*['"]session['"]/, // pytest session-scoped fixture (DB lifecycle)
+      /factory\.(?:Factory|DjangoModelFactory|SQLAlchemyModelFactory)/, // Factory Boy (real-model tests)
+      /create_engine|sessionmaker|Base\.metadata/, // SQLAlchemy DB setup
     ],
     priority: 60,
   },

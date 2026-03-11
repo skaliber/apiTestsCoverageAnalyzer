@@ -27,6 +27,7 @@ beforeEach(() => {
     serviceFiles: [],
     languages: [],
     frameworks: [],
+    apiFrameworks: [],
     discoverySource: {
       specs: 'discovered',
       testFiles: 'discovered',

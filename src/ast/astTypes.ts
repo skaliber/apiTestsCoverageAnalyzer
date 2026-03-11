@@ -28,6 +28,90 @@ export type SupportedLanguage =
   | 'cucumber'
   | 'auto';
 
+// ─── Structure-agnostic types (Feature 27) ──────────────────────────────────
+
+/** How an endpoint is served — REST, GraphQL, gRPC, etc. */
+export type EndpointProtocol = 'rest' | 'graphql' | 'grpc' | 'websocket';
+
+/** Current state of cross-file node resolution */
+export type NodeResolution = 'resolved' | 'cross-file-unresolved' | 'partial';
+
+/** Unified security classification for any framework's auth pattern */
+export interface SecurityClassification {
+  /** Auth mechanism type */
+  type: 'jwt' | 'oauth' | 'apikey' | 'session' | 'basic' | 'custom';
+  /** True when auth is mandatory (401 on missing credentials) */
+  required: boolean;
+  /** True when auth is optional (request proceeds with or without credentials) */
+  optional: boolean;
+  /** Framework-specific source pattern, e.g. '@jwt_required', 'auth.required' */
+  sourcePattern?: string;
+}
+
+/** A decorator or annotation associated with a function/method */
+export interface DecoratorInfo {
+  name: string;
+  /** Full text of the decorator including arguments */
+  fullText?: string;
+  /** Parsed arguments (key-value) when detectable */
+  args?: Record<string, string>;
+  line?: number;
+}
+
+/** A decorator stack: all decorators on a single function/method */
+export interface DecoratorStack {
+  /** The function/method name these decorators are applied to */
+  functionName: string;
+  decorators: DecoratorInfo[];
+  sourceFile: string;
+  line?: number;
+}
+
+/** A route registration detected in source code */
+export interface RouteRegistration {
+  /** The variable or object that routes are being registered on */
+  registrarName: string;
+  /** The URL path or prefix being registered */
+  path: string;
+  /** HTTP methods if specified at registration */
+  methods?: string[];
+  /** Security classification if auth middleware is attached at registration */
+  security?: SecurityClassification;
+  /** The target module/file being mounted (for router.use(path, require('./target'))) */
+  targetModule?: string;
+  sourceFile: string;
+  line?: number;
+}
+
+/** A middleware entry detected in the middleware chain */
+export interface MiddlewareInfo {
+  name: string;
+  /** Classified type of middleware */
+  type: 'auth-required' | 'auth-optional' | 'validation' | 'error-handler' | 'custom';
+  /** Whether this middleware applies to an entire router or a single route */
+  appliedTo: 'router' | 'route';
+  sourceFile: string;
+  line?: number;
+}
+
+/** Base type for all structure-agnostic discovered nodes */
+export interface StructureAgnosticNode {
+  /** Current state of cross-file resolution */
+  resolution: NodeResolution;
+  /** Confidence level from deep analysis */
+  confidence: ConfidenceLevel;
+  /** File where this node was found */
+  sourceFile: string;
+  /** Line number in the source file */
+  lineNumber?: number;
+  /** Protocol for endpoint nodes */
+  protocol?: EndpointProtocol;
+  /** Security classification if detected */
+  security?: SecurityClassification;
+  /** Diagnostic message when resolution is incomplete */
+  diagnosticMessage?: string;
+}
+
 // ─── Assertion type ───────────────────────────────────────────────────────────
 
 export type AssertionType =
@@ -76,6 +160,12 @@ export interface SemanticHttpCall {
   /** Variable name the response is assigned to, for assertion linking */
   responseVariable?: string;
   line?: number;
+  /** Security classification if auth is associated with this call */
+  security?: SecurityClassification;
+  /** Protocol (REST, GraphQL, etc.) — defaults to 'rest' */
+  protocol?: EndpointProtocol;
+  /** Source of the base URL (e.g., 'environment.ts', 'axios.defaults.baseURL') */
+  baseUrlSource?: string;
 }
 
 export interface SemanticAssertion {
@@ -126,6 +216,12 @@ export interface SemanticModel {
   assertions: SemanticAssertion[];
   businessRuleRefs: BusinessRuleRef[];
   flowRefs: FlowRef[];
+  /** Decorator stacks grouped by function (Feature 27) */
+  decoratorStacks?: DecoratorStack[];
+  /** Route registrations detected in this file (Feature 27) */
+  routeRegistrations?: RouteRegistration[];
+  /** Middleware chains detected in this file (Feature 27) */
+  middlewareChains?: MiddlewareInfo[];
 }
 
 // ─── Resolved HTTP interaction (superset of ResolvedHttpCall) ─────────────────

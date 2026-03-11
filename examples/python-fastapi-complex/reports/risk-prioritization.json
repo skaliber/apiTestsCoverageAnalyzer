@@ -1,0 +1,208 @@
+{
+  "generatedAt": "2026-03-11T15:46:18.852Z",
+  "summary": {
+    "totalFindings": 17,
+    "findingsBySeverity": {
+      "LOW": 0,
+      "MEDIUM": 16,
+      "HIGH": 1,
+      "CRITICAL": 0
+    },
+    "totalRecommendations": 10,
+    "recommendationsByPriority": {
+      "P0": 0,
+      "P1": 2,
+      "P2": 8,
+      "P3": 0
+    },
+    "maxRiskScore": 73,
+    "avgRiskScore": 56,
+    "criticalUncoveredItems": 1,
+    "unprotectedSecurityFindings": 0,
+    "topRiskAreas": [
+      "GET /transfers/{transfer_id} (score 73)",
+      "POST /auth/refresh (score 65)",
+      "DELETE /cards/{card_id} (score 54)",
+      "PUT /cards/{card_id}/status (score 54)",
+      "GET /merchants/{merchant_id} (score 54)"
+    ]
+  },
+  "recommendations": [
+    {
+      "id": "rec-1773243978851-30",
+      "priority": "P1",
+      "title": "Add positive api test for: Uncovered endpoint: GET /transfers/{transfer_id}",
+      "rationale": "Endpoint GET /transfers/{transfer_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transfers/{transfer_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-4"
+      ],
+      "riskScore": 73,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-27",
+      "priority": "P1",
+      "title": "Add positive api test for: Uncovered endpoint: POST /auth/refresh",
+      "rationale": "Endpoint POST /auth/refresh has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/auth/refresh"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-1"
+      ],
+      "riskScore": 65,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-33",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: DELETE /cards/{card_id}",
+      "rationale": "Endpoint DELETE /cards/{card_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/cards/{card_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-7"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-34",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /cards/{card_id}/status",
+      "rationale": "Endpoint PUT /cards/{card_id}/status has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/cards/{card_id}/status"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-8"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-35",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /merchants/{merchant_id}",
+      "rationale": "Endpoint GET /merchants/{merchant_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/merchants/{merchant_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-9"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978852-36",
+      "priority": "P2",
+      "title": "Add business rule test for: Uncovered business rule: BR-001",
+      "rationale": "Business rule \"BR-001\" has no test coverage. pytest test function",
+      "recommendedTestType": "business-rule-test",
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-biz-1773243978851-10"
+      ],
+      "riskScore": 52,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1773243978851-28",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /accounts/{account_id}/balance",
+      "rationale": "Endpoint GET /accounts/{account_id}/balance has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/balance"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-2"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-29",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /accounts/{account_id}/summary",
+      "rationale": "Endpoint GET /accounts/{account_id}/summary has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/summary"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-3"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-31",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /limits/{account_id}",
+      "rationale": "Endpoint PUT /limits/{account_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/limits/{account_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-5"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-32",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /statements/{account_id}/{month}",
+      "rationale": "Endpoint GET /statements/{account_id}/{month} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/statements/{account_id}/{month}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-6"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    }
+  ]
+}

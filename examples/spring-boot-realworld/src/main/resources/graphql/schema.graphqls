@@ -1,0 +1,46 @@
+type Query {
+    articles(tag: String, author: String, limit: Int, offset: Int): [Article!]!
+    article(slug: String!): Article
+    profile(username: String!): Profile
+}
+
+type Mutation {
+    createArticle(input: CreateArticleInput!): Article!
+    updateArticle(slug: String!, input: UpdateArticleInput!): Article!
+    deleteArticle(slug: String!): Boolean!
+    followUser(username: String!): Profile!
+    unfollowUser(username: String!): Profile!
+}
+
+type Article {
+    slug: String!
+    title: String!
+    description: String
+    body: String!
+    author: Profile!
+    tagList: [String!]!
+    createdAt: String!
+    updatedAt: String!
+    favorited: Boolean!
+    favoritesCount: Int!
+}
+
+input CreateArticleInput {
+    title: String!
+    description: String
+    body: String!
+    tagList: [String!]
+}
+
+input UpdateArticleInput {
+    title: String
+    description: String
+    body: String
+}
+
+type Profile {
+    username: String!
+    bio: String
+    image: String
+    following: Boolean!
+}

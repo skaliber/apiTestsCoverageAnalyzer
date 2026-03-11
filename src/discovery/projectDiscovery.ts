@@ -13,6 +13,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { classifyFile, ClassifiedFile, FileCategory } from './fileClassifier';
+import { detectApiFrameworks, DetectedApiFramework, ApiFrameworkName } from './frameworkDetector';
+
+export type { DetectedApiFramework, ApiFrameworkName } from './frameworkDetector';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -69,8 +72,10 @@ export interface DiscoveredArtifacts {
   languages: DetectedLanguage[];
   /** Detected test frameworks */
   frameworks: DetectedFramework[];
+  /** Detected API frameworks (Feature 27 — structure-agnostic detection) */
+  apiFrameworks: DetectedApiFramework[];
   /** Whether each artifact type was explicitly configured vs auto-discovered */
-  discoverySource: Record<keyof Omit<DiscoveredArtifacts, 'allFiles' | 'projectRoot' | 'discoverySource' | 'languages' | 'frameworks'>, 'explicit' | 'discovered'>;
+  discoverySource: Record<keyof Omit<DiscoveredArtifacts, 'allFiles' | 'projectRoot' | 'discoverySource' | 'languages' | 'frameworks' | 'apiFrameworks'>, 'explicit' | 'discovered'>;
 }
 
 export interface DiscoveryOptions {
@@ -273,6 +278,9 @@ export function discoverProject(options: DiscoveryOptions = {}): DiscoveredArtif
     frameworks.push('cucumber');
   }
 
+  // ── API framework detection (Feature 27) ─────────────────────────────────
+  const apiFrameworks = detectApiFrameworks([...serviceFiles, ...testFiles]);
+
   return {
     projectRoot:         rootDir,
     allFiles,
@@ -285,6 +293,7 @@ export function discoverProject(options: DiscoveryOptions = {}): DiscoveredArtif
     serviceFiles,
     languages:           [...new Set(languages)],
     frameworks:          [...new Set(frameworks)],
+    apiFrameworks,
     discoverySource,
   };
 }

@@ -34,6 +34,10 @@ function makeTable(overrides: Partial<CrossFileSymbolTable> = {}): CrossFileSymb
     exportedSymbols: new Map(),
     classes: new Map(),
     importGraph: new Map(),
+    routerMounts: new Map(),
+    injectionChains: new Map(),
+    interfaceImplementations: new Map(),
+    middlewareInheritance: new Map(),
     ...overrides,
   };
 }

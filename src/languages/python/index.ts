@@ -15,6 +15,10 @@ import type {
   BusinessRuleRef,
   FlowRef,
   AnalysisContext,
+  DecoratorStack,
+  DecoratorInfo,
+  RouteRegistration,
+  SecurityClassification,
 } from '../../ast/astTypes';
 import { registerAnalyzer } from '../../ast/parserRegistry';
 import {
@@ -25,6 +29,10 @@ import {
   type TsNode,
 } from '../shared/treeSitterUtils';
 import { normalizePathToTemplate } from '../../coverage/deep-analysis/resolvePaths';
+import {
+  detectWebtestCalls,
+  webtestCallsToHttpCalls,
+} from './testPatternDetector';
 
 // ─── Parser ───────────────────────────────────────────────────────────────────
 
@@ -71,6 +79,10 @@ export class PythonAnalyzer implements LanguageAnalyzer {
     const assertions = extractPythonAssertions(root);
     const businessRuleRefs = extractPythonBusinessRefs(root);
 
+    // Feature 27: Flask/FastAPI pattern detection
+    const decoratorStacks = extractFlaskDecoratorStacks(root, parsed.filePath);
+    const routeRegistrations = extractFlaskRouteRegistrations(root, parsed.filePath);
+
     return {
       filePath: parsed.filePath,
       language: 'python',
@@ -82,6 +94,8 @@ export class PythonAnalyzer implements LanguageAnalyzer {
       assertions,
       businessRuleRefs,
       flowRefs: [],
+      decoratorStacks,
+      routeRegistrations,
     };
   }
 
@@ -210,11 +224,13 @@ function extractPythonHttpCalls(
 
     const funcText = funcNode.text ?? '';
     const match = funcText.match(
-      /(?:requests|httpx|self\.client|client|self\.app|app)\.(get|post|put|patch|delete|head|options)/i,
+      /(?:requests|httpx|self\.client|client|self\.app|app|testapp|self\.testapp)\.(get|post|post_json|put|put_json|patch|patch_json|delete|delete_json|head|options)/i,
     );
     if (!match) continue;
 
     const [, methodName] = match;
+    // Normalize webtest methods: post_json → POST, put_json → PUT, etc.
+    const normalizedMethod = methodName.replace(/_json$/i, '').toUpperCase();
     const argList = call.childForFieldName?.('arguments') ?? firstChildOfType(call, 'argument_list');
     if (!argList) continue;
 
@@ -228,7 +244,7 @@ function extractPythonHttpCalls(
     const resolvedPath = rawPath.includes('{') ? resolveFString(rawPath, constants) : rawPath;
 
     out.push({
-      method: methodName.toUpperCase(),
+      method: normalizedMethod,
       rawPathArg: rawPath,
       resolvedPath,
       normalizedPath: resolvedPath.startsWith('/') ? normalizePathToTemplate(resolvedPath) : undefined,
@@ -322,6 +338,179 @@ function emptyModel(filePath: string): SemanticModel {
     businessRuleRefs: [],
     flowRefs: [],
   };
+}
+
+// ─── Flask / FastAPI pattern extraction (Feature 27) ─────────────────────────
+
+/**
+ * Extract decorator stacks for Flask/FastAPI route functions.
+ * Groups decorators by the function they decorate:
+ *   @blueprint.route('/articles', methods=['GET'])
+ *   @use_kwargs({...})
+ *   @marshal_with(ArticleSchema)
+ *   @jwt_required
+ *   def get_articles():
+ *     → DecoratorStack for 'get_articles' with 4 decorators
+ */
+function extractFlaskDecoratorStacks(root: TsNode, filePath: string): DecoratorStack[] {
+  const stacks: DecoratorStack[] = [];
+  const fnDefs = findNodes(root, ['function_definition']);
+
+  for (const fn of fnDefs) {
+    const nameNode = fn.childForFieldName?.('name') ?? firstChildOfType(fn, 'identifier');
+    const funcName = nameNode?.text ?? '';
+    if (!funcName) continue;
+
+    const decorators: DecoratorInfo[] = [];
+    for (let i = 0; i < (fn?.childCount ?? 0); i++) {
+      const child = fn.child(i);
+      if (child?.type !== 'decorator') continue;
+
+      const decText = child.text ?? '';
+      const dec = parseFlaskDecorator(decText, child.startPosition?.row);
+      if (dec) decorators.push(dec);
+    }
+
+    if (decorators.length > 0) {
+      stacks.push({
+        functionName: funcName,
+        decorators,
+        sourceFile: filePath,
+        line: fn.startPosition?.row ? fn.startPosition.row + 1 : undefined,
+      });
+    }
+  }
+
+  return stacks;
+}
+
+/**
+ * Parse a single Flask/FastAPI decorator into a DecoratorInfo.
+ */
+function parseFlaskDecorator(text: string, line?: number): DecoratorInfo | null {
+  // @blueprint.route('/path', methods=['GET', 'POST'])
+  const routeMatch = text.match(/@(\w+)\.route\s*\(\s*['"]([^'"]+)['"]/);
+  if (routeMatch) {
+    const args: Record<string, string> = { path: routeMatch[2] };
+    const methodsMatch = text.match(/methods\s*=\s*\[([^\]]+)\]/);
+    if (methodsMatch) args.methods = methodsMatch[1].replace(/['"]/g, '').trim();
+    return { name: 'route', fullText: text, args, line };
+  }
+
+  // @use_kwargs({...}) or @use_kwargs(SchemaClass)
+  const useKwargsMatch = text.match(/@use_kwargs\s*\((.+)\)/s);
+  if (useKwargsMatch) {
+    return { name: 'use_kwargs', fullText: text, args: { schema: useKwargsMatch[1].trim() }, line };
+  }
+
+  // @marshal_with(SchemaClass)
+  const marshalMatch = text.match(/@marshal_with\s*\(\s*(\w+)/);
+  if (marshalMatch) {
+    return { name: 'marshal_with', fullText: text, args: { schema: marshalMatch[1] }, line };
+  }
+
+  // @jwt_required, @jwt_required(), @jwt_required(optional=True), @jwt_optional
+  if (text.includes('@jwt_required') || text.includes('@jwt_optional')) {
+    const isOptional = text.includes('jwt_optional') || text.includes('optional=True') || text.includes('optional = True');
+    return {
+      name: isOptional ? 'jwt_optional' : 'jwt_required',
+      fullText: text,
+      args: { optional: isOptional ? 'true' : 'false' },
+      line,
+    };
+  }
+
+  // @login_required
+  if (text.includes('@login_required')) {
+    return { name: 'login_required', fullText: text, args: {}, line };
+  }
+
+  // Generic decorator
+  const genericMatch = text.match(/@(\w[\w.]*)/);
+  if (genericMatch) {
+    return { name: genericMatch[1], fullText: text, line };
+  }
+
+  return null;
+}
+
+/**
+ * Extract Flask Blueprint route registrations.
+ * Detects: Blueprint() constructors, register_blueprint() calls,
+ *          @blueprint.route() registrations.
+ */
+function extractFlaskRouteRegistrations(root: TsNode, filePath: string): RouteRegistration[] {
+  const registrations: RouteRegistration[] = [];
+
+  // Use regex on the full source text since tree-sitter node traversal
+  // for call arguments is complex. This is a targeted pattern match.
+  const sourceText = root.text ?? '';
+  const lines = sourceText.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Blueprint constructor: bp = Blueprint('name', __name__, url_prefix='/api')
+    const bpMatch = line.match(/(\w+)\s*=\s*Blueprint\s*\(\s*['"](\w+)['"](?:[^)]*?url_prefix\s*=\s*['"]([^'"]+)['"])?\s*\)/);
+    if (bpMatch) {
+      registrations.push({
+        registrarName: bpMatch[1],
+        path: bpMatch[3] ?? '',
+        sourceFile: filePath,
+        line: i + 1,
+      });
+      continue;
+    }
+
+    // register_blueprint(bp, url_prefix='/api/articles')
+    const regMatch = line.match(/register_blueprint\s*\(\s*(\w+)(?:\s*,\s*url_prefix\s*=\s*['"]([^'"]+)['"])?\s*\)/);
+    if (regMatch) {
+      registrations.push({
+        registrarName: regMatch[1],
+        path: regMatch[2] ?? '',
+        targetModule: regMatch[1],
+        sourceFile: filePath,
+        line: i + 1,
+      });
+      continue;
+    }
+
+    // @blueprint.route('/path', methods=[...])
+    const routeMatch = line.match(/@(\w+)\.route\s*\(\s*['"]([^'"]+)['"]/);
+    if (routeMatch) {
+      const methodsMatch = line.match(/methods\s*=\s*\[([^\]]+)\]/);
+      const methods = methodsMatch
+        ? methodsMatch[1].replace(/['"]/g, '').split(',').map((m: string) => m.trim().toUpperCase())
+        : ['GET'];
+      registrations.push({
+        registrarName: routeMatch[1],
+        path: routeMatch[2],
+        methods,
+        sourceFile: filePath,
+        line: i + 1,
+      });
+    }
+  }
+
+  return registrations;
+}
+
+/**
+ * Classify JWT/auth security from decorator information.
+ */
+export function classifyFlaskSecurity(decorators: DecoratorInfo[]): SecurityClassification | undefined {
+  for (const dec of decorators) {
+    if (dec.name === 'jwt_required') {
+      return { type: 'jwt', required: true, optional: false, sourcePattern: '@jwt_required' };
+    }
+    if (dec.name === 'jwt_optional') {
+      return { type: 'jwt', required: false, optional: true, sourcePattern: '@jwt_optional' };
+    }
+    if (dec.name === 'login_required') {
+      return { type: 'session', required: true, optional: false, sourcePattern: '@login_required' };
+    }
+  }
+  return undefined;
 }
 
 registerAnalyzer('python', () => new PythonAnalyzer());

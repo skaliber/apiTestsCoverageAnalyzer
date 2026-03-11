@@ -5,8 +5,9 @@ import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
 import IntelligenceSection from '../components/IntelligenceSection';
-import MermaidDiagram from '../components/MermaidDiagram';
-import type { DetailItem, FlowStepDetail } from '../types';
+import MermaidSourceAndRenderPanel from '../components/MermaidSourceAndRenderPanel';
+import EvidencePanel from '../components/EvidencePanel';
+import type { DetailItem, FlowStepDetail, RichDetailItem } from '../types';
 import { generateIntegrationFlowsSummary, generateFlowMermaid } from '../utils/markdownSummaries';
 
 interface FlowItem extends DetailItem {
@@ -52,7 +53,6 @@ export default function IntegrationFlowsPage() {
   const { findingsFor, recommendationsFor } = useIntelligence();
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [showDiagramFor, setShowDiagramFor] = useState<string | null>(null);
   const [inferredFlows, setInferredFlows] = useState<Record<string, InferredFlowDetail>>({});
 
   // Optionally load inferred-integration-flows.json for step details and source location
@@ -281,24 +281,22 @@ export default function IntegrationFlowsPage() {
                         </div>
                       )}
 
-                      {/* Mermaid diagram toggle */}
+                      {/* Evidence Panel */}
+                      {(() => {
+                        const rich = item as unknown as RichDetailItem;
+                        if (!rich.evidence && !rich.description) return null;
+                        return (
+                          <EvidencePanel
+                            evidence={rich.evidence}
+                            testFiles={item.tests}
+                            description={rich.description || (item as any).description}
+                          />
+                        );
+                      })()}
+
+                      {/* Mermaid source and render panel */}
                       {diagram && (
-                        <div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowDiagramFor(showDiagramFor === item.id ? null : item.id);
-                            }}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium flex items-center gap-1"
-                          >
-                            {showDiagramFor === item.id ? '▲ Hide' : '▶ Show'} flow diagram
-                          </button>
-                          {showDiagramFor === item.id && (
-                            <div className="mt-2">
-                              <MermaidDiagram chart={diagram} />
-                            </div>
-                          )}
-                        </div>
+                        <MermaidSourceAndRenderPanel chart={diagram} title={`${title} Flow Diagram`} />
                       )}
                     </div>
                   )}

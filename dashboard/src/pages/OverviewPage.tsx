@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useCoverage } from '../context/CoverageContext';
 import { useIntelligence } from '../context/IntelligenceContext';
 import { DEFAULT_THRESHOLDS } from '../types';
@@ -6,6 +7,9 @@ import QualityGateBanner from '../components/QualityGateBanner';
 import FileUpload from '../components/FileUpload';
 import IntelligenceSection from '../components/IntelligenceSection';
 import { Link } from 'react-router-dom';
+import ConfidenceBadge from '../components/ConfidenceBadge';
+import LocalValidationPanel from '../components/LocalValidationPanel';
+import type { ConfidenceLevel, EvidenceDepth, LocalValidationCommand } from '../types';
 import {
   BarChart,
   Bar,
@@ -28,6 +32,7 @@ function riskBandColor(score: number): string {
 export default function OverviewPage() {
   const { report, loading, error } = useCoverage();
   const { report: intel, loading: intelLoading } = useIntelligence();
+  const [expandedType, setExpandedType] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -59,6 +64,11 @@ export default function OverviewPage() {
     Threshold: DEFAULT_THRESHOLDS[s.type] ?? 50,
   }));
 
+  const failing = report.summary.filter((s) => {
+    const threshold = DEFAULT_THRESHOLDS[s.type] ?? 50;
+    return s.coveragePercent < threshold;
+  });
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -67,6 +77,20 @@ export default function OverviewPage() {
       </div>
 
       <QualityGateBanner summary={report.summary} />
+
+      {/* Marginal coverage warning when all gates pass */}
+      {failing.length === 0 && (() => {
+        const shallowSections = report.summary.filter(s => {
+          const t = DEFAULT_THRESHOLDS[s.type] ?? 50;
+          return s.coveragePercent >= t && s.coveragePercent < t + 15 && s.totalItems > 0;
+        });
+        if (shallowSections.length === 0) return null;
+        return (
+          <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm">
+            Thresholds passed, but {shallowSections.map(s => s.type).join(', ')} coverage is marginal. Evidence depth may be shallow.
+          </div>
+        );
+      })()}
 
       {/* Intelligence Summary Banner */}
       {!intelLoading && intel && intel.summary.totalRecommendations > 0 && (
@@ -115,36 +139,110 @@ export default function OverviewPage() {
             {report.summary.map((row, i) => {
               const threshold = DEFAULT_THRESHOLDS[row.type] ?? 50;
               const { label, color } = getStatus(row.coveragePercent, threshold);
+              const isExpanded = expandedType === row.type;
+
+              // Derive confidence interpretation
+              let confidence: ConfidenceLevel;
+              if (row.coveragePercent >= 100 && row.coveragePercent >= threshold) {
+                confidence = 'high';
+              } else if (row.coveragePercent >= 80 && row.coveragePercent >= threshold) {
+                confidence = 'medium';
+              } else if (row.coveragePercent >= threshold && row.coveragePercent < 80) {
+                confidence = 'low';
+              } else {
+                confidence = 'low';
+              }
+              const thresholdMet = row.coveragePercent >= threshold;
+
+              // Derive evidence depth
+              let evidenceDepth: EvidenceDepth;
+              if (row.totalItems > 20) {
+                evidenceDepth = 'deep';
+              } else if (row.totalItems > 5) {
+                evidenceDepth = 'moderate';
+              } else {
+                evidenceDepth = 'shallow';
+              }
+
+              // Blind spots
+              const blindSpots: string[] = [];
+              if (row.coveragePercent === 100) {
+                blindSpots.push('Full coverage claimed — verify assertion depth');
+              }
+
               return (
-                <tr
-                  key={row.type}
-                  className={
-                    i % 2 === 0
-                      ? 'bg-white dark:bg-gray-800'
-                      : 'bg-gray-50 dark:bg-gray-750'
-                  }
-                >
-                  <td className="px-4 py-3 font-medium capitalize text-gray-800 dark:text-gray-100">
-                    {row.type}
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{row.totalItems}</td>
-                  <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{row.coveredItems}</td>
-                  <td className="px-4 py-3 text-right">
-                    <span
-                      className={`font-semibold ${
-                        row.coveragePercent >= threshold
-                          ? 'text-green-600 dark:text-green-400'
-                          : row.coveragePercent >= threshold - 10
-                          ? 'text-yellow-600 dark:text-yellow-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {row.coveragePercent}%
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{threshold}%</td>
-                  <td className={`px-4 py-3 text-center font-medium ${color}`}>{label}</td>
-                </tr>
+                <React.Fragment key={row.type}>
+                  <tr
+                    className={`cursor-pointer ${
+                      i % 2 === 0
+                        ? 'bg-white dark:bg-gray-800'
+                        : 'bg-gray-50 dark:bg-gray-750'
+                    } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    onClick={() => setExpandedType(isExpanded ? null : row.type)}
+                  >
+                    <td className="px-4 py-3 font-medium capitalize text-gray-800 dark:text-gray-100">
+                      <span className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">{isExpanded ? '▲' : '▼'}</span>
+                        {row.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{row.totalItems}</td>
+                    <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{row.coveredItems}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span
+                        className={`font-semibold ${
+                          row.coveragePercent >= threshold
+                            ? 'text-green-600 dark:text-green-400'
+                            : row.coveragePercent >= threshold - 10
+                            ? 'text-yellow-600 dark:text-yellow-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}
+                      >
+                        {row.coveragePercent}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">{threshold}%</td>
+                    <td className={`px-4 py-3 text-center font-medium ${color}`}>{label}</td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="bg-gray-100 dark:bg-gray-750">
+                      <td colSpan={6} className="px-6 py-4">
+                        <div className="flex flex-wrap items-center gap-3 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Confidence:</span>
+                            <ConfidenceBadge confidence={confidence} />
+                            {thresholdMet && row.coveragePercent < 80 && (
+                              <span className="text-xs text-amber-600 dark:text-amber-400 italic">barely passing</span>
+                            )}
+                            {!thresholdMet && (
+                              <span className="text-xs text-red-600 dark:text-red-400 font-semibold">threshold not met</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Evidence Depth:</span>
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                              evidenceDepth === 'deep'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                                : evidenceDepth === 'moderate'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
+                            }`}>
+                              {evidenceDepth.charAt(0).toUpperCase() + evidenceDepth.slice(1)}
+                            </span>
+                          </div>
+                          {blindSpots.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Blind Spots:</span>
+                              {blindSpots.map((bs, idx) => (
+                                <span key={idx} className="text-xs text-amber-600 dark:text-amber-400">{bs}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -199,6 +297,22 @@ export default function OverviewPage() {
             </div>
           </div>
         );
+      })()}
+
+      {/* Local Validation Commands */}
+      {(() => {
+        const commands: LocalValidationCommand[] = [];
+        // Check for common build systems in discovery info
+        if (report.discoveryInfo?.frameworks?.some(f => f.toLowerCase().includes('jest'))) {
+          commands.push({ command: 'npm test', source: 'detected', label: 'Detected from package.json' });
+        }
+        if (report.discoveryInfo?.frameworks?.some(f => f.toLowerCase().includes('cypress'))) {
+          commands.push({ command: 'npx cypress run', source: 'detected', label: 'Detected Cypress' });
+        }
+        // Always suggest the analyzer command
+        commands.push({ command: 'api-coverage-analyzer scan --report coverage-summary.json', source: 'suggested', label: 'Run the analyzer' });
+        if (commands.length > 0) return <LocalValidationPanel commands={commands} />;
+        return null;
       })()}
 
       {/* Bar Chart */}

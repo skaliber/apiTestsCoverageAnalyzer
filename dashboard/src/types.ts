@@ -81,3 +81,76 @@ export interface InferredRuleDetail {
   type?: string;
   specificKeywords?: string[];
 }
+
+// ─── Phase 1: Rich evidence & diagnostics types ──────────────────────────────
+
+/** Confidence level for coverage match detection. */
+export type ConfidenceLevel = 'low' | 'medium' | 'high';
+
+/** How a coverage match was detected. */
+export type DetectionMode = 'direct' | 'inferred' | 'heuristic';
+
+/** Extended status beyond boolean covered/uncovered. */
+export type CoverageStatus = 'covered' | 'uncovered' | 'partial' | 'inferred' | 'unknown';
+
+/** Evidence depth rating. */
+export type EvidenceDepth = 'shallow' | 'moderate' | 'deep';
+
+/** Rich evidence metadata attached to any coverage item. */
+export interface EvidenceMetadata {
+  confidence?: ConfidenceLevel;
+  detectionMode?: DetectionMode;
+  status?: CoverageStatus;
+  sourceLocations?: Array<{ file: string; line?: number; snippet?: string }>;
+  testLocations?: Array<{ file: string; line?: number; snippet?: string }>;
+  scannerNotes?: string[];
+  matchedFrameworks?: string[];
+  matchedLibraries?: string[];
+  riskScore?: number;
+  supportingEvidence?: string[];
+  contradictingEvidence?: string[];
+}
+
+/** Extended DetailItem with rich evidence fields. */
+export interface RichDetailItem extends DetailItem {
+  evidence?: EvidenceMetadata;
+  category?: string;
+  description?: string;
+  relatedEndpoint?: string;
+  statusCode?: number;
+  suggestedTest?: string;
+  codeSnippet?: string;
+  pseudocode?: string;
+}
+
+/** Overview section derived interpretation. */
+export interface SectionInterpretation {
+  thresholdStatus: 'pass' | 'fail' | 'warning';
+  confidenceRating: ConfidenceLevel;
+  evidenceDepth: EvidenceDepth;
+  fragilityRisk: 'low' | 'medium' | 'high';
+  blindSpots: string[];
+  topContributingFiles?: string[];
+  unsupportedFrameworkNotes?: string[];
+}
+
+/** Scan diagnostics information. */
+export interface ScanDiagnostics {
+  scannedPaths?: string[];
+  ignoredPaths?: string[];
+  excludedFiles?: string[];
+  parseFailures?: string[];
+  unsupportedPatterns?: string[];
+  fallbackHeuristicsTriggered?: string[];
+  manifestsFound?: string[];
+  packagesDetected?: string[];
+  sourceFileCount?: number;
+  testFileCount?: number;
+}
+
+/** Local validation command with its source/confidence. */
+export interface LocalValidationCommand {
+  command: string;
+  source: 'detected' | 'inferred' | 'suggested';
+  label?: string;
+}

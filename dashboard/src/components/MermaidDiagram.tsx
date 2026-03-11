@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
+import { useTheme } from '../hooks/useTheme';
 
 interface MermaidDiagramProps {
   chart: string;
@@ -10,18 +11,20 @@ let diagramCounter = 0;
 export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef<string | null>(null);
+  const { isDark } = useTheme();
+  
   if (idRef.current === null) {
     idRef.current = `mermaid-diagram-${++diagramCounter}`;
   }
 
   useEffect(() => {
     if (!containerRef.current || !chart) return;
-    const isDark = document.documentElement.classList.contains('dark');
     mermaid.initialize({
       startOnLoad: false,
       theme: isDark ? 'dark' : 'default',
     });
-    const id = idRef.current!;
+    // Generate a fresh unique id for each render to avoid mermaid caching issues
+    const id = `${idRef.current}-${Date.now()}`;
     mermaid
       .render(id, chart)
       .then(({ svg }) => {
@@ -34,7 +37,7 @@ export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
           containerRef.current.innerHTML = `<pre class="text-xs text-red-500">Diagram error: ${String(err)}</pre>`;
         }
       });
-  }, [chart]);
+  }, [chart, isDark]); // Now re-renders when isDark changes!
 
   return (
     <div

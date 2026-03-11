@@ -5,7 +5,9 @@ import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
 import IntelligenceSection from '../components/IntelligenceSection';
-import type { DetailItem, InferredRuleDetail } from '../types';
+import EvidencePanel from '../components/EvidencePanel';
+import ConfidenceBadge from '../components/ConfidenceBadge';
+import type { DetailItem, InferredRuleDetail, RichDetailItem } from '../types';
 import { generateBusinessRulesSummary } from '../utils/markdownSummaries';
 
 export default function BusinessRulesPage() {
@@ -61,8 +63,10 @@ export default function BusinessRulesPage() {
                   className="w-full flex items-center justify-between px-4 py-3 text-left"
                   onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                 >
-                  <span className="font-medium text-gray-800 dark:text-gray-100 text-sm">
-                    {item.covered ? '✅' : '❌'} {item.id}
+                  <span className="font-medium text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
+                    {item.covered ? '✅' : '❌'}
+                    <ConfidenceBadge confidence={(item as RichDetailItem).evidence?.confidence} />
+                    {item.id}
                   </span>
                   <span className="text-gray-400 dark:text-gray-500 text-xs">
                     {expandedId === item.id ? '▲' : '▼'}
@@ -136,6 +140,18 @@ export default function BusinessRulesPage() {
                             </div>
                           )}
                         </div>
+                      );
+                    })()}
+                    {(() => {
+                      const rich = item as RichDetailItem;
+                      if (!rich.evidence && !rich.description && !rich.category) return null;
+                      return (
+                        <EvidencePanel
+                          evidence={rich.evidence}
+                          testFiles={item.tests}
+                          description={rich.description}
+                          category={rich.category}
+                        />
                       );
                     })()}
                   </div>

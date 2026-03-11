@@ -155,7 +155,7 @@ describe('normalizeSection', () => {
         },
       ];
       const result = normalizeSection(input, 'error');
-      expect(result.items[0].id).toBe('POST /api/users (400)');
+      expect(result.items[0].id).toBe('POST /api/users:400');
       expect(result.items[0].covered).toBe(true);
     });
 

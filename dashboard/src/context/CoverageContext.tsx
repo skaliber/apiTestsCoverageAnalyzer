@@ -50,11 +50,19 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
       const method = ((raw.method as string) || epNested.method || '') as string;
       const pathStr = ((raw.path as string) || epNested.path || '') as string;
       const tests = (raw.testFiles ?? raw.matchedTests ?? []) as string[];
-      return {
+      const matches = (raw.matches ?? []) as Array<{resolutionType?: string; confidence?: string}>;
+      const languages = (raw.languages ?? []) as string[];
+      const evidence = (matches.length > 0 || languages.length > 0) ? {
+        confidence: (matches[0]?.confidence as string) || undefined,
+        detectionMode: (matches[0]?.resolutionType as string) || undefined,
+        matchedFrameworks: languages.length > 0 ? languages : undefined,
+      } : undefined;
+      const base: DetailItem = {
         id: `${method} ${pathStr}`.trim() || `endpoint-${idx}`,
         covered: Boolean(raw.covered),
         tests,
       };
+      return evidence ? Object.assign(base, { evidence }) : base;
     }
     case 'parameter': {
       // Raw format: { parameter: { name, location, method, path, ... }, ratio, validValue, ... }
@@ -71,22 +79,38 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
     }
     case 'business': {
       // Raw format: { rule: { id, name, description, ... }, covered, matchedTests }
-      const ruleData = (raw.rule ?? {}) as { id?: string; name?: string; description?: string };
+      const ruleData = (raw.rule ?? {}) as { id?: string; name?: string; description?: string; title?: string; category?: string; endpoints?: unknown[]; keywords?: string[] };
       const tests = (raw.matchedTests ?? raw.testFiles ?? []) as string[];
-      return {
+      const base: DetailItem = {
         id: ruleData.id || (raw.name as string) || (raw.id as string) || `rule-${idx}`,
         covered: Boolean(raw.covered),
         tests,
       };
+      const description = ruleData.description || ruleData.title || undefined;
+      const category = ruleData.category || undefined;
+      return Object.assign(base, {
+        ...(description ? { description } : {}),
+        ...(category ? { category } : {}),
+      });
     }
     case 'error': {
       // Real analyzer format: { scenario: { id, endpoint, statusCode, ... }, covered, matchedTests }
       // Demo/legacy format:   { endpoint: { method, path }, errorCodes, covered }
-      const scenario = (raw.scenario ?? {}) as { id?: string; endpoint?: string; statusCode?: number };
+      const scenario = (raw.scenario ?? {}) as { id?: string; endpoint?: string; statusCode?: number; categories?: string[]; description?: string; method?: string; path?: string };
       const epNested = (raw.endpoint ?? {}) as { method?: string; path?: string };
       const tests = (raw.matchedTests ?? raw.testFiles ?? []) as string[];
       if (scenario.id) {
-        return { id: scenario.id, covered: Boolean(raw.covered), tests };
+        const base: DetailItem = { id: scenario.id, covered: Boolean(raw.covered), tests };
+        const category = Array.isArray(scenario.categories) && scenario.categories.length > 0 ? scenario.categories.join(', ') : undefined;
+        const description = scenario.description || undefined;
+        const statusCode = scenario.statusCode || undefined;
+        const relatedEndpoint = (scenario.method && scenario.path) ? `${scenario.method} ${scenario.path}` : (scenario.endpoint || undefined);
+        return Object.assign(base, {
+          ...(category ? { category } : {}),
+          ...(description ? { description } : {}),
+          ...(statusCode ? { statusCode } : {}),
+          ...(relatedEndpoint ? { relatedEndpoint } : {}),
+        });
       }
       // Legacy: build id from endpoint + error codes
       const codes = (raw.errorCodes ?? []) as string[];
@@ -97,7 +121,7 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
     }
     case 'integration': {
       // Raw format: { flow: { id, name, description, steps }, status, testFiles, steps: [{step, covered, matchedTests}] }
-      const flowData = (raw.flow ?? {}) as { id?: string; name?: string; steps?: unknown[] };
+      const flowData = (raw.flow ?? {}) as { id?: string; name?: string; steps?: unknown[]; description?: string };
       // raw.steps = array of { step: { step, name, method, path, ... }, covered, matchedTests }
       // flowData.steps = array of step definition objects (no coverage info)
       const stepsArr = (raw.steps ?? []) as unknown[];
@@ -131,7 +155,7 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
 
       const coveredStepsCount = effectiveSteps.filter((s) => s.covered).length;
       const tests = (raw.testFiles ?? raw.matchedTests ?? []) as string[];
-      return {
+      const base: DetailItem = {
         id: flowData.id || (raw.id as string) || `flow-${idx}`,
         flowName: (flowData.name as string) || undefined,
         covered: raw.status === 'covered' || coveredStepsCount > 0,
@@ -140,15 +164,25 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
         coveredSteps: coveredStepsCount,
         rawSteps: effectiveSteps,
       };
+      const description = flowData.description || undefined;
+      return description ? Object.assign(base, { description }) : base;
     }
     case 'security': {
       const ctrl = (raw.control ?? {}) as { id?: string; category?: string; description?: string };
       const tests = (raw.matchedTests ?? []) as string[];
-      return {
+      const base: DetailItem = {
         id: ctrl.id || `security-${idx}`,
         covered: Boolean(raw.covered),
         tests,
       };
+      const category = ctrl.category || undefined;
+      const description = ctrl.description || undefined;
+      const scannerNotes = raw.coveredByScanReport === true ? ['Covered by external scan report'] : undefined;
+      return Object.assign(base, {
+        ...(category ? { category } : {}),
+        ...(description ? { description } : {}),
+        ...(scannerNotes ? { scannerNotes } : {}),
+      });
     }
     default: {
       return {

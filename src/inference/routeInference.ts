@@ -65,6 +65,39 @@ const CHAINED_METHOD_PATTERN = /\.\s*(get|post|put|patch|delete|head|options)\s*
 /** Matches JSDoc @route {GET} /path */
 const JSDOC_ROUTE_PATTERN = /@route\s+\{(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\}\s+(\S+)/i;
 
+// ─── AngularJS / $http / fetch / axios patterns ────────────────────────────
+
+/**
+ * Detects that a file uses HTTP client patterns ($http, fetch, axios).
+ * Used to gate the URL+method object-form scan so we only activate it in
+ * files that actually make HTTP calls (avoids scanning every JS file).
+ */
+const HTTP_CLIENT_SIGNAL = /\$http|\bfetch\s*\(|\baxios\b/;
+
+/**
+ * Matches a `url:` property that ends with a literal path segment starting
+ * with `/`.  Handles both bare and concatenated forms:
+ *   url: '/articles'
+ *   url: this._AppConstants.api + '/articles'
+ *   url: `${base}/articles`
+ * Group 1 = the static path portion (starts with /).
+ */
+const ANGULAR_HTTP_URL_KEY =
+  /\burl\s*:(?:[^'"`\n]*?\+\s*)?['"`](\/[^'"`?#{\n]+)['"`]/;
+
+/**
+ * Matches a `method:` property with an HTTP verb value.
+ *   method: 'GET'   method: "POST"
+ * Group 1 = the HTTP method (uppercase).
+ */
+const ANGULAR_HTTP_METHOD_KEY = /\bmethod\s*:\s*['"]([A-Z]+)['"]/i;
+
+/**
+ * Number of lines to search around a `method:` key when looking for the
+ * paired `url:` key in the same AngularJS $http config object.
+ */
+const ANGULAR_HTTP_SCAN_WINDOW = 12;
+
 /**
  * Matches the primary async service function call within a route handler body.
  * e.g. `await deleteComment(...)` or `const result = await getArticles(...)`.
@@ -129,6 +162,11 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
     }
   };
 
+  // Pre-check: does this file use AngularJS $http, fetch, or axios?
+  // We only enable the object-form method+url scanner for such files to
+  // avoid false positives in ordinary JS/TS source.
+  const usesHttpClient = HTTP_CLIENT_SIGNAL.test(content);
+
   for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
     const line = lines[lineIdx];
 
@@ -178,6 +216,27 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
       while ((methodMatch = CHAINED_METHOD_PATTERN.exec(windowText)) !== null) {
         const method = methodMatch[1].toLowerCase() as HttpMethod;
         addRoute(method, routePath, lineIdx + 1, 'code');
+      }
+    }
+
+    // 4. AngularJS / fetch / axios — { url: base + '/path', method: 'GET' }
+    //    Only active when the file contains an HTTP-client signal.
+    if (usesHttpClient) {
+      const httpMethodKey = line.match(ANGULAR_HTTP_METHOD_KEY);
+      if (httpMethodKey) {
+        const httpVerb = httpMethodKey[1].toLowerCase();
+        if (HTTP_METHODS.includes(httpVerb as HttpMethod)) {
+          // Scan a window around this line to find the paired url: key
+          const searchStart = Math.max(0, lineIdx - ANGULAR_HTTP_SCAN_WINDOW);
+          const searchEnd = Math.min(lines.length, lineIdx + ANGULAR_HTTP_SCAN_WINDOW);
+          for (let j = searchStart; j < searchEnd; j++) {
+            const urlKeyMatch = lines[j].match(ANGULAR_HTTP_URL_KEY);
+            if (urlKeyMatch) {
+              addRoute(httpVerb as HttpMethod, urlKeyMatch[1], lineIdx + 1, 'code');
+              break;
+            }
+          }
+        }
       }
     }
   }

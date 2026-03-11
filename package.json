@@ -1,6 +1,6 @@
 {
   "name": "api-tests-coverage",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "CLI and library to measure how thoroughly your test suite exercises your API surface area",
   "main": "dist/src/lib/index.js",
   "types": "dist/src/lib/index.d.ts",

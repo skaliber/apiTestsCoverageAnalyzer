@@ -32,9 +32,13 @@ function normalizeItem(raw: Record<string, unknown>, sectionKey: string, idx: nu
       id: raw.id,
       covered: Boolean(raw.covered),
       tests: (raw.tests ?? raw.matchedTests) as string[] | undefined,
-      steps: raw.steps as number | undefined,
+      // `total` is the Spring Boot inferred-flow step count field; `steps` is the generic name
+      steps: (raw.steps ?? raw.total) as number | undefined,
       coveredSteps: raw.coveredSteps as number | undefined,
       threshold: raw.threshold as string | undefined,
+      // `name` is used for integration flows (e.g. "Flow in ArticleApiTest.java:72")
+      flowName: (raw.flowName ?? raw.name) as string | undefined,
+      rawSteps: raw.rawSteps as import('../types').FlowStepDetail[] | undefined,
     };
   }
 

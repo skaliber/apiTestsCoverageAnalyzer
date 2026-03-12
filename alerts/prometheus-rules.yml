@@ -29,7 +29,7 @@ groups:
             The {{ $labels.coverage_type }} coverage ratio for service {{ $labels.service }}
             is {{ $value | humanizePercentage }}, which is below the 80% threshold.
             Check the coverage reports and add missing tests.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/README.md"
 
       # ── Threshold breach alert (set by --threshold-* flags) ─────────────────
       - alert: ApiCoverageThresholdBreached
@@ -44,7 +44,7 @@ groups:
             has dropped below the configured threshold.
             Current ratio: {{ with query "api_coverage_ratio{coverage_type=\"" }}{{ . }}{{ end }}.
             Investigate recent test changes and restore coverage immediately.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/README.md"
 
       # ── Zero error coverage alert ────────────────────────────────────────────
       - alert: ApiErrorCoverageZero
@@ -58,7 +58,7 @@ groups:
             No error scenarios are covered by tests for service {{ $labels.service }}.
             Error-handling tests are essential for production-grade APIs.
             Add tests for HTTP 4xx/5xx responses and edge cases.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/README.md"
 
       # ── Zero security coverage alert ─────────────────────────────────────────
       - alert: ApiSecurityCoverageZero
@@ -71,7 +71,7 @@ groups:
           description: |
             No security controls are covered by tests for service {{ $labels.service }}.
             Add authentication, authorisation, and input-validation tests.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/README.md"
 
       # ── Coverage regression alert (significant drop) ─────────────────────────
       - alert: ApiCoverageDropped
@@ -89,7 +89,7 @@ groups:
             The {{ $labels.coverage_type }} coverage ratio for service {{ $labels.service }}
             dropped by more than 10 percentage points compared to 1 hour ago.
             This may indicate recently deleted or disabled tests.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/README.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/README.md"
 
   # ── Security scanning alerts ─────────────────────────────────────────────────
   - name: api_security_scan
@@ -107,7 +107,7 @@ groups:
             The security gate for service {{ $labels.service }} failed on the last scan.
             One or more configured thresholds (failOnCritical, maxSecrets, etc.) were exceeded.
             Review the security-scan-summary.html report and address findings immediately.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
 
       # ── Critical security findings detected ──────────────────────────────────
       - alert: SecurityCriticalFindingsDetected
@@ -121,7 +121,7 @@ groups:
             {{ $value }} CRITICAL severity finding(s) were detected in the last security scan
             for service {{ $labels.service }}.
             These must be addressed immediately. Review security-sast.json and security-dependencies.json.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
 
       # ── High security findings detected ──────────────────────────────────────
       - alert: SecurityHighFindingsDetected
@@ -135,7 +135,7 @@ groups:
             {{ $value }} HIGH severity finding(s) were detected in the last security scan
             for service {{ $labels.service }}.
             Review and remediate these within 48 hours.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
 
       # ── Secrets detected ─────────────────────────────────────────────────────
       - alert: SecuritySecretsDetected
@@ -149,7 +149,7 @@ groups:
             {{ $value }} secret(s) were detected in the last security scan for service {{ $labels.service }}.
             Revoke and rotate all affected credentials immediately.
             Check security-secrets.json for details.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
 
       # ── Security scan stale (no recent scan) ─────────────────────────────────
       - alert: SecurityScanStale
@@ -162,7 +162,7 @@ groups:
           description: |
             The last security scan for service {{ $labels.service }} ran more than 24 hours ago.
             Ensure the security-scan step is running in the CI pipeline.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/ci-cd.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/ci-cd.md"
 
       # ── Security findings increasing trend ───────────────────────────────────
       - alert: SecurityFindingsIncreasing
@@ -180,4 +180,4 @@ groups:
             The number of CRITICAL or HIGH security findings for service {{ $labels.service }}
             increased by more than 2 in the past hour.
             This may indicate a recent commit introduced new vulnerabilities.
-          runbook: "https://github.com/skaliber/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"
+          runbook: "https://github.com/q-intel/apiTestsCoverageAnalyzer/blob/main/docs/guide/security-scanning.md"

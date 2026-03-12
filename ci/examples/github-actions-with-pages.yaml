@@ -33,7 +33,7 @@ jobs:
 
       - name: API Test Coverage Analysis
         id: coverage
-        uses: skaliber/apiTestsCoverageAnalyzer@main
+        uses: q-intel/apiTestsCoverageAnalyzer@main
         with:
           spec: './openapi.yaml'
           tests: 'tests/**/*.ts'

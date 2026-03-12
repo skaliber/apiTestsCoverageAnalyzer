@@ -9,12 +9,12 @@ Thank you for considering contributing! Please read this guide before submitting
 - [Coding standards](#coding-standards)
 - [Commit messages](#commit-messages)
 - [Pull request process](#pull-request-process)
-- [Full contributing guide in the docs →](https://skaliber.github.io/apiTestsCoverageAnalyzer/reference/contributing)
+- [Full contributing guide in the docs →](https://q-intel.github.io/apiTestsCoverageAnalyzer/reference/contributing)
 
 ## Development setup
 
 ```bash
-git clone https://github.com/skaliber/apiTestsCoverageAnalyzer.git
+git clone https://github.com/q-intel/apiTestsCoverageAnalyzer.git
 cd apiTestsCoverageAnalyzer
 npm install
 npm run build
@@ -63,7 +63,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 
 ## Reporting bugs
 
-Open an issue at https://github.com/skaliber/apiTestsCoverageAnalyzer/issues with the **bug** label. Include:
+Open an issue at https://github.com/q-intel/apiTestsCoverageAnalyzer/issues with the **bug** label. Include:
 
 - Steps to reproduce
 - Expected behaviour

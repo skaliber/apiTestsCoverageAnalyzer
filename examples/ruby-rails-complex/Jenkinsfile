@@ -104,7 +104,7 @@ pipeline {
         stage('Coverage Analysis - Baseline (spec-initial ~50%)') {
             steps {
                 sh '''
-                    npm install -g @skaliber/api-tests-coverage-analyzer
+                    npm install -g @q-intel/api-tests-coverage-analyzer
                     api-coverage analyze \
                         --config config.yaml \
                         --test-dir spec/requests/spec-initial \

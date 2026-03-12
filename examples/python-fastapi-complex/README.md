@@ -1,6 +1,6 @@
 # python-fastapi-complex
 
-A realistic **Financial Accounts & Transactions API** built with FastAPI, used as an example project for the [apiTestsCoverageAnalyzer](https://github.com/skaliber/apiTestsCoverageAnalyzer).
+A realistic **Financial Accounts & Transactions API** built with FastAPI, used as an example project for the [apiTestsCoverageAnalyzer](https://github.com/q-intel/apiTestsCoverageAnalyzer).
 
 This project demonstrates the complete coverage improvement journey: starting with a partial test suite (~55% coverage), discovering gaps with the analyzer, and iteratively adding tests until 100% coverage is achieved.
 

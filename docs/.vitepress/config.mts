@@ -88,7 +88,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present skaliber',
+      copyright: 'Copyright © 2024-present q-intel',
     },
   },
 

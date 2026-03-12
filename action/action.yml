@@ -1,6 +1,6 @@
 name: 'API Test Coverage Analyzer'
 description: 'Analyze API test coverage based on OpenAPI specs and generate reports'
-author: 'skaliber'
+author: 'q-intel'
 
 branding:
   icon: 'check-circle'

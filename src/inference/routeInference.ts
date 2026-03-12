@@ -72,7 +72,21 @@ const JSDOC_ROUTE_PATTERN = /@route\s+\{(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)
  * Used to gate the URL+method object-form scan so we only activate it in
  * files that actually make HTTP calls (avoids scanning every JS file).
  */
-const HTTP_CLIENT_SIGNAL = /\$http|\bfetch\s*\(|\baxios\b/;
+const HTTP_CLIENT_SIGNAL = /\$http|\bfetch\s*\(|\baxios\b|\bsuperagent\b/;
+
+/**
+ * Matches client-side HTTP method calls: requests.get('/path'), api.post('/path'), etc.
+ * Group 1 = HTTP method, Group 2 = path literal starting with /
+ * Also handles: superagent.get(`${base}/path`) → captures the static suffix
+ */
+const HTTP_CLIENT_METHOD_CALL =
+  /\b\w+\s*\.\s*(get|post|put|patch|delete|del|head|options)\s*\(\s*(?:[^'"`\n]*?\+\s*)?['"`](\/[^'"`?\n]+)/i;
+
+/**
+ * Signals that this JS/TS file is a client-side HTTP service layer.
+ * Expands on HTTP_CLIENT_SIGNAL to include superagent and common wrapper patterns.
+ */
+const HTTP_SERVICE_SIGNAL = /\bsuperagent\b|\brequests\s*\.\s*(?:get|post|put|delete|del)\b|\bapi\s*\.\s*(?:get|post|put|delete)\b/;
 
 /**
  * Matches a `url:` property that ends with a literal path segment starting
@@ -173,6 +187,9 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
   // avoid false positives in ordinary JS/TS source.
   const usesHttpClient = HTTP_CLIENT_SIGNAL.test(content);
 
+  // Pre-check: does this file use a client-side HTTP service wrapper (requests.*, api.*, etc.)?
+  const usesHttpServiceWrapper = HTTP_SERVICE_SIGNAL.test(content);
+
   for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
     const line = lines[lineIdx];
 
@@ -253,6 +270,21 @@ export function inferRoutesFromFile(filePath: string): InferredRoute[] {
               break;
             }
           }
+        }
+      }
+    }
+
+    // 6. Client-side HTTP method calls: requests.get('/path'), api.post('/path')
+    //    Only activate for files that contain HTTP service signals to avoid false positives
+    if (usesHttpServiceWrapper) {
+      const clientCallMatch = line.match(HTTP_CLIENT_METHOD_CALL);
+      if (clientCallMatch) {
+        let httpMethod = clientCallMatch[1].toLowerCase();
+        // Normalize 'del' → 'delete'
+        if (httpMethod === 'del') httpMethod = 'delete';
+        if (HTTP_METHODS.includes(httpMethod as HttpMethod)) {
+          const routePath = clientCallMatch[2].split('?')[0]; // strip query string
+          addRoute(httpMethod as HttpMethod, routePath, lineIdx + 1, 'code');
         }
       }
     }
@@ -439,7 +471,7 @@ function findNextMethodNameInJava(javaLines: string[], fromLine: number): string
  *   @app.route('/tags')   ← defaults to GET
  */
 const FLASK_ROUTE =
-  /@(\w+)\.route\s*\(\s*['"]([^'"]+)['"](?:\s*,\s*methods\s*=\s*\[([^\]]+)\])?\s*\)/;
+  /@(\w+)\.route\s*\(\s*['"]([^'"]+)['"](?:[^\n]*?\bmethods\s*=\s*[\[(]([^\])\n]+)[\])])?/;
 
 /**
  * Matches FastAPI decorators.
@@ -466,6 +498,21 @@ const FASTAPI_APIROUTER =
   /(\w+)\s*=\s*APIRouter\s*\([^)]*?prefix\s*=\s*['"]([^'"]+)['"]/;
 
 /**
+ * Scan ahead for a Python `def function_name(` line following a decorator.
+ * Skips additional decorator lines and stops at the first non-decorator,
+ * non-blank, non-comment line that is not a def.
+ */
+function findPythonHandlerFunction(lines: string[], fromLine: number): string | undefined {
+  for (let j = fromLine + 1; j < Math.min(fromLine + 6, lines.length); j++) {
+    const m = lines[j].match(/^def\s+(\w+)\s*\(/);
+    if (m) return m[1];
+    // Skip decorator lines
+    if (!lines[j].trim().startsWith('@') && lines[j].trim().length > 0 && !lines[j].trim().startsWith('#')) break;
+  }
+  return undefined;
+}
+
+/**
  * Infer routes from a Python (Flask/FastAPI) source file.
  */
 function inferRoutesFromPythonFile(filePath: string): InferredRoute[] {
@@ -479,10 +526,10 @@ function inferRoutesFromPythonFile(filePath: string): InferredRoute[] {
   const lines = content.split('\n');
   const byKey = new Map<string, InferredRoute>();
 
-  const addRoute = (method: HttpMethod, routePath: string, lineNumber: number) => {
+  const addRoute = (method: HttpMethod, routePath: string, lineNumber: number, handlerFunction?: string) => {
     const key = `${method}:${routePath}`;
     if (!byKey.has(key)) {
-      byKey.set(key, { method, path: routePath, sourceFile: filePath, lineNumber, discoveredVia: 'code' });
+      byKey.set(key, { method, path: routePath, handlerFunction, sourceFile: filePath, lineNumber, discoveredVia: 'code' });
     }
   };
 
@@ -513,18 +560,19 @@ function inferRoutesFromPythonFile(filePath: string): InferredRoute[] {
       const fullPath = localPrefix + (routePath.startsWith('/') ? routePath : '/' + routePath);
       // Normalize Flask <param> to {param}
       const normalizedPath = fullPath.replace(/<(?:\w+:)?(\w+)>/g, '{$1}');
+      const handlerFn = findPythonHandlerFunction(lines, i);
 
       if (methodsList) {
-        // Parse methods=['GET', 'POST'] → individual routes
+        // Parse methods=['GET', 'POST'] or methods=('GET', 'POST') → individual routes
         const methods = methodsList.replace(/['"]/g, '').split(',').map((m) => m.trim().toLowerCase());
         for (const m of methods) {
           if (HTTP_METHODS.includes(m as HttpMethod)) {
-            addRoute(m as HttpMethod, normalizedPath, i + 1);
+            addRoute(m as HttpMethod, normalizedPath, i + 1, handlerFn);
           }
         }
       } else {
         // Default to GET
-        addRoute('get', normalizedPath, i + 1);
+        addRoute('get', normalizedPath, i + 1, handlerFn);
       }
       continue;
     }
@@ -535,8 +583,9 @@ function inferRoutesFromPythonFile(filePath: string): InferredRoute[] {
       const httpMethod = fastapiMatch[2].toLowerCase() as HttpMethod;
       const routePath = fastapiMatch[3];
       const fullPath = localPrefix + (routePath.startsWith('/') ? routePath : '/' + routePath);
+      const handlerFn = findPythonHandlerFunction(lines, i);
       // FastAPI uses {param} natively
-      addRoute(httpMethod, fullPath, i + 1);
+      addRoute(httpMethod, fullPath, i + 1, handlerFn);
       continue;
     }
   }

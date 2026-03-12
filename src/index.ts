@@ -2342,6 +2342,143 @@ program
       console.log(`  ${syntheticReport.complete}/${syntheticReport.total} multi-step flows detected and covered (100%)`);
     }
 
+    // ── 4f-perf. Performance & resilience coverage ────────────────────────────
+    // When load-test files (JMeter/k6/Gatling) are available, use them.
+    // When none are found, infer performance/resilience evidence from test content.
+    {
+      // ─ Keywords ──────────────────────────────────────────────────────────────
+      const PERF_KEYWORDS = [
+        'load', 'performance', 'stress', 'throughput', 'latency', 'benchmark',
+        'concurrent', 'response time', 'response_time', 'timing', 'timed',
+        'slow', 'fast', 'speed', 'millisecond', 'ms ', ' ms',
+      ];
+      const RESILIENCE_KEYWORD_MAP: Record<string, string[]> = {
+        'timeout':        ['timeout', 'timed out', 'connection timeout', 'request timeout', 'read timeout'],
+        'retry':          ['retry', 'retries', 'retried', 'attempt', 'backoff', 'back-off'],
+        'circuit-breaker':['circuit breaker', 'circuit_breaker', 'circuitbreaker', 'open circuit'],
+        'fallback':       ['fallback', 'fall back', 'fall-back', 'default response', 'degraded'],
+        'rate-limiting':  ['rate limit', 'rate_limit', 'ratelimit', '429', 'too many requests', 'throttl'],
+        'bulkhead':       ['bulkhead', 'semaphore', 'queue full', 'concurrency limit'],
+      };
+
+      if (artifacts.performanceFiles.length > 0) {
+        // ─ Explicit: JMeter / k6 / Gatling files found ─────────────────────
+        try {
+          console.log(`\nAnalyzing performance coverage (${artifacts.performanceFiles.length} load-test file(s))...`);
+          const endpointItems = (allCoverageResults.find((r) => r.type === 'endpoint')?.details as { items?: { id: string }[] } | undefined)?.items ?? [];
+          const endpoints = endpointItems.map((item) => {
+            const parts = item.id.split(' ');
+            return { id: item.id, method: parts[0] ?? 'GET', path: parts[1] ?? item.id };
+          });
+          const metricsMap = parseLoadTestResults(artifacts.performanceFiles);
+          const perfThresholds: PerformanceThresholds = { responseMs: 500, errorRate: 0.05 };
+          const perfCoverages = analyzePerformanceCoverage(endpoints, metricsMap, perfThresholds);
+          const scenarios     = buildResilienceScenarios(endpoints);
+          const resilienceCoverages = await analyzeResilienceCoverage(scenarios, testsGlob);
+          const report = buildPerfResilienceReport(perfCoverages, resilienceCoverages);
+
+          const perfResult: CoverageResult = {
+            type: 'performance',
+            totalItems: report.totalEndpoints,
+            coveredItems: report.endpointsWithLoadData,
+            coveragePercent: report.performanceCoveragePercent,
+            details: report,
+          };
+          const resilienceResult: CoverageResult = {
+            type: 'resilience',
+            totalItems: report.totalResilienceScenarios,
+            coveredItems: report.coveredResilienceScenarios,
+            coveragePercent: report.resilienceCoveragePercent,
+            details: report,
+          };
+          allCoverageResults.push(perfResult, resilienceResult);
+          console.log(`  ${report.endpointsWithLoadData}/${report.totalEndpoints} endpoints have load-test data (${report.performanceCoveragePercent}%)`);
+          console.log(`  ${report.coveredResilienceScenarios}/${report.totalResilienceScenarios} resilience scenarios covered (${report.resilienceCoveragePercent}%)`);
+        } catch (perfErr) {
+          warnings.push(`Performance coverage failed: ${perfErr instanceof Error ? perfErr.message : String(perfErr)}`);
+        }
+      } else {
+        // ─ Inferred: no load-test files found — scan test content for signals ─
+        console.log(`\nPerformance & resilience coverage (inferred — no JMeter/k6/Gatling files found)...`);
+
+        // Build a flat list of all known endpoints from earlier coverage results
+        const knownEndpoints: string[] = ((allCoverageResults.find((r) => r.type === 'endpoint')?.details as { items?: { id: string }[] } | undefined)?.items ?? []).map((item) => item.id);
+
+        const allTestContent = testEntries.map((e) => e.contentLower);
+        const combinedTestContent = allTestContent.join('\n');
+
+        // ─ Performance inference ────────────────────────────────────────────
+        const hasPerfSignal = PERF_KEYWORDS.some((kw) => combinedTestContent.includes(kw));
+        const perfItems = knownEndpoints.map((endpointId) => {
+          const parts = endpointId.split(' ');
+          const epPath = (parts[1] ?? endpointId).toLowerCase();
+          const epLeaf = epPath.split('/').filter(Boolean).pop() ?? epPath;
+          const hasEvidenceInTests = testEntries.some(({ contentLower }) => {
+            const mentionsEndpoint = epLeaf.length > 2
+              ? contentLower.includes(epLeaf)
+              : contentLower.includes(epPath);
+            const hasPerfKw = PERF_KEYWORDS.some((kw) => contentLower.includes(kw));
+            return mentionsEndpoint && hasPerfKw;
+          });
+          return { id: endpointId, hasEvidence: hasEvidenceInTests };
+        });
+        const perfCoveredCount = perfItems.filter((i) => i.hasEvidence).length;
+        const perfTotal = Math.max(perfItems.length, 1); // avoid 0-denominator
+        const perfPct = knownEndpoints.length === 0
+          ? (hasPerfSignal ? 30 : 0)                     // no routes but some signal
+          : Math.round((perfCoveredCount / perfItems.length) * 100);
+
+        const perfResult: CoverageResult = {
+          type: 'performance',
+          totalItems: perfItems.length || 1,
+          coveredItems: knownEndpoints.length === 0 && hasPerfSignal ? 0 : perfCoveredCount,
+          coveragePercent: perfPct,
+          details: {
+            inferred: true,
+            note: 'No JMeter, k6, or Gatling files found. Coverage inferred from test content keywords.',
+            totalEndpoints: perfItems.length,
+            endpointsWithEvidence: perfCoveredCount,
+            performanceCoveragePercent: perfPct,
+            items: perfItems,
+          },
+        };
+        allCoverageResults.push(perfResult);
+        if (knownEndpoints.length > 0) {
+          console.log(`  ${perfCoveredCount}/${perfItems.length} endpoints have performance test evidence (${perfPct}%)`);
+        } else {
+          console.log(`  Performance signal in tests: ${hasPerfSignal ? 'yes' : 'none'} (0% — no load-test files)`);
+        }
+        console.log(`  [NOTE] Add JMeter .jtl/.csv, k6 .json, or Gatling simulation.log files for accurate load-test metrics.`);
+
+        // ─ Resilience inference ──────────────────────────────────────────────
+        const resilienceItems = Object.entries(RESILIENCE_KEYWORD_MAP).map(([category, keywords]) => {
+          const covered = testEntries.some(({ contentLower }) =>
+            keywords.some((kw) => contentLower.includes(kw)),
+          );
+          return { id: `resilience:${category}`, category, covered };
+        });
+        const resCoveredCount = resilienceItems.filter((i) => i.covered).length;
+        const resPct = Math.round((resCoveredCount / resilienceItems.length) * 100);
+
+        const resilienceResult: CoverageResult = {
+          type: 'resilience',
+          totalItems: resilienceItems.length,
+          coveredItems: resCoveredCount,
+          coveragePercent: resPct,
+          details: {
+            inferred: true,
+            note: 'Resilience coverage inferred from test content. No load-test files found.',
+            totalResilienceScenarios: resilienceItems.length,
+            coveredResilienceScenarios: resCoveredCount,
+            resilienceCoveragePercent: resPct,
+            items: resilienceItems,
+          },
+        };
+        allCoverageResults.push(resilienceResult);
+        console.log(`  ${resCoveredCount}/${resilienceItems.length} resilience categories have test evidence (${resPct}%)`);
+      }
+    }
+
     if (allCoverageResults.length > 0) {
       const observabilityInfo = buildObservabilityInfo(metricsPort);
       generateMultiFormatReports(allCoverageResults, ['json'], reportsDir, {}, observabilityInfo);

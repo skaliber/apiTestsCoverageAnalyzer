@@ -69,6 +69,11 @@ const HTTP_CALL_PATTERNS: HttpCallPattern[] = [
   { pattern: /\b(get|post|put|patch|delete)\s+['"`]([^'"`\s]+)['"`]/i, methodGroup: 1, pathGroup: 2 },
   // fetch('/path', { method: 'POST' })
   { pattern: /fetch\s*\(\s*['"`]([^'"`]+)['"`]\s*,\s*\{[^}]*method\s*:\s*['"`](GET|POST|PUT|PATCH|DELETE|HEAD)['"`]/i, methodGroup: 2, pathGroup: 1 },
+  // WebTest TestApp: testapp.post_json(url_for('endpoint'), data)
+  // Also handles: testapp.get(url_for('endpoint')), testapp.delete_json(...)
+  { pattern: /(?:testapp|self\.testapp)\.(get_json|post_json|put_json|patch_json|delete_json|get|post|put|patch|delete)\s*\(\s*url_for\s*\(\s*['"]([^'"]+)['"]/i, methodGroup: 1, pathGroup: 2 },
+  // WebTest without url_for: testapp.get('/path')
+  { pattern: /(?:testapp|self\.testapp)\.(get_json|post_json|put_json|patch_json|delete_json|get|post|put|patch|delete)\s*\(\s*['"`]([^'"`]+)['"`]/i, methodGroup: 1, pathGroup: 2 },
 ];
 
 /** Patterns for test function / scenario boundaries */
@@ -101,12 +106,14 @@ function extractHttpCallsFromLines(lines: string[]): ExtractedCall[] {
       const m = line.match(p.pattern);
       if (m) {
         const method = m[p.methodGroup].toUpperCase();
+        // Normalize WebTest _json suffix: POST_JSON → POST, GET_JSON → GET
+        const normalizedMethod = method.replace(/_JSON$/, '') as string;
         const rawPath = m[p.pathGroup];
         // Skip unlikely paths (full URLs with domain, non-path values)
         if (rawPath.startsWith('http') && !rawPath.includes('/api')) continue;
         const cleanPath = extractPathFromUrl(rawPath);
         if (!cleanPath) continue;
-        calls.push({ method, path: cleanPath, lineIdx: i });
+        calls.push({ method: normalizedMethod, path: cleanPath, lineIdx: i });
         break; // only first pattern match per line
       }
     }
@@ -116,6 +123,8 @@ function extractHttpCallsFromLines(lines: string[]): ExtractedCall[] {
 
 function extractPathFromUrl(raw: string): string | undefined {
   if (raw.startsWith('/')) return raw;
+  // url_for endpoint name: 'blueprint.function' — treat as pseudo-path
+  if (/^\w+\.\w+$/.test(raw)) return `/${raw.replace('.', '/')}`;
   try {
     const u = new URL(raw);
     return u.pathname || undefined;
@@ -237,12 +246,49 @@ export function inferFlowsFromFile(filePath: string): InferredIntegrationFlow[] 
 }
 
 /**
+ * Infer integration flows from service source files (not test files).
+ *
+ * Used as a fallback when no test files are present (e.g. frontend-only projects).
+ * Only produces flows for source files that contain 2+ HTTP calls in the same function.
+ */
+export function inferFlowsFromSourceFiles(serviceFiles: string[]): InferredIntegrationFlow[] {
+  const allFlows: InferredIntegrationFlow[] = [];
+  for (const fp of serviceFiles) {
+    let content: string;
+    try {
+      content = fs.readFileSync(fp, 'utf-8');
+    } catch {
+      continue;
+    }
+    const lines = content.split('\n');
+    const calls = extractHttpCallsFromLines(lines);
+    if (calls.length < 2) continue;
+    const flows = groupCallsIntoFlows(calls, fp, lines);
+    allFlows.push(...flows);
+  }
+  return allFlows;
+}
+
+/**
  * Run flow inference across all provided test files.
+ *
+ * When `testFiles` is empty and `serviceFiles` is provided, flows are inferred
+ * from the service source code instead and tagged accordingly.
  */
 export function inferIntegrationFlows(
   testFiles: string[],
   warnings: string[] = [],
+  serviceFiles?: string[],
 ): IntegrationFlowInferenceResult {
+  if (testFiles.length === 0 && serviceFiles && serviceFiles.length > 0) {
+    warnings.push('No test files found; integration flows inferred from service source code.');
+    const flows = inferFlowsFromSourceFiles(serviceFiles);
+    if (flows.length === 0) {
+      warnings.push('No multi-step HTTP call sequences detected in service source files; integration flow inference produced no results.');
+    }
+    return { flows, filesAnalyzed: serviceFiles.length, inferred: true, warnings };
+  }
+
   if (testFiles.length === 0) {
     warnings.push('No test files provided; integration flow inference skipped.');
     return { flows: [], filesAnalyzed: 0, inferred: true, warnings };

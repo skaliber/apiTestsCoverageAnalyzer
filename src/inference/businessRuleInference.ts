@@ -71,6 +71,11 @@ interface InferencePattern {
   behaviorTemplate: (match: RegExpMatchArray) => string;
   /** Derive condition expression from match */
   conditionTemplate: (match: RegExpMatchArray) => string;
+  /**
+   * Optional post-match filter: if this regex matches the first captured group (m[1]),
+   * the rule is discarded. Used to exclude false-positive matches.
+   */
+  skipIfGroup1Matches?: RegExp;
 }
 
 const INFERENCE_PATTERNS: InferencePattern[] = [
@@ -158,6 +163,99 @@ const INFERENCE_PATTERNS: InferencePattern[] = [
     behaviorTemplate: (m) => `${m[1]} must not exceed ${m[2]}`,
     conditionTemplate: (m) => `${m[1]} > ${m[2]}`,
   },
+
+  // ── Flask / Python-specific patterns ──────────────────────────────────────
+
+  // Broader Python raise: any raise X() or raise X.y() not already ending in Exception/Error
+  // (Ordered after the existing raise patterns so deduplification by source location handles overlap)
+  {
+    type: 'business_logic',
+    pattern: /\braise\s+([\w]+(?:\.[\w]+)*)\s*(?:\(([^)]{0,60})\))?/,
+    nameTemplate: (m) => toSnakeCase(m[1].split('.').pop() ?? m[1]),
+    behaviorTemplate: (m) => `Operation rejected: ${m[1]}`,
+    conditionTemplate: (m) => `raise ${m[1]}(${(m[2] ?? '').trim()})`,
+  },
+
+  // Python `if not X:` null guard — idiomatic Python nil check
+  {
+    type: 'validation',
+    pattern: /if\s+not\s+([\w.]+)\s*(?::|and|or)/,
+    nameTemplate: (m) => `require_${toSnakeCase(m[1].replace(/\./g, '_'))}`,
+    behaviorTemplate: (m) => `${m[1]} must exist`,
+    conditionTemplate: (m) => `if not ${m[1]}`,
+  },
+
+  // Flask/Django auth decorators: @jwt_required, @login_required, etc.
+  {
+    type: 'authorization',
+    pattern: /@(jwt_required|login_required|require_auth|requires_auth|permission_required|auth_required|authenticated_user|require_permissions?)\b/i,
+    nameTemplate: (m) => `require_${toSnakeCase(m[1])}`,
+    behaviorTemplate: (m) => `Request requires authentication (${m[1]})`,
+    conditionTemplate: (m) => `@${m[1]}`,
+  },
+
+  // Flask `@use_kwargs` / `@validate_arguments` input validation
+  {
+    type: 'validation',
+    pattern: /@(use_kwargs|validate_arguments?|expects_json|validate_body)\s*\(\s*([\w]+)/i,
+    nameTemplate: (m) => `validate_input_${toSnakeCase(m[2] ?? 'schema')}`,
+    behaviorTemplate: (m) => `Input validated against ${m[2] ?? 'schema'}`,
+    conditionTemplate: (m) => `@${m[1]}(${m[2] ?? ''})`,
+  },
+
+  // Python ownership / attribute comparison guard
+  {
+    type: 'authorization',
+    pattern: /if\s+[\w.]+\s*!=\s*[\w.]+\.(?:id|user_id|author_id|owner_id|profile\.id)/,
+    nameTemplate: () => 'ownership_check',
+    behaviorTemplate: () => 'Resource must belong to the requesting user',
+    conditionTemplate: (m) => m[0].trim(),
+  },
+
+  // ── Generic JS/TS/frontend patterns ───────────────────────────────────────
+
+  // Generic JS/TS `if (!expression)` null/falsy guard
+  // Matches meaningful presence checks like !JWT.get(), !User.current, !token
+  // Skips pure normalisation calls like .trim(), .length, .toLowerCase(), etc.
+  // via the skipIfGroup1Matches post-match filter.
+  {
+    type: 'validation',
+    pattern: /if\s*\(\s*!\s*([\w][\w.[\]]*(?:\.\w+\(\s*\))?)\s*\)/,
+    skipIfGroup1Matches: /\.(trim|length|split|join|toLowerCase|toUpperCase|toString|valueOf|slice|substr|substring|replace|indexOf|includes|startsWith|endsWith)\(\s*\)$/,
+    nameTemplate: (m) => `require_${toSnakeCase(m[1].replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, ''))}`,
+    behaviorTemplate: (m) => `${m[1]} must be present/truthy`,
+    conditionTemplate: (m) => `!${m[1]}`,
+  },
+
+  // HTTP status comparison guard (frontend interceptors): rejection.status === 401
+  {
+    type: 'validation',
+    pattern: /\.status\s*={1,3}\s*(4\d\d|5\d\d)/,
+    nameTemplate: (m) => `http_status_${m[1]}_check`,
+    behaviorTemplate: (m) => `Handle HTTP ${m[1]} error response`,
+    conditionTemplate: (m) => `status == ${m[1]}`,
+  },
+
+  // Ownership / identity comparison guard (username === author.username)
+  {
+    type: 'authorization',
+    pattern: /if\s*\(?\s*[\w.]+\.(?:username|userId|user_id|email|id)\s*!==?\s*[\w.]+\.(?:username|userId|user_id|email|id|author\.username)/,
+    nameTemplate: () => 'ownership_identity_check',
+    behaviorTemplate: () => 'Resource belongs to a specific user identity',
+    conditionTemplate: (m) => m[0].trim().replace(/^if\s*\(?/, '').replace(/\)?\s*$/, ''),
+  },
+
+  // Generic early-return guard: if (cond) return/throw on same or adjacent line
+  {
+    type: 'business_logic',
+    pattern: /if\s*\([^)]{3,80}\)\s*(?:\{[^}]{0,40}\})?\s*(?:return|throw|raise)\b/,
+    nameTemplate: () => 'guard_condition',
+    behaviorTemplate: () => 'Early return or error on condition',
+    conditionTemplate: (m) => {
+      const cond = m[0].match(/if\s*\(([^)]{3,80})\)/);
+      return cond ? cond[1].trim() : m[0].trim();
+    },
+  },
 ];
 
 // ─── Endpoint heuristics ──────────────────────────────────────────────────────
@@ -166,6 +264,17 @@ const INFERENCE_PATTERNS: InferencePattern[] = [
 function guessEndpoint(lines: string[], ruleLineIdx: number): string | undefined {
   // Search up to 40 lines above for common routing patterns
   const lookupLines = lines.slice(Math.max(0, ruleLineIdx - 40), ruleLineIdx);
+
+  // Flask: @blueprint.route('/path', methods=...) / @app.route('/path', ...)
+  for (let i = lookupLines.length - 1; i >= 0; i--) {
+    const fm = lookupLines[i].match(/@\w+\.route\s*\(\s*['"]([^'"]+)['"]/);
+    if (fm) {
+      // Try to find method from same line or near
+      const methodsMatch = lookupLines[i].match(/methods\s*=\s*[\[(]['"]?([\w]+)['"]?/);
+      const method = methodsMatch ? methodsMatch[1].toUpperCase() : 'GET';
+      return `${method} ${fm[1]}`;
+    }
+  }
 
   // Spring: @GetMapping("/path") / @PostMapping / @RequestMapping
   for (let i = lookupLines.length - 1; i >= 0; i--) {
@@ -216,6 +325,8 @@ export function inferRulesFromFile(filePath: string): InferredBusinessRule[] {
     for (const ip of INFERENCE_PATTERNS) {
       const match = line.match(ip.pattern);
       if (!match) continue;
+      // Post-match filter: skip false positives based on first captured group
+      if (ip.skipIfGroup1Matches && match[1] && ip.skipIfGroup1Matches.test(match[1])) continue;
 
       const condition     = ip.conditionTemplate(match);
       const sourceLocation = `${filePath}:${lineIdx + 1}`;

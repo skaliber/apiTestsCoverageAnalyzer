@@ -1854,7 +1854,7 @@ program
 
     // ── 3. Integration flow inference ──────────────────────────────────────
     if (doInferFlows) {
-      inferredFlowsResult = inferIntegrationFlows(artifacts.testFiles, warnings);
+      inferredFlowsResult = inferIntegrationFlows(artifacts.testFiles, warnings, artifacts.serviceFiles);
       const flowsPath = writeInferredIntegrationFlows(inferredFlowsResult, reportsDir);
 
       console.log(`\nIntegration Flow Inference`);
@@ -1910,6 +1910,13 @@ program
         TEST_DECL_RE.lastIndex = 0;
         while ((m = TEST_DECL_RE.exec(content)) !== null) {
           descriptions.push(m[2].toLowerCase());
+        }
+        // Generic: extract test function/method names for Python (def test_xxx),
+        // Ruby (def test_xxx), and similar frameworks where test names are method names.
+        const GENERIC_TEST_FN_RE = /\bdef\s+((?:test|should|spec)_\w+)\s*\(/g;
+        GENERIC_TEST_FN_RE.lastIndex = 0;
+        while ((m = GENERIC_TEST_FN_RE.exec(content)) !== null) {
+          descriptions.push(m[1].replace(/_/g, ' ').toLowerCase());
         }
       }
       return [{ file: tf, contentLower, descriptions, isJavaLike }];

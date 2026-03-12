@@ -226,7 +226,7 @@ describe('Feature 27: Spring Boot RealWorld example', () => {
     const handlers = detectCqrsHandlers(source, 'CreateArticleHandler.java');
     // The handler uses handle(CreateArticleCommand command)
     // Detection depends on exact signature match
-    expect(handlers.length).toBeGreaterThanOrEqual(0);
+    expect(handlers.length).toBeGreaterThan(0);
     if (handlers.length > 0) {
       expect(handlers[0].handlerType).toBe('command');
     }

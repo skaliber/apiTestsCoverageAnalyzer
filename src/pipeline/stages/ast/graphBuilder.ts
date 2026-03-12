@@ -43,7 +43,7 @@ export function buildAstGraph(
 
     addNode({
       id: `file:${filePath}`,
-      type: fileNodeType as any,
+      type: fileNodeType,
       label: basename,
       sourceStage: 'ast',
       filePath,
@@ -226,6 +226,70 @@ export function buildAstGraph(
         targetNodeId: targetId,
         sourceStage: 'ast',
         metadata: {},
+      });
+    }
+  }
+
+  // 7. Feature 27: Create router mount edges
+  for (const [filePath, mounts] of crossFileTable.routerMounts) {
+    const sourceId = `file:${filePath}`;
+    if (!addedNodeIds.has(sourceId)) continue;
+
+    for (const mount of mounts) {
+      const targetId = `file:${mount.targetModulePath}`;
+      // Create edge even if target not parsed (helps identify missing files)
+      addEdge({
+        id: `${sourceId}->mounts->${mount.prefix}:${mount.targetModulePath}`,
+        type: 'router-mount',
+        sourceNodeId: sourceId,
+        targetNodeId: addedNodeIds.has(targetId) ? targetId : sourceId,
+        sourceStage: 'ast',
+        metadata: {
+          prefix: mount.prefix,
+          targetModule: mount.targetModulePath,
+          middlewareCount: mount.middleware.length,
+        },
+      });
+    }
+  }
+
+  // 8. Feature 27: Create injection chain edges
+  for (const [consumerFile, chains] of crossFileTable.injectionChains) {
+    for (const chain of chains) {
+      const consumerNodeId = `file:${chain.consumerFile}`;
+      const serviceNodeId = `file:${chain.serviceFile}`;
+
+      addEdge({
+        id: `${consumerNodeId}->injects->${chain.serviceClass}:${chain.serviceFile}`,
+        type: 'injects',
+        sourceNodeId: addedNodeIds.has(consumerNodeId) ? consumerNodeId : consumerNodeId,
+        targetNodeId: addedNodeIds.has(serviceNodeId) ? serviceNodeId : serviceNodeId,
+        sourceStage: 'ast',
+        metadata: {
+          consumerClass: chain.consumerClass,
+          serviceClass: chain.serviceClass,
+          injectionStyle: chain.injectionStyle,
+        },
+      });
+    }
+  }
+
+  // 9. Feature 27: Create interface implementation edges
+  for (const [ifaceFile, impls] of crossFileTable.interfaceImplementations) {
+    for (const impl of impls) {
+      const ifaceNodeId = `file:${impl.interfaceFile}`;
+      const implNodeId = `file:${impl.implFile}`;
+
+      addEdge({
+        id: `${implNodeId}->implements->${impl.interfaceName}:${impl.interfaceFile}`,
+        type: 'implements',
+        sourceNodeId: addedNodeIds.has(implNodeId) ? implNodeId : implNodeId,
+        targetNodeId: addedNodeIds.has(ifaceNodeId) ? ifaceNodeId : ifaceNodeId,
+        sourceStage: 'ast',
+        metadata: {
+          interfaceName: impl.interfaceName,
+          implName: impl.implName,
+        },
       });
     }
   }

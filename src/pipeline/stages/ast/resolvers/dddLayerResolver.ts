@@ -50,25 +50,81 @@ export class DddLayerResolver implements CrossFileResolver {
     const cqrsHandlers: DddCqrsHandler[] = [];
     const implementations = new Map<string, string[]>();
 
-    for (const [filePath, model] of ctx.symbolTable.models) {
-      const sourceText = getSourceText(filePath, ctx);
-      if (!sourceText) continue;
+    // ----- Detect from class registry and semantic models -----
 
-      // Detect repository interfaces
-      const repos = detectRepositoryInterfaces(sourceText, filePath);
-      repoInterfaces.push(...repos);
+    // 1. Detect repository interfaces from class registry
+    for (const [className, classDecl] of ctx.symbolTable.classes) {
+      const isRepoByName = /(?:Repository|Repo|Store|Gateway)$/.test(className);
+      const repoMethods = classDecl.methods.filter(m =>
+        /^(?:findBy\w+|find\w+|save|saveAll|delete|deleteById|existsBy\w+|countBy\w+|getBy\w+)$/.test(m),
+      );
 
-      // Detect CQRS handlers
-      const handlers = detectCqrsHandlers(sourceText, filePath);
-      cqrsHandlers.push(...handlers);
+      if (isRepoByName && repoMethods.length > 0) {
+        repoInterfaces.push({
+          interfaceName: className,
+          methods: repoMethods,
+          sourceFile: classDecl.filePath,
+          line: classDecl.line,
+        });
+      } else if (!isRepoByName && repoMethods.length >= 2) {
+        // Generic interface with enough repository-like methods
+        repoInterfaces.push({
+          interfaceName: className,
+          methods: repoMethods,
+          sourceFile: classDecl.filePath,
+          line: classDecl.line,
+        });
+      }
+    }
 
-      // Detect implements clauses
-      const impls = detectImplementsClauses(sourceText, filePath);
-      for (const [ifaceName, implName] of impls) {
-        if (!implementations.has(ifaceName)) {
-          implementations.set(ifaceName, []);
+    // 2. Detect CQRS handlers from class registry + semantic models
+    for (const [className, classDecl] of ctx.symbolTable.classes) {
+      const model = ctx.symbolTable.models.get(classDecl.filePath);
+      if (!model) continue;
+
+      for (const methodName of classDecl.methods) {
+        if (methodName !== 'execute' && methodName !== 'handle' && methodName !== 'apply') continue;
+
+        // Determine handler type from class name or method context
+        let handlerType: 'command' | 'query' | 'event' = 'command';
+        if (/Query/.test(className)) handlerType = 'query';
+        else if (/Event/.test(className)) handlerType = 'event';
+
+        // Try to get parameter type from the function's annotations or the class name
+        const func = model.functions.get(methodName);
+        let parameterType = `${className.replace(/Handler$/, '')}`;
+        if (func?.annotations) {
+          // Check for annotations that hint at the command/query type
+          for (const ann of func.annotations) {
+            const typeMatch = ann.match(/(\w+(?:Command|Query|Event))/);
+            if (typeMatch) {
+              parameterType = typeMatch[1];
+              if (/Command$/.test(parameterType)) handlerType = 'command';
+              else if (/Query$/.test(parameterType)) handlerType = 'query';
+              else if (/Event$/.test(parameterType)) handlerType = 'event';
+            }
+          }
         }
-        implementations.get(ifaceName)!.push(implName);
+
+        cqrsHandlers.push({
+          className,
+          handlerType,
+          handleMethodName: methodName,
+          parameterType,
+          sourceFile: classDecl.filePath,
+          line: classDecl.line,
+        });
+      }
+    }
+
+    // 3. Detect implements clauses from class registry (already parsed by tree-sitter)
+    for (const [className, classDecl] of ctx.symbolTable.classes) {
+      if (!classDecl.implementsInterfaces || classDecl.implementsInterfaces.length === 0) continue;
+      for (const iface of classDecl.implementsInterfaces) {
+        if (!implementations.has(iface)) {
+          implementations.set(iface, []);
+        }
+        implementations.get(iface)!.push(className);
       }
     }
 
@@ -254,21 +310,6 @@ export function detectImplementsClauses(source: string, filePath: string): Array
   }
 
   return impls;
-}
-
-function getSourceText(filePath: string, ctx: CrossFileResolutionContext): string | undefined {
-  // Try to get content from models (stored as raw source in semantic model)
-  // For now, we scan from the model's functions and other extracted data
-  // to detect patterns. In practice, we use regex on the raw source.
-
-  // If the model has functions, we have some content available.
-  const model = ctx.symbolTable.models.get(filePath);
-  if (!model) return undefined;
-
-  // We return a synthetic source text reconstructed from available data.
-  // In a full implementation, we'd cache the raw source from the parse stage.
-  // For now, return undefined to indicate we can't access raw source from the symbol table.
-  return undefined;
 }
 
 function findFileForClass(className: string, ctx: CrossFileResolutionContext): string | undefined {

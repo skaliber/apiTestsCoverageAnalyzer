@@ -67,8 +67,8 @@ function tryExtractAssertion(callNode: AstNode): SemanticAssertion | null {
       const subject = innerCall.arguments?.[0];
       if (!subject) return null;
       const methodName = callee.property?.name?.toLowerCase() ?? '';
-      const assertionType = classifyAssertionMethod(methodName);
-      const { variable } = classifyExpectSubject(subject);
+      const { variable, assertionType: subjectType } = classifyExpectSubject(subject);
+      const assertionType = classifyAssertionMethod(methodName, subjectType);
       return { assertionType, subjectVariable: variable, line: callNode.loc?.start?.line };
     }
   }
@@ -149,7 +149,10 @@ function classifyExpectSubject(subject: AstNode): {
   return { variable: undefined, assertionType: 'body-field' };
 }
 
-function classifyAssertionMethod(methodName: string): SemanticAssertion['assertionType'] {
+function classifyAssertionMethod(
+  methodName: string,
+  subjectType?: SemanticAssertion['assertionType'],
+): SemanticAssertion['assertionType'] {
   if (
     methodName === 'tobe' ||
     methodName === 'toequal' ||
@@ -157,7 +160,9 @@ function classifyAssertionMethod(methodName: string): SemanticAssertion['asserti
     methodName === 'tobetruthy' ||
     methodName === 'tobefalsy'
   ) {
-    return 'status-code'; // Could be either, default to status-code
+    // These methods are ambiguous — use subject context to decide.
+    // Only classify as status-code when the subject involves status.
+    return subjectType === 'status-code' ? 'status-code' : 'body-field';
   }
   if (methodName === 'tohaveproperty' || methodName === 'tocontain' || methodName === 'tomatch') {
     return 'body-field';

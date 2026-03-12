@@ -118,6 +118,9 @@ export function extractJavaFunctions(
     const annotations = extractAnnotationNames(method);
     const block = method.childForFieldName?.('body') ?? firstChildOfType(method, 'block');
 
+    // Extract method parameters
+    const parameters = extractMethodParameters(method);
+
     const bodyHttpCalls: SemanticHttpCall[] = [];
     const calledFunctions: string[] = [];
     let returnValue: string | undefined;
@@ -133,7 +136,7 @@ export function extractJavaFunctions(
 
     graph.set(name, {
       name,
-      parameters: [],
+      parameters,
       bodyHttpCalls,
       calledFunctions,
       returnValue,
@@ -159,6 +162,34 @@ export function extractJavaHttpCalls(
       invoc.childForFieldName?.('name')?.text ?? firstChildNamed(invoc, 'identifier')?.text ?? '';
     const lowerMethod = methodName.toLowerCase();
 
+    // MockMvc: perform(get("/path")) — extract the inner HTTP method call
+    if (lowerMethod === 'perform') {
+      const argList = invoc.childForFieldName?.('arguments') ?? firstChildOfType(invoc, 'argument_list');
+      if (!argList) continue;
+      // The argument to perform() is a method invocation like get("/path") or post("/path")
+      const innerInvocations = findNodes(argList, ['method_invocation']);
+      for (const innerInvoc of innerInvocations) {
+        const innerMethodName =
+          innerInvoc.childForFieldName?.('name')?.text ?? firstChildNamed(innerInvoc, 'identifier')?.text ?? '';
+        const innerLower = innerMethodName.toLowerCase();
+        if (!HTTP_METHODS.has(innerLower)) continue;
+        const innerArgList = innerInvoc.childForFieldName?.('arguments') ?? firstChildOfType(innerInvoc, 'argument_list');
+        if (!innerArgList) continue;
+        const innerStringArg = findFirstStringInArgList(innerArgList, constants);
+        if (!innerStringArg) continue;
+        const normalizedPath = innerStringArg.value.startsWith('/') ? normalizePathToTemplate(innerStringArg.value) : undefined;
+        out.push({
+          method: innerLower.toUpperCase(),
+          rawPathArg: innerStringArg.varName ?? innerStringArg.value,
+          resolvedPath: innerStringArg.value,
+          normalizedPath,
+          resolutionType: innerStringArg.isDirect ? 'direct' : 'constant',
+          confidence: innerStringArg.isDirect ? 'high' : 'medium',
+        });
+      }
+      continue;
+    }
+
     if (!HTTP_METHODS.has(lowerMethod)) continue;
 
     const argList = invoc.childForFieldName?.('arguments') ?? firstChildOfType(invoc, 'argument_list');
@@ -172,16 +203,6 @@ export function extractJavaHttpCalls(
 
     // Try to detect the HTTP method from context
     let httpMethod = lowerMethod.toUpperCase();
-
-    // RestAssured: .when().get("/path") or .given().get("/path")
-    // The method name IS the HTTP method in RestAssured style
-    if (!HTTP_METHODS.has(lowerMethod)) continue;
-
-    // MockMvc: perform(get("/path")) — perform wraps a method call
-    if (lowerMethod === 'perform') {
-      // The arg is another method invocation
-      continue; // Handled when we process the inner get/post
-    }
 
     if (lowerMethod === 'request') {
       // generic request(method, path) — try to get HTTP method from first arg
@@ -276,6 +297,39 @@ export function extractJavaFlowRefs(root: TsNode): FlowRef[] {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Extract method parameters with their annotations (e.g. @RequestParam, @PathVariable, @RequestBody).
+ */
+function extractMethodParameters(method: TsNode): string[] {
+  const params: string[] = [];
+  const formalParams = firstChildOfType(method, 'formal_parameters');
+  if (!formalParams) return params;
+
+  const paramNodes = findNodes(formalParams, ['formal_parameter', 'spread_parameter']);
+  for (const paramNode of paramNodes) {
+    const paramAnnotations: string[] = [];
+    walkTree(paramNode, (n) => {
+      if (n.type === 'annotation' || n.type === 'marker_annotation') {
+        const nameNode = firstChildOfType(n, 'identifier');
+        if (nameNode) paramAnnotations.push('@' + (nameNode.text ?? ''));
+      }
+    });
+
+    const nameNode = firstChildNamed(paramNode, 'identifier');
+    const name = nameNode?.text ?? '';
+    if (!name) continue;
+
+    // Include annotation prefix for annotated params (Spring @RequestParam, @PathVariable, etc.)
+    if (paramAnnotations.length > 0) {
+      params.push(`${paramAnnotations.join(' ')} ${name}`);
+    } else {
+      params.push(name);
+    }
+  }
+
+  return params;
+}
 
 function extractModifierTexts(node: TsNode): string[] {
   const modifiers: string[] = [];

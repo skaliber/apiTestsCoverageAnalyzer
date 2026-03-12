@@ -124,6 +124,17 @@ export function resolveSymbolCrossFile(
   return undefined;
 }
 
+/** Built-in objects that should never be treated as import module names */
+const BUILTIN_OBJECTS = new Set([
+  'console', 'math', 'json', 'object', 'array', 'promise', 'date',
+  'string', 'number', 'boolean', 'symbol', 'regexp', 'error', 'map',
+  'set', 'weakmap', 'weakset', 'proxy', 'reflect', 'intl',
+  'arraybuffer', 'sharedarraybuffer', 'atomics', 'dataview',
+  'this', 'self', 'super', 'window', 'document', 'process',
+  'global', 'globalthis', 'module', 'exports', 'require',
+  '__dirname', '__filename',
+]);
+
 /**
  * Extract import declarations from a semantic model.
  * This is a heuristic extraction — real import extraction would come from the AST.
@@ -135,6 +146,16 @@ function extractImportsFromModel(
 ): ImportDeclaration[] {
   const imports: ImportDeclaration[] = [];
 
+  // Build a set of known identifiers from the model (constants and local variables)
+  // These are the names that could plausibly be import aliases
+  const knownIdentifiers = new Set<string>();
+  for (const [name] of model.constants) {
+    knownIdentifiers.add(name);
+  }
+  for (const [name] of model.localVariables) {
+    knownIdentifiers.add(name);
+  }
+
   // Use functions' calledFunctions to infer cross-file references
   for (const [, func] of model.functions) {
     for (const calledName of func.calledFunctions) {
@@ -142,6 +163,19 @@ function extractImportsFromModel(
       const dotIndex = calledName.indexOf('.');
       if (dotIndex > 0) {
         const modulePart = calledName.substring(0, dotIndex);
+
+        // Skip common built-in objects that are never import sources
+        if (BUILTIN_OBJECTS.has(modulePart.toLowerCase())) {
+          continue;
+        }
+
+        // Only treat as an import if the prefix matches a known identifier
+        // (constant or local variable) in this file, which is how import
+        // aliases typically appear in the semantic model
+        if (!knownIdentifiers.has(modulePart)) {
+          continue;
+        }
+
         const resolvedPath = resolveImportPath(
           `./${modulePart}`,
           filePath,

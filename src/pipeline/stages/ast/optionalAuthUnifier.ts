@@ -27,39 +27,42 @@ export function unifyAuthClassification(
 ): SecurityClassification | undefined {
   const key = `${framework}:${pattern}`.toLowerCase();
 
-  // Flask patterns
-  if (key.includes('flask:@jwt_required') || key.includes('flask:jwt_required')) {
+  // Flask patterns — use word-boundary regex to avoid matching e.g. "@jwt_required_custom"
+  if (/^flask:@?jwt_required\b/.test(key)) {
     return { type: 'jwt', required: true, optional: false, sourcePattern: pattern };
   }
-  if (key.includes('flask:@jwt_optional') || key.includes('flask:jwt_optional')) {
+  if (/^flask:@?jwt_optional\b/.test(key)) {
     return { type: 'jwt', required: false, optional: true, sourcePattern: pattern };
   }
-  if (key.includes('flask:@login_required') || key.includes('flask:login_required')) {
+  if (/^flask:@?login_required\b/.test(key)) {
     return { type: 'session', required: true, optional: false, sourcePattern: pattern };
   }
 
-  // Express patterns
-  if (key.includes('express:auth.required') || key.includes('express:credentialsrequired: true')) {
+  // Express patterns — use word-boundary regex for precise matching
+  if (/^express:auth\.required\b/.test(key) || /^express:credentialsrequired:\s*true\b/.test(key)) {
     return { type: 'jwt', required: true, optional: false, sourcePattern: pattern };
   }
-  if (key.includes('express:auth.optional') || key.includes('express:credentialsrequired: false')) {
+  if (/^express:auth\.optional\b/.test(key) || /^express:credentialsrequired:\s*false\b/.test(key)) {
     return { type: 'jwt', required: false, optional: true, sourcePattern: pattern };
   }
-  if (key.includes('express:passport.authenticate')) {
+  if (/^express:passport\.authenticate\b/.test(key)) {
     return { type: 'jwt', required: true, optional: false, sourcePattern: pattern };
   }
 
   // HapiJS patterns (framework may be 'hapi' or 'hapijs')
-  const isHapi = key.startsWith('hapi:') || key.startsWith('hapijs:');
-  if (isHapi && key.includes('auth') && key.includes('mode') && (key.includes('try') || key.includes('optional'))) {
+  const isHapi = /^hapi(?:js)?:/.test(key);
+  if (isHapi && /\bauth\b/.test(key) && /\bmode\b/.test(key) && (/\btry\b/.test(key) || /\boptional\b/.test(key))) {
     return { type: 'jwt', required: false, optional: true, sourcePattern: pattern };
   }
-  if (isHapi && key.includes('auth') && !key.includes('false') && !key.includes('try') && !key.includes('optional')) {
+  if (isHapi && /\bauth\b/.test(key) && !/\bfalse\b/.test(key) && !/\btry\b/.test(key) && !/\boptional\b/.test(key)) {
     return { type: 'jwt', required: true, optional: false, sourcePattern: pattern };
   }
 
-  // Spring patterns
-  if (key.includes('spring:@preauthorize') || key.includes('spring:@secured')) {
+  // Spring patterns — include @RolesAllowed and @WithMockUser
+  if (/^spring:@?preauthorize\b/.test(key) || /^spring:@?secured\b/.test(key) || /^spring:@?rolesallowed\b/.test(key)) {
+    return { type: 'custom', required: true, optional: false, sourcePattern: pattern };
+  }
+  if (/^spring:@?withmockuser\b/.test(key)) {
     return { type: 'custom', required: true, optional: false, sourcePattern: pattern };
   }
 

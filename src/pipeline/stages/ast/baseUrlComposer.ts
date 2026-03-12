@@ -19,12 +19,28 @@
  */
 export function composeUrl(...segments: (string | undefined)[]): string {
   const parts = segments
-    .filter((s): s is string => typeof s === 'string' && s.length > 0)
-    .map((s) => s.replace(/^\/+|\/+$/g, ''));
+    .filter((s): s is string => typeof s === 'string' && s.length > 0);
 
-  const joined = parts.join('/');
-  const normalized = '/' + joined.replace(/\/+/g, '/');
+  if (parts.length === 0) return '/';
 
+  // Detect protocol in the first segment (e.g. http://, https://)
+  const protocolMatch = parts[0].match(/^(\w+:\/\/)/);
+  let protocol = '';
+  if (protocolMatch) {
+    protocol = protocolMatch[1];
+    parts[0] = parts[0].slice(protocol.length);
+  }
+
+  const stripped = parts.map((s) => s.replace(/^\/+|\/+$/g, ''));
+  const joined = stripped.join('/');
+  const deduped = joined.replace(/\/+/g, '/');
+
+  if (protocol) {
+    const normalized = protocol + deduped;
+    return normalized.replace(/\/+$/, '') || protocol;
+  }
+
+  const normalized = '/' + deduped;
   return normalized === '/' ? '/' : normalized.replace(/\/+$/, '');
 }
 

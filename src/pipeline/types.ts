@@ -121,7 +121,10 @@ export type GraphEdgeType =
   | 'depends-on'
   | 'observed-by'
   | 'executes'
-  | 'conflicts-with';
+  | 'conflicts-with'
+  | 'router-mount'
+  | 'injects'
+  | 'implements';
 
 // ─── Graph node ──────────────────────────────────────────────────────────────
 

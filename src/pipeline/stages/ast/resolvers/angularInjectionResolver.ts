@@ -30,8 +30,7 @@ export class AngularInjectionResolver implements CrossFileResolver {
 
     // Build injection chains from class registry
     for (const [className, classInfo] of ctx.symbolTable.classes) {
-      // If class implements interfaces, it may be a service
-      if (!classInfo.implementsInterfaces) continue;
+      // Check any class that has a model — Angular services typically don't implement interfaces
 
       // Look for classes that have methods making HTTP calls
       const model = ctx.symbolTable.models.get(classInfo.filePath);
@@ -82,6 +81,28 @@ function findConsumers(
           file: chain.consumerFile,
           style: chain.injectionStyle,
         });
+      }
+    }
+  }
+
+  // Fallback: search class registry for classes that might inject this service
+  // (constructor injection detected by parameter name matching)
+  for (const [className, classInfo] of ctx.symbolTable.classes) {
+    // Skip if already found as a consumer
+    if (consumers.some((c) => c.className === className && c.file === classInfo.filePath)) continue;
+
+    // Check if this class's model has the service name in its calledFunctions
+    const model = ctx.symbolTable.models.get(classInfo.filePath);
+    if (!model) continue;
+
+    for (const [, func] of model.functions) {
+      if (func.calledFunctions.some((f) => f.includes(serviceName))) {
+        consumers.push({
+          className,
+          file: classInfo.filePath,
+          style: 'constructor',
+        });
+        break;
       }
     }
   }

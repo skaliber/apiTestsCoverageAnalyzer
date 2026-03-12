@@ -131,7 +131,6 @@ const BUILD_FILE_LANGUAGE_MAP: Record<string, DetectedLanguage[]> = {
   'pyproject.toml':   ['python'],
   'Gemfile':          ['ruby'],
   'go.mod':           ['go'],
-  '*.csproj':         ['csharp'],
 };
 
 const EXTENSION_LANGUAGE_MAP: Record<string, DetectedLanguage> = {
@@ -311,6 +310,11 @@ function detectLanguages(filePaths: string[]): DetectedLanguage[] {
     const byBuild = BUILD_FILE_LANGUAGE_MAP[basename];
     if (byBuild) {
       byBuild.forEach((lang) => found.add(lang));
+    }
+
+    // Check for .csproj files (basename varies, so match by extension)
+    if (basename.endsWith('.csproj')) {
+      found.add('csharp');
     }
 
     // Check extension mapping

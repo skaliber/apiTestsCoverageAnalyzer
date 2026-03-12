@@ -85,19 +85,23 @@ const CONFIG_BASENAMES = new Set([
   '.eslintrc.yml',
 ]);
 
-/** Extensions mapped directly to a category */
-const EXTENSION_MAP: Record<string, FileCategory> = {
-  '.feature': 'bdd_scenarios',
-};
-
 /** Glob-style path-segment patterns for security reports */
 const SECURITY_REPORT_DIRS = ['zap', 'trivy', 'semgrep'];
 
 /** Glob-style path-segment patterns for performance artifacts */
 const PERFORMANCE_DIRS = ['jmeter', 'k6', 'gatling', 'locust'];
 
-/** Extensions for contract files */
-const CONTRACT_EXTENSIONS = new Set(['.pact.json']);
+/** Source code file extensions for service code classification */
+const SERVICE_CODE_EXTS = new Set([
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
+  '.java', '.kt', '.kts',
+  '.py',
+  '.rb',
+  '.go',
+  '.cs',
+  '.cpp', '.cc', '.h',
+  '.rs',
+]);
 
 // ─── Core classifier ─────────────────────────────────────────────────────────
 
@@ -176,16 +180,6 @@ export function classifyFile(filePath: string): ClassifiedFile {
   }
 
   // 9. Service code by extension
-  const SERVICE_CODE_EXTS = new Set([
-    '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
-    '.java', '.kt', '.kts',
-    '.py',
-    '.rb',
-    '.go',
-    '.cs',
-    '.cpp', '.cc', '.h',
-    '.rs',
-  ]);
   if (SERVICE_CODE_EXTS.has(ext)) {
     return make(filePath, 'service_code');
   }

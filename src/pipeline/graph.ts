@@ -33,7 +33,16 @@ export class CoverageKnowledgeGraph {
   }
 
   removeNode(id: string): boolean {
-    return this.nodes.delete(id);
+    const deleted = this.nodes.delete(id);
+    if (deleted) {
+      // Remove all edges that reference this node to avoid dangling edges
+      for (const [edgeId, edge] of this.edges) {
+        if (edge.sourceNodeId === id || edge.targetNodeId === id) {
+          this.edges.delete(edgeId);
+        }
+      }
+    }
+    return deleted;
   }
 
   getNodesByType(type: GraphNodeType): GraphNode[] {
@@ -152,8 +161,9 @@ export class CoverageKnowledgeGraph {
       const path = queue.shift()!;
       const currentId = path[path.length - 1];
 
-      if (visited.has(currentId)) continue;
-      visited.add(currentId);
+      // Don't skip endId — we need to check every path that arrives at it
+      if (currentId !== endId && visited.has(currentId)) continue;
+      if (currentId !== endId) visited.add(currentId);
 
       if (currentId === endId) {
         // Check interior nodes (not start or end)
@@ -161,7 +171,8 @@ export class CoverageKnowledgeGraph {
           const node = this.nodes.get(path[i]);
           if (node?.type === nodeType) return true;
         }
-        return false;
+        // Don't return false here — other paths may still contain the node type
+        continue;
       }
 
       const outEdges = this.getEdgesFrom(currentId);

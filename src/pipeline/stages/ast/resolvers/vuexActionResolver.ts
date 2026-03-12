@@ -27,38 +27,61 @@ export class VuexActionResolver implements CrossFileResolver {
     const diagnostics: string[] = [];
     const unresolvedRefs: Array<{ ref: string; reason: string }> = [];
 
-    // Look for Vuex store modules (files with actions that call APIs)
-    // and link them to component dispatch calls
-
-    let vuexStoreFiles = 0;
-    let dispatchFiles = 0;
+    // Collect Vuex store files: files with functions that have API calls (actions)
+    const actionFiles = new Map<string, string[]>(); // filePath → action function names
 
     for (const [filePath, model] of ctx.symbolTable.models) {
-      // Check if file has functions that look like Vuex actions (call API services)
-      let hasApiCalls = false;
-      for (const [, func] of model.functions) {
+      const actionNames: string[] = [];
+      for (const [funcName, func] of model.functions) {
         if (func.bodyHttpCalls.length > 0) {
-          hasApiCalls = true;
-          break;
+          actionNames.push(funcName);
         }
       }
-
-      if (hasApiCalls) {
-        vuexStoreFiles++;
+      if (actionNames.length > 0) {
+        actionFiles.set(filePath, actionNames);
       }
+    }
 
-      // Check if file dispatches to store
-      if (model.functions.size > 0) {
-        for (const [, func] of model.functions) {
-          if (func.calledFunctions.some((f) => f.includes('dispatch'))) {
-            dispatchFiles++;
+    // Find dispatch calls and link them to actions
+    for (const [filePath, model] of ctx.symbolTable.models) {
+      for (const [funcName, func] of model.functions) {
+        for (const calledFunc of func.calledFunctions) {
+          if (!calledFunc.includes('dispatch')) continue;
+
+          // Try to match dispatched action name to a known action function
+          // dispatch('getArticles') → match to 'getArticles' action in a store file
+          // Extract the action name from the dispatch call if possible
+          // Since we only have function names from calledFunctions, look for action names
+          // across all store files
+          for (const [storeFile, actionNames] of actionFiles) {
+            if (storeFile === filePath) continue; // Don't link a file to itself
+
+            for (const actionName of actionNames) {
+              // Check if the current file references this action name
+              if (func.calledFunctions.some((f) => f.includes(actionName))) {
+                if (!ctx.symbolTable.injectionChains.has(filePath)) {
+                  ctx.symbolTable.injectionChains.set(filePath, []);
+                }
+                ctx.symbolTable.injectionChains.get(filePath)!.push({
+                  consumerFile: filePath,
+                  consumerClass: funcName,
+                  serviceClass: actionName,
+                  serviceFile: storeFile,
+                  injectionStyle: 'property',
+                });
+                entriesAdded++;
+              }
+            }
           }
         }
       }
     }
 
-    if (vuexStoreFiles > 0 || dispatchFiles > 0) {
-      diagnostics.push(`Found ${vuexStoreFiles} Vuex store file(s), ${dispatchFiles} dispatch file(s)`);
+    if (actionFiles.size > 0) {
+      diagnostics.push(`Found ${actionFiles.size} Vuex store file(s) with actions`);
+    }
+    if (entriesAdded > 0) {
+      diagnostics.push(`Linked ${entriesAdded} Vuex dispatch→action chain(s)`);
     }
 
     return { entriesAdded, diagnostics, unresolvedRefs };

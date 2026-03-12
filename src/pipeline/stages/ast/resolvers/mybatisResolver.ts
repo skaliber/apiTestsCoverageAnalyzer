@@ -12,6 +12,8 @@ import type {
   CrossFileResolutionResult,
 } from '../types';
 import type { DetectedApiFramework } from '../../../../discovery/frameworkDetector';
+import { parseMyBatisMapper, isMyBatisMapperXml } from '../../../../languages/java/mybatisXmlParser';
+import * as fs from 'fs';
 
 export interface MyBatisBinding {
   /** Java @Mapper interface name (simple name, not FQCN) */
@@ -59,6 +61,25 @@ export class MyBatisResolver implements CrossFileResolver {
     for (const [className, classInfo] of ctx.symbolTable.classes) {
       if (className.endsWith('Mapper')) {
         mapperInterfaces.push({ name: className, file: classInfo.filePath });
+      }
+    }
+
+    // Parse XML mapper files from the project
+    for (const filePath of ctx.allSourceFiles) {
+      if (!filePath.endsWith('.xml')) continue;
+      try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        if (!isMyBatisMapperXml(content)) continue;
+        const parsed = parseMyBatisMapper(content, filePath);
+        if (parsed) {
+          xmlMappers.push({
+            namespace: parsed.namespace,
+            file: filePath,
+            methods: parsed.queries.map((q) => q.id),
+          });
+        }
+      } catch {
+        // Skip unreadable XML files
       }
     }
 

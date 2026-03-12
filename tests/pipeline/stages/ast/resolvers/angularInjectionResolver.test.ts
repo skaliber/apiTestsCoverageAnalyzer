@@ -104,6 +104,6 @@ describe('AngularInjectionResolver', () => {
     const result = resolver.resolve(ctx);
     // Should find the injection chain since ArticlesService has HTTP calls
     // and there's already a consumer in injectionChains
-    expect(result.entriesAdded).toBeGreaterThanOrEqual(0);
+    expect(result.entriesAdded).toBeGreaterThan(0);
   });
 });

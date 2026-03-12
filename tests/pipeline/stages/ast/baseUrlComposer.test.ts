@@ -109,8 +109,7 @@ describe('composeFrameworkUrl', () => {
       baseUrl: 'https://api.example.com',
       routePath: '/articles',
     });
-    expect(url).toBe('/https:/api.example.com/articles');
-    // Note: base URL composition for full URLs is handled differently in practice
+    expect(url).toBe('https://api.example.com/articles');
   });
 
   it('handles route path only', () => {

@@ -107,6 +107,7 @@ export function detectAngularInjections(sourceText: string, filePath: string): A
   const lines = sourceText.split('\n');
 
   let currentClass = '';
+  let inConstructorParams = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -115,16 +116,36 @@ export function detectAngularInjections(sourceText: string, filePath: string): A
     const classMatch = line.match(/class\s+(\w+)/);
     if (classMatch) currentClass = classMatch[1];
 
+    // Track constructor parameter block boundaries
+    if (/\bconstructor\s*\(/.test(line)) {
+      inConstructorParams = true;
+    }
+    if (inConstructorParams && line.includes(')')) {
+      // Process this line (it's still inside the constructor params), then close
+      // We'll close after checking for injections below
+    }
+
     // Constructor injection: constructor(private http: HttpClient)
-    const ctorMatch = line.match(/(?:private|protected|public|readonly)\s+(\w+)\s*:\s*(\w+)/);
-    if (ctorMatch && currentClass) {
-      injections.push({
-        consumerClass: currentClass,
-        serviceClass: ctorMatch[2],
-        style: 'constructor',
-        sourceFile: filePath,
-        line: i + 1,
-      });
+    // Only match visibility-modified parameters when inside a constructor(...) block
+    if (inConstructorParams) {
+      const ctorParamPattern = /(?:private|protected|public|readonly)\s+(\w+)\s*:\s*(\w+)/g;
+      let ctorMatch;
+      while ((ctorMatch = ctorParamPattern.exec(line)) !== null) {
+        if (currentClass) {
+          injections.push({
+            consumerClass: currentClass,
+            serviceClass: ctorMatch[2],
+            style: 'constructor',
+            sourceFile: filePath,
+            line: i + 1,
+          });
+        }
+      }
+    }
+
+    // Close the constructor param block after processing (handles closing paren on same line)
+    if (inConstructorParams && line.includes(')')) {
+      inConstructorParams = false;
     }
 
     // Functional inject: inject(HttpClient)

@@ -32,6 +32,7 @@ import { normalizePathToTemplate } from '../../coverage/deep-analysis/resolvePat
 import {
   detectWebtestCalls,
   webtestCallsToHttpCalls,
+  detectPytestFixtures,
 } from './testPatternDetector';
 
 // ─── Parser ───────────────────────────────────────────────────────────────────
@@ -83,6 +84,21 @@ export class PythonAnalyzer implements LanguageAnalyzer {
     const decoratorStacks = extractFlaskDecoratorStacks(root, parsed.filePath);
     const routeRegistrations = extractFlaskRouteRegistrations(root, parsed.filePath);
 
+    // Feature 27: webtest API call detection
+    const sourceText = root.text ?? parsed.content ?? '';
+    const webtestCalls = detectWebtestCalls(sourceText, parsed.filePath);
+    if (webtestCalls.length > 0) {
+      const httpCalls = webtestCallsToHttpCalls(webtestCalls);
+      // Merge webtest HTTP calls into the functions map under a synthetic entry
+      const webtestFunc: SemanticFunction = {
+        name: '__webtest_calls__',
+        parameters: [],
+        bodyHttpCalls: httpCalls,
+        calledFunctions: [],
+      };
+      functions.set('__webtest_calls__', webtestFunc);
+    }
+
     return {
       filePath: parsed.filePath,
       language: 'python',
@@ -129,8 +145,26 @@ export class PythonAnalyzer implements LanguageAnalyzer {
   extractBusinessRuleRefs(model: SemanticModel): BusinessRuleRef[] {
     return model.businessRuleRefs;
   }
-  extractFlowRefs(_model: SemanticModel): FlowRef[] {
-    return [];
+  extractFlowRefs(model: SemanticModel): FlowRef[] {
+    // Feature 27: Resolve pytest fixture chains
+    const refs: FlowRef[] = [...model.flowRefs];
+
+    // Use function parameter names to discover fixture dependencies
+    // In pytest, function parameters that aren't built-in fixtures are fixture references
+    const builtinFixtures = new Set([
+      'request', 'tmp_path', 'tmpdir', 'capsys', 'capfd', 'monkeypatch',
+      'pytestconfig', 'recwarn', 'caplog', 'cache', 'self',
+    ]);
+
+    for (const [funcName, func] of model.functions) {
+      for (const param of func.parameters) {
+        if (param && !builtinFixtures.has(param)) {
+          refs.push({ flowId: `fixture:${param}`, source: 'tag' });
+        }
+      }
+    }
+
+    return refs;
   }
 }
 

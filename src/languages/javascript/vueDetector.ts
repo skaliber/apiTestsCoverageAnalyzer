@@ -10,6 +10,8 @@
 
 export interface VueApiCall {
   actionName?: string;
+  /** Resolved string value when actionName is a constant (e.g., FETCH_ARTICLES → 'fetchArticles') */
+  resolvedName?: string;
   method: string;
   urlPattern: string;
   baseUrl?: string;
@@ -48,7 +50,23 @@ export function detectVuexActions(sourceText: string, filePath: string): VueApiC
   const calls: VueApiCall[] = [];
   const lines = sourceText.split('\n');
 
+  // Pass 1: Build a map of constant name → string value.
+  // Matches patterns like:
+  //   const FETCH_ARTICLES = 'fetchArticles'
+  //   export const FETCH_ARTICLES = "fetchArticles"
+  const constantMap = new Map<string, string>();
+  for (const line of lines) {
+    const constMatch = line.match(
+      /(?:export\s+)?const\s+([A-Z_][A-Z0-9_]*)\s*=\s*['"]([^'"]+)['"]/,
+    );
+    if (constMatch) {
+      constantMap.set(constMatch[1], constMatch[2]);
+    }
+  }
+
+  // Pass 2: Detect action definitions and their API calls.
   let currentAction = '';
+  let currentResolvedName: string | undefined;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -58,6 +76,12 @@ export function detectVuexActions(sourceText: string, filePath: string): VueApiC
     const actionMatch = line.match(/(?:\[(\w+)\]|(\w+))\s*\(\s*\{\s*(?:commit|dispatch|state|getters|rootState)/);
     if (actionMatch) {
       currentAction = actionMatch[1] || actionMatch[2] || '';
+      // If using bracket syntax with a constant, resolve to its string value
+      if (actionMatch[1] && constantMap.has(actionMatch[1])) {
+        currentResolvedName = constantMap.get(actionMatch[1]);
+      } else {
+        currentResolvedName = undefined;
+      }
       continue;
     }
 
@@ -66,6 +90,7 @@ export function detectVuexActions(sourceText: string, filePath: string): VueApiC
     if (apiServiceMatch) {
       calls.push({
         actionName: currentAction || undefined,
+        resolvedName: currentResolvedName,
         method: apiServiceMatch[1].toUpperCase(),
         urlPattern: apiServiceMatch[2],
         sourceFile: filePath,
@@ -79,6 +104,7 @@ export function detectVuexActions(sourceText: string, filePath: string): VueApiC
     if (axiosMatch) {
       calls.push({
         actionName: currentAction || undefined,
+        resolvedName: currentResolvedName,
         method: axiosMatch[1].toUpperCase(),
         urlPattern: axiosMatch[2],
         sourceFile: filePath,

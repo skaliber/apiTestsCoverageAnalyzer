@@ -7,6 +7,7 @@
 import type {
   CoverageMapping,
   CoverageMappingItemType,
+  GraphNodeType,
   PipelineConfidence,
   AssertionSource,
   UrlResolution,
@@ -18,6 +19,22 @@ import type { IastOutput } from '../iast/types';
 import type { DastOutput } from '../dast/types';
 import { computeConfidence, buildConfidenceEvidence } from '../../confidence';
 import { determineCoverageClass, mergeConfidence, mergeCoverageClass } from './mergeRules';
+
+/** Rank test layers so deeper coverage layers win when comparing. */
+const TEST_LAYER_RANK: Record<string, number> = {
+  e2e: 6,
+  api: 5,
+  integration: 4,
+  component: 3,
+  unit: 2,
+  security: 1,
+  performance: 1,
+};
+
+function testLayerRank(layer: string | undefined): number {
+  if (!layer) return 0;
+  return TEST_LAYER_RANK[layer] ?? 0;
+}
 
 /**
  * Build coverage mappings for all endpoint-type nodes in the graph.
@@ -86,9 +103,9 @@ export function buildCoverageMappings(
         assertionSource = 'direct';
       }
 
-      // Check test layer
+      // Check test layer — only replace if the new layer has a higher rank
       const layer = testLayerLookup.get(testFilePath);
-      if (layer) {
+      if (layer && testLayerRank(layer) > testLayerRank(bestTestLayer)) {
         bestTestLayer = layer;
       }
 
@@ -132,6 +149,8 @@ export function buildCoverageMappings(
       graph,
       pathNodeIds,
       isStaticOnlyMode,
+      iastConfirmed.has(endpoint.id),
+      dastConfirmed.has(endpoint.id),
     );
 
     // Compute confidence
@@ -176,6 +195,70 @@ export function buildCoverageMappings(
       conflicts,
       traversalDepth,
     });
+  }
+
+  // ─── Secondary mappings: service, error-branch, repository ────────────────
+
+  const secondaryNodeTypes: Array<{ nodeType: GraphNodeType; itemType: CoverageMappingItemType }> = [
+    { nodeType: 'service', itemType: 'service' },
+    { nodeType: 'exception-branch', itemType: 'error-branch' },
+    { nodeType: 'repository', itemType: 'repository' },
+  ];
+
+  for (const { nodeType, itemType } of secondaryNodeTypes) {
+    const nodes = graph.getNodesByType(nodeType);
+
+    for (const node of nodes) {
+      const incomingEdges = graph.getEdgesTo(node.id);
+      const testEdges = incomingEdges.filter(
+        (e) => e.type === 'tests' || e.type === 'asserts',
+      );
+
+      const linkedTests: string[] = [];
+      const sourceStages = new Set<StageName>([node.sourceStage]);
+      let assertionConfirmed = false;
+      let assertionSource: AssertionSource = 'unresolved';
+
+      for (const edge of testEdges) {
+        const testFilePath = edge.sourceNodeId.replace(/^file:/, '');
+        if (!linkedTests.includes(testFilePath)) {
+          linkedTests.push(testFilePath);
+        }
+        sourceStages.add(edge.sourceStage);
+        if (edge.type === 'asserts') {
+          assertionConfirmed = true;
+          assertionSource = 'direct';
+        }
+      }
+
+      const pathNodeIds = [node.id, ...linkedTests.map((t) => `file:${t}`)];
+      const evidence = buildConfidenceEvidence(
+        graph,
+        pathNodeIds,
+        isStaticOnlyMode,
+        false,
+        false,
+      );
+      const confidence = computeConfidence(evidence);
+      const coverageClass = linkedTests.length > 0 ? 'unit-covered' : 'uncovered';
+
+      mappings.push({
+        itemId: node.id,
+        itemType,
+        linkedTests,
+        sourceStages: Array.from(sourceStages),
+        confidence,
+        coverageClass,
+        mockBoundaries: [],
+        assertionSource,
+        assertionConfirmed,
+        dastReachable: 'not-probed',
+        runtimeConfirmed: false,
+        urlResolution: 'unresolved',
+        conflicts: [],
+        traversalDepth: 0,
+      });
+    }
   }
 
   return mappings;

@@ -22,12 +22,20 @@ import type {
 import type { ScaOutput } from '../sca/types';
 import { registerAllAnalyzers, analyzeFileDetailed, buildAnalysisContext } from '../../../ast/astAnalysisOrchestrator';
 import { buildCrossFileSymbolTable } from './crossFileResolver';
-import { runCrossFileResolution } from './crossFileResolutionPass';
+import { registerCrossFileResolver, clearCrossFileResolvers, runCrossFileResolution } from './crossFileResolutionPass';
 import { traverseInheritanceChain, resolveImportedHelper } from './abstractLayerTraversal';
 import { buildAstGraph } from './graphBuilder';
 import { isTestFile } from '../../../discovery/fileClassifier';
 import { discoverProject } from '../../../discovery/projectDiscovery';
 import { getAnalyzer } from '../../../ast/parserRegistry';
+import { enforceStructureAgnosticRules } from './rulesEnforcer';
+import { detectAuthCoverageGaps } from './optionalAuthUnifier';
+import { ExpressRouterResolver } from './resolvers/expressRouterResolver';
+import { FlaskBlueprintResolver } from './resolvers/flaskBlueprintResolver';
+import { AngularInjectionResolver } from './resolvers/angularInjectionResolver';
+import { VuexActionResolver } from './resolvers/vuexActionResolver';
+import { MyBatisResolver } from './resolvers/mybatisResolver';
+import { DddLayerResolver } from './resolvers/dddLayerResolver';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -49,7 +57,8 @@ export class AstStage implements PipelineStage<AstStageOutput> {
     // Build analysis context
     const analysisContext = buildAnalysisContext(context.config.astConfig);
 
-    // Discover all files
+    // Discover all files — XML, GraphQL, and PHP files are included in serviceFiles
+    // via SERVICE_CODE_EXTS in fileClassifier.ts (RULE-SA05, SA06)
     const artifacts = discoverProject({ rootDir: context.projectRoot });
     const allSourceFiles = [
       ...artifacts.testFiles,
@@ -116,13 +125,40 @@ export class AstStage implements PipelineStage<AstStageOutput> {
     // Phase 2: Build cross-file symbol table
     const crossFileTable = buildCrossFileSymbolTable(models, context.projectRoot);
 
-    // Phase 2b: Run cross-file resolution pass (Feature 27)
+    // Phase 2b: Register and run cross-file resolvers (Feature 27)
+    // Clear any stale registrations from prior runs, then register all 6 resolvers
+    clearCrossFileResolvers();
+    registerCrossFileResolver(new ExpressRouterResolver());
+    registerCrossFileResolver(new FlaskBlueprintResolver());
+    registerCrossFileResolver(new AngularInjectionResolver());
+    registerCrossFileResolver(new VuexActionResolver());
+    registerCrossFileResolver(new MyBatisResolver());
+    registerCrossFileResolver(new DddLayerResolver());
+
     const crossFileResolutionResult = runCrossFileResolution(
       crossFileTable,
       context.projectRoot,
       artifacts.apiFrameworks,
       allSourceFiles,
     );
+
+    // Phase 2c: Detect auth coverage gaps (Feature 27)
+    // Collect all endpoints with their security classifications for gap analysis
+    const endpointsForAuthGaps: Array<{ path: string; security?: import('../../../ast/astTypes').SecurityClassification; sourceFile: string }> = [];
+    for (const [filePath, model] of crossFileTable.models) {
+      if (!model.routeRegistrations) continue;
+      for (const reg of model.routeRegistrations) {
+        endpointsForAuthGaps.push({
+          path: reg.path,
+          security: reg.security,
+          sourceFile: filePath,
+        });
+      }
+    }
+    const authCoverageGaps = detectAuthCoverageGaps(endpointsForAuthGaps, new Set());
+
+    // Phase 2d: Enforce structure-agnostic rules (Feature 27)
+    const rulesResult = enforceStructureAgnosticRules(crossFileTable, context.projectRoot);
 
     // Phase 3: Run abstract layer traversal for test files
     const traversalResults = new Map<string, import('./types').TraversalResult>();
@@ -198,6 +234,10 @@ export class AstStage implements PipelineStage<AstStageOutput> {
         graphEdgesAdded: edges.length,
         crossFileResolversRun: crossFileResolutionResult.resolverResults.length,
         crossFileEntriesAdded: crossFileResolutionResult.totalEntriesAdded,
+        rulesChecked: rulesResult.rulesChecked,
+        rulesPassed: rulesResult.rulesPassed,
+        ruleViolations: rulesResult.violations.length,
+        authCoverageGaps: authCoverageGaps.length,
       },
     };
     context.diagnostics.set('ast', diagnostics);
@@ -235,8 +275,13 @@ function detectLanguage(filePath: string, scaOutput?: ScaOutput): SupportedLangu
     '.kts': 'kotlin',
     '.py': 'python',
     '.rb': 'ruby',
+    '.php': 'php' as SupportedLanguage,
     '.feature': 'cucumber',
   };
+
+  // Handle GraphQL schema files and XML as special-case languages
+  if (ext === '.graphqls' || ext === '.graphql') return 'graphql' as SupportedLanguage;
+  if (ext === '.xml') return 'xml' as SupportedLanguage;
 
   return extensionMap[ext];
 }

@@ -118,7 +118,17 @@ export function detectMockBoundaries(
       if (pattern.regex.test(line)) {
         // Extract mocked target (heuristic: argument in parentheses)
         const targetMatch = /[\(][\s]*['"`]?([a-zA-Z0-9_./@]+)['"`]?/.exec(line);
-        const mockedTarget = targetMatch?.[1] ?? 'unknown';
+        let mockedTarget = targetMatch?.[1] ?? 'unknown';
+
+        // Secondary extraction for Java/Kotlin annotation-style mocks (e.g. @Mock private UserService userService;)
+        if (mockedTarget === 'unknown') {
+          const annotationTypeMatch = line.match(
+            /(?:private|protected|public)?\s*(\w+)\s+\w+\s*;/,
+          );
+          if (annotationTypeMatch) {
+            mockedTarget = annotationTypeMatch[1];
+          }
+        }
 
         boundaries.push({
           testFilePath: filePath,

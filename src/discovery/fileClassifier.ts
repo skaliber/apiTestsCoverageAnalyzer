@@ -101,6 +101,10 @@ const SERVICE_CODE_EXTS = new Set([
   '.cs',
   '.cpp', '.cc', '.h',
   '.rs',
+  '.php',
+  '.graphql', '.graphqls',
+  '.vue',
+  '.xml',
 ]);
 
 // ─── Core classifier ─────────────────────────────────────────────────────────

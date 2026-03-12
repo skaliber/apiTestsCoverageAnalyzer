@@ -134,13 +134,22 @@ export function classifyTestLayer(
   // Sort rules by priority (highest first)
   const sortedRules = [...CLASSIFICATION_RULES].sort((a, b) => b.priority - a.priority);
 
+  // Track the best path-only (directory/filename) candidate in case no
+  // content-based match is found.  Content-based evidence always wins over
+  // path-based evidence so that a file living in /tests/integration/ but
+  // containing only unit-level code is classified by its content, not its
+  // directory name.
+  let pathOnlyCandidate: TestClassification | null = null;
+
   for (const rule of sortedRules) {
     let matchCount = 0;
+    let hasContentMatch = false;
+    const ruleSignals: string[] = [];
 
     // Check directory patterns
     for (const pattern of rule.directoryPatterns) {
       if (pattern.test(normalizedPath)) {
-        signals.push(`dir:${rule.layer}`);
+        ruleSignals.push(`dir:${rule.layer}`);
         matchCount++;
         break;
       }
@@ -149,7 +158,7 @@ export function classifyTestLayer(
     // Check file name patterns
     for (const pattern of rule.fileNamePatterns) {
       if (pattern.test(basename)) {
-        signals.push(`name:${rule.layer}`);
+        ruleSignals.push(`name:${rule.layer}`);
         matchCount++;
         break;
       }
@@ -159,22 +168,40 @@ export function classifyTestLayer(
     if (content) {
       for (const pattern of rule.contentPatterns) {
         if (pattern.test(content)) {
-          signals.push(`content:${rule.layer}`);
+          ruleSignals.push(`content:${rule.layer}`);
           matchCount++;
+          hasContentMatch = true;
           break;
         }
       }
     }
 
     if (matchCount > 0) {
-      const confidence = matchCount >= 2 ? 'high' : 'medium';
-      return {
-        filePath,
-        layer: rule.layer,
-        confidence,
-        signals,
-      };
+      if (hasContentMatch) {
+        // Content-based match — return immediately (highest-priority content wins)
+        signals.push(...ruleSignals);
+        const confidence = matchCount >= 2 ? 'high' : 'medium';
+        return {
+          filePath,
+          layer: rule.layer,
+          confidence,
+          signals,
+        };
+      } else if (!pathOnlyCandidate) {
+        // Path-only match — store as candidate but keep searching for content
+        pathOnlyCandidate = {
+          filePath,
+          layer: rule.layer,
+          confidence: matchCount >= 2 ? 'high' : 'medium',
+          signals: [...ruleSignals],
+        };
+      }
     }
+  }
+
+  // If a path-only candidate was found but no content-based match, use it
+  if (pathOnlyCandidate) {
+    return pathOnlyCandidate;
   }
 
   // Default: unit test

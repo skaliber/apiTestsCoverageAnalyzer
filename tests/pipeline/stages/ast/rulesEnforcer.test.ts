@@ -270,6 +270,13 @@ describe('enforceStructureAgnosticRules', () => {
       assertions: [],
       businessRuleRefs: [],
       flowRefs: [],
+      decoratorStacks: [
+        {
+          functionName: 'ArticlesService',
+          decorators: [{ name: 'Injectable' }],
+          sourceFile: '/fake/articles.service.ts',
+        },
+      ],
     });
 
     const result = enforceStructureAgnosticRules(symbolTable, '/fake/project');
@@ -309,6 +316,13 @@ describe('enforceStructureAgnosticRules', () => {
       assertions: [],
       businessRuleRefs: [],
       flowRefs: [],
+      decoratorStacks: [
+        {
+          functionName: 'ArticlesService',
+          decorators: [{ name: 'Injectable' }],
+          sourceFile: '/fake/articles.service.ts',
+        },
+      ],
     });
     symbolTable.injectionChains.set('/fake/articles.component.ts', [
       {

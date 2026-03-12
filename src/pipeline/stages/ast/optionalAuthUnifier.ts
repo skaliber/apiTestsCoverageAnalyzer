@@ -7,7 +7,9 @@
  *   Express auth.optional / credentialsRequired: false → { optional: true }
  *   HapiJS auth: { mode: 'try' } → { optional: true }
  *   Spring @PreAuthorize → { required: true }
- *   Angular route guard → depends on guard type
+ *   Slim PHP optionalAuth → { optional: true }, jwt/auth → { required: true }
+ *   Angular canActivate:none → { optional: true } (interceptor-based)
+ *   NestJS @UseGuards → { required: true }
  */
 
 import type { SecurityClassification } from '../../../ast/astTypes';
@@ -63,6 +65,24 @@ export function unifyAuthClassification(
     return { type: 'custom', required: true, optional: false, sourcePattern: pattern };
   }
   if (/^spring:@?withmockuser\b/.test(key)) {
+    return { type: 'custom', required: true, optional: false, sourcePattern: pattern };
+  }
+
+  // Slim PHP patterns — slim:optionalAuth is optional, slim:jwt or slim:auth is required
+  if (/^slim:optionalauth\b/.test(key)) {
+    return { type: 'jwt', required: false, optional: true, sourcePattern: pattern };
+  }
+  if (/^slim:(?:jwt|auth)\b/.test(key)) {
+    return { type: 'jwt', required: true, optional: false, sourcePattern: pattern };
+  }
+
+  // Angular patterns — canActivate:none (no guard) with interceptor tokens is optional
+  if (/^angular:canactivate:none\b/.test(key)) {
+    return { type: 'custom', required: false, optional: true, sourcePattern: pattern };
+  }
+
+  // NestJS patterns — @UseGuards is required auth
+  if (/^nestjs:@?useguards\b/.test(key)) {
     return { type: 'custom', required: true, optional: false, sourcePattern: pattern };
   }
 

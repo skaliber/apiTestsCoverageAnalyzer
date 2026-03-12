@@ -271,8 +271,16 @@ function checkRuleSA07(symbolTable: CrossFileSymbolTable): RuleViolation[] {
     }
     if (!hasHttpCalls) continue;
 
-    // Check if the file looks like an Angular service (.service.ts)
-    if (!classDecl.filePath.includes('.service.')) continue;
+    // Content-based check: is this an Angular @Injectable service?
+    // (RULE-SA01 compliant — no filename convention used)
+    const hasInjectableMarker =
+      (model.decoratorStacks?.some((ds) =>
+        ds.decorators.some((d) => d.name === 'Injectable' || d.name.includes('Injectable')),
+      ) ?? false) ||
+      Array.from(model.functions.values()).some((f) =>
+        f.annotations?.some((a) => a === 'Injectable' || a === '@Injectable'),
+      );
+    if (!hasInjectableMarker) continue;
 
     // Check if any injection chains reference this service
     let hasConsumer = false;
@@ -352,9 +360,58 @@ function checkRuleSA08(symbolTable: CrossFileSymbolTable): RuleViolation[] {
 function checkRuleSA09(symbolTable: CrossFileSymbolTable): RuleViolation[] {
   const violations: RuleViolation[] = [];
 
-  // Find files that look like Angular guards but aren't linked
+  // Find files with Angular guard-related content (content-based, not filename-based)
   for (const [filePath, model] of symbolTable.models) {
-    if (!filePath.includes('.guard.')) continue;
+    // Content-based check: does this file have guard-related types or implementations?
+    // (RULE-SA01 compliant — no filename convention used)
+    let hasGuardContent = false;
+
+    // Check function annotations for guard type markers (CanActivateFn, etc.)
+    const guardTypeAnnotations = [
+      'CanActivateFn',
+      'CanActivateChildFn',
+      'CanDeactivateFn',
+      'ResolveFn',
+      'CanMatchFn',
+    ];
+    for (const [, func] of model.functions) {
+      if (func.annotations?.some((a) => guardTypeAnnotations.includes(a))) {
+        hasGuardContent = true;
+        break;
+      }
+    }
+
+    // Check if any class in this file implements guard interfaces
+    if (!hasGuardContent) {
+      const guardInterfaces = [
+        'CanActivate',
+        'CanActivateChild',
+        'CanDeactivate',
+        'Resolve',
+        'CanMatch',
+      ];
+      for (const [, classDecl] of symbolTable.classes) {
+        if (
+          classDecl.filePath === filePath &&
+          classDecl.implementsInterfaces?.some((i) => guardInterfaces.includes(i))
+        ) {
+          hasGuardContent = true;
+          break;
+        }
+      }
+    }
+
+    // Check function names for guard-related patterns as content heuristic
+    if (!hasGuardContent) {
+      for (const [funcName] of model.functions) {
+        if (/guard|canActivate|canDeactivate|canMatch/i.test(funcName)) {
+          hasGuardContent = true;
+          break;
+        }
+      }
+    }
+
+    if (!hasGuardContent) continue;
 
     // Check if this guard has any route registrations or middleware entries
     let isLinked = false;

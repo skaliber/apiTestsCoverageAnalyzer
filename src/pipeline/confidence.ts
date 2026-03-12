@@ -174,11 +174,18 @@ export function hasPartialResolution(
 /**
  * Build a ConfidenceEvidence object from a coverage path in the graph.
  * Inspects the nodes and their source stages to determine what evidence exists.
+ *
+ * Optional `iastConfirmed` and `dastConfirmed` flags allow the caller to
+ * inject runtime confirmation state that may not be discoverable by walking
+ * `pathNodeIds` alone (e.g. when IAST/DAST nodes are not directly on the
+ * endpoint→test path in the graph).
  */
 export function buildConfidenceEvidence(
   graph: CoverageKnowledgeGraph,
   pathNodeIds: string[],
   isStaticOnlyMode: boolean,
+  iastConfirmed?: boolean,
+  dastConfirmed?: boolean,
 ): ConfidenceEvidence {
   const sourceStages = new Set<StageName>();
   let hasIastConfirmation = false;
@@ -216,8 +223,8 @@ export function buildConfidenceEvidence(
 
   return {
     sourceStages: Array.from(sourceStages),
-    hasIastConfirmation,
-    hasDastConfirmation,
+    hasIastConfirmation: hasIastConfirmation || (iastConfirmed ?? false),
+    hasDastConfirmation: hasDastConfirmation || (dastConfirmed ?? false),
     hasAssertionConfirmation,
     hasMockBoundary,
     hasPartialResolution: hasPartial,

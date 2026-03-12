@@ -154,6 +154,40 @@ export class DddLayerResolver implements CrossFileResolver {
       }
     }
 
+    // Write repository interfaces into symbolTable (Section 5.3)
+    for (const repo of repoInterfaces) {
+      const key = repo.sourceFile;
+      if (!ctx.symbolTable.interfaceImplementations.has(key)) {
+        ctx.symbolTable.interfaceImplementations.set(key, []);
+      }
+      const existing = ctx.symbolTable.interfaceImplementations.get(key)!;
+      const alreadyMapped = existing.some(e => e.interfaceName === repo.interfaceName);
+      if (!alreadyMapped) {
+        existing.push({
+          interfaceName: repo.interfaceName,
+          interfaceFile: repo.sourceFile,
+          implName: '',
+          implFile: '',
+        });
+        entriesAdded++;
+      }
+    }
+
+    // Write CQRS handlers as service-layer entries into symbolTable (Section 5.2)
+    for (const handler of cqrsHandlers) {
+      const key = handler.sourceFile;
+      if (!ctx.symbolTable.interfaceImplementations.has(key)) {
+        ctx.symbolTable.interfaceImplementations.set(key, []);
+      }
+      ctx.symbolTable.interfaceImplementations.get(key)!.push({
+        interfaceName: handler.parameterType,
+        interfaceFile: handler.sourceFile,
+        implName: handler.className,
+        implFile: handler.sourceFile,
+      });
+      entriesAdded++;
+    }
+
     if (repoInterfaces.length > 0) {
       diagnostics.push(`Found ${repoInterfaces.length} repository interface(s)`);
     }

@@ -84,13 +84,25 @@ export function detectHapiRoutes(sourceText: string, filePath: string): HapiRout
         auth = { strategy: authSimple[1], mode: 'required' };
       }
 
-      // auth: { mode: 'try' } or auth: { mode: 'optional' }
+      // auth: { mode: 'try' } or auth: { mode: 'optional' } — single-line case
       const authMode = nearLine.match(/(?:auth|mode)\s*:\s*[{]?\s*mode\s*:\s*['"](\w+)['"]/);
       if (authMode) {
         auth = {
           strategy: auth?.strategy,
           mode: authMode[1] === 'try' || authMode[1] === 'optional' ? 'optional' : 'required',
         };
+      } else if (/auth\s*:\s*\{/.test(nearLine) || /auth\s*\{/.test(nearLine)) {
+        // Multi-line auth object: scan the next 5 lines for mode: 'try' / 'optional'
+        for (let m = j + 1; m < Math.min(j + 6, lines.length); m++) {
+          const modeMatch = lines[m].match(/mode\s*:\s*['"](\w+)['"]/);
+          if (modeMatch) {
+            auth = {
+              strategy: auth?.strategy,
+              mode: modeMatch[1] === 'try' || modeMatch[1] === 'optional' ? 'optional' : 'required',
+            };
+            break;
+          }
+        }
       }
 
       // auth: false
@@ -106,8 +118,9 @@ export function detectHapiRoutes(sourceText: string, filePath: string): HapiRout
         // Scan validation block
         for (let k = j; k < Math.min(j + 15, lines.length); k++) {
           const valLine = lines[k];
-          // query: { ... }
+          // query: { ... } — extract Joi fields from same line and subsequent lines
           if (/query\s*:/.test(valLine)) {
+            // Same-line extraction
             const paramMatch = valLine.match(/(\w+)\s*:\s*Joi\./g);
             if (paramMatch) {
               for (const pm of paramMatch) {
@@ -115,14 +128,39 @@ export function detectHapiRoutes(sourceText: string, filePath: string): HapiRout
                 if (name) queryParams.push(name);
               }
             }
+            // Multi-line extraction: scan subsequent lines for fieldName: Joi. patterns
+            for (let q = k + 1; q < Math.min(k + 16, lines.length); q++) {
+              const subLine = lines[q];
+              if (/}\s*[),]/.test(subLine) || /]\s*,/.test(subLine)) break;
+              const fieldMatch = subLine.match(/(\w+)\s*:\s*Joi\./g);
+              if (fieldMatch) {
+                for (const fm of fieldMatch) {
+                  const name = fm.match(/(\w+)\s*:/)?.[1];
+                  if (name && !queryParams.includes(name)) queryParams.push(name);
+                }
+              }
+            }
           }
-          // payload: { ... }
+          // payload: { ... } — extract Joi fields from same line and subsequent lines
           if (/payload\s*:/.test(valLine)) {
+            // Same-line extraction
             const paramMatch = valLine.match(/(\w+)\s*:\s*Joi\./g);
             if (paramMatch) {
               for (const pm of paramMatch) {
                 const name = pm.match(/(\w+)\s*:/)?.[1];
                 if (name) payloadParams.push(name);
+              }
+            }
+            // Multi-line extraction: scan subsequent lines for fieldName: Joi. patterns
+            for (let q = k + 1; q < Math.min(k + 16, lines.length); q++) {
+              const subLine = lines[q];
+              if (/}\s*[),]/.test(subLine) || /]\s*,/.test(subLine)) break;
+              const fieldMatch = subLine.match(/(\w+)\s*:\s*Joi\./g);
+              if (fieldMatch) {
+                for (const fm of fieldMatch) {
+                  const name = fm.match(/(\w+)\s*:/)?.[1];
+                  if (name && !payloadParams.includes(name)) payloadParams.push(name);
+                }
               }
             }
           }

@@ -132,6 +132,7 @@ function expandJestParameterized(
   const results: ExpandedParameterizedTest[] = [];
   const lines = content.split('\n');
 
+  let lineStartOffset = 0;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
@@ -141,12 +142,14 @@ function expandJestParameterized(
     const eachMatch = /(?:test|it|describe)\.each\s*\(\s*\[/.exec(line);
     if (eachMatch) {
       // Try to extract the array and count items
-      const arrayContent = extractBalancedBrackets(content, content.indexOf(eachMatch[0], i > 0 ? content.indexOf(lines[i]) : 0));
+      const matchOffset = lineStartOffset + (eachMatch.index ?? 0);
+      const bracketStart = content.indexOf('[', matchOffset);
+      const arrayContent = extractBalancedBrackets(content, bracketStart);
       const variantCount = arrayContent ? countArrayElements(arrayContent) : 'unresolvable';
 
       // Extract test name from the next argument
       const nameMatch = /\)\s*\(\s*['"`]([^'"`]+)['"`]/.exec(
-        content.substring(content.indexOf(eachMatch[0])),
+        content.substring(matchOffset),
       );
       const testName = nameMatch?.[1] ?? 'parameterized test';
 
@@ -178,6 +181,8 @@ function expandJestParameterized(
         line: i + 1,
       });
     }
+
+    lineStartOffset += lines[i].length + 1; // +1 for newline
   }
 
   return results;

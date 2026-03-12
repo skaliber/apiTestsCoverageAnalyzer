@@ -4,7 +4,7 @@
  */
 
 import type { SemanticModel, SemanticHttpCall, ResolvedHttpInteraction } from '../../../ast/astTypes';
-import type { GraphNode, GraphEdge } from '../../types';
+import type { GraphNode, GraphEdge, GraphNodeType } from '../../types';
 import type { CrossFileSymbolTable, TraversalResult } from './types';
 import { isTestFile } from '../../../discovery/fileClassifier';
 import * as path from 'path';
@@ -33,6 +33,28 @@ export function buildAstGraph(
     if (addedEdgeIds.has(edge.id)) return;
     addedEdgeIds.add(edge.id);
     edges.push(edge);
+  }
+
+  /**
+   * Ensure a node exists in the graph. If the node ID is not yet present,
+   * create a stub node flagged as cross-file-unresolved (spec §2.3).
+   * Confidence on stub nodes is capped at 'low'.
+   */
+  function ensureNodeExists(nodeId: string, missingFilePath: string, nodeType: GraphNodeType): string {
+    if (addedNodeIds.has(nodeId)) return nodeId;
+    addNode({
+      id: nodeId,
+      type: nodeType,
+      label: `[unresolved] ${path.basename(missingFilePath)}`,
+      sourceStage: 'ast',
+      filePath: missingFilePath,
+      metadata: {
+        resolution: 'cross-file-unresolved',
+        confidence: 'low',
+        diagnostic: `Cross-file resolution failed: file "${missingFilePath}" was not found in parsed models`,
+      },
+    });
+    return nodeId;
   }
 
   // 1. Create file nodes for every parsed file
@@ -237,12 +259,12 @@ export function buildAstGraph(
 
     for (const mount of mounts) {
       const targetId = `file:${mount.targetModulePath}`;
-      // Create edge even if target not parsed (helps identify missing files)
+      // Create edge even if target not parsed (creates stub node for missing files)
       addEdge({
         id: `${sourceId}->mounts->${mount.prefix}:${mount.targetModulePath}`,
         type: 'router-mount',
         sourceNodeId: sourceId,
-        targetNodeId: addedNodeIds.has(targetId) ? targetId : sourceId,
+        targetNodeId: ensureNodeExists(targetId, mount.targetModulePath, 'file'),
         sourceStage: 'ast',
         metadata: {
           prefix: mount.prefix,
@@ -262,8 +284,8 @@ export function buildAstGraph(
       addEdge({
         id: `${consumerNodeId}->injects->${chain.serviceClass}:${chain.serviceFile}`,
         type: 'injects',
-        sourceNodeId: addedNodeIds.has(consumerNodeId) ? consumerNodeId : consumerNodeId,
-        targetNodeId: addedNodeIds.has(serviceNodeId) ? serviceNodeId : serviceNodeId,
+        sourceNodeId: ensureNodeExists(consumerNodeId, chain.consumerFile, 'file'),
+        targetNodeId: ensureNodeExists(serviceNodeId, chain.serviceFile, 'file'),
         sourceStage: 'ast',
         metadata: {
           consumerClass: chain.consumerClass,
@@ -283,8 +305,8 @@ export function buildAstGraph(
       addEdge({
         id: `${implNodeId}->implements->${impl.interfaceName}:${impl.interfaceFile}`,
         type: 'implements',
-        sourceNodeId: addedNodeIds.has(implNodeId) ? implNodeId : implNodeId,
-        targetNodeId: addedNodeIds.has(ifaceNodeId) ? ifaceNodeId : ifaceNodeId,
+        sourceNodeId: ensureNodeExists(implNodeId, impl.implFile, 'file'),
+        targetNodeId: ensureNodeExists(ifaceNodeId, impl.interfaceFile, 'file'),
         sourceStage: 'ast',
         metadata: {
           interfaceName: impl.interfaceName,

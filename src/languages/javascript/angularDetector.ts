@@ -107,6 +107,7 @@ export function detectAngularInjections(sourceText: string, filePath: string): A
   const lines = sourceText.split('\n');
 
   let currentClass = '';
+  let currentConstHost = '';
   let inConstructorParams = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -115,6 +116,15 @@ export function detectAngularInjections(sourceText: string, filePath: string): A
     // Track current class
     const classMatch = line.match(/class\s+(\w+)/);
     if (classMatch) currentClass = classMatch[1];
+
+    // Track current const/export const assignment as potential host for inject() outside class.
+    // Only update when the line is NOT itself an inject() call (e.g. skip `const x = inject(Y)`).
+    if (!currentClass) {
+      const constHostMatch = line.match(/(?:export\s+)?(?:const|let)\s+(\w+)\s*(?::\s*\S+)?\s*=/);
+      if (constHostMatch && !line.match(/=\s*inject\s*\(/)) {
+        currentConstHost = constHostMatch[1];
+      }
+    }
 
     // Track constructor parameter block boundaries
     if (/\bconstructor\s*\(/.test(line)) {
@@ -150,14 +160,19 @@ export function detectAngularInjections(sourceText: string, filePath: string): A
 
     // Functional inject: inject(HttpClient)
     const injectMatch = line.match(/(\w+)\s*=\s*inject\s*\(\s*(\w+)\s*\)/);
-    if (injectMatch && currentClass) {
-      injections.push({
-        consumerClass: currentClass,
-        serviceClass: injectMatch[2],
-        style: 'inject-fn',
-        sourceFile: filePath,
-        line: i + 1,
-      });
+    if (injectMatch) {
+      // Use the enclosing class, or fall back to the enclosing const/export const host
+      // (e.g. functional guards/interceptors: `export const authGuard: CanActivateFn = ...`)
+      const hostName = currentClass || currentConstHost;
+      if (hostName) {
+        injections.push({
+          consumerClass: hostName,
+          serviceClass: injectMatch[2],
+          style: 'inject-fn',
+          sourceFile: filePath,
+          line: i + 1,
+        });
+      }
     }
   }
 

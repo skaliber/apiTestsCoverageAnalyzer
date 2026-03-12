@@ -117,3 +117,48 @@ Do not create duplicate files with slightly different purposes. Remove obsolete 
 ## When in Doubt
 
 If unsure whether a test suite, doc page, report, or config path is affected — assume it **is** and verify it. The correct default: implement fully → test broadly → update docs → verify outputs → only then consider the task complete.
+
+## Test Generation Engine (Feature 28)
+
+`src/generation/` — generates test scaffolds from coverage gaps.
+
+**Key files:**
+- `src/generation/engine.ts` — main `TestGenerationEngine` class
+- `src/generation/template-renderer.ts` — renders test code for each language/framework/test type
+- `src/generation/context-builder.ts` — assembles `GenerationContext` from gap + endpoint data
+- `src/generation/file-router.ts` — computes output file paths from gap context
+- `src/generation/quality-scorer.ts` — scores existing tests on 5 dimensions (0–100)
+- `src/generation/ai-flow-exporter.ts` — produces `ai-ready-flows.md` and `ai-ready-flows.json`
+- `src/generation/gap-extractor.ts` — reads coverage-summary.json and extracts gap objects
+
+**CLI commands:**
+- `generate-tests` — generate test scaffolds for detected gaps
+- `export-ai-flows` — export AI-ready flow documentation
+- `score-tests` — score quality of existing test suite
+
+## Test Generation Rules — Non-Negotiable
+
+When implementing or modifying `src/generation/`:
+
+1. **Generated files ALWAYS start with the AUTO-GENERATED comment block** — gapId, risk, priority.
+2. **Placeholder values ALWAYS have TODO comments** — auth tokens, URLs, test data.
+3. **Auth tests ALWAYS generated** for auth-required endpoints — never skipped.
+4. **Status code assertion BEFORE body assertion** in every generated test.
+5. **No weak assertions** — never `toBeTruthy()`, always specific matchers.
+6. **Generated TypeScript MUST compile** — run `tsc --noEmit` on generated output in tests.
+7. **Cypress tests go in `cypress/e2e/generated/`** — never in root `cypress/e2e/`.
+8. **Security test IDs in labels** — `[SEC-AUTH-01]`, `[SEC-INJ-01]` etc.
+9. **Injection tests use `not.toBe(500)`** as primary assertion — a 500 is always a defect.
+10. **AI prompt max 800 tokens** — split into multiple prompts if needed.
+
+When adding a new coverage metric type, also:
+8. Add a gap-to-generator mapping entry in `src/generation/engine.ts` `GAP_GENERATOR_MAP`
+9. Add rendering logic in `src/generation/template-renderer.ts` for the new test type
+10. Add quality scorer rules for the new test type in `src/generation/quality-scorer.ts`
+
+**Copilot constraints for `src/generation/`:**
+- DO NOT change `GenerationContext` interface without updating all rendering functions that use it.
+- DO NOT add logic to templates — all intelligence lives in the renderer functions and `ContextBuilder`.
+- DO NOT generate tests that import from `dist/` — always import from `src/`.
+- DO NOT hardcode language detection in the engine — always read from `discoveryInfo`.
+- DO NOT write files outside `generation.outputDir` without explicit user config.

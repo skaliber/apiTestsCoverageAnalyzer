@@ -48,7 +48,9 @@ FORMATS       ?= json,html,csv,junit
         summary pr-summary build-summary \
         dashboard \
         examples-analyze-all examples-analyze examples-analyze-feature27 examples-dashboard examples-test-structure \
-        ci
+        ci \
+        generate-tests generate-tests-dry-run export-ai-flows score-tests ci-with-generation \
+        self-analysis-generation self-analysis-quality self-analysis-ai-flows
 
 # ── Default target ─────────────────────────────────────────────────────────────
 .DEFAULT_GOAL := help
@@ -207,11 +209,55 @@ self-analysis-compatibility: build ## Run compatibility/contract coverage agains
 	  --format "$(FORMATS)" \
 	  --threshold-compat 100
 
+generate-tests: build ## Generate test scaffolds for all detected gaps
+	@mkdir -p $(REPORTS_DIR)
+	$(ANALYZER_CMD) generate-tests \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --out-dir generated-tests/
+
+generate-tests-dry-run: build ## Preview generated tests without writing files
+	@mkdir -p $(REPORTS_DIR)
+	$(ANALYZER_CMD) generate-tests \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --dry-run
+
+export-ai-flows: build ## Export AI-ready flow documentation
+	@mkdir -p $(REPORTS_DIR)
+	$(ANALYZER_CMD) export-ai-flows \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --out-dir "$(REPORTS_DIR)"
+
+score-tests: build ## Score quality of existing test suite
+	$(ANALYZER_CMD) score-tests \
+	  --tests "tests/**/*.test.ts" \
+	  --reports-dir "$(REPORTS_DIR)"
+
+ci-with-generation: ci export-ai-flows score-tests ## Full CI + generation pipeline
+
+self-analysis-generation: build ## Run generate-tests dry-run against this repository
+	@mkdir -p $(REPORTS_DIR)
+	$(ANALYZER_CMD) generate-tests \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --dry-run \
+	  --priority P1
+
+self-analysis-quality: build ## Score this repository's own test quality
+	$(ANALYZER_CMD) score-tests \
+	  --tests "tests/**/*.test.ts" \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --fail-below 80
+
+self-analysis-ai-flows: build ## Export AI-ready flows for this repository
+	@mkdir -p $(REPORTS_DIR)
+	$(ANALYZER_CMD) export-ai-flows \
+	  --reports-dir "$(REPORTS_DIR)" \
+	  --out-dir "$(REPORTS_DIR)"
+
 # =============================================================================
 #  SELF-ANALYSIS — AGGREGATED
 # =============================================================================
 
-self-analysis-all: build ## Run ALL metric types, produce all reports, apply all thresholds
+self-analysis-all: build self-analysis-generation self-analysis-quality self-analysis-ai-flows ## Run ALL metric types, produce all reports, apply all thresholds
 	@echo "==========================================================="
 	@echo "  Running self-analysis across all metric types"
 	@echo "==========================================================="

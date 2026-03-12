@@ -108,6 +108,8 @@ import { inferRoutes, writeInferredRoutes } from './inference/routeInference';
 import { writeScanManifest } from './inference/scanManifest';
 import type { ScanTypeEntry } from './inference/scanManifest';
 import { serveDashboard } from './serveDashboard';
+import { generateTests, exportAiFlows, scoreTests } from './generation/index';
+import type { GapPriority, GapType } from './generation/types';
 
 // Register all language AST analyzers at startup.
 // This side-effect import ensures each language module's registerAnalyzer() call runs.
@@ -2491,6 +2493,125 @@ program
       open: Boolean(options['open']),
     });
     // Keep the process alive while the server runs
+  });
+
+program
+  .command('generate-tests')
+  .description('Generate test scaffolds for detected coverage gaps')
+  .option('--reports-dir <dir>', 'Directory with coverage reports', 'reports/')
+  .option('--out-dir <dir>', 'Output directory for generated tests', 'generated-tests/')
+  .option('--language <lang>', 'Target language override (auto-detected if omitted)')
+  .option('--framework <fw>', 'Test framework override (auto-detected if omitted)')
+  .option('--priority <p>', 'Only generate for gaps at this priority or higher', 'P1')
+  .option('--dry-run', 'Print generated tests to stdout, do not write files', false)
+  .option('--overwrite', 'Overwrite existing generated files', false)
+  .option('--gap-id <id>', 'Generate tests for a single specific gap')
+  .option('--types <list>', 'Comma-separated gap types to generate (default: all)')
+  .option('--no-security', 'Skip security test generation')
+  .option('--no-cypress', 'Skip Cypress test generation')
+  .action(async (options) => {
+    const types = options.types
+      ? (options.types as string).split(',').map(t => t.trim()) as GapType[]
+      : undefined;
+
+    const result = await generateTests({
+      reportsDir: options.reportsDir as string,
+      outDir: options.outDir as string,
+      language: options.language as string | undefined,
+      framework: options.framework as string | undefined,
+      priority: options.priority as GapPriority,
+      dryRun: Boolean(options.dryRun),
+      overwrite: Boolean(options.overwrite),
+      gapId: options.gapId as string | undefined,
+      types,
+      noSecurity: Boolean(options.noSecurity),
+      noCypress: Boolean(options.noCypress),
+    });
+
+    if (result.dryRun) {
+      for (const file of result.files) {
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`// FILE: ${file.relativePath}`);
+        console.log(`${'='.repeat(60)}`);
+        console.log(file.content);
+      }
+    } else {
+      console.log(`\nTest generation complete:`);
+      console.log(`  Gaps processed:  ${result.totalGaps}`);
+      console.log(`  Files generated: ${result.generatedCount}`);
+      console.log(`  Errors:          ${result.errors.length}`);
+      if (result.errors.length > 0) {
+        for (const err of result.errors) {
+          console.error(`  ERROR [${err.gapId}]: ${err.message}`);
+        }
+      }
+    }
+  });
+
+program
+  .command('export-ai-flows')
+  .description('Export AI-ready flow documentation for Copilot/Cursor/Claude')
+  .option('--reports-dir <dir>', 'Directory with coverage reports', 'reports/')
+  .option('--out-dir <dir>', 'Output directory for AI flow files', 'reports/')
+  .option('--format <fmt>', 'Output format: markdown, json, or both', 'both')
+  .option('--max-gaps <n>', 'Maximum number of gaps to include', '50')
+  .option('--priority <p>', 'Only include gaps at this priority or higher', 'P3')
+  .action(async (options) => {
+    const flows = await exportAiFlows({
+      reportsDir: options.reportsDir as string,
+      outDir: options.outDir as string,
+      format: options.format as 'markdown' | 'json' | 'both',
+      maxGaps: parseInt(options.maxGaps as string, 10),
+      priority: options.priority as GapPriority,
+    });
+
+    console.log(`\nAI flows export complete:`);
+    console.log(`  Gaps exported: ${flows.gaps.length}`);
+    console.log(`  Project:       ${flows.project.name}`);
+    console.log(`  Language:      ${flows.project.language}`);
+  });
+
+program
+  .command('score-tests')
+  .description('Score quality of existing test suite on 5 dimensions (0-100)')
+  .option('--tests <glob>', 'Glob pattern for test files to score', 'tests/**/*.test.ts')
+  .option('--reports-dir <dir>', 'Directory to write quality score output', 'reports/')
+  .option('--fail-below <score>', 'Exit non-zero if any file scores below this', '0')
+  .action(async (options) => {
+    try {
+      const report = await scoreTests({
+        testsGlob: options.tests as string,
+        reportsDir: options.reportsDir as string,
+        failBelow: parseInt(options.failBelow as string, 10),
+      });
+
+      console.log(`\nTest Quality Score Report:`);
+      console.log(`  Overall score: ${report.overallScore}/100`);
+      console.log(`  Files scored:  ${report.byFile.length}`);
+
+      if (report.lowestQualityFiles.length > 0) {
+        console.log(`\n  Lowest quality files:`);
+        for (const f of report.lowestQualityFiles) {
+          const entry = report.byFile.find(b => b.file === f);
+          console.log(`    ${f}: ${entry?.score ?? '?'}/100`);
+        }
+      }
+
+      if (report.highestRiskLowQualityGaps.length > 0) {
+        console.log(`\n  High risk + low quality:`);
+        for (const g of report.highestRiskLowQualityGaps) {
+          console.log(`    ${g.endpoint}: quality=${g.qualityScore}, risk=${g.riskScore}`);
+          console.log(`      → ${g.primaryIssue}`);
+        }
+      }
+
+      console.log(`\n  Report written to: ${options.reportsDir}/test-quality.json`);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+      process.exit(1);
+    }
   });
 
 // Parse the command-line arguments

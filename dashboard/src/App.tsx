@@ -15,6 +15,8 @@ import ErrorHandlingPage from './pages/ErrorHandlingPage';
 import PerformancePage from './pages/PerformancePage';
 import TrendsPage from './pages/TrendsPage';
 import CoverageIntelligencePage from './pages/CoverageIntelligencePage';
+import TestGeneratorPage from './pages/TestGeneratorPage';
+import TestQualityPage from './pages/TestQualityPage';
 
 export default function App() {
   return (
@@ -39,6 +41,8 @@ export default function App() {
                       <Route path="/performance" element={<PerformancePage />} />
                       <Route path="/trends" element={<TrendsPage />} />
                       <Route path="/intelligence" element={<CoverageIntelligencePage />} />
+                      <Route path="/generator" element={<TestGeneratorPage />} />
+                      <Route path="/quality" element={<TestQualityPage />} />
                     </Routes>
                   </main>
                 </div>

@@ -30,23 +30,10 @@ jobs:
 
       - run: npm ci
 
-      - name: Endpoint coverage
-        run: |
-          node -r ts-node/register src/index.ts endpoint-coverage \
-            --spec openapi.yaml \
-            --tests "tests/**/*.ts" \
-            --format json,html,csv,junit \
-            --threshold-endpoint 80
-
-      - name: Parameter coverage
-        run: |
-          node -r ts-node/register src/index.ts parameter-coverage \
-            --spec openapi.yaml \
-            --tests "tests/**/*.ts" \
-            --format json,html \
-            --threshold-parameter 70
-
-      # ... add more coverage steps as needed
+      # config.yaml at repo root controls all scan types, thresholds, and reporting.
+      # Running `analyze` with no arguments runs the full default profile.
+      - name: Run analysis
+        run: analyze
 
       - name: Upload reports
         if: always()
@@ -122,15 +109,10 @@ pipeline {
       steps { sh 'npm ci' }
     }
 
-    stage('Endpoint Coverage') {
+    stage('API Coverage') {
       steps {
-        sh '''
-          node -r ts-node/register src/index.ts endpoint-coverage \
-            --spec openapi.yaml \
-            --tests "tests/**/*.ts" \
-            --format json,html,junit \
-            --threshold-endpoint 80
-        '''
+        // config.yaml at workspace root controls all scan behaviour
+        sh 'analyze'
       }
     }
 
@@ -146,22 +128,25 @@ pipeline {
 
 ## Enforcing thresholds
 
-When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Set thresholds in `config.yaml` or use `--threshold-*` CLI flags (deprecated).
+When any threshold is exceeded the CLI exits with code **1**, causing the CI step to fail. Set thresholds in `config.yaml`:
 
-```json
-{
-  "thresholds": {
-    "endpoint": 80,
-    "parameter": 70,
-    "business": 60,
-    "integration": 50,
-    "security": 60,
-    "error": 50,
-    "performance": 75,
-    "resilience": 50
-  }
-}
+```yaml
+thresholds:
+  endpoint: 80
+  parameter: 70
+  business: 60
+  integration: 50
+  security: 60
+  error: 50
+  performance: 75
+  resilience: 50
+
+qualityGate:
+  enabled: true
+  failBuildOnThresholdMiss: true
 ```
+
+The `--threshold-*` CLI flags are **deprecated**. Use `config.yaml` instead.
 
 ## Security scanning in CI
 

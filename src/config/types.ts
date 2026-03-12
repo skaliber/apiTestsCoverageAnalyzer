@@ -198,6 +198,50 @@ export interface DashboardConfig {
   aiSummary?: AiSummaryConfig;
 }
 
+export interface GenerationSecurityTestsConfig {
+  enabled?: boolean;
+  includeInjection?: boolean;
+  includeAuthBypass?: boolean;
+  includeRateLimit?: boolean;
+}
+
+export interface GenerationFixturesConfig {
+  authTokenPlaceholder?: string;
+  baseUrl?: string;
+}
+
+export interface GenerationConfig {
+  enabled?: boolean;
+  outputDir?: string;
+  dryRun?: boolean;
+  overwrite?: boolean;
+  minPriority?: string;
+  unitFramework?: string;
+  integrationFramework?: string;
+  e2eFramework?: string;
+  fileNaming?: string;
+  includeTypes?: string[];
+  securityTests?: GenerationSecurityTestsConfig;
+  fixtures?: GenerationFixturesConfig;
+}
+
+export interface TestQualityConfig {
+  enabled?: boolean;
+  minimumScore?: number;
+  enforceOnGlob?: string;
+  excludeGlob?: string;
+  outputPath?: string;
+}
+
+export interface AiFlowsConfig {
+  enabled?: boolean;
+  outputDir?: string;
+  maxGapsPerExport?: number;
+  minPriority?: string;
+  includeGeneratedCode?: boolean;
+  copilotPromptMaxTokens?: number;
+}
+
 // ─── Top-level config ─────────────────────────────────────────────────────────
 
 export interface AnalyzerConfig {
@@ -212,4 +256,7 @@ export interface AnalyzerConfig {
   reports: ReportsConfig;
   publishing: PublishingConfig;
   dashboard: DashboardConfig;
+  generation?: GenerationConfig;
+  testQuality?: TestQualityConfig;
+  aiFlows?: AiFlowsConfig;
 }

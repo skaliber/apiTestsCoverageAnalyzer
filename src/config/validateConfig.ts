@@ -33,6 +33,9 @@ const KNOWN_TOP_LEVEL_KEYS = new Set([
   'reports',
   'publishing',
   'dashboard',
+  'generation',
+  'testQuality',
+  'aiFlows',
 ]);
 
 // ─── Error helpers ────────────────────────────────────────────────────────────

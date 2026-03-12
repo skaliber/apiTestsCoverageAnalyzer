@@ -11,6 +11,8 @@ const navItems = [
   { to: '/performance', label: '⚡ Performance' },
   { to: '/intelligence', label: '🧠 Intelligence' },
   { to: '/trends', label: '📈 Trends' },
+  { to: '/generator', label: '🧪 Test Generator' },
+  { to: '/quality', label: '🏆 Test Quality' },
 ];
 
 export default function Sidebar() {

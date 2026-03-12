@@ -555,15 +555,19 @@ Documentation sections:
 |---------|-------------|
 | [Getting Started](docs/guide/getting-started.md) | First-run walkthrough |
 | [Installation](docs/guide/installation.md) | Detailed setup steps |
-| [CLI Reference](docs/reference/cli.md) | All commands and options |
+| [CLI Reference](docs/guides/cli-reference.md) | All commands and options, `--config` flag, no-config behaviour |
+| [CI/CD Integration](docs/guides/ci-integration.md) | GitHub Actions & Jenkins with `config.yaml` setup |
+| [Configuration Reference](docs/guides/configuration.md) | `config.yaml` field reference |
+| [Security Scanning](docs/guides/security-scanning.md) | `scans.security` block reference |
+| [MCP Integration](docs/guides/mcp.md) | `mcp` block reference |
+| [Dashboard](docs/guides/dashboard.md) | `dashboard.aiSummary` configuration |
+| [AI Summary](docs/guides/ai-summary.md) | `scans.intelligence` and `dashboard.aiSummary` blocks |
 | [Multi-Language Support](docs/guide/multi-language.md) | Java, Kotlin, Python, Ruby, Cucumber test suites |
 | [Coverage Intelligence](docs/guide/coverage-intelligence.md) | Findings, risk scoring, missing test recommendations |
 | [Architecture](docs/reference/architecture.md) | Module design and data flow |
-| [CI/CD Integration](docs/guide/ci-cd.md) | GitHub Actions & Jenkins |
 | [Interpreting Reports](docs/guide/interpreting-reports.md) | Reading each report type |
 | [Writing Effective Tests](docs/guide/writing-tests.md) | Test best practices |
 | [Extending via Plugins](docs/guide/plugins.md) | Custom coverage types |
-| [Configuration Reference](docs/guides/configuration.md) | `config.yaml` field reference |
 | [Troubleshooting](docs/guide/troubleshooting.md) | Common issues & FAQ |
 | [Glossary](docs/guide/glossary.md) | Key terms |
 | [Contributing](docs/reference/contributing.md) | How to contribute |

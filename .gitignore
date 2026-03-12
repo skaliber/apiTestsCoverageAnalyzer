@@ -27,3 +27,7 @@ examples/java-spring-complex/reports/pr-summary.md
 examples/java-spring-complex/reports/risk-prioritization.json
 examples/java-spring-complex/reports/risk-prioritization.md
 examples/java-spring-complex/reports/summary.json
+
+# Dashboard public report overrides (test-only, not to be committed)
+dashboard/public/coverage-summary.json
+dashboard/public/reports/

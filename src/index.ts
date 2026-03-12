@@ -2158,6 +2158,109 @@ program
             allCoverageResults.push(errorResult);
             console.log(`  ${errorCovered}/${errorItems.length} inferred error scenarios have test coverage (${errorPct}%)`);
           }
+
+          // ── 4b-alt. Parameter coverage from inferred routes + body params ──
+          // Extract path parameters (e.g. ':article', ':id') and body params
+          // (e.g. 'req.body.email') from inferred routes and business rules.
+          // This populates the Parameters tab even without an OpenAPI spec.
+          console.log(`\nAnalyzing parameter coverage (from inferred routes)...`);
+          try {
+            const paramItems: Array<{
+              id: string;
+              covered: boolean;
+              matchedTests: string[];
+              param_type: 'path' | 'body';
+              source_file?: string;
+              line_number?: number;
+            }> = [];
+
+            // Path parameters from routes
+            const seenParamKeys = new Set<string>();
+            for (const epItem of endpointItems) {
+              const route = routeResult.routes.find(
+                (r) => `${r.method.toUpperCase()} ${r.path}` === epItem.id,
+              );
+              if (!route) continue;
+              const pathParams = route.path.split('/').filter((s) => s.startsWith(':'));
+              for (const param of pathParams) {
+                const paramName = param.slice(1); // strip ':'
+                const key = `${paramName}@${route.method.toUpperCase()}`;
+                if (seenParamKeys.has(key)) continue;
+                seenParamKeys.add(key);
+                paramItems.push({
+                  id: `PATH :${paramName} @ ${epItem.id}`,
+                  covered: epItem.covered, // param is covered if the route is covered
+                  matchedTests: epItem.matchedTests,
+                  param_type: 'path',
+                  source_file: route.sourceFile,
+                  line_number: route.lineNumber,
+                });
+              }
+            }
+
+            // Body parameters from inferred business rules (req.body.<field>)
+            if (inferredRulesResult) {
+              const BODY_PARAM_RE = /req\.body\.(\w+)/g;
+              const seenBodyParams = new Set<string>();
+              for (const rule of inferredRulesResult.rules) {
+                let bm: RegExpExecArray | null;
+                BODY_PARAM_RE.lastIndex = 0;
+                const combinedText = `${rule.condition} ${rule.code_snippet}`;
+                while ((bm = BODY_PARAM_RE.exec(combinedText)) !== null) {
+                  const fieldName = bm[1];
+                  const paramKey = `body_${fieldName}_${rule.endpoint ?? ''}`;
+                  if (seenBodyParams.has(paramKey)) continue;
+                  seenBodyParams.add(paramKey);
+                  const endpointLabel = rule.endpoint ?? 'unknown endpoint';
+                  // Match: any test description mentioning the field name
+                  const fieldNameLower = fieldName.toLowerCase();
+                  const matchedTestDescs: string[] = [];
+                  for (const { file, descriptions } of testEntries) {
+                    const hitting = descriptions.filter((desc) =>
+                      desc.includes(fieldNameLower),
+                    );
+                    if (hitting.length > 0) {
+                      matchedTestDescs.push(...hitting.map((d) => `[${path.basename(file)}] ${d}`));
+                    }
+                  }
+                  const srcParts = rule.source_location?.split(':') ?? [];
+                  const srcFile = srcParts[0];
+                  const srcLine = srcParts[1] !== undefined ? parseInt(srcParts[1], 10) : undefined;
+                  paramItems.push({
+                    id: `BODY ${fieldName} @ ${endpointLabel}`,
+                    covered: matchedTestDescs.length > 0,
+                    matchedTests: matchedTestDescs,
+                    param_type: 'body',
+                    source_file: srcFile,
+                    line_number: srcLine && srcLine > 0 ? srcLine : undefined,
+                  });
+                }
+              }
+            }
+
+            if (paramItems.length > 0) {
+              const paramCovered = paramItems.filter((i) => i.covered).length;
+              const paramPct = Math.round((paramCovered / paramItems.length) * 100);
+              allCoverageResults.push({
+                type: 'parameter',
+                totalItems: paramItems.length,
+                coveredItems: paramCovered,
+                coveragePercent: paramPct,
+                details: {
+                  total: paramItems.length,
+                  covered: paramCovered,
+                  percentage: paramPct,
+                  items: paramItems,
+                  source: 'inferred',
+                },
+              });
+              console.log(`  ${paramCovered}/${paramItems.length} inferred parameters have test coverage (${paramPct}%)`);
+            }
+          } catch (paramErr) {
+            warnings.push(
+              `Parameter inference failed: ${paramErr instanceof Error ? paramErr.message : String(paramErr)}`,
+            );
+          }
         } else {
           warnings.push('No routes detected in service files; endpoint coverage skipped.');
         }

@@ -7,8 +7,9 @@ import AiSummaryPanel from '../components/AiSummaryPanel';
 import IntelligenceSection from '../components/IntelligenceSection';
 import MermaidSourceAndRenderPanel from '../components/MermaidSourceAndRenderPanel';
 import EvidencePanel from '../components/EvidencePanel';
+import EmptyStatePanel from '../components/EmptyStatePanel';
 import type { DetailItem, FlowStepDetail, RichDetailItem } from '../types';
-import { generateIntegrationFlowsSummary, generateFlowMermaid } from '../utils/markdownSummaries';
+import { generateIntegrationFlowsSummary, generateFlowMermaid, generateFallbackAnalysis } from '../utils/markdownSummaries';
 
 interface FlowItem extends DetailItem {
   steps?: number;
@@ -72,7 +73,20 @@ export default function IntegrationFlowsPage() {
   if (!section) {
     return (
       <div className="p-6">
-        <div className="text-gray-500 dark:text-gray-400 mb-4">No integration flows data available.</div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Integration Flows</h1>
+        {showAiSummaries && report && (
+          <AiSummaryPanel markdown={generateFallbackAnalysis('integration', report.discoveryInfo)} />
+        )}
+        <EmptyStatePanel
+          sectionName="Integration Flows"
+          scannedInfo={{
+            suggestedNextSteps: [
+              'Add test files that call 2+ API endpoints in sequence (e.g. POST /users → POST /articles → GET /articles/:slug)',
+              'Use supertest or axios chains in your test files — the analyzer detects multi-step HTTP call sequences',
+              'Run analyze again after adding test files with integration-style tests',
+            ],
+          }}
+        />
         <IntelligenceSection
           coverageType="integration"
           findings={findingsFor('integration')}

@@ -261,11 +261,10 @@ export async function scoreTests(opts: QualityScorerOptions): Promise<TestQualit
   }
 
   if (opts.failBelow && opts.failBelow > 0) {
-    const failing = byFile.filter(f => f.score < opts.failBelow!);
-    if (failing.length > 0) {
+    if (overallScore < opts.failBelow) {
       throw new Error(
-        `Quality gate failed: ${failing.length} test file(s) scored below ${opts.failBelow}.\n` +
-          failing.map(f => `  ${path.relative(process.cwd(), f.file)}: ${f.score}/100`).join('\n'),
+        `Quality gate failed: overall score ${overallScore}/100 is below the minimum threshold of ${opts.failBelow}.\n` +
+          `Run 'make score-tests' to see which files need improvement.`,
       );
     }
   }

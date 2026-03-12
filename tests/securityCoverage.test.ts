@@ -533,3 +533,94 @@ describe('generateSecurityReports', () => {
     }
   });
 });
+
+// ─── edge cases and error handling ───────────────────────────────────────────
+
+describe('securityCoverage – edge cases and error handling', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('alertNameToCategory returns null for null-like empty string input (boundary)', () => {
+    expect(alertNameToCategory('')).toBeNull();
+  });
+
+  it('alertNameToCategory handles invalid/unknown names gracefully', () => {
+    const result = alertNameToCategory('Not a real security alert at all');
+    expect(result).toBeNull();
+  });
+
+  it('buildSecurityCoverageReport handles null/empty coverages array (boundary: min input)', () => {
+    const report = buildSecurityCoverageReport([]);
+    expect(report.total).toBe(0);
+    expect(report.covered).toBe(0);
+    expect(report.percentage).toBe(0);
+    expect(report.categorySummary).toBeDefined();
+  });
+
+  it('buildSecurityCoverageReport handles missing scanFindings count (boundary: undefined)', () => {
+    const report = buildSecurityCoverageReport([], undefined);
+    expect(report.scanFindings).toBe(0);
+  });
+
+  it('parseScanReport throws error for missing/non-existent file path', () => {
+    expect(() => parseScanReport('/nonexistent/path/report.json')).toThrow();
+  });
+
+  it('parseScanReport returns empty array for report with no recognized findings (invalid categories)', () => {
+    const tmpFile = path.join(os.tmpdir(), 'no-findings-report.json');
+    fs.writeFileSync(tmpFile, JSON.stringify({ findings: [{ name: 'Unknown weird alert', severity: 'low' }] }), 'utf-8');
+    try {
+      const findings = parseScanReport(tmpFile);
+      expect(Array.isArray(findings)).toBe(true);
+    } finally {
+      fs.unlinkSync(tmpFile);
+    }
+  });
+
+  it('testCoversControl returns false when control has no matching keywords (without auth)', () => {
+    const control: SecurityControl = {
+      id: 'authentication:BearerAuth',
+      category: 'authentication',
+      description: 'Authentication via BearerAuth',
+    };
+    const entry = { description: 'GET /users returns a list of resources', content: 'GET /users returns success', filePath: 'test.ts' };
+    expect(testCoversControl(entry, control)).toBe(false);
+  });
+
+  it('analyzeSecurityCoverage returns coverage with 401 unauthorized for missing auth endpoint', async () => {
+    const tmpSpec = path.join(os.tmpdir(), 'auth-spec.yaml');
+    fs.writeFileSync(
+      tmpSpec,
+      `openapi: "3.0.0"
+info:
+  title: Auth Test
+  version: "1.0.0"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /secure:
+    get:
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+`,
+      'utf-8',
+    );
+    try {
+      const controls = await parseSecurityControls(tmpSpec);
+      expect(controls.length).toBeGreaterThan(0);
+      const authControl = controls.find((c) => c.category === 'authentication');
+      expect(authControl).toBeDefined();
+    } finally {
+      fs.unlinkSync(tmpSpec);
+    }
+  });
+});

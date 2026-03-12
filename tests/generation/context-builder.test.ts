@@ -122,3 +122,68 @@ describe('ContextBuilder', () => {
     });
   });
 });
+
+describe('ContextBuilder – edge cases and error handling', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should handle gap with empty/no parameters array (boundary: min params)', () => {
+    const gap: DetectedGap = { ...SAMPLE_GAP, parameters: [] };
+    const ctx = buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(Array.isArray(ctx.parameters)).toBe(true);
+    expect(ctx.parameters).toHaveLength(0);
+  });
+
+  it('should handle gap with empty/no responses array (boundary: null status codes)', () => {
+    const gap: DetectedGap = { ...SAMPLE_GAP, responses: [] };
+    const ctx = buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(Array.isArray(ctx.responses)).toBe(true);
+    expect(ctx.responses).toHaveLength(0);
+  });
+
+  it('should handle missing/undefined auth on endpoint without throwing', () => {
+    const gap: DetectedGap = {
+      ...SAMPLE_GAP,
+      endpoint: {
+        ...SAMPLE_GAP.endpoint,
+        auth: undefined as any,
+      },
+    };
+    expect(() => buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY)).not.toThrow();
+  });
+
+  it('should handle invalid path param syntax with no braces (boundary: plain path)', () => {
+    const gap: DetectedGap = {
+      ...SAMPLE_GAP,
+      endpoint: { ...SAMPLE_GAP.endpoint, path: '/api/articles' },
+    };
+    const ctx = buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(ctx.endpoint.pathNormalized).toBe('/api/articles');
+    expect(ctx.fixtures.pathParams).toEqual({});
+  });
+
+  it('should set authToken fixture to non-empty string when auth is required', () => {
+    const ctx = buildContext(SAMPLE_GAP, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(typeof ctx.fixtures.authToken).toBe('string');
+    expect(ctx.fixtures.authToken.length).toBeGreaterThan(0);
+  });
+
+  it('should set validPayload fixture as an object (not null/undefined)', () => {
+    const ctx = buildContext(SAMPLE_GAP, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(ctx.fixtures.validPayload).not.toBeNull();
+    expect(typeof ctx.fixtures.validPayload).toBe('object');
+  });
+
+  it('should handle min boundary riskScore of 0 correctly', () => {
+    const gap: DetectedGap = { ...SAMPLE_GAP, riskScore: 0 };
+    const ctx = buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(ctx.gap.riskScore).toBe(0);
+  });
+
+  it('should handle max boundary riskScore of 100 correctly', () => {
+    const gap: DetectedGap = { ...SAMPLE_GAP, riskScore: 100 };
+    const ctx = buildContext(gap, '/project/generated-tests/test.ts', DISCOVERY);
+    expect(ctx.gap.riskScore).toBe(100);
+  });
+});

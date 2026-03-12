@@ -151,6 +151,15 @@ When implementing or modifying `src/generation/`:
 9. **Injection tests use `not.toBe(500)`** as primary assertion — a 500 is always a defect.
 10. **AI prompt max 800 tokens** — split into multiple prompts if needed.
 
+**AI Flow Export Rules (RULE-AI01–AI06) — applied to `src/generation/ai-flow-exporter.ts`:**
+
+- RULE-AI01 — `suggestedOutputPath` MUST be an exact, relative file path (e.g. `generated-tests/api-users-post.test.ts`). Never a directory. Never abstract.
+- RULE-AI02 — Each `copilotPrompt` MUST reference the import path (`import { app } from 'src/app'`). Never leave the import for the user to guess.
+- RULE-AI03 — Each `copilotPrompt` MUST list ALL missing test cases (happy path + auth + error scenarios). Do not summarise.
+- RULE-AI04 — Each `copilotPrompt` MUST reference `existingSimilarTests[0]` if available: "Follow the pattern in `tests/xxx.test.ts`".
+- RULE-AI05 — Each `copilotPrompt` MUST be ≤ 800 tokens (~3200 characters). If longer, truncate at the last complete sentence before the limit.
+- RULE-AI06 — All `copilotPrompt` content MUST be written in English, regardless of project locale settings.
+
 When adding a new coverage metric type, also:
 8. Add a gap-to-generator mapping entry in `src/generation/engine.ts` `GAP_GENERATOR_MAP`
 9. Add rendering logic in `src/generation/template-renderer.ts` for the new test type

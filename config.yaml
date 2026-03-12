@@ -107,3 +107,90 @@ dashboard:
     enabled: true
     collapsedByDefault: true
 
+# ─── Feature 28: Test Generation ─────────────────────────────────────────────
+# Uncomment to enable test scaffold generation.
+#
+# generation:
+#   enabled: true
+#
+#   # Where generated test files are written.
+#   # Default: generated-tests/
+#   outputDir: generated-tests/
+#
+#   # If true, print what would be generated without writing files.
+#   # Default: false
+#   dryRun: false
+#
+#   # If false, skip files that already exist. If true, overwrite.
+#   # Default: false
+#   overwrite: false
+#
+#   # Minimum gap priority to generate tests for.
+#   # Valid: P0 | P1 | P2 | P3 | P4 | P5
+#   # Default: P1
+#   minPriority: P1
+#
+#   # Test framework for unit tests.
+#   # Valid: jest | pytest | junit5 | auto
+#   # auto = detected from package.json / build.gradle / pyproject.toml
+#   # Default: auto
+#   unitFramework: auto
+#
+#   # Test framework for integration tests.
+#   # Default: auto
+#   integrationFramework: auto
+#
+#   # Test framework for E2E tests.
+#   # Valid: cypress | playwright
+#   # Default: cypress
+#   e2eFramework: cypress
+#
+#   securityTests:
+#     # Generate security test scaffolds for auth and injection gaps.
+#     # Default: true
+#     enabled: true
+#
+#     # Include SQL injection and XSS test cases.
+#     # Default: true
+#     includeInjection: true
+#
+#     # Include auth bypass test cases.
+#     # Default: true
+#     includeAuthBypass: true
+#
+#     # Include rate limiting tests.
+#     # Default: false — requires infrastructure support
+#     includeRateLimit: false
+
+# ─── Feature 28: Test Quality Scorer ─────────────────────────────────────────
+# Uncomment to enable quality scoring of existing tests.
+#
+# testQuality:
+#   enabled: true
+#
+#   # CI fails if overall quality score is below this value.
+#   # 0 = never fail (score-only mode)
+#   # Default: 0
+#   minimumScore: 0
+#
+#   # Glob pattern for test files to score.
+#   # Default: tests/**/*.test.ts
+#   enforceOnGlob: "tests/**/*.test.ts"
+#
+#   # Glob pattern for files to exclude from scoring.
+#   # Default: generated-tests/**
+#   excludeGlob: "generated-tests/**"
+
+# ─── Feature 28: AI-Ready Flows Exporter ─────────────────────────────────────
+# Uncomment to enable AI-ready flow documentation export.
+#
+# aiFlows:
+#   enabled: true
+#
+#   # Maximum number of gaps to include in the exported document.
+#   # Default: 50
+#   maxGapsPerExport: 50
+#
+#   # Maximum token count for each copilot prompt.
+#   # Default: 800
+#   copilotPromptMaxTokens: 800

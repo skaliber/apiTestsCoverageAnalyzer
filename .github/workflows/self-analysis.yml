@@ -71,6 +71,15 @@ jobs:
         # Process exit code governs pass/fail — no shell string-parsing.
         # Reports are always written even when a threshold is breached.
 
+      - name: Test Generation Dry-Run (Feature 28)
+        run: make self-analysis-generation
+
+      - name: Test Quality Score (Feature 28)
+        run: make self-analysis-quality
+
+      - name: Export AI-Ready Flows (Feature 28)
+        run: make self-analysis-ai-flows
+
       - name: Generate Summaries
         if: always()
         run: make summary

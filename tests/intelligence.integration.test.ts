@@ -576,3 +576,102 @@ describe('Intelligence engine – edge cases', () => {
     }
   });
 });
+
+// ─── 9. Error and boundary cases ─────────────────────────────────────────────
+
+describe('Intelligence engine – error and boundary cases', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('handles null/undefined projectName without throwing', () => {
+    const input: IntelligenceInput = {
+      projectName: undefined,
+      coverageResults: [makeEndpointResult([{ method: 'GET', path: '/test', covered: false }])],
+    };
+    expect(() => runIntelligenceEngine(input)).not.toThrow();
+  });
+
+  it('handles empty coverageResults array gracefully', () => {
+    const input: IntelligenceInput = {
+      projectName: 'empty-project',
+      coverageResults: [],
+    };
+    const report = runIntelligenceEngine(input);
+    expect(report.findings).toHaveLength(0);
+    expect(report.summary.totalFindings).toBe(0);
+  });
+
+  it('handles missing/null securityFindings gracefully (boundary: no security data)', () => {
+    const input: IntelligenceInput = {
+      projectName: 'no-security',
+      coverageResults: [makeEndpointResult([{ method: 'POST', path: '/api/users', covered: false }])],
+      securityFindings: undefined,
+    };
+    expect(() => runIntelligenceEngine(input)).not.toThrow();
+    const report = runIntelligenceEngine(input);
+    expect(report.summary.unprotectedSecurityFindings).toBe(0);
+  });
+
+  it('handles coverage result with 0 total items (boundary: empty endpoint list)', () => {
+    const input: IntelligenceInput = {
+      coverageResults: [
+        {
+          type: 'endpoint',
+          totalItems: 0,
+          coveredItems: 0,
+          coveragePercent: 100,
+          details: [],
+        },
+      ],
+    };
+    expect(() => runIntelligenceEngine(input)).not.toThrow();
+    const report = runIntelligenceEngine(input);
+    expect(report.findings).toHaveLength(0);
+  });
+
+  it('handles 401 unauthorized finding linked to auth endpoint gap', () => {
+    const input: IntelligenceInput = {
+      projectName: 'auth-test',
+      coverageResults: [makeEndpointResult([{ method: 'POST', path: '/auth/token', covered: false }])],
+      securityFindings: [
+        { severity: 'HIGH', title: 'Missing auth on /auth/token', scanner: 'semgrep', endpoint: { method: 'POST', path: '/auth/token' } },
+      ],
+    };
+    const report = runIntelligenceEngine(input);
+    expect(report.findings.length).toBeGreaterThan(0);
+    expect(report.summary.unprotectedSecurityFindings).toBeGreaterThan(0);
+  });
+
+  it('returns 400-level risk scores for invalid/forbidden endpoint coverage gaps', () => {
+    const input: IntelligenceInput = {
+      projectName: 'risk-test',
+      coverageResults: [
+        makeEndpointResult([
+          { method: 'DELETE', path: '/admin/users/{id}', covered: false },
+        ]),
+      ],
+    };
+    const report = runIntelligenceEngine(input);
+    expect(report.recommendations.length).toBeGreaterThan(0);
+    for (const rec of report.recommendations) {
+      expect(rec.riskScore).toBeGreaterThanOrEqual(0);
+      expect(rec.riskScore).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it('handles max boundary of 100 endpoints without failure', () => {
+    const maxEndpoints = Array.from({ length: 100 }, (_, i) => ({
+      method: 'GET',
+      path: `/resource-${i}`,
+      covered: false,
+    }));
+    const input: IntelligenceInput = {
+      projectName: 'max-test',
+      coverageResults: [makeEndpointResult(maxEndpoints)],
+    };
+    expect(() => runIntelligenceEngine(input)).not.toThrow();
+    const report = runIntelligenceEngine(input);
+    expect(report.findings.length).toBe(100);
+  });
+});

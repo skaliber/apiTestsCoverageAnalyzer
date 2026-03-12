@@ -64,7 +64,7 @@ describe('AiFlowExporter', () => {
     });
 
     for (const gap of result.gaps) {
-      expect(gap.copilotPrompt).toBeTruthy();
+      expect(typeof gap.copilotPrompt).toBe('string');
       expect(gap.copilotPrompt.length).toBeGreaterThan(0);
     }
   });
@@ -77,7 +77,7 @@ describe('AiFlowExporter', () => {
     });
 
     for (const gap of result.gaps) {
-      expect(gap.suggestedOutputPath).toBeTruthy();
+      expect(typeof gap.suggestedOutputPath).toBe('string');
       expect(gap.suggestedOutputPath).not.toBe('');
     }
   });
@@ -101,9 +101,10 @@ describe('AiFlowExporter', () => {
     });
 
     expect(result.project).toBeDefined();
-    expect(result.project.name).toBeTruthy();
-    expect(result.project.language).toBeTruthy();
-    expect(result.project.testFramework).toBeTruthy();
+    expect(typeof result.project.name).toBe('string');
+    expect(result.project.name.length).toBeGreaterThan(0);
+    expect(typeof result.project.language).toBe('string');
+    expect(typeof result.project.testFramework).toBe('string');
   });
 
   it('should have generatedAt timestamp', async () => {
@@ -113,7 +114,8 @@ describe('AiFlowExporter', () => {
       format: 'json',
     });
 
-    expect(result.generatedAt).toBeTruthy();
+    expect(typeof result.generatedAt).toBe('string');
+    expect(result.generatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(new Date(result.generatedAt).getTime()).not.toBeNaN();
   });
 

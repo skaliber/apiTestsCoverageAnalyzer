@@ -241,3 +241,77 @@ describe('TemplateRenderer', () => {
     });
   });
 });
+
+describe('TemplateRenderer – edge cases and error handling', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should handle missing optional auth gracefully (without auth context)', () => {
+    const noAuthCtx: GenerationContext = {
+      ...BASE_CONTEXT,
+      endpoint: {
+        ...BASE_CONTEXT.endpoint,
+        auth: { required: false, optional: false, type: undefined, headerName: undefined, scheme: undefined },
+      },
+    };
+    const output = renderTemplate(noAuthCtx, { language: 'typescript', testType: 'unit' });
+    expect(typeof output).toBe('string');
+    expect(output.length).toBeGreaterThan(0);
+  });
+
+  it('should return non-empty string for null-like gap riskScore boundary (riskScore = 0)', () => {
+    const zeroRiskCtx: GenerationContext = {
+      ...BASE_CONTEXT,
+      gap: { ...BASE_CONTEXT.gap, riskScore: 0 },
+    };
+    const output = renderTemplate(zeroRiskCtx, { language: 'typescript', testType: 'unit' });
+    expect(output).toContain('Risk: 0');
+  });
+
+  it('should handle empty parameters array without error', () => {
+    const noParamsCtx: GenerationContext = {
+      ...BASE_CONTEXT,
+      parameters: [],
+    };
+    const output = renderTemplate(noParamsCtx, { language: 'typescript', testType: 'unit' });
+    expect(typeof output).toBe('string');
+    expect(output.length).toBeGreaterThan(0);
+  });
+
+  it('should handle empty responses array without error (boundary: no status codes)', () => {
+    const noResponsesCtx: GenerationContext = {
+      ...BASE_CONTEXT,
+      responses: [],
+    };
+    const output = renderTemplate(noResponsesCtx, { language: 'typescript', testType: 'unit' });
+    expect(typeof output).toBe('string');
+  });
+
+  it('should include 401 unauthorized check when auth is required (with auth token)', () => {
+    const output = renderTemplate(BASE_CONTEXT, { language: 'typescript', testType: 'unit' });
+    expect(output).toContain('401');
+    expect(output).toContain('Authorization');
+  });
+
+  it('should handle invalid/unknown testType by returning a fallback string', () => {
+    const output = renderTemplate(BASE_CONTEXT, { language: 'typescript', testType: 'unknown' as any });
+    expect(typeof output).toBe('string');
+  });
+
+  it('should handle missing/null flow for integration type without throwing', () => {
+    const noFlowCtx: GenerationContext = {
+      ...BASE_CONTEXT,
+      gap: { ...BASE_CONTEXT.gap, type: 'integration' },
+      flow: undefined,
+    };
+    expect(() => renderTemplate(noFlowCtx, { language: 'typescript', testType: 'integration' })).not.toThrow();
+  });
+
+  it('should include 200 or 201 success path alongside 401 auth failure path', () => {
+    const output = renderTemplate(BASE_CONTEXT, { language: 'typescript', testType: 'unit' });
+    const has200or201 = output.includes('201') || output.includes('200');
+    expect(has200or201).toBe(true);
+    expect(output).toContain('401');
+  });
+});

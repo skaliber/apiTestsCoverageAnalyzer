@@ -1,0 +1,205 @@
+openapi: "3.0.3"
+info:
+  title: Angular RealWorld Conduit API
+  version: "1.0.0"
+  description: Minimal fixture for Feature 27 Angular HttpClient + DI + guards + interceptors pattern detection.
+paths:
+  /api/articles:
+    get:
+      summary: List articles
+      operationId: getArticles
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: author
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: Create article
+      operationId: createArticle
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Created
+  /api/articles/{slug}:
+    get:
+      summary: Get article
+      operationId: getArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    put:
+      summary: Update article
+      operationId: updateArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Delete article
+      operationId: deleteArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/articles/{slug}/comments:
+    get:
+      summary: Get comments
+      operationId: getComments
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: Add comment
+      operationId: addComment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Created
+  /api/articles/{slug}/favorite:
+    post:
+      summary: Favorite article
+      operationId: favoriteArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Unfavorite article
+      operationId: unfavoriteArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/users:
+    post:
+      summary: Register
+      operationId: registerUser
+      responses:
+        "201":
+          description: Created
+  /api/users/login:
+    post:
+      summary: Login
+      operationId: loginUser
+      responses:
+        "200":
+          description: OK
+  /api/user:
+    get:
+      summary: Get current user
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+    put:
+      summary: Update user
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+  /api/profiles/{username}:
+    get:
+      summary: Get profile
+      operationId: getProfile
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/profiles/{username}/follow:
+    post:
+      summary: Follow user
+      operationId: followUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Unfollow user
+      operationId: unfollowUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

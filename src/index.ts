@@ -13,6 +13,7 @@ import {
   analyzeParameterCoverage,
   buildParameterCoverageReport,
   generateParameterReports,
+  AstParameterAnalysisOptions,
 } from './parameterCoverage';
 import {
   parseBusinessRules,
@@ -31,12 +32,14 @@ import {
   analyzeErrorCoverage,
   buildErrorCoverageReport,
   generateErrorReports,
+  AstErrorAnalysisOptions,
 } from './errorCoverage';
 import {
   parseSecurityControls,
   analyzeSecurityCoverage,
   buildSecurityCoverageReport,
   generateSecurityReports,
+  AstSecurityAnalysisOptions,
 } from './securityCoverage';
 import {
   parseEndpointsFromSpec,
@@ -96,6 +99,22 @@ import { recordIntelligenceMetrics } from './observability';
 import { generateBuildSummary } from './summary/buildSummary';
 import { generatePrSummary } from './summary/prSummary';
 import type { SummaryInput } from './summary/markdownRenderer';
+import { KNOWN_METRIC_TYPES } from './summary/summaryTypes';
+import { registerAllAnalyzers } from './ast/astAnalysisOrchestrator';
+import { discoverProject } from './discovery/projectDiscovery';
+import { inferBusinessRules, writeInferredBusinessRules, KEYWORD_STOP_WORDS } from './inference/businessRuleInference';
+import { inferIntegrationFlows, writeInferredIntegrationFlows } from './inference/integrationFlowInference';
+import { inferRoutes, writeInferredRoutes } from './inference/routeInference';
+import { writeScanManifest } from './inference/scanManifest';
+import type { ScanTypeEntry } from './inference/scanManifest';
+import { serveDashboard } from './serveDashboard';
+
+// Register all language AST analyzers at startup.
+// This side-effect import ensures each language module's registerAnalyzer() call runs.
+registerAllAnalyzers();
+
+/** Keywords that indicate a test is exercising an error/failure path. */
+const ERROR_TEST_KEYWORDS = ['error', 'fail', 'throw', 'exception', 'reject', 'invalid', 'blank', 'missing'] as const;
 
 const program = new Command();
 
@@ -407,7 +426,12 @@ program
     const parameters = await parseParameters(specPath);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeParameterCoverage(parameters, testsGlob);
+    const analyzerCfgForParam = loadCentralConfig(parentOpts.config as string | undefined);
+    const astParamOptions: AstParameterAnalysisOptions = {
+      astConfig: analyzerCfgForParam.analysis.ast ?? {},
+      deepConfig: analyzerCfgForParam.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeParameterCoverage(parameters, testsGlob, astParamOptions);
 
     const report = buildParameterCoverageReport(coverages);
 
@@ -687,7 +711,12 @@ program
     console.log(`Found ${scenarios.length} error scenarios`);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeErrorCoverage(scenarios, testsGlob);
+    const analyzerCfgForError = loadCentralConfig(parentOpts.config as string | undefined);
+    const astErrorOptions: AstErrorAnalysisOptions = {
+      astConfig: analyzerCfgForError.analysis.ast ?? {},
+      deepConfig: analyzerCfgForError.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeErrorCoverage(scenarios, testsGlob, astErrorOptions);
 
     const report = buildErrorCoverageReport(coverages);
 
@@ -797,7 +826,12 @@ program
     console.log(`Found ${controls.length} security controls`);
 
     console.log(`Analyzing tests matching: ${testsGlob}`);
-    const coverages = await analyzeSecurityCoverage(controls, testsGlob, scanReportPath);
+    const analyzerCfgForSec = loadCentralConfig(parentOpts.config as string | undefined);
+    const astSecOptions: AstSecurityAnalysisOptions = {
+      astConfig: analyzerCfgForSec.analysis.ast ?? {},
+      deepConfig: analyzerCfgForSec.scans.coverage?.deepAnalysis,
+    };
+    const coverages = await analyzeSecurityCoverage(controls, testsGlob, scanReportPath, astSecOptions);
 
     const report = buildSecurityCoverageReport(
       coverages,
@@ -1370,12 +1404,23 @@ function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] 
 
   switch (type) {
     case 'endpoint': {
-      const eps = obj.endpoints;
+      // Spec-based: { endpoints: [{ method, path, covered }] }
+      // Inferred:   { items: [{ id: "GET /path", covered, matchedTests, source_file }] }
+      const eps = (obj.endpoints ?? obj.items) as Array<Record<string, unknown>> | undefined;
       if (!Array.isArray(eps)) return [];
-      return (eps as Array<Record<string, unknown>>).map((e) => ({
-        endpoint: { method: e.method, path: e.path },
-        covered: e.covered ?? false,
-      }));
+      return eps.map((e) => {
+        let method = e.method as string | undefined;
+        let epPath = e.path as string | undefined;
+        // Inferred format stores id as "METHOD /path"
+        if (!method && !epPath && typeof e.id === 'string') {
+          const parts = (e.id as string).split(' ');
+          if (parts.length >= 2) { method = parts[0]; epPath = parts.slice(1).join(' '); }
+        }
+        return {
+          endpoint: { method, path: epPath },
+          covered: e.covered ?? false,
+        };
+      });
     }
     case 'parameter': {
       const params = obj.parameters;
@@ -1422,15 +1467,46 @@ function normalizeDetailsForIntelligence(type: string, raw: unknown): unknown[] 
       });
     }
     case 'error': {
-      const scenarios = obj.scenarios;
-      if (!Array.isArray(scenarios)) return [];
-      return (scenarios as Array<Record<string, unknown>>).map((s) => {
+      // Spec-based: { scenarios: [{ scenario: { method, path, errorCode }, covered }] }
+      // Inferred:   { items: [{ id, description, covered, source_location, code_snippet }] }
+      const rawItems = (obj.scenarios ?? obj.items) as Array<Record<string, unknown>> | undefined;
+      if (!Array.isArray(rawItems)) return [];
+      return rawItems.map((s) => {
         const sc = s.scenario as Record<string, unknown> | undefined;
+        if (sc) {
+          // Spec-based format
+          return {
+            endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+            covered: s.covered ?? false,
+            errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
+            name: sc?.id,
+          };
+        }
+        // Inferred format — synthesize errorCodes from exception/condition patterns
+        const desc = ((s.description as string) ?? '').toLowerCase();
+        const id = (s.id as string) ?? '';
+        const syntheticCodes: string[] = [];
+        if (/unauthorized|no.*authorization|forbidden/.test(desc + id)) syntheticCodes.push('403');
+        else if (/authentication|invalid.*auth|invalid_auth/.test(desc + id)) syntheticCodes.push('401');
+        else if (/not.*found|resource.*not/.test(desc + id)) syntheticCodes.push('404');
+        else if (/illegal.*argument|invalid.*param|bad.*request/.test(desc + id)) syntheticCodes.push('400');
+        else if (/null.*check|npe|null_check/.test(desc + id)) syntheticCodes.push('500');
+        // Fall back to a generic code so the intelligence engine generates a finding
+        if (syntheticCodes.length === 0) syntheticCodes.push('exception');
+        // Extract a rough endpoint path from source_location (e.g. "...api/ArticleApi.java:54")
+        // Handle Api, Controller, Resource, Handler, Mutation, Datafetcher, Filter, Service
+        const sourceLocation = (s.source_location as string) ?? '';
+        const fileMatch = sourceLocation.match(
+          /\/([A-Z][a-zA-Z]+?)(?:Api|Controller|Resource|Handler|Mutation|Datafetcher|Filter|QueryService|Repository)\.java/i,
+        );
+        const endpointPath = fileMatch
+          ? `/${fileMatch[1].toLowerCase()}`
+          : undefined;
         return {
-          endpoint: sc ? { method: sc.method, path: sc.path } : undefined,
+          endpoint: endpointPath ? { path: endpointPath } : undefined,
           covered: s.covered ?? false,
-          errorCodes: sc?.errorCode ? [String(sc.errorCode)] : [],
-          name: sc?.id,
+          errorCodes: syntheticCodes,
+          name: id,
         };
       });
     }
@@ -1695,6 +1771,829 @@ program
     console.log(`\nSummary reports written to: ${outDir}`);
 
     logger.info({ event: 'summary_report_complete' }, 'Coverage summary report generated');
+  });
+
+// ─── analyze command ─────────────────────────────────────────────────────────
+
+program
+  .command('analyze')
+  .description(
+    'Zero-config full analysis: discover project artifacts, infer missing rules/flows, compute coverage.',
+  )
+  .option('--root <dir>', 'Project root to analyze (default: current working directory)')
+  .option('--reports-dir <dir>', 'Directory to write reports to (default: reports/)')
+  .option('--export-inferred-rules', 'Export inferred rules/flows as editable YAML files')
+  .option('--no-infer-business-rules', 'Disable business rule inference')
+  .option('--no-infer-integration-flows', 'Disable integration flow inference')
+  .option('--dashboard', 'Start the coverage dashboard after analysis')
+  .option('--port <port>', 'Port for the dashboard server (requires --dashboard)', parseInt)
+  .option('--open', 'Open the dashboard in your browser automatically (requires --dashboard)')
+  .action(async (options: Record<string, unknown>) => {
+    const { metricsPort, serviceName } = setupObservability();
+    const logger = getLogger();
+    const configPath = (program.opts()['config'] as string | undefined);
+    const analyzerCfg = loadCentralConfig(configPath);
+
+    const rootDir         = (options['root'] as string | undefined) ?? process.cwd();
+    const reportsDir      = (options['reportsDir'] as string | undefined) ??
+                            analyzerCfg.reports?.outputDir ?? 'reports';
+    const doInferRules    = options['inferBusinessRules'] !== false &&
+                            (analyzerCfg.analysis?.inferBusinessRules ?? true);
+    const doInferFlows    = options['inferIntegrationFlows'] !== false &&
+                            (analyzerCfg.analysis?.inferIntegrationFlows ?? true);
+    const agnosticDisc    = analyzerCfg.analysis?.agnosticDiscovery ?? true;
+
+    logger.info({ event: 'analyze_start', rootDir }, 'Starting agnostic project analysis');
+
+    // ── 1. Discover project artifacts ──────────────────────────────────────
+    const artifacts = discoverProject({ rootDir });
+
+    console.log('\n=== API Test Coverage Analyzer ===');
+    console.log(`Project root: ${rootDir}`);
+    console.log(`Languages detected: ${artifacts.languages.join(', ') || 'none'}`);
+    console.log(`Frameworks detected: ${artifacts.frameworks.join(', ') || 'none'}`);
+    console.log(`API specs found: ${artifacts.specs.length}`);
+    console.log(`Test files found: ${artifacts.testFiles.length}`);
+    console.log(`Service files found: ${artifacts.serviceFiles.length}`);
+
+    if (!agnosticDisc && artifacts.specs.length === 0) {
+      console.error('\n[ERROR] No API spec found and agnosticDiscovery is disabled. Aborting.');
+      process.exitCode = 1;
+      return;
+    }
+
+    const warnings: string[] = [];
+    let inferredRulesResult: ReturnType<typeof inferBusinessRules> | null = null;
+    let inferredFlowsResult: ReturnType<typeof inferIntegrationFlows> | null = null;
+
+    // ── 2. Business rule inference ─────────────────────────────────────────
+    if (doInferRules) {
+      inferredRulesResult = inferBusinessRules(artifacts.serviceFiles, warnings);
+      const rulesPath = writeInferredBusinessRules(inferredRulesResult, reportsDir);
+
+      console.log(`\nBusiness Rule Inference`);
+      console.log(`  Rules detected in service code: ${inferredRulesResult.rules.length}`);
+      console.log(`  Written to: ${rulesPath}`);
+
+      if (options['exportInferredRules']) {
+        const fsMod = require('fs') as typeof import('fs');
+        const yaml = inferredRulesResult.rules.map((r) => [
+          `- id: ${r.id}`,
+          `  name: ${r.name}`,
+          `  type: ${r.type}`,
+          r.endpoint ? `  endpoint: "${r.endpoint}"` : null,
+          `  condition: "${r.condition.replace(/"/g, "'")}"`,
+          `  source: ${r.source_location}`,
+        ].filter(Boolean).join('\n')).join('\n');
+        fsMod.writeFileSync(path.join(rootDir, 'generated-business-rules.yaml'), yaml, 'utf-8');
+        console.log('  Exported: generated-business-rules.yaml');
+      }
+    }
+
+    // ── 3. Integration flow inference ──────────────────────────────────────
+    if (doInferFlows) {
+      inferredFlowsResult = inferIntegrationFlows(artifacts.testFiles, warnings);
+      const flowsPath = writeInferredIntegrationFlows(inferredFlowsResult, reportsDir);
+
+      console.log(`\nIntegration Flow Inference`);
+      console.log(`  Multi-step flows detected in tests: ${inferredFlowsResult.flows.length}`);
+      console.log(`  Written to: ${flowsPath}`);
+
+      if (options['exportInferredRules']) {
+        const fs = require('fs') as typeof import('fs');
+        const yaml = inferredFlowsResult.flows.map((f) => [
+          `- id: ${f.id}`,
+          `  name: "${f.name}"`,
+          `  steps:`,
+          ...f.steps.map((s) => `    - { method: ${s.method}, path: "${s.path}" }`),
+        ].join('\n')).join('\n');
+        fs.writeFileSync(path.join(rootDir, 'generated-integration-flows.yaml'), yaml, 'utf-8');
+        console.log('  Exported: generated-integration-flows.yaml');
+      }
+    }
+
+    // ── 4. Full coverage analysis → coverage-summary.json ─────────────────
+    const allCoverageResults: CoverageResult[] = [];
+    const fsMod = require('fs') as typeof import('fs');
+    // When test files are explicitly discovered, use them directly.
+    // Otherwise fall back to a test-file-pattern glob (avoids scanning node_modules
+    // or the entire project tree, which can hang on large repositories).
+    const testsGlob = artifacts.testFiles.length > 0
+      ? '{' + artifacts.testFiles.join(',') + '}'
+      : path.join(rootDir, '**', '*.{test,spec}.{js,ts,jsx,tsx,mjs,cjs,py,rb}');
+    const detectedLanguages = artifacts.languages as SupportedLanguage[];
+
+    // Pre-compute test entries once from the discovered test files.
+    // These are reused for endpoint, error, and business-rule coverage matching
+    // (avoids multiple glob expansions which can hang on large projects).
+    const TEST_DECL_RE = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
+    // Java/Kotlin JUnit: @Test followed by a method declaration
+    const JAVA_TEST_RE = /@Test\b[^{]*?(?:public|protected|private|default)?\s+(?:\w+\s+)?(\w+)\s*\(\s*\)/g;
+    interface TestFileEntry { file: string; contentLower: string; descriptions: string[]; isJavaLike: boolean }
+    const testEntries: TestFileEntry[] = artifacts.testFiles.flatMap((tf) => {
+      let content = '';
+      try { content = fsMod.readFileSync(tf, 'utf-8'); } catch { return []; }
+      const descriptions: string[] = [];
+      const contentLower = content.toLowerCase();
+      const ext = path.extname(tf).toLowerCase();
+      const isJavaLike = ext === '.java' || ext === '.kt' || ext === '.kts';
+      let m: RegExpExecArray | null;
+      if (isJavaLike) {
+        // Extract @Test-annotated method names; convert snake_case to spaces for keyword matching
+        JAVA_TEST_RE.lastIndex = 0;
+        while ((m = JAVA_TEST_RE.exec(content)) !== null) {
+          descriptions.push(m[1].replace(/_/g, ' ').toLowerCase());
+        }
+      } else {
+        TEST_DECL_RE.lastIndex = 0;
+        while ((m = TEST_DECL_RE.exec(content)) !== null) {
+          descriptions.push(m[2].toLowerCase());
+        }
+      }
+      return [{ file: tf, contentLower, descriptions, isJavaLike }];
+    });
+
+    if (artifacts.specs.length > 0) {
+      for (const specPath of artifacts.specs) {
+        // ── 4a. Endpoint coverage ───────────────────────────────────────────
+        try {
+          console.log(`\nAnalyzing endpoint coverage for: ${path.basename(specPath)}`);
+          const endpoints  = await parseOpenApiSpec(specPath);
+          const coverageMap = await analyzeTestCoverage(endpoints, testsGlob, detectedLanguages);
+          const report     = buildCoverageReport(coverageMap);
+          const result: CoverageResult = {
+            type: 'endpoint',
+            totalItems: report.total,
+            coveredItems: report.covered,
+            coveragePercent: report.percentage,
+            details: report,
+          };
+          allCoverageResults.push(result);
+          console.log(`  ${report.covered}/${report.total} endpoints covered (${report.percentage}%)`);
+        } catch (err) {
+          warnings.push(
+            `Endpoint coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+
+        // ── 4b. Parameter coverage ──────────────────────────────────────────
+        try {
+          const parameters = await parseParameters(specPath);
+          const astParamOptions: AstParameterAnalysisOptions = {
+            astConfig: analyzerCfg.analysis?.ast ?? {},
+            deepConfig: undefined,
+          };
+          const paramCoverages = await analyzeParameterCoverage(parameters, testsGlob, astParamOptions);
+          const paramReport    = buildParameterCoverageReport(paramCoverages);
+          const paramResult: CoverageResult = {
+            type: 'parameter',
+            totalItems: paramReport.totalParameters,
+            coveredItems: paramCoverages.filter((c) => c.ratio > 0).length,
+            coveragePercent: paramReport.averageCoverage,
+            details: paramReport,
+          };
+          allCoverageResults.push(paramResult);
+          console.log(`  ${paramResult.coveredItems}/${paramResult.totalItems} parameters covered (${paramReport.averageCoverage}%)`);
+        } catch (err) {
+          warnings.push(
+            `Parameter coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+
+        // ── 4c. Error scenario coverage ─────────────────────────────────────
+        try {
+          const scenarios = await parseErrorScenarios(specPath);
+          if (scenarios.length > 0) {
+            const astErrorOptions: AstErrorAnalysisOptions = {
+              astConfig: analyzerCfg.analysis?.ast ?? {},
+              deepConfig: undefined,
+            };
+            const errorCoverages = await analyzeErrorCoverage(scenarios, testsGlob, astErrorOptions);
+            const errorReport    = buildErrorCoverageReport(errorCoverages);
+            const errorResult: CoverageResult = {
+              type: 'error',
+              totalItems: errorReport.total,
+              coveredItems: errorReport.covered,
+              coveragePercent: errorReport.percentage,
+              details: errorReport,
+            };
+            allCoverageResults.push(errorResult);
+            console.log(`  ${errorReport.covered}/${errorReport.total} error scenarios covered (${errorReport.percentage}%)`);
+          }
+        } catch (err) {
+          warnings.push(
+            `Error coverage failed for ${path.basename(specPath)}: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    } else {
+      warnings.push('No API spec files found; attempting route inference for endpoint/error coverage.');
+
+      // ── 4a-alt. Inferred route endpoint coverage ──────────────────────────
+      try {
+        const routeResult = inferRoutes(artifacts.serviceFiles);
+        if (routeResult.routes.length > 0) {
+          const routesPath = writeInferredRoutes(routeResult, reportsDir);
+          console.log(`\nRoute Inference`);
+          console.log(`  Routes detected in service code: ${routeResult.routes.length}`);
+          console.log(`  Written to: ${routesPath}`);
+
+          console.log(`\nAnalyzing endpoint coverage (from inferred routes)...`);
+
+          const endpointItems = routeResult.routes.map((route) => {
+            const pathSegments = route.path.split('/').filter(
+              (s) => s.length > 1 && !s.startsWith(':'),
+            );
+            const method = route.method.toLowerCase();
+            // Leaf path segment is the most specific identifier (e.g., "comments", "favorite", "feed")
+            const leafSegment = pathSegments[pathSegments.length - 1] ?? '';
+            const matchedTests: string[] = [];
+
+            for (const { file, contentLower, descriptions } of testEntries) {
+              let matched = false;
+
+              // Priority 1: handler function name appears in test file imports/calls
+              if (route.handlerFunction) {
+                const fnLower = route.handlerFunction.toLowerCase();
+                if (contentLower.includes(fnLower)) {
+                  matched = true;
+                }
+              }
+
+              // Priority 2: test description mentions method + leaf path segment
+              if (!matched && leafSegment.length > 2) {
+                matched = descriptions.some((desc) =>
+                  desc.includes(method) && desc.includes(leafSegment),
+                );
+              }
+
+              // Priority 3: test description mentions the exact path
+              if (!matched && route.path.length >= 1) {
+                matched = descriptions.some((desc) => desc.includes(route.path.toLowerCase()));
+              }
+
+              // Priority 4: test file directly calls the URL path (e.g., axios.get('/articles'))
+              if (!matched && pathSegments.length > 0) {
+                // Check for full path string in file (e.g., axios.get('/articles/feed'))
+                const quotedPathPattern = new RegExp(
+                  `['"\`]${route.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"\`]`,
+                );
+                if (quotedPathPattern.test(contentLower)) {
+                  matched = true;
+                }
+              }
+
+              if (matched) {
+                matchedTests.push(path.basename(file));
+              }
+            }
+
+            const covered = matchedTests.length > 0;
+            return {
+              id: `${route.method.toUpperCase()} ${route.path}`,
+              covered,
+              matchedTests,
+              handler_function: route.handlerFunction,
+              source_file: route.sourceFile,
+              line_number: route.lineNumber,
+            };
+          });
+
+          const coveredCount = endpointItems.filter((i) => i.covered).length;
+          const pct = endpointItems.length > 0 ? Math.round((coveredCount / endpointItems.length) * 100) : 0;
+
+          const endpointResult: CoverageResult = {
+            type: 'endpoint',
+            totalItems: endpointItems.length,
+            coveredItems: coveredCount,
+            coveragePercent: pct,
+            details: {
+              total: endpointItems.length,
+              covered: coveredCount,
+              percentage: pct,
+              items: endpointItems,
+              source: 'inferred',
+            },
+          };
+          allCoverageResults.push(endpointResult);
+          console.log(`  ${coveredCount}/${endpointItems.length} inferred routes have test coverage (${pct}%)`);
+
+          // ── 4c-alt. Error coverage from inferred routes + rules ──────────
+          if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
+            console.log(`\nAnalyzing error coverage (from inferred business rules)...`);
+            const errorCandidateRules = inferredRulesResult.rules.filter(
+              (r) => r.type === 'validation' || r.type === 'business_logic',
+            );
+
+            const errorItems = errorCandidateRules.map((rule) => {
+              const matchedTestDescriptions: string[] = [];
+              for (const { file, descriptions, isJavaLike, contentLower } of testEntries) {
+                // Match at TEST DESCRIPTION level, not file level
+                // Require: description contains an error indicator + at least one specific keyword
+                const specificKws = rule.specificKeywords ?? [];
+                const matchingDescs = descriptions.filter((desc) => {
+                  const hasErrorKeyword = ERROR_TEST_KEYWORDS.some((kw) => desc.includes(kw));
+                  if (!hasErrorKeyword) return false;
+                  // If we have specific keywords, at least one must match in the description
+                  if (specificKws.length > 0) {
+                    return specificKws.some((kw) => desc.includes(kw.toLowerCase()));
+                  }
+                  // No specific keywords — use handler function name as fallback
+                  return true;
+                });
+                if (matchingDescs.length > 0) {
+                  matchedTestDescriptions.push(...matchingDescs.map((d) => `[${path.basename(file)}] ${d}`));
+                } else if (isJavaLike) {
+                  // Java/Kotlin: test method names rarely contain exception class names.
+                  // Check file body for specific long keywords (≥8 chars, e.g. "authorization")
+                  // combined with HTTP 4xx status checks or exception throws.
+                  const specificLongKws = specificKws
+                    .filter((k) => k.length >= 8)
+                    .map((k) => k.toLowerCase());
+                  if (specificLongKws.length > 0 && specificLongKws.some((kw) => contentLower.includes(kw))) {
+                    const hasErrorInContent =
+                      /\.statuscode\s*\(\s*[45]\d{2}|throw\s+new\s+\w*exception/i.test(contentLower);
+                    if (hasErrorInContent) {
+                      // Prefer test methods that look like error/boundary tests
+                      const errorDescs = descriptions.filter((d) =>
+                        /\b(4\d\d|error|fail|forbidden|unauthorized|invalid|exception|not.?found)\b/.test(d),
+                      );
+                      const descsToReport = errorDescs.length > 0 ? errorDescs : descriptions.slice(0, 1);
+                      matchedTestDescriptions.push(
+                        ...descsToReport.map((d) => `[${path.basename(file)}] ${d}`),
+                      );
+                    }
+                  }
+                }
+              }
+              return {
+                id: rule.id,
+                description: rule.condition,
+                covered: matchedTestDescriptions.length > 0,
+                matchedTests: matchedTestDescriptions,
+                source_location: rule.source_location,
+                code_snippet: rule.code_snippet,
+              };
+            });
+
+            const errorCovered = errorItems.filter((i) => i.covered).length;
+            const errorPct = errorItems.length > 0 ? Math.round((errorCovered / errorItems.length) * 100) : 0;
+
+            const errorResult: CoverageResult = {
+              type: 'error',
+              totalItems: errorItems.length,
+              coveredItems: errorCovered,
+              coveragePercent: errorPct,
+              details: {
+                total: errorItems.length,
+                covered: errorCovered,
+                percentage: errorPct,
+                items: errorItems,
+                source: 'inferred',
+              },
+            };
+            allCoverageResults.push(errorResult);
+            console.log(`  ${errorCovered}/${errorItems.length} inferred error scenarios have test coverage (${errorPct}%)`);
+          }
+
+          // ── 4b-alt. Parameter coverage from inferred routes + body params ──
+          // Extract path parameters (e.g. ':article', ':id') and body params
+          // (e.g. 'req.body.email') from inferred routes and business rules.
+          // This populates the Parameters tab even without an OpenAPI spec.
+          console.log(`\nAnalyzing parameter coverage (from inferred routes)...`);
+          try {
+            const paramItems: Array<{
+              id: string;
+              covered: boolean;
+              matchedTests: string[];
+              param_type: 'path' | 'body';
+              source_file?: string;
+              line_number?: number;
+            }> = [];
+
+            // Path parameters from routes
+            const seenParamKeys = new Set<string>();
+            for (const epItem of endpointItems) {
+              const route = routeResult.routes.find(
+                (r) => `${r.method.toUpperCase()} ${r.path}` === epItem.id,
+              );
+              if (!route) continue;
+              const pathParams = route.path.split('/').filter((s) => s.startsWith(':'));
+              for (const param of pathParams) {
+                const paramName = param.slice(1); // strip ':'
+                const key = `${paramName}@${route.method.toUpperCase()}`;
+                if (seenParamKeys.has(key)) continue;
+                seenParamKeys.add(key);
+                paramItems.push({
+                  id: `PATH :${paramName} @ ${epItem.id}`,
+                  covered: epItem.covered, // param is covered if the route is covered
+                  matchedTests: epItem.matchedTests,
+                  param_type: 'path',
+                  source_file: route.sourceFile,
+                  line_number: route.lineNumber,
+                });
+              }
+            }
+
+            // Body parameters from inferred business rules (req.body.<field>)
+            if (inferredRulesResult) {
+              const BODY_PARAM_RE = /req\.body\.(\w+)/g;
+              const seenBodyParams = new Set<string>();
+              for (const rule of inferredRulesResult.rules) {
+                let bm: RegExpExecArray | null;
+                BODY_PARAM_RE.lastIndex = 0;
+                const combinedText = `${rule.condition} ${rule.code_snippet}`;
+                while ((bm = BODY_PARAM_RE.exec(combinedText)) !== null) {
+                  const fieldName = bm[1];
+                  const paramKey = `body_${fieldName}_${rule.endpoint ?? ''}`;
+                  if (seenBodyParams.has(paramKey)) continue;
+                  seenBodyParams.add(paramKey);
+                  const endpointLabel = rule.endpoint ?? 'unknown endpoint';
+                  // Match: any test description mentioning the field name
+                  const fieldNameLower = fieldName.toLowerCase();
+                  const matchedTestDescs: string[] = [];
+                  for (const { file, descriptions } of testEntries) {
+                    const hitting = descriptions.filter((desc) =>
+                      desc.includes(fieldNameLower),
+                    );
+                    if (hitting.length > 0) {
+                      matchedTestDescs.push(...hitting.map((d) => `[${path.basename(file)}] ${d}`));
+                    }
+                  }
+                  const srcParts = rule.source_location?.split(':') ?? [];
+                  const srcFile = srcParts[0];
+                  const srcLine = srcParts[1] !== undefined ? parseInt(srcParts[1], 10) : undefined;
+                  paramItems.push({
+                    id: `BODY ${fieldName} @ ${endpointLabel}`,
+                    covered: matchedTestDescs.length > 0,
+                    matchedTests: matchedTestDescs,
+                    param_type: 'body',
+                    source_file: srcFile,
+                    line_number: srcLine && srcLine > 0 ? srcLine : undefined,
+                  });
+                }
+              }
+            }
+
+            if (paramItems.length > 0) {
+              const paramCovered = paramItems.filter((i) => i.covered).length;
+              const paramPct = Math.round((paramCovered / paramItems.length) * 100);
+              allCoverageResults.push({
+                type: 'parameter',
+                totalItems: paramItems.length,
+                coveredItems: paramCovered,
+                coveragePercent: paramPct,
+                details: {
+                  total: paramItems.length,
+                  covered: paramCovered,
+                  percentage: paramPct,
+                  items: paramItems,
+                  source: 'inferred',
+                },
+              });
+              console.log(`  ${paramCovered}/${paramItems.length} inferred parameters have test coverage (${paramPct}%)`);
+            }
+          } catch (paramErr) {
+            warnings.push(
+              `Parameter inference failed: ${paramErr instanceof Error ? paramErr.message : String(paramErr)}`,
+            );
+          }
+        } else {
+          warnings.push('No routes detected in service files; endpoint coverage skipped.');
+        }
+      } catch (err) {
+        warnings.push(
+          `Route/error inference failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    // ── 4d. Business rules coverage ─────────────────────────────────────────
+    const businessRulesYaml = path.join(rootDir, 'business-rules.yaml');
+    if (fsMod.existsSync(businessRulesYaml)) {
+      // Explicit YAML takes precedence
+      try {
+        console.log(`\nAnalyzing business rules coverage...`);
+        const rules         = parseBusinessRules(businessRulesYaml);
+        const bizCoverages  = await analyzeBusinessCoverage(rules, testsGlob);
+        const bizReport     = buildBusinessCoverageReport(bizCoverages);
+        const bizResult: CoverageResult = {
+          type: 'business',
+          totalItems: bizReport.total,
+          coveredItems: bizReport.covered,
+          coveragePercent: bizReport.percentage,
+          details: bizReport,
+        };
+        allCoverageResults.push(bizResult);
+        console.log(`  ${bizReport.covered}/${bizReport.total} business rules covered (${bizReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Business rules coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    } else if (inferredRulesResult && inferredRulesResult.rules.length > 0) {
+      // Auto-inferred: use specificKeywords from rule for accurate test matching.
+      // Reuse the testEntries already computed for endpoint coverage — avoids
+      // a second glob expansion (which can be slow/hang on large projects).
+      try {
+        console.log(`\nAnalyzing business rules coverage (from inferred rules)...`);
+        const syntheticRules = inferredRulesResult.rules.map((r) => {
+          const kwSet = new Set<string>();
+          // Use specificKeywords extracted from the condition (most accurate)
+          if (r.specificKeywords && r.specificKeywords.length > 0) {
+            r.specificKeywords.forEach((kw) => { if (!KEYWORD_STOP_WORDS.has(kw)) kwSet.add(kw); });
+          } else {
+            // Fallback: words from rule name only (filter stop words)
+            r.name.toLowerCase().split(/[-_\s]+/).forEach((w) => {
+              if (w.length > 2 && !KEYWORD_STOP_WORDS.has(w)) kwSet.add(w);
+            });
+          }
+          // Non-trivial path segments from endpoint
+          if (r.endpoint) {
+            r.endpoint.toLowerCase().split(/[/.\s:]+/)
+              .forEach((w) => { if (w.length > 2 && !/^(api|v\d)$/.test(w) && !KEYWORD_STOP_WORDS.has(w)) kwSet.add(w); });
+          }
+          return {
+            id: r.id,
+            description: r.name,
+            endpoints: r.endpoint ? [r.endpoint] : [],
+            keywords: [...kwSet],
+            scenarios: [],
+          };
+        });
+
+        // Match rules against the testEntries already built for endpoint coverage.
+        // This avoids a second glob expansion and is safe when there are no test files.
+        const bizCoverages = syntheticRules.map((rule) => {
+          const kwsLower = rule.keywords.map((k) => k.toLowerCase());
+          const matchedDescs: string[] = [];
+          const matchedFileSet = new Set<string>();
+          for (const { file, descriptions, isJavaLike, contentLower } of testEntries) {
+            const hitting = descriptions.filter((desc) =>
+              kwsLower.length > 0 && kwsLower.some((kw) => desc.includes(kw)),
+            );
+            if (hitting.length > 0) {
+              matchedDescs.push(...hitting);
+              matchedFileSet.add(file);
+            } else if (isJavaLike) {
+              // Java/Kotlin: test method names may not contain exception class names.
+              // Fall back to checking the file body for specific long keywords (≥8 chars).
+              const specificLongKws = kwsLower.filter((k) => k.length >= 8);
+              if (specificLongKws.length > 0 && specificLongKws.some((kw) => contentLower.includes(kw))) {
+                // Prefer tests that look like error/boundary tests; otherwise include all
+                const relevantDescs = descriptions.filter((d) =>
+                  /\b(4\d\d|error|fail|forbidden|unauthorized|invalid|exception|not.?found)\b/.test(d),
+                );
+                const descsToAdd = relevantDescs.length > 0 ? relevantDescs : descriptions;
+                matchedDescs.push(...descsToAdd);
+                matchedFileSet.add(file);
+              }
+            }
+          }
+          return {
+            rule,
+            covered: matchedDescs.length > 0,
+            testFiles: [...matchedFileSet],
+            matchedTests: matchedDescs,
+            scenarios: [],
+          };
+        });
+
+        const bizReport    = buildBusinessCoverageReport(bizCoverages);
+        const bizResult: CoverageResult = {
+          type: 'business',
+          totalItems: bizReport.total,
+          coveredItems: bizReport.covered,
+          coveragePercent: bizReport.percentage,
+          details: {
+            ...bizReport,
+            inferred_details: inferredRulesResult.rules.reduce((acc, r) => {
+              acc[r.id] = {
+                source_location: r.source_location,
+                condition: r.condition,
+                code_snippet: r.code_snippet,
+                type: r.type,
+                specificKeywords: r.specificKeywords,
+              };
+              return acc;
+            }, {} as Record<string, unknown>),
+          },
+        };
+        allCoverageResults.push(bizResult);
+        console.log(`  ${bizReport.covered}/${bizReport.total} inferred business rules have test coverage (${bizReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Business rules coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    // ── 4e. Integration flows coverage ──────────────────────────────────────
+    const integrationFlowsYaml = path.join(rootDir, 'integration-flows.yaml');
+    if (fsMod.existsSync(integrationFlowsYaml)) {
+      // Explicit YAML takes precedence
+      try {
+        console.log(`\nAnalyzing integration flows coverage...`);
+        const flows        = parseIntegrationFlows(integrationFlowsYaml);
+        const flowCoverages = await analyzeIntegrationCoverage(flows, testsGlob);
+        const flowReport   = buildIntegrationCoverageReport(flowCoverages);
+        const flowResult: CoverageResult = {
+          type: 'integration',
+          totalItems: flowReport.total,
+          coveredItems: flowReport.complete,
+          coveragePercent: flowReport.percentage,
+          details: flowReport,
+        };
+        allCoverageResults.push(flowResult);
+        console.log(`  ${flowReport.complete}/${flowReport.total} integration flows covered (${flowReport.percentage}%)`);
+      } catch (err) {
+        warnings.push(
+          `Integration flows coverage failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    } else if (inferredFlowsResult && inferredFlowsResult.flows.length > 0) {
+      // Auto-inferred: flows are extracted FROM tests, so by definition they're all covered
+      console.log(`\nIntegration flows coverage (from inferred flows)...`);
+      const syntheticItems = inferredFlowsResult.flows.map((f) => ({
+        id: f.id,
+        name: f.name,
+        total: f.steps.length,
+        covered: f.steps.length,
+        complete: true,
+        percentage: 100,
+        uncoveredSteps: [] as string[],
+      }));
+      const syntheticReport = {
+        total: syntheticItems.length,
+        complete: syntheticItems.length,
+        percentage: 100,
+        items: syntheticItems,
+      };
+      const flowResult: CoverageResult = {
+        type: 'integration',
+        totalItems: syntheticReport.total,
+        coveredItems: syntheticReport.complete,
+        coveragePercent: syntheticReport.percentage,
+        details: syntheticReport,
+      };
+      allCoverageResults.push(flowResult);
+      console.log(`  ${syntheticReport.complete}/${syntheticReport.total} multi-step flows detected and covered (100%)`);
+    }
+
+    if (allCoverageResults.length > 0) {
+      const observabilityInfo = buildObservabilityInfo(metricsPort);
+      generateMultiFormatReports(allCoverageResults, ['json'], reportsDir, {}, observabilityInfo);
+
+      // Append discoveryInfo to coverage-summary.json for the dashboard
+      const summaryPath = path.join(reportsDir, 'coverage-summary.json');
+      try {
+        const summaryJson = JSON.parse(fsMod.readFileSync(summaryPath, 'utf-8')) as Record<string, unknown>;
+        summaryJson.discoveryInfo = {
+          projectRoot: rootDir,
+          analyzedAt: new Date().toISOString(),
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          serviceFilesCount: artifacts.serviceFiles.length,
+          testFilesCount: artifacts.testFiles.length,
+          specFilesCount: artifacts.specs.length,
+          analysisMode: artifacts.specs.length > 0 ? 'explicit-spec' : 'inferred',
+        };
+        fsMod.writeFileSync(summaryPath, JSON.stringify(summaryJson, null, 2), 'utf-8');
+      } catch {
+        // Non-fatal — discovery info is also in scan-manifest.json
+      }
+
+      console.log(`\nReports written to: ${reportsDir}`);
+
+      // ── 4f-intel. Run coverage intelligence automatically ─────────────────
+      try {
+        const coverageResultsForIntel = allCoverageResults.map((r) => ({
+          type: r.type,
+          totalItems: r.totalItems,
+          coveredItems: r.coveredItems,
+          coveragePercent: r.coveragePercent,
+          details: normalizeDetailsForIntelligence(r.type, r.details),
+        }));
+        const intelReport = runIntelligenceEngine({
+          coverageResults: coverageResultsForIntel,
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          projectName: path.basename(rootDir),
+          outDir: reportsDir,
+        });
+        console.log(`\nCoverage Intelligence: ${intelReport.summary.totalFindings} findings, ` +
+          `${intelReport.summary.totalRecommendations} recommendations ` +
+          `(${intelReport.summary.criticalUncoveredItems} critical uncovered)`);
+        if (intelReport.summary.recommendationsByPriority.P0 > 0) {
+          console.log(`⚠️  P0 Recommendations: ${intelReport.summary.recommendationsByPriority.P0} — immediate action required`);
+        }
+      } catch (intelErr) {
+        warnings.push(`Coverage intelligence failed: ${intelErr instanceof Error ? intelErr.message : String(intelErr)}`);
+      }
+    }
+
+    // ── 4f. Write scan manifest ────────────────────────────────────────────
+    try {
+      const scanTypes: ScanTypeEntry[] = allCoverageResults.map((r) => ({
+        type: r.type,
+        source: artifacts.specs.length > 0 ? 'explicit' : 'inferred',
+        itemsFound: r.totalItems,
+        itemsCovered: r.coveredItems,
+        coveragePercent: r.coveragePercent,
+      }));
+      // Add skipped types (exclude 'business' and 'integration' since these are always attempted
+      // via rule/flow inference regardless of whether a spec file is present; their absence from
+      // allCoverageResults means no rules or flows were discovered, which is informative on its own.)
+      const coveredTypes = new Set(allCoverageResults.map((r) => r.type));
+      for (const skippedType of KNOWN_METRIC_TYPES.filter((t) => t !== 'business' && t !== 'integration')) {
+        if (!coveredTypes.has(skippedType as CoverageResult['type'])) {
+          scanTypes.push({
+            type: skippedType,
+            source: 'skipped',
+            reason: artifacts.specs.length === 0 ? 'No API spec and no routes detected' : 'No data available',
+            itemsFound: 0,
+            itemsCovered: 0,
+            coveragePercent: 0,
+          });
+        }
+      }
+      const manifestPath = writeScanManifest(
+        {
+          projectRoot: rootDir,
+          analyzedAt: new Date().toISOString(),
+          discoveredFiles: {
+            serviceFiles: artifacts.serviceFiles,
+            testFiles: artifacts.testFiles,
+            specFiles: artifacts.specs,
+          },
+          languages: artifacts.languages,
+          frameworks: artifacts.frameworks,
+          scanTypes,
+        },
+        reportsDir,
+      );
+      console.log(`Scan manifest written to: ${manifestPath}`);
+    } catch (err) {
+      warnings.push(`Scan manifest write failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    // ── 5. Emit warnings ───────────────────────────────────────────────────
+    for (const w of warnings) {
+      console.warn(`[WARN] ${w}`);
+    }
+
+    // ── 6. Configuration override log ──────────────────────────────────────
+    if (options['inferBusinessRules'] === false) {
+      console.log('\nConfiguration override detected: business rule inference disabled via CLI');
+    }
+    if (options['inferIntegrationFlows'] === false) {
+      console.log('\nConfiguration override detected: integration flow inference disabled via CLI');
+    }
+
+    logger.info(
+      { event: 'analyze_complete', warnings: warnings.length },
+      'Agnostic project analysis complete',
+    );
+
+    await finaliseObservability(allCoverageResults, {}, metricsPort, serviceName);
+
+    // ── 7. Optionally launch the dashboard ─────────────────────────────────
+    if (options['dashboard']) {
+      serveDashboard({
+        reportsDir: reportsDir,
+        port: (options['port'] as number | undefined) ?? 4000,
+        open: Boolean(options['open']),
+      });
+      // Keep the process alive — the HTTP server holds the event loop open
+    }
+  });
+
+// ─── serve command ────────────────────────────────────────────────────────────
+
+program
+  .command('serve')
+  .description(
+    'Start the coverage dashboard UI and serve reports from your reports directory.',
+  )
+  .option('--reports-dir <dir>', 'Directory containing report JSON files (default: reports/)')
+  .option('--port <port>', 'Port to listen on (default: 4000)', parseInt)
+  .option('--open', 'Open the dashboard in your browser automatically')
+  .action((options: Record<string, unknown>) => {
+    const configPath  = (program.opts()['config'] as string | undefined);
+    const analyzerCfg = loadCentralConfig(configPath);
+    const reportsDir  = (options['reportsDir'] as string | undefined) ??
+                        analyzerCfg.reports?.outputDir ?? 'reports';
+    const port        = (options['port'] as number | undefined) ?? 4000;
+
+    serveDashboard({
+      reportsDir,
+      port,
+      open: Boolean(options['open']),
+    });
+    // Keep the process alive while the server runs
   });
 
 // Parse the command-line arguments

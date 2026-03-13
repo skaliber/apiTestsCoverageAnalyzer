@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-03-10T09:42:19.760Z",
+  "flow_source": "inferred",
+  "files_analyzed": 12,
+  "flow_count": 7,
+  "flows": [
+    {
+      "id": "security_test_remaining_decrements_on_subsequent_requests",
+      "name": "Remaining decrements on subsequent requests",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/carriers"
+        },
+        {
+          "method": "GET",
+          "path": "/carriers"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js:139",
+      "test_name": "remaining decrements on subsequent requests"
+    },
+    {
+      "id": "orders_test_returns_paginated_results",
+      "name": "Returns paginated results",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/orders"
+        },
+        {
+          "method": "GET",
+          "path": "/orders?page=1&limit=2"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js:74",
+      "test_name": "returns paginated results"
+    },
+    {
+      "id": "orders_test_returns_order_by_id",
+      "name": "Returns order by id",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/orders"
+        },
+        {
+          "method": "GET",
+          "path": "/orders/${id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js:85",
+      "test_name": "returns order by id"
+    },
+    {
+      "id": "shipments_test_returns_created_shipments",
+      "name": "Returns created shipments",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/shipments"
+        },
+        {
+          "method": "POST",
+          "path": "/shipments"
+        },
+        {
+          "method": "GET",
+          "path": "/shipments"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js:98",
+      "test_name": "returns created shipments"
+    },
+    {
+      "id": "shipments_test_filters_by_status_query_param",
+      "name": "Filters by status query param",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/shipments"
+        },
+        {
+          "method": "GET",
+          "path": "/shipments?status=pending"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js:107",
+      "test_name": "filters by status query param"
+    },
+    {
+      "id": "shipments_test_returns_shipment_by_id",
+      "name": "Returns shipment by id",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/shipments"
+        },
+        {
+          "method": "GET",
+          "path": "/shipments/${id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js:116",
+      "test_name": "returns shipment by id"
+    },
+    {
+      "id": "shipments_test_updates_carrier_on_a_pending_shipment",
+      "name": "Updates carrier on a pending shipment",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "POST",
+          "path": "/shipments"
+        },
+        {
+          "method": "PUT",
+          "path": "/shipments/${id}"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js:132",
+      "test_name": "updates carrier on a pending shipment"
+    }
+  ]
+}

@@ -1,0 +1,1445 @@
+{
+  "generatedAt": "2026-03-11T15:43:32.132Z",
+  "projectName": "ruby-rails-complex",
+  "findings": [
+    {
+      "id": "ff-ep-1773243812131-1",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /users",
+      "description": "Endpoint GET /users has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/users"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-2",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /users",
+      "description": "Endpoint POST /users has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/users"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-3",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /users/{id}",
+      "description": "Endpoint GET /users/{id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/users/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-4",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: PUT /users/{id}",
+      "description": "Endpoint PUT /users/{id} has no test coverage.",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/users/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-5",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: DELETE /users/{id}",
+      "description": "Endpoint DELETE /users/{id} has no test coverage.",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/users/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-6",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /subscriptions",
+      "description": "Endpoint POST /subscriptions has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-7",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /subscriptions/{id}",
+      "description": "Endpoint GET /subscriptions/{id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-8",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: PUT /subscriptions/{id}",
+      "description": "Endpoint PUT /subscriptions/{id} has no test coverage.",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/subscriptions/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-9",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: DELETE /subscriptions/{id}",
+      "description": "Endpoint DELETE /subscriptions/{id} has no test coverage.",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/subscriptions/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-10",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /subscriptions/{id}/upgrade",
+      "description": "Endpoint GET /subscriptions/{id}/upgrade has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{id}/upgrade"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-11",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /subscriptions/{id}/cancel",
+      "description": "Endpoint POST /subscriptions/{id}/cancel has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions/{id}/cancel"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-12",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /invoices",
+      "description": "Endpoint GET /invoices has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/invoices"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-13",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /invoices/{id}",
+      "description": "Endpoint GET /invoices/{id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/invoices/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-14",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /invoices/{id}/pay",
+      "description": "Endpoint POST /invoices/{id}/pay has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/invoices/{id}/pay"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-15",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /usage/{subscription_id}",
+      "description": "Endpoint GET /usage/{subscription_id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/usage/{subscription_id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-16",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /usage/record",
+      "description": "Endpoint POST /usage/record has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/usage/record"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-17",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /subscriptions/{subscription_id}/seats",
+      "description": "Endpoint GET /subscriptions/{subscription_id}/seats has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{subscription_id}/seats"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-18",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /subscriptions/{subscription_id}/seats",
+      "description": "Endpoint POST /subscriptions/{subscription_id}/seats has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions/{subscription_id}/seats"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-19",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: DELETE /subscriptions/{subscription_id}/seats/{id}",
+      "description": "Endpoint DELETE /subscriptions/{subscription_id}/seats/{id} has no test coverage.",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/subscriptions/{subscription_id}/seats/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-20",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /plans",
+      "description": "Endpoint GET /plans has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/plans"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-21",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /plans/{id}",
+      "description": "Endpoint GET /plans/{id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/plans/{id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-22",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /coupons/validate",
+      "description": "Endpoint POST /coupons/validate has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/coupons/validate"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-23",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /audit-logs",
+      "description": "Endpoint GET /audit-logs has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/audit-logs"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-24",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /webhooks",
+      "description": "Endpoint POST /webhooks has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/webhooks"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-25",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /admin/health",
+      "description": "Endpoint GET /admin/health has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/admin/health"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243812131-26",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /admin/stats",
+      "description": "Endpoint GET /admin/stats has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/admin/stats"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-27",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: user-deletion-requires-admin",
+      "description": "Business rule \"user-deletion-requires-admin\" has no test coverage.",
+      "relatedRules": [
+        "user-deletion-requires-admin"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-28",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: active-subscription-required",
+      "description": "Business rule \"active-subscription-required\" has no test coverage.",
+      "relatedRules": [
+        "active-subscription-required"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-30",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: seat-limit-per-plan",
+      "description": "Business rule \"seat-limit-per-plan\" has no test coverage.",
+      "relatedRules": [
+        "seat-limit-per-plan"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-31",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: invoice-payment-window",
+      "description": "Business rule \"invoice-payment-window\" has no test coverage.",
+      "relatedRules": [
+        "invoice-payment-window"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-32",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: coupon-single-use",
+      "description": "Business rule \"coupon-single-use\" has no test coverage.",
+      "relatedRules": [
+        "coupon-single-use"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-33",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: subscription-cancellation-period",
+      "description": "Business rule \"subscription-cancellation-period\" has no test coverage.",
+      "relatedRules": [
+        "subscription-cancellation-period"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-35",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: usage-quota-enforcement",
+      "description": "Business rule \"usage-quota-enforcement\" has no test coverage.",
+      "relatedRules": [
+        "usage-quota-enforcement"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243812131-36",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: subscription-downgrade-seats",
+      "description": "Business rule \"subscription-downgrade-seats\" has no test coverage.",
+      "relatedRules": [
+        "subscription-downgrade-seats"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "rspec",
+        "minitest",
+        "rails-request-specs"
+      ],
+      "languageHints": [
+        "ruby"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-1773243812131-42",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /subscriptions",
+      "rationale": "Endpoint POST /subscriptions has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-6"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-43",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /subscriptions/{id}",
+      "rationale": "Endpoint GET /subscriptions/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-7"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-44",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /subscriptions/{id}",
+      "rationale": "Endpoint PUT /subscriptions/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/subscriptions/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-8"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-45",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: DELETE /subscriptions/{id}",
+      "rationale": "Endpoint DELETE /subscriptions/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/subscriptions/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-9"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-46",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /subscriptions/{id}/upgrade",
+      "rationale": "Endpoint GET /subscriptions/{id}/upgrade has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{id}/upgrade"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-10"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-47",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /subscriptions/{id}/cancel",
+      "rationale": "Endpoint POST /subscriptions/{id}/cancel has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions/{id}/cancel"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-11"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-48",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /invoices",
+      "rationale": "Endpoint GET /invoices has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/invoices"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-12"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-49",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /invoices/{id}",
+      "rationale": "Endpoint GET /invoices/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/invoices/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-13"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-50",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /invoices/{id}/pay",
+      "rationale": "Endpoint POST /invoices/{id}/pay has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/invoices/{id}/pay"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-14"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-51",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /usage/{subscription_id}",
+      "rationale": "Endpoint GET /usage/{subscription_id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/usage/{subscription_id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-15"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-52",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /usage/record",
+      "rationale": "Endpoint POST /usage/record has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/usage/record"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-16"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-53",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /subscriptions/{subscription_id}/seats",
+      "rationale": "Endpoint GET /subscriptions/{subscription_id}/seats has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/subscriptions/{subscription_id}/seats"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-17"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-54",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /subscriptions/{subscription_id}/seats",
+      "rationale": "Endpoint POST /subscriptions/{subscription_id}/seats has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/subscriptions/{subscription_id}/seats"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-18"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-55",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: DELETE /subscriptions/{subscription_id}/seats/{id}",
+      "rationale": "Endpoint DELETE /subscriptions/{subscription_id}/seats/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/subscriptions/{subscription_id}/seats/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-19"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-56",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /plans",
+      "rationale": "Endpoint GET /plans has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/plans"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-20"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-57",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /plans/{id}",
+      "rationale": "Endpoint GET /plans/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/plans/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-21"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-58",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /coupons/validate",
+      "rationale": "Endpoint POST /coupons/validate has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/coupons/validate"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-22"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-59",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /audit-logs",
+      "rationale": "Endpoint GET /audit-logs has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/audit-logs"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-23"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-60",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /webhooks",
+      "rationale": "Endpoint POST /webhooks has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/webhooks"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-24"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-63",
+      "priority": "P2",
+      "title": "Add business rule test for: Uncovered business rule: user-deletion-requires-admin",
+      "rationale": "Business rule \"user-deletion-requires-admin\" has no test coverage. RSpec request spec",
+      "recommendedTestType": "business-rule-test",
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-biz-1773243812131-27"
+      ],
+      "riskScore": 52,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1773243812131-37",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /users",
+      "rationale": "Endpoint GET /users has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/users"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-1"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-38",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: POST /users",
+      "rationale": "Endpoint POST /users has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/users"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-2"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-39",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /users/{id}",
+      "rationale": "Endpoint GET /users/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/users/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-3"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-40",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /users/{id}",
+      "rationale": "Endpoint PUT /users/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/users/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-4"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-41",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: DELETE /users/{id}",
+      "rationale": "Endpoint DELETE /users/{id} has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/users/{id}"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-5"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-61",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /admin/health",
+      "rationale": "Endpoint GET /admin/health has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/admin/health"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-25"
+      ],
+      "riskScore": 50,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243812131-62",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /admin/stats",
+      "rationale": "Endpoint GET /admin/stats has no test coverage. RSpec request spec",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/admin/stats"
+      },
+      "likelyFramework": "rspec",
+      "likelyLanguage": "ruby",
+      "linkedFindingIds": [
+        "ff-ep-1773243812131-26"
+      ],
+      "riskScore": 50,
+      "confidence": "high"
+    }
+  ],
+  "summary": {
+    "totalFindings": 34,
+    "findingsBySeverity": {
+      "LOW": 0,
+      "MEDIUM": 34,
+      "HIGH": 0,
+      "CRITICAL": 0
+    },
+    "totalRecommendations": 27,
+    "recommendationsByPriority": {
+      "P0": 0,
+      "P1": 0,
+      "P2": 27,
+      "P3": 0
+    },
+    "maxRiskScore": 54,
+    "avgRiskScore": 53,
+    "criticalUncoveredItems": 0,
+    "unprotectedSecurityFindings": 0,
+    "topRiskAreas": [
+      "POST /subscriptions (score 54)",
+      "GET /subscriptions/{id} (score 54)",
+      "PUT /subscriptions/{id} (score 54)",
+      "DELETE /subscriptions/{id} (score 54)",
+      "GET /subscriptions/{id}/upgrade (score 54)"
+    ]
+  }
+}

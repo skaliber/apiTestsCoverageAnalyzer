@@ -18,6 +18,36 @@ export interface ProjectConfig {
   name?: string;
 }
 
+export interface AstLanguageConfig {
+  /** When false, skip AST analysis for this language and use regex fallback */
+  enabled?: boolean;
+}
+
+export interface AstAnalysisConfig {
+  /** Master switch. When false, skip AST entirely and use regex fallback. Default: true. */
+  enabled?: boolean;
+  /**
+   * When true (default), if AST parsing succeeds but returns 0 HTTP interactions the
+   * engine runs the regex fallback and tags its results with resolutionType:'heuristic'
+   * and confidence:'low'. When false, 0 AST results are returned verbatim.
+   */
+  fallbackHeuristics?: boolean;
+  /** Maximum call-chain depth for wrapper/helper tracing. Default: 4. */
+  maxCallDepth?: number;
+  /** Include assertion type metadata in output. Default: true. */
+  assertionAware?: boolean;
+  /** Per-language enable/disable toggles */
+  languages?: {
+    java?: AstLanguageConfig;
+    kotlin?: AstLanguageConfig;
+    python?: AstLanguageConfig;
+    ruby?: AstLanguageConfig;
+    javascript?: AstLanguageConfig;
+    typescript?: AstLanguageConfig;
+    cucumber?: AstLanguageConfig;
+  };
+}
+
 export interface AnalysisConfig {
   /** 'full' runs all scans; 'custom' runs only explicitly-enabled scans */
   defaultMode?: 'full' | 'custom';
@@ -25,6 +55,24 @@ export interface AnalysisConfig {
   failOnConfigMissing?: boolean;
   /** If true, emits a warning when config.yaml is absent */
   warnOnConfigMissing?: boolean;
+  /** AST-based analysis configuration */
+  ast?: AstAnalysisConfig;
+  /**
+   * When true, the analyzer will automatically discover API specs, tests,
+   * contracts, performance results, and security reports without explicit config.
+   * Default: true.
+   */
+  agnosticDiscovery?: boolean;
+  /**
+   * When true, if business rule files are absent the analyzer infers rules
+   * from service-code validation / conditional logic. Default: true.
+   */
+  inferBusinessRules?: boolean;
+  /**
+   * When true, if integration flow files are absent the analyzer constructs
+   * flows from test call sequences and Cucumber scenarios. Default: true.
+   */
+  inferIntegrationFlows?: boolean;
 }
 
 export type CoverageType =

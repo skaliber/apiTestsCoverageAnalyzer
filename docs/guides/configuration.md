@@ -57,6 +57,47 @@ analysis:
 
 ---
 
+## analysis.ast
+
+AST-based multi-language analysis engine. Enabled by default for all supported languages.
+
+```yaml
+analysis:
+  ast:
+    enabled: true              # master switch; false → regex-only fallback for all languages
+    fallbackHeuristics: true   # run regex when AST returns 0 results (Tier 2 fallback)
+    maxCallDepth: 4            # max call-chain depth when tracing wrapper/helper functions
+    assertionAware: true       # link HTTP calls to downstream response assertions
+    languages:
+      javascript: { enabled: true }
+      typescript: { enabled: true }
+      java:       { enabled: true }
+      kotlin:     { enabled: true }
+      python:     { enabled: true }
+      ruby:       { enabled: true }
+      cucumber:   { enabled: true }
+```
+
+| Field | Default | Description |
+|---|---|---|
+| `enabled` | `true` | Master AST switch. `false` uses the existing regex pipeline |
+| `fallbackHeuristics` | `true` | Run regex when AST parse succeeds but returns 0 HTTP calls |
+| `maxCallDepth` | `4` | Depth limit for tracing wrapper methods / helper functions |
+| `assertionAware` | `true` | Associate HTTP calls with downstream `expect`/`assert` calls |
+| `languages.<lang>.enabled` | `true` | Disable a specific language; others continue using AST |
+
+**Three-tier fallback cascade:**
+
+1. **Tier 1** — AST parse succeeds → `confidence: high` or `medium`
+2. **Tier 2** — AST succeeds but 0 results + `fallbackHeuristics: true` → regex, `confidence: low`
+3. **Tier 3** — AST disabled or parse error → existing `deepResolveFile()` pipeline
+
+**Tree-sitter native bindings** (`tree-sitter-java`, `-python`, `-ruby`, `-kotlin`) are loaded
+lazily inside `try/catch`. If native compilation failed in your environment the analyzer falls
+back to regex transparently — no configuration change required.
+
+---
+
 ## scans.coverage
 
 ```yaml

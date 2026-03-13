@@ -16,3 +16,18 @@ cypress/downloads/
 # Generated example output
 examples/typescript/coverage/
 examples/typescript/reports/
+examples/java-spring-complex/reports/ai-summary.json
+examples/java-spring-complex/reports/ai-summary.md
+examples/java-spring-complex/reports/build-summary.md
+examples/java-spring-complex/reports/coverage-intelligence.json
+examples/java-spring-complex/reports/coverage-intelligence.md
+examples/java-spring-complex/reports/missing-tests-recommendations.json
+examples/java-spring-complex/reports/missing-tests-recommendations.md
+examples/java-spring-complex/reports/pr-summary.md
+examples/java-spring-complex/reports/risk-prioritization.json
+examples/java-spring-complex/reports/risk-prioritization.md
+examples/java-spring-complex/reports/summary.json
+
+# Dashboard public report overrides (test-only, not to be committed)
+dashboard/public/coverage-summary.json
+dashboard/public/reports/

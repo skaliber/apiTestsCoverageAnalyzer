@@ -3,6 +3,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import fg from 'fast-glob';
 import { OpenAPIV3 } from 'openapi-types';
+import type { AstAnalysisConfig, DeepAnalysisCoverageConfig } from './config/types';
+import {
+  analyzeFile as astAnalyzeFile,
+  buildAnalysisContext,
+  registerAllAnalyzers,
+} from './ast/astAnalysisOrchestrator';
+import type { ResolvedHttpInteraction, SupportedLanguage } from './ast/astTypes';
 
 // ─── Data structures ─────────────────────────────────────────────────────────
 
@@ -36,6 +43,25 @@ export interface ParameterCoverage {
   invalidValue: boolean;
   /** Fraction of the four categories that are covered (0–1). */
   ratio: number;
+  /**
+   * AST metadata when at least one coverage category was informed by semantic
+   * analysis rather than text scanning alone.
+   */
+  astMetadata?: {
+    sourceLanguage?: string;
+    resolutionType?: string;
+    confidence?: string;
+  };
+}
+
+/**
+ * Options to enable AST-augmented parameter coverage analysis.
+ * When provided, the AST layer supplements text-scan detection with
+ * semantic parameter scenario signals from language analyzers.
+ */
+export interface AstParameterAnalysisOptions {
+  astConfig: AstAnalysisConfig;
+  deepConfig?: DeepAnalysisCoverageConfig;
 }
 
 export interface ParameterCoverageReport {
@@ -140,6 +166,181 @@ export async function parseParameters(specPath: string): Promise<ParameterInfo[]
   }
 
   return params;
+}
+
+// ─── AST augmentation ─────────────────────────────────────────────────────────
+
+/**
+ * Infer coverage category flags from a `parameterScenarios` string array (as
+ * populated by language analyzers) or from the interaction's semantic context.
+ */
+function scenariosToFlags(
+  scenarios: string[],
+): { validValue: boolean; boundaryValue: boolean; missing: boolean; invalidValue: boolean } {
+  const s = scenarios.map((x) => x.toLowerCase());
+  return {
+    validValue:
+      s.includes('valid') ||
+      s.includes('happy-path') ||
+      s.includes('success') ||
+      s.includes('positive'),
+    boundaryValue:
+      s.includes('boundary') ||
+      s.includes('min') ||
+      s.includes('max') ||
+      s.includes('edge') ||
+      s.includes('zero') ||
+      s.includes('empty') ||
+      s.includes('oversized'),
+    missing:
+      s.includes('missing') ||
+      s.includes('missing-required') ||
+      s.includes('absent') ||
+      s.includes('omitted'),
+    invalidValue:
+      s.includes('invalid') ||
+      s.includes('invalid-value') ||
+      s.includes('bad-value') ||
+      s.includes('wrong-type') ||
+      s.includes('malformed') ||
+      s.includes('null') ||
+      s.includes('invalid-enum'),
+  };
+}
+
+/**
+ * Detect the language of a file from its extension for AST analysis.
+ */
+function detectLanguage(filePath: string): SupportedLanguage {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.ts':
+    case '.tsx':
+      return 'typescript';
+    case '.js':
+    case '.jsx':
+      return 'javascript';
+    case '.java':
+      return 'java';
+    case '.kt':
+    case '.kts':
+      return 'kotlin';
+    case '.py':
+      return 'python';
+    case '.rb':
+      return 'ruby';
+    case '.feature':
+      return 'cucumber';
+    default:
+      return 'auto';
+  }
+}
+
+/**
+ * Normalize an endpoint path (possibly with {param} placeholders) so that it
+ * can be compared against an OpenAPI path template.
+ * e.g. '/users/123' → '/users/{id}' won't match — but '/users/{id}' → '/users/{id}' will.
+ * We strip the query string and trailing slash for a loose match.
+ */
+function normalizePath(p: string): string {
+  return p.split('?')[0].replace(/\/$/, '').toLowerCase();
+}
+
+/**
+ * Return true when the interaction's resolved path loosely matches the
+ * OpenAPI path template (e.g. /users/{id} ≈ /users/).
+ */
+function pathMatches(interaction: ResolvedHttpInteraction, apiPath: string): boolean {
+  const iPath = normalizePath(interaction.normalizedPath ?? interaction.path);
+  const aPath = normalizePath(apiPath);
+  // Exact match
+  if (iPath === aPath) return true;
+  // OpenAPI template prefix match: /users/{id} starts with /users
+  const templateBase = aPath.split('{')[0].replace(/\/$/, '');
+  if (templateBase && iPath.startsWith(templateBase)) return true;
+  return false;
+}
+
+type AstInteractionMap = Map<string, ResolvedHttpInteraction[]>;
+
+/**
+ * Run AST analysis over all files matching `testGlob` and build a map of
+ * endpoint path → interactions for quick lookup during parameter coverage.
+ */
+function buildAstInteractionMap(
+  testFiles: string[],
+  astOptions: AstParameterAnalysisOptions,
+): AstInteractionMap {
+  registerAllAnalyzers();
+  const context = buildAnalysisContext(astOptions.astConfig, astOptions.deepConfig);
+  const map: AstInteractionMap = new Map();
+
+  for (const filePath of testFiles) {
+    let content: string;
+    try {
+      content = fs.readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+    const lang = detectLanguage(filePath);
+    const interactions = astAnalyzeFile(content, filePath, lang, context);
+    for (const interaction of interactions) {
+      const key = normalizePath(interaction.normalizedPath ?? interaction.path);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(interaction);
+    }
+  }
+
+  return map;
+}
+
+/**
+ * Given all AST interactions that match a parameter's endpoint path, compute
+ * AST-derived coverage flags and metadata.
+ */
+function deriveAstCoverage(
+  matchingInteractions: ResolvedHttpInteraction[],
+): {
+  validValue: boolean;
+  boundaryValue: boolean;
+  missing: boolean;
+  invalidValue: boolean;
+  astMetadata?: ParameterCoverage['astMetadata'];
+} {
+  let validValue = false;
+  let boundaryValue = false;
+  let missing = false;
+  let invalidValue = false;
+  let bestInteraction: ResolvedHttpInteraction | undefined;
+
+  for (const interaction of matchingInteractions) {
+    // Use parameterScenarios if populated
+    if (interaction.parameterScenarios && interaction.parameterScenarios.length > 0) {
+      const flags = scenariosToFlags(interaction.parameterScenarios);
+      validValue = validValue || flags.validValue;
+      boundaryValue = boundaryValue || flags.boundaryValue;
+      missing = missing || flags.missing;
+      invalidValue = invalidValue || flags.invalidValue;
+    }
+    // Pick the highest-confidence interaction for metadata
+    if (
+      !bestInteraction ||
+      (interaction.confidence === 'high' && bestInteraction.confidence !== 'high') ||
+      (interaction.confidence === 'medium' && bestInteraction.confidence === 'low')
+    ) {
+      bestInteraction = interaction;
+    }
+  }
+
+  const astMetadata: ParameterCoverage['astMetadata'] = bestInteraction
+    ? {
+        sourceLanguage: bestInteraction.sourceLanguage,
+        resolutionType: bestInteraction.resolutionType,
+        confidence: bestInteraction.confidence,
+      }
+    : undefined;
+
+  return { validValue, boundaryValue, missing, invalidValue, astMetadata };
 }
 
 // ─── Coverage detection ───────────────────────────────────────────────────────
@@ -344,11 +545,13 @@ function classifySegment(
 
 /**
  * For each parameter, scan test files and determine which coverage
- * categories are satisfied.
+ * categories are satisfied. Optionally augments text-scan results with
+ * AST-derived semantic signals when `astOptions` is provided.
  */
 export async function analyzeParameterCoverage(
   params: ParameterInfo[],
   testGlob: string,
+  astOptions?: AstParameterAnalysisOptions,
 ): Promise<ParameterCoverage[]> {
   const testFiles = await fg(testGlob, { onlyFiles: true });
 
@@ -359,7 +562,13 @@ export async function analyzeParameterCoverage(
     allSegments.push(...extractTestSegments(contents));
   }
 
+  // Build AST interaction map if AST options provided
+  const astMap: AstInteractionMap | null = astOptions
+    ? buildAstInteractionMap(testFiles, astOptions)
+    : null;
+
   return params.map((param) => {
+    // ── Text-scan pass ──────────────────────────────────────────────────────
     let validValue = false;
     let boundaryValue = false;
     let missing = false;
@@ -373,10 +582,38 @@ export async function analyzeParameterCoverage(
       invalidValue = invalidValue || result.invalidValue;
     }
 
+    // ── AST augmentation pass ───────────────────────────────────────────────
+    let astMetadata: ParameterCoverage['astMetadata'] | undefined;
+
+    if (astMap !== null) {
+      // Collect all interactions that match this parameter's endpoint path
+      const matchingInteractions: ResolvedHttpInteraction[] = [];
+      for (const [, interactions] of astMap) {
+        for (const interaction of interactions) {
+          if (
+            pathMatches(interaction, param.path) &&
+            interaction.method.toUpperCase() === param.method.toUpperCase()
+          ) {
+            matchingInteractions.push(interaction);
+          }
+        }
+      }
+
+      if (matchingInteractions.length > 0) {
+        const astResult = deriveAstCoverage(matchingInteractions);
+        // Merge: OR semantics — AST supplements but never removes text-scan coverage
+        validValue = validValue || astResult.validValue;
+        boundaryValue = boundaryValue || astResult.boundaryValue;
+        missing = missing || astResult.missing;
+        invalidValue = invalidValue || astResult.invalidValue;
+        astMetadata = astResult.astMetadata;
+      }
+    }
+
     const categoriesCovered = [validValue, boundaryValue, missing, invalidValue].filter(Boolean).length;
     const ratio = categoriesCovered / 4;
 
-    return { parameter: param, validValue, boundaryValue, missing, invalidValue, ratio };
+    return { parameter: param, validValue, boundaryValue, missing, invalidValue, ratio, astMetadata };
   });
 }
 

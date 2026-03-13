@@ -5,7 +5,9 @@ import { useIntelligence } from '../context/IntelligenceContext';
 import CoveragePieChart from '../components/CoveragePieChart';
 import AiSummaryPanel from '../components/AiSummaryPanel';
 import IntelligenceSection from '../components/IntelligenceSection';
-import type { DetailItem } from '../types';
+import EvidencePanel from '../components/EvidencePanel';
+import ConfidenceBadge from '../components/ConfidenceBadge';
+import type { DetailItem, InferredRuleDetail, RichDetailItem } from '../types';
 import { generateBusinessRulesSummary } from '../utils/markdownSummaries';
 
 export default function BusinessRulesPage() {
@@ -61,8 +63,10 @@ export default function BusinessRulesPage() {
                   className="w-full flex items-center justify-between px-4 py-3 text-left"
                   onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                 >
-                  <span className="font-medium text-gray-800 dark:text-gray-100 text-sm">
-                    {item.covered ? '✅' : '❌'} {item.id}
+                  <span className="font-medium text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
+                    {item.covered ? '✅' : '❌'}
+                    <ConfidenceBadge confidence={(item as RichDetailItem).evidence?.confidence} />
+                    {item.id}
                   </span>
                   <span className="text-gray-400 dark:text-gray-500 text-xs">
                     {expandedId === item.id ? '▲' : '▼'}
@@ -84,6 +88,72 @@ export default function BusinessRulesPage() {
                         {item.tests.join(', ')}
                       </p>
                     )}
+                    {(() => {
+                      const inferred = section['inferred_details'] as
+                        | Record<string, InferredRuleDetail>
+                        | undefined;
+                      const detail = inferred?.[item.id];
+                      if (!detail) return null;
+                      return (
+                        <div className="mt-2 space-y-1">
+                          {detail.type && (
+                            <p>
+                              <span className="font-medium">Rule type: </span>
+                              <span className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1 rounded">
+                                {detail.type}
+                              </span>
+                            </p>
+                          )}
+                          {detail.source_location && (
+                            <p>
+                              <span className="font-medium">Source: </span>
+                              <span className="font-mono text-xs break-all">{detail.source_location}</span>
+                            </p>
+                          )}
+                          {detail.condition && (
+                            <p>
+                              <span className="font-medium">Condition: </span>
+                              <code className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1 rounded break-all">
+                                {detail.condition}
+                              </code>
+                            </p>
+                          )}
+                          {detail.code_snippet && (
+                            <div>
+                              <span className="font-medium">Code snippet:</span>
+                              <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-700 p-2 rounded overflow-x-auto whitespace-pre-wrap break-all">
+                                {detail.code_snippet}
+                              </pre>
+                            </div>
+                          )}
+                          {!item.covered && (
+                            <div className="text-amber-600 dark:text-amber-400 text-xs mt-2">
+                              <p className="font-medium">⚠ Gap: No tests covering this rule were found.</p>
+                              {detail.specificKeywords && detail.specificKeywords.length > 0 && (
+                                <p className="mt-1">
+                                  To cover this rule, add a test whose name contains:{' '}
+                                  <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">
+                                    {detail.specificKeywords.join(', ')}
+                                  </code>
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                    {(() => {
+                      const rich = item as RichDetailItem;
+                      if (!rich.evidence && !rich.description && !rich.category) return null;
+                      return (
+                        <EvidencePanel
+                          evidence={rich.evidence}
+                          testFiles={item.tests}
+                          description={rich.description}
+                          category={rich.category}
+                        />
+                      );
+                    })()}
                   </div>
                 )}
               </div>

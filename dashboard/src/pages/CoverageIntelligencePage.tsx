@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import AiSummaryPanel from '../components/AiSummaryPanel';
+import ConfidenceBadge from '../components/ConfidenceBadge';
+import type { ConfidenceLevel } from '../types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -104,32 +106,46 @@ function SummaryCard({ label, value, color }: { label: string; value: number | s
 function FindingRow({ finding }: { finding: FunctionalFinding }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <tr
-      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer"
-      onClick={() => setExpanded(!expanded)}
-    >
-      <td className="px-4 py-2">
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${severityColor(finding.severity)}`}>
-          {finding.severity}
-        </span>
-      </td>
-      <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{finding.title}</td>
-      <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">{finding.category}</td>
-      <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
-        {finding.endpoint ? `${finding.endpoint.method ?? ''} ${finding.endpoint.path ?? ''}`.trim() : '—'}
-      </td>
-      {expanded && (
-        <td colSpan={4} className="px-4 py-2 bg-gray-50 dark:bg-gray-750 text-sm text-gray-700 dark:text-gray-300">
-          {finding.description}
-          {finding.missingTestTypes?.length ? (
-            <div className="mt-1">
-              <span className="font-medium">Missing tests: </span>
-              {finding.missingTestTypes.join(', ')}
-            </div>
-          ) : null}
+    <>
+      <tr
+        className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <td className="px-4 py-2">
+          <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${severityColor(finding.severity)}`}>
+            {finding.severity}
+          </span>
         </td>
+        <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{finding.title}</td>
+        <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">{finding.category}</td>
+        <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
+          {finding.endpoint ? `${finding.endpoint.method ?? ''} ${finding.endpoint.path ?? ''}`.trim() : '—'}
+        </td>
+      </tr>
+      {expanded && (
+        <tr className="bg-gray-50 dark:bg-gray-800/50">
+          <td colSpan={4} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+            <p>{finding.description}</p>
+            {finding.missingTestTypes?.length ? (
+              <div className="mt-2">
+                <span className="font-medium text-xs uppercase text-gray-500">Missing test types: </span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {finding.missingTestTypes.map(t => (
+                    <span key={t} className="px-1.5 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-xs">{t}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {finding.frameworkHints?.length ? (
+              <div className="mt-2">
+                <span className="font-medium text-xs uppercase text-gray-500">Framework hints: </span>
+                <span className="text-xs">{finding.frameworkHints.join(', ')}</span>
+              </div>
+            ) : null}
+          </td>
+        </tr>
       )}
-    </tr>
+    </>
   );
 }
 
@@ -156,6 +172,7 @@ function RecommendationCard({
             <span className={`font-semibold ${riskBandColor(rec.riskScore)}`}>
               Risk: {rec.riskScore} ({riskBand(rec.riskScore)})
             </span>
+            <ConfidenceBadge confidence={rec.confidence as ConfidenceLevel} />
             {rec.endpoint?.path && (
               <span className="font-mono bg-gray-100 dark:bg-gray-700 px-1 rounded">
                 {rec.endpoint.method ?? ''} {rec.endpoint.path}
@@ -342,6 +359,31 @@ export default function CoverageIntelligencePage() {
       {aiSummaryMarkdown && (
         <AiSummaryPanel markdown={aiSummaryMarkdown} />
       )}
+
+      {/* False Confidence Warnings */}
+      {(() => {
+        const warnings: string[] = [];
+        // Check for sections with 100% coverage but few items
+        // We don't have per-section data here, but we can derive from findings
+        if (summary.totalFindings > 0 && summary.avgRiskScore >= 40) {
+          warnings.push('Coverage appears adequate, but the average risk score suggests meaningful gaps remain.');
+        }
+        if (summary.criticalUncoveredItems > 0) {
+          warnings.push(`${summary.criticalUncoveredItems} critical item(s) lack test coverage despite threshold passing.`);
+        }
+        if (summary.unprotectedSecurityFindings > 0) {
+          warnings.push(`${summary.unprotectedSecurityFindings} security finding(s) have no matching test protection.`);
+        }
+        if (warnings.length === 0) return null;
+        return (
+          <div className="p-4 rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 space-y-2">
+            <h2 className="text-sm font-semibold text-amber-800 dark:text-amber-300">False Confidence Warnings</h2>
+            <ul className="list-disc list-inside text-sm text-amber-700 dark:text-amber-400 space-y-1">
+              {warnings.map((w, i) => <li key={i}>{w}</li>)}
+            </ul>
+          </div>
+        );
+      })()}
 
       {/* Missing Test Recommendations */}
       <section>

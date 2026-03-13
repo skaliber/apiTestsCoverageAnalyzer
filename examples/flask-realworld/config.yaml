@@ -1,0 +1,17 @@
+version: 1
+project:
+  name: flask-realworld
+  language: python
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./tests
+  language: python
+
+thresholds:
+  endpoint: 80
+  parameter: 60
+
+reports:
+  outputDir: ./reports
+  formats: [json]

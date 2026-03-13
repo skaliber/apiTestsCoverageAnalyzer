@@ -265,8 +265,93 @@ When('I send a GET request to {word}') do |path|
 end
 ```
 
+## AST-based analysis engine
+
+The analyzer uses a **true multi-language AST engine** powered by language-specific parsers, not just regex scanning.
+
+### How it works
+
+Analysis happens through a **three-tier fallback**:
+
+| Tier | Condition | Output |
+|------|-----------|--------|
+| **1 — AST** | Parse succeeds, ≥1 HTTP interactions found | Returned verbatim; `confidence: high` or `medium` |
+| **2 — Heuristic** | Parse succeeds but 0 interactions AND `fallbackHeuristics: true` | Regex fallback, all tagged `resolutionType: heuristic`, `confidence: low` |
+| **3 — Regex** | AST disabled or parse error | Existing regex pipeline; confidence unchanged |
+
+### Resolution types
+
+Every detected HTTP call carries a `resolutionType` that explains how the URL was found:
+
+| Type | Confidence | Description |
+|------|-----------|-------------|
+| `direct` | high | String literal URL: `axios.get('/users')` |
+| `constant` | high/medium | Named constant: `const PATH = '/users'; get(PATH)` |
+| `enum` | high/medium | Enum member resolved to URL |
+| `string-template` | medium | Template literal / f-string: `` `${BASE}/users` `` |
+| `wrapper-method` | medium | Call traced through a helper function |
+| `request-builder` | medium | Builder pattern: `WebClient.get().uri(...)` |
+| `client-mapping` | high | Explicit client ↔ endpoint mapping |
+| `cucumber-step` | medium | HTTP call inside a Gherkin step definition |
+| `heuristic` | low | Regex fallback (Tier 2) |
+
+### Language capabilities
+
+| Language | Parser | Symbol Res. | Call Graph | Enum Res. | Template | Assertion Link |
+|----------|--------|------------|-----------|-----------|----------|-----|
+| TypeScript | `@typescript-eslint/typescript-estree` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| JavaScript | `@typescript-eslint/typescript-estree` | ✓ | ✓ | — | ✓ | ✓ |
+| Java | `tree-sitter-java` | ✓ | ✓ | ✓ | — | ✓ |
+| Kotlin | `tree-sitter-kotlin` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Python | `tree-sitter-python` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Ruby | `tree-sitter-ruby` | ✓ | ✓ | — | ✓ | ✓ |
+| Cucumber | regex | — | — | — | — | — |
+
+### Configuring AST analysis
+
+```yaml
+analysis:
+  ast:
+    enabled: true              # master switch
+    fallbackHeuristics: true   # run regex when AST finds 0 calls (keeps detection high)
+    maxCallDepth: 4            # how deep to follow wrapper/helper methods
+    assertionAware: true       # link HTTP calls to response assertions
+    languages:
+      java:       { enabled: true }
+      kotlin:     { enabled: true }
+      python:     { enabled: true }
+      ruby:       { enabled: true }
+      javascript: { enabled: true }
+      typescript: { enabled: true }
+      cucumber:   { enabled: true }
+```
+
+### AST metadata in coverage results
+
+When AST analysis contributes to parameter, error, or security coverage detection, the result
+includes an `astMetadata` field:
+
+```json
+{
+  "parameter": { "name": "userId", "path": "/users/{id}", "method": "GET" },
+  "validValue": true,
+  "boundaryValue": false,
+  "missing": true,
+  "invalidValue": true,
+  "ratio": 0.75,
+  "astMetadata": {
+    "sourceLanguage": "typescript",
+    "resolutionType": "direct",
+    "confidence": "high"
+  }
+}
+```
+
+This metadata tells you which language and how the coverage signal was detected.
+
 ## Next steps
 
 - [CLI Reference: --language option →](../reference/cli.md#supported-languages)
 - [Extending via Plugins →](./plugins.md)
 - [Writing Effective Tests →](./writing-tests.md)
+- [AST Engine Architecture →](../architecture/ast-engine.md)

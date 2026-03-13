@@ -1,0 +1,47 @@
+# When .npmignore exists, npm ignores .gitignore entirely for package publishing.
+# The files field in package.json already whitelists what ships; this file exists only
+# to prevent .gitignore from accidentally excluding dashboard/dist/ (which is the
+# pre-built static dashboard included in the package for `api-tests-coverage serve`).
+
+# Dev & test artifacts
+tests/
+specs/
+examples/
+sample/
+scripts/
+cypress/
+src/
+dist/tests/
+
+# Config / build files
+tsconfig.json
+jest.config.js
+cypress.config.js
+cypress.dashboard.config.js
+Makefile
+.eslintrc*
+.prettierrc*
+
+# Self-analysis files (only relevant inside this repo)
+*.self-analysis.yaml
+*.self-analysis.json
+openapi.self-analysis.yaml
+business-rules.self-analysis.yaml
+integration-flows.self-analysis.yaml
+load-results.self-analysis.json
+coverage.self-analysis.json
+coverage.config.json
+TODO.self-analysis.md
+
+# Runtime outputs (not part of the installed package)
+reports/
+alerts/
+
+# dashboard source — only the built output ships
+dashboard/src/
+dashboard/node_modules/
+dashboard/public/
+dashboard/cypress/
+dashboard/*.config.*
+dashboard/tsconfig*.json
+dashboard/package*.json

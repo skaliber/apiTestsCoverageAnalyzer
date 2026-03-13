@@ -1,0 +1,108 @@
+{
+  "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex",
+  "analyzedAt": "2026-03-11T15:51:53.610Z",
+  "discoveredFiles": {
+    "serviceFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/runners/CucumberRunner.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/AccountSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/AdminSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/AuthSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/LoanSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/TransactionSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/steps/TransferSteps.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/support/ApiClient.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/support/BankingApiHelper.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/support/Hooks.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/support/PathConstants.java",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/java/com/example/banking/support/TestContext.java"
+    ],
+    "testFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/account_management.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/admin_operations.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/error_scenarios.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/loans.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/security_scenarios.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/transactions.feature",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/src/test/resources/features/transfers.feature"
+    ],
+    "specFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex/openapi.yaml"
+    ]
+  },
+  "languages": [
+    "java",
+    "kotlin"
+  ],
+  "frameworks": [
+    "cucumber"
+  ],
+  "scanTypes": [
+    {
+      "type": "endpoint",
+      "source": "explicit",
+      "itemsFound": 26,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "parameter",
+      "source": "explicit",
+      "itemsFound": 57,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "source": "explicit",
+      "itemsFound": 53,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "source": "explicit",
+      "itemsFound": 8,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "source": "explicit",
+      "itemsFound": 5,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "security",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "performance",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "resilience",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "compatibility",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    }
+  ]
+}

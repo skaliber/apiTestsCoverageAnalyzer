@@ -5,7 +5,7 @@
  *   - Sidebar navigation to every page
  *   - Overview: summary table, quality gate banner, bar chart, header info
  *   - Detail pages (Endpoints, Parameters, Security, Error Handling, Performance):
- *       table rendering, search/filter, pie chart
+ *       card/accordion rendering, search/filter, pie chart
  *   - Business Rules: accordion expand / collapse, search
  *   - Integration Flows: flow cards with step counts, search, pie chart
  *   - Coverage Intelligence: placeholder / no-report state
@@ -116,10 +116,10 @@ describe('Endpoints page', () => {
     cy.get('input[type="text"]').should('exist')
   })
 
-  it('renders endpoint rows in the table', () => {
-    cy.get('table', { timeout: 10000 }).should('exist')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
-    cy.contains('GET /api/users').should('exist')
+  it('renders endpoint cards', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 }).should('exist')
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
+    cy.contains('/wallets').should('exist')
   })
 
   it('shows the pie chart', () => {
@@ -127,19 +127,18 @@ describe('Endpoints page', () => {
   })
 
   it('filters endpoints by search term', () => {
-    cy.get('table', { timeout: 10000 })
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('products')
-    cy.get('table tbody tr').each(($row) => {
-      cy.wrap($row).contains(/products/i)
+    cy.get('.flex.flex-col.gap-2 > div').each(($card) => {
+      cy.wrap($card).contains(/products/i)
     })
   })
 
-  it('shows no rows when search matches nothing', () => {
-    cy.get('table', { timeout: 10000 })
+  it('shows no cards when search matches nothing', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('zzz-nonexistent-zzz')
-    // The table renders a single placeholder row with "No results found." text
-    cy.contains('No results found.').should('be.visible')
-    cy.get('table tbody tr').should('have.length', 1)
+    // Card list container should have no item cards
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length', 0)
   })
 })
 
@@ -152,9 +151,9 @@ describe('Parameters page', () => {
     cy.get('h1').should('contain', 'Parameters')
   })
 
-  it('renders parameter rows in the table', () => {
-    cy.get('table', { timeout: 10000 }).should('exist')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+  it('renders parameter cards', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 }).should('exist')
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
   })
 
   it('shows the pie chart', () => {
@@ -162,9 +161,9 @@ describe('Parameters page', () => {
   })
 
   it('filters parameters by search term', () => {
-    cy.get('table', { timeout: 10000 })
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('page')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains(/page/i).should('exist')
   })
 })
@@ -178,9 +177,9 @@ describe('Security page', () => {
     cy.get('h1').should('contain', 'Security')
   })
 
-  it('renders security check rows in the table', () => {
-    cy.get('table', { timeout: 10000 }).should('exist')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+  it('renders security check cards', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 }).should('exist')
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains('JWT').should('exist')
   })
 
@@ -189,9 +188,9 @@ describe('Security page', () => {
   })
 
   it('filters security items by search term', () => {
-    cy.get('table', { timeout: 10000 })
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('JWT')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains(/JWT/i).should('exist')
   })
 })
@@ -205,9 +204,9 @@ describe('Error Handling page', () => {
     cy.get('h1').should('contain', 'Error Handling')
   })
 
-  it('renders error scenario rows in the table', () => {
-    cy.get('table', { timeout: 10000 }).should('exist')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+  it('renders error scenario cards', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 }).should('exist')
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains('400').should('exist')
   })
 
@@ -216,9 +215,9 @@ describe('Error Handling page', () => {
   })
 
   it('filters error scenarios by search term', () => {
-    cy.get('table', { timeout: 10000 })
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('401')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains(/401/i).should('exist')
   })
 })
@@ -232,9 +231,9 @@ describe('Performance & Resilience page', () => {
     cy.get('h1').should('contain', 'Performance & Resilience')
   })
 
-  it('renders performance and resilience rows in the table', () => {
-    cy.get('table', { timeout: 10000 }).should('exist')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+  it('renders performance and resilience cards', () => {
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 }).should('exist')
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     // Merged section shows both performance and resilience items
     cy.contains(/response|Retry/i).should('exist')
   })
@@ -244,9 +243,9 @@ describe('Performance & Resilience page', () => {
   })
 
   it('filters items by search term', () => {
-    cy.get('table', { timeout: 10000 })
+    cy.get('.flex.flex-col.gap-2', { timeout: 10000 })
     cy.get('input[type="text"]').type('200ms')
-    cy.get('table tbody tr').should('have.length.greaterThan', 0)
+    cy.get('.flex.flex-col.gap-2 > div').should('have.length.greaterThan', 0)
     cy.contains(/200ms/i).should('exist')
   })
 })

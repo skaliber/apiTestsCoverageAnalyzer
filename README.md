@@ -36,6 +36,7 @@ It identifies **functional findings**, links them to **missing test recommendati
 - [GitHub Action](#github-action)
 - [Commands overview](#commands-overview)
 - [Configuration](#configuration)
+- [AST Analysis](#ast-analysis)
 - [UI Dashboard](#ui-dashboard)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
@@ -333,6 +334,19 @@ project:
 
 analysis:
   defaultMode: full
+  ast:
+    enabled: true              # master switch for AST analysis
+    fallbackHeuristics: true   # run regex when AST returns 0 results
+    maxCallDepth: 4            # wrapper/helper tracing depth
+    assertionAware: true       # link HTTP calls to response assertions
+    languages:                 # per-language enable/disable toggles
+      javascript: { enabled: true }
+      typescript: { enabled: true }
+      java:       { enabled: true }
+      kotlin:     { enabled: true }
+      python:     { enabled: true }
+      ruby:       { enabled: true }
+      cucumber:   { enabled: true }
 
 scans:
   coverage:
@@ -390,6 +404,62 @@ If you are migrating from `coverage.config.json`, see
 
 CLI threshold flags (`--threshold-endpoint`, etc.) still work but are deprecated. Migrate
 values to the `thresholds` block in `config.yaml`.
+
+## AST Analysis
+
+The analyzer uses a **true multi-language AST-based engine** to detect HTTP calls with far
+higher accuracy than regex scanning.  Analysis happens through a three-tier fallback cascade:
+
+| Tier | Condition | Result |
+|------|-----------|--------|
+| 1 | AST parse succeeds | `confidence: high` or `medium` |
+| 2 | AST yields 0 results + `fallbackHeuristics: true` | regex run, `confidence: low` |
+| 3 | AST disabled or parse error | existing regex pipeline |
+
+### Supported languages
+
+| Language | Parser | Notes |
+|----------|--------|-------|
+| JavaScript | `@typescript-eslint/typescript-estree` | axios, fetch, supertest, got |
+| TypeScript | `@typescript-eslint/typescript-estree` | full type annotation support |
+| Java | `tree-sitter-java` | RestAssured, MockMvc, WebTestClient |
+| Kotlin | `tree-sitter-kotlin` → `tree-sitter-java` → regex | Ktor DSL, Spring Boot |
+| Python | `tree-sitter-python` | requests, httpx, Django/Flask test clients |
+| Ruby | `tree-sitter-ruby` | Rails request specs, HTTParty, Faraday |
+| Cucumber | (step dispatch) | `@Given/@When/@Then` annotations |
+
+### Resolution types
+
+Each covered endpoint carries a `resolutionType` indicating how the URL was found:
+
+| Type | Description | Confidence |
+|------|-------------|------------|
+| `direct` | String literal URL in source | high |
+| `constant` | Named constant resolved to URL | high/medium |
+| `enum` | Enum member resolved to URL | high/medium |
+| `string-template` | Template literal / f-string / interpolation | medium |
+| `wrapper-method` | HTTP call traced through a helper function | medium |
+| `request-builder` | Builder object (RequestEntity, etc.) | medium |
+| `client-mapping` | Explicit client ↔ HTTP mapping | high |
+| `interpolated-path` | URL with run-time segment interpolation | medium |
+| `cucumber-step` | HTTP call inside a Cucumber step definition | medium |
+| `heuristic` | Regex fallback | low |
+
+### Disable AST for a specific language
+
+```yaml
+analysis:
+  ast:
+    enabled: true
+    languages:
+      kotlin:
+        enabled: false   # use regex fallback for Kotlin only
+```
+
+### Debugging resolution
+
+Add `--format json` to any command and inspect the `matches[].resolutionType` field
+in the endpoint coverage JSON report.
 
 ## Built-in Summary Engine
 

@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-03-11T15:46:18.754Z",
+  "flow_source": "inferred",
+  "files_analyzed": 12,
+  "flow_count": 1,
+  "flows": [
+    {
+      "id": "test_accounts_test_alice_sees_only_her_accounts",
+      "name": "Test alice sees only her accounts",
+      "flow_source": "inferred",
+      "steps": [
+        {
+          "method": "GET",
+          "path": "/accounts"
+        },
+        {
+          "method": "GET",
+          "path": "/accounts"
+        }
+      ],
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py:156",
+      "test_name": "test_alice_sees_only_her_accounts"
+    }
+  ]
+}

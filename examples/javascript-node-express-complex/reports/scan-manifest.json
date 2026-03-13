@@ -1,0 +1,126 @@
+{
+  "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex",
+  "analyzedAt": "2026-03-10T09:42:20.290Z",
+  "discoveredFiles": {
+    "serviceFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/scripts/run-analyzer.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/app.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/helpers/apiClient.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/helpers/pathBuilder.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/helpers/routes.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/auth.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/rateLimit.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/validation.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/models/schemas.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/admin.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/carriers.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/tracking.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/warehouses.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/server.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/services/carrierService.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/services/notificationService.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/services/orderService.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/services/shipmentService.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/helpers/fixtures.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/helpers/testClient.js"
+    ],
+    "testFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/admin.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/carriers.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/customers.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/error.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/orders.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/returns.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/security.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/shipments.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/tracking.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-complete/warehouses.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/orders.test.js",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/tests/tests-initial/shipments.test.js"
+    ],
+    "specFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/openapi.yaml"
+    ]
+  },
+  "languages": [
+    "javascript",
+    "typescript"
+  ],
+  "frameworks": [
+    "jest",
+    "cucumber"
+  ],
+  "scanTypes": [
+    {
+      "type": "endpoint",
+      "source": "explicit",
+      "itemsFound": 30,
+      "itemsCovered": 30,
+      "coveragePercent": 100
+    },
+    {
+      "type": "parameter",
+      "source": "explicit",
+      "itemsFound": 74,
+      "itemsCovered": 69,
+      "coveragePercent": 73.31
+    },
+    {
+      "type": "error",
+      "source": "explicit",
+      "itemsFound": 92,
+      "itemsCovered": 8,
+      "coveragePercent": 8.7
+    },
+    {
+      "type": "business",
+      "source": "explicit",
+      "itemsFound": 8,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "source": "explicit",
+      "itemsFound": 5,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "security",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "performance",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "resilience",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "compatibility",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    }
+  ]
+}

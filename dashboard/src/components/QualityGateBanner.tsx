@@ -24,9 +24,19 @@ export default function QualityGateBanner({ summary }: { summary: SummaryItem[] 
   });
 
   if (failing.length === 0 && warnings.length === 0) {
+    // Check for shallow sections
+    const shallowCount = summary.filter(s => {
+      const threshold = DEFAULT_THRESHOLDS[s.type] ?? 50;
+      return s.totalItems > 0 && s.coveragePercent >= threshold && s.coveragePercent < threshold + 15;
+    }).length;
+
+    const message = shallowCount > 0
+      ? `All configured thresholds passed, but ${shallowCount} section(s) have marginal coverage depth.`
+      : 'All quality gates passed.';
+
     return (
       <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm font-medium">
-        ✅ All quality gates passed
+        ✅ {message}
       </div>
     );
   }

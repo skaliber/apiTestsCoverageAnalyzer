@@ -1,0 +1,156 @@
+openapi: "3.0.3"
+info:
+  title: Vue RealWorld Conduit API
+  version: "1.0.0"
+  description: Minimal fixture for Feature 27 Vue + Vuex + axios pattern detection.
+paths:
+  /api/articles:
+    get:
+      summary: List articles
+      operationId: getArticles
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: Create article
+      operationId: createArticle
+      responses:
+        "201":
+          description: Created
+  /api/articles/{slug}:
+    get:
+      summary: Get article
+      operationId: getArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    put:
+      summary: Update article
+      operationId: updateArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Delete article
+      operationId: deleteArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/articles/{slug}/favorite:
+    post:
+      summary: Favorite
+      operationId: favoriteArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Unfavorite
+      operationId: unfavoriteArticle
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/users:
+    post:
+      summary: Register
+      operationId: registerUser
+      responses:
+        "201":
+          description: Created
+  /api/users/login:
+    post:
+      summary: Login
+      operationId: loginUser
+      responses:
+        "200":
+          description: OK
+  /api/user:
+    get:
+      summary: Get current user
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: OK
+    put:
+      summary: Update user
+      operationId: updateUser
+      responses:
+        "200":
+          description: OK
+  /api/profiles/{username}:
+    get:
+      summary: Get profile
+      operationId: getProfile
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /api/profiles/{username}/follow:
+    post:
+      summary: Follow
+      operationId: followUser
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Unfollow
+      operationId: unfollowUser
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+components: {}

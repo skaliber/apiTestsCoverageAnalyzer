@@ -109,7 +109,8 @@ describe('ContextBuilder', () => {
         DISCOVERY,
       );
 
-      expect(ctx.project.importPrefix).toBeTruthy();
+      expect(typeof ctx.project.importPrefix).toBe('string');
+      expect(ctx.project.importPrefix.length).toBeGreaterThan(0);
       expect(ctx.project.importPrefix).toContain('..');
     });
 

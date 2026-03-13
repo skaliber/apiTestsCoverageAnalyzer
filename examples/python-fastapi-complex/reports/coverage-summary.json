@@ -1,0 +1,4275 @@
+{
+  "generatedAt": "2026-03-11T15:46:18.849Z",
+  "summary": [
+    {
+      "type": "endpoint",
+      "totalItems": 26,
+      "coveredItems": 17,
+      "coveragePercent": 65.38
+    },
+    {
+      "type": "parameter",
+      "totalItems": 49,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "totalItems": 52,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    }
+  ],
+  "details": {
+    "endpoint": {
+      "total": 26,
+      "covered": 17,
+      "percentage": 65.38,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/auth/token",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/auth/refresh",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/accounts",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/accounts",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_error_scenarios.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{account_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".get(\n            f\"/accounts/{account_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".get(\n                f\"/accounts/{alice_account_id}\""
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/accounts/{account_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".put(\n            f\"/accounts/{alice_account_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/accounts/{account_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".delete(\n            f\"/accounts/{account_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{account_id}/balance",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{account_id}/summary",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/transactions",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_transactions.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/transactions",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_transactions.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_error_scenarios.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/transactions/{transaction_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".get(\n            f\"/transactions/{txn_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/transfers",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_transfers.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/transfers/{transfer_id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/limits/{account_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".get(\n            f\"/limits/{bob_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/limits/{account_id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/statements/{account_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "string-template",
+              "confidence": "medium",
+              "rawCall": ".get(\n            f\"/statements/{bob_id}\""
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/statements/{account_id}/{month}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/cards",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_cards.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/cards/{card_id}",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/cards/{card_id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "PUT",
+          "path": "/cards/{card_id}/status",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/merchants",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_merchants.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/merchants/{merchant_id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/admin/health",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_admin.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/stats",
+          "pathRegex": {},
+          "covered": true,
+          "testFiles": [
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_admin.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+            "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_error_scenarios.py"
+          ],
+          "languages": [
+            "python"
+          ],
+          "matches": [
+            {
+              "resolutionType": "direct",
+              "confidence": "high"
+            },
+            {
+              "resolutionType": "wrapper-method",
+              "confidence": "medium"
+            }
+          ]
+        }
+      ]
+    },
+    "parameter": {
+      "totalParameters": 49,
+      "averageCoverage": 0,
+      "fullyCoveredPercentage": 0,
+      "uncoveredParameters": [
+        {
+          "endpoint": "POST /auth/refresh",
+          "method": "POST",
+          "path": "/auth/refresh",
+          "name": "refresh_token",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /accounts",
+          "method": "GET",
+          "path": "/accounts",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /accounts",
+          "method": "GET",
+          "path": "/accounts",
+          "name": "page_size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /accounts",
+          "method": "POST",
+          "path": "/accounts",
+          "name": "account_type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "checking",
+              "savings",
+              "investment"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /accounts",
+          "method": "POST",
+          "path": "/accounts",
+          "name": "currency",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          }
+        },
+        {
+          "endpoint": "POST /accounts",
+          "method": "POST",
+          "path": "/accounts",
+          "name": "initial_deposit",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "decimal",
+            "minimum": 0
+          }
+        },
+        {
+          "endpoint": "POST /accounts",
+          "method": "POST",
+          "path": "/accounts",
+          "name": "nickname",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        {
+          "endpoint": "GET /accounts/{account_id}",
+          "method": "GET",
+          "path": "/accounts/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /accounts/{account_id}",
+          "method": "PUT",
+          "path": "/accounts/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /accounts/{account_id}",
+          "method": "PUT",
+          "path": "/accounts/{account_id}",
+          "name": "nickname",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        {
+          "endpoint": "PUT /accounts/{account_id}",
+          "method": "PUT",
+          "path": "/accounts/{account_id}",
+          "name": "status",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "closed",
+              "pending"
+            ]
+          }
+        },
+        {
+          "endpoint": "DELETE /accounts/{account_id}",
+          "method": "DELETE",
+          "path": "/accounts/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /accounts/{account_id}/balance",
+          "method": "GET",
+          "path": "/accounts/{account_id}/balance",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /accounts/{account_id}/summary",
+          "method": "GET",
+          "path": "/accounts/{account_id}/summary",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /transactions",
+          "method": "GET",
+          "path": "/transactions",
+          "name": "account_id",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /transactions",
+          "method": "GET",
+          "path": "/transactions",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /transactions",
+          "method": "GET",
+          "path": "/transactions",
+          "name": "page_size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "account_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "decimal"
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "transaction_type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "debit",
+              "credit",
+              "transfer",
+              "fee",
+              "interest"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "description",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "idempotency_key",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "merchant_id",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /transactions",
+          "method": "POST",
+          "path": "/transactions",
+          "name": "metadata",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "object"
+          }
+        },
+        {
+          "endpoint": "GET /transactions/{transaction_id}",
+          "method": "GET",
+          "path": "/transactions/{transaction_id}",
+          "name": "transaction_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /transfers",
+          "method": "POST",
+          "path": "/transfers",
+          "name": "source_account_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /transfers",
+          "method": "POST",
+          "path": "/transfers",
+          "name": "destination_account_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /transfers",
+          "method": "POST",
+          "path": "/transfers",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "decimal"
+          }
+        },
+        {
+          "endpoint": "POST /transfers",
+          "method": "POST",
+          "path": "/transfers",
+          "name": "description",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        {
+          "endpoint": "POST /transfers",
+          "method": "POST",
+          "path": "/transfers",
+          "name": "idempotency_key",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        {
+          "endpoint": "GET /transfers/{transfer_id}",
+          "method": "GET",
+          "path": "/transfers/{transfer_id}",
+          "name": "transfer_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /limits/{account_id}",
+          "method": "GET",
+          "path": "/limits/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /limits/{account_id}",
+          "method": "PUT",
+          "path": "/limits/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /limits/{account_id}",
+          "method": "PUT",
+          "path": "/limits/{account_id}",
+          "name": "limit_type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "daily_transfer",
+              "single_transaction",
+              "monthly_spending",
+              "atm_withdrawal"
+            ]
+          }
+        },
+        {
+          "endpoint": "PUT /limits/{account_id}",
+          "method": "PUT",
+          "path": "/limits/{account_id}",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "decimal"
+          }
+        },
+        {
+          "endpoint": "GET /statements/{account_id}",
+          "method": "GET",
+          "path": "/statements/{account_id}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /statements/{account_id}/{month}",
+          "method": "GET",
+          "path": "/statements/{account_id}/{month}",
+          "name": "account_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /statements/{account_id}/{month}",
+          "method": "GET",
+          "path": "/statements/{account_id}/{month}",
+          "name": "month",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$"
+          }
+        },
+        {
+          "endpoint": "POST /cards",
+          "method": "POST",
+          "path": "/cards",
+          "name": "account_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /cards",
+          "method": "POST",
+          "path": "/cards",
+          "name": "card_type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "debit",
+              "credit",
+              "prepaid"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /cards",
+          "method": "POST",
+          "path": "/cards",
+          "name": "cardholder_name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          }
+        },
+        {
+          "endpoint": "GET /cards/{card_id}",
+          "method": "GET",
+          "path": "/cards/{card_id}",
+          "name": "card_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "DELETE /cards/{card_id}",
+          "method": "DELETE",
+          "path": "/cards/{card_id}",
+          "name": "card_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /cards/{card_id}/status",
+          "method": "PUT",
+          "path": "/cards/{card_id}/status",
+          "name": "card_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /cards/{card_id}/status",
+          "method": "PUT",
+          "path": "/cards/{card_id}/status",
+          "name": "status",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended",
+              "cancelled"
+            ]
+          }
+        },
+        {
+          "endpoint": "PUT /cards/{card_id}/status",
+          "method": "PUT",
+          "path": "/cards/{card_id}/status",
+          "name": "reason",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        {
+          "endpoint": "GET /merchants",
+          "method": "GET",
+          "path": "/merchants",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /merchants",
+          "method": "GET",
+          "path": "/merchants",
+          "name": "page_size",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /merchants/{merchant_id}",
+          "method": "GET",
+          "path": "/merchants/{merchant_id}",
+          "name": "merchant_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "parameter": {
+            "endpoint": "POST /auth/refresh",
+            "method": "POST",
+            "path": "/auth/refresh",
+            "name": "refresh_token",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /accounts",
+            "method": "GET",
+            "path": "/accounts",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /accounts",
+            "method": "GET",
+            "path": "/accounts",
+            "name": "page_size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "name": "account_type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "checking",
+                "savings",
+                "investment"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "name": "currency",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "name": "initial_deposit",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "decimal",
+              "minimum": 0
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "name": "nickname",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /accounts/{account_id}",
+            "method": "GET",
+            "path": "/accounts/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /accounts/{account_id}",
+            "method": "PUT",
+            "path": "/accounts/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /accounts/{account_id}",
+            "method": "PUT",
+            "path": "/accounts/{account_id}",
+            "name": "nickname",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /accounts/{account_id}",
+            "method": "PUT",
+            "path": "/accounts/{account_id}",
+            "name": "status",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "suspended",
+                "closed",
+                "pending"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /accounts/{account_id}",
+            "method": "DELETE",
+            "path": "/accounts/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /accounts/{account_id}/balance",
+            "method": "GET",
+            "path": "/accounts/{account_id}/balance",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /accounts/{account_id}/summary",
+            "method": "GET",
+            "path": "/accounts/{account_id}/summary",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /transactions",
+            "method": "GET",
+            "path": "/transactions",
+            "name": "account_id",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /transactions",
+            "method": "GET",
+            "path": "/transactions",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /transactions",
+            "method": "GET",
+            "path": "/transactions",
+            "name": "page_size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "account_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "decimal"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "transaction_type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "debit",
+                "credit",
+                "transfer",
+                "fee",
+                "interest"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "description",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "idempotency_key",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "merchant_id",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "name": "metadata",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /transactions/{transaction_id}",
+            "method": "GET",
+            "path": "/transactions/{transaction_id}",
+            "name": "transaction_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "name": "source_account_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "name": "destination_account_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "decimal"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "name": "description",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "name": "idempotency_key",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /transfers/{transfer_id}",
+            "method": "GET",
+            "path": "/transfers/{transfer_id}",
+            "name": "transfer_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /limits/{account_id}",
+            "method": "GET",
+            "path": "/limits/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /limits/{account_id}",
+            "method": "PUT",
+            "path": "/limits/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /limits/{account_id}",
+            "method": "PUT",
+            "path": "/limits/{account_id}",
+            "name": "limit_type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily_transfer",
+                "single_transaction",
+                "monthly_spending",
+                "atm_withdrawal"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /limits/{account_id}",
+            "method": "PUT",
+            "path": "/limits/{account_id}",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "decimal"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /statements/{account_id}",
+            "method": "GET",
+            "path": "/statements/{account_id}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /statements/{account_id}/{month}",
+            "method": "GET",
+            "path": "/statements/{account_id}/{month}",
+            "name": "account_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /statements/{account_id}/{month}",
+            "method": "GET",
+            "path": "/statements/{account_id}/{month}",
+            "name": "month",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "name": "account_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "name": "card_type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "debit",
+                "credit",
+                "prepaid"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "name": "cardholder_name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /cards/{card_id}",
+            "method": "GET",
+            "path": "/cards/{card_id}",
+            "name": "card_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /cards/{card_id}",
+            "method": "DELETE",
+            "path": "/cards/{card_id}",
+            "name": "card_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "name": "card_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "name": "status",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "suspended",
+                "cancelled"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "name": "reason",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /merchants",
+            "method": "GET",
+            "path": "/merchants",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /merchants",
+            "method": "GET",
+            "path": "/merchants",
+            "name": "page_size",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /merchants/{merchant_id}",
+            "method": "GET",
+            "path": "/merchants/{merchant_id}",
+            "name": "merchant_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0,
+          "astMetadata": {
+            "sourceLanguage": "python",
+            "resolutionType": "direct",
+            "confidence": "high"
+          }
+        }
+      ]
+    },
+    "error": {
+      "total": 52,
+      "covered": 0,
+      "percentage": 0,
+      "scenarios": [
+        {
+          "scenario": {
+            "id": "POST /auth/token:401",
+            "endpoint": "POST /auth/token",
+            "method": "POST",
+            "path": "/auth/token",
+            "statusCode": 401,
+            "description": "Invalid credentials",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /auth/refresh:401",
+            "endpoint": "POST /auth/refresh",
+            "method": "POST",
+            "path": "/auth/refresh",
+            "statusCode": 401,
+            "description": "Invalid refresh token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts:401",
+            "endpoint": "GET /accounts",
+            "method": "GET",
+            "path": "/accounts",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /accounts:401",
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /accounts:422",
+            "endpoint": "POST /accounts",
+            "method": "POST",
+            "path": "/accounts",
+            "statusCode": 422,
+            "description": "Validation error",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}:403",
+            "endpoint": "GET /accounts/{account_id}",
+            "method": "GET",
+            "path": "/accounts/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}:404",
+            "endpoint": "GET /accounts/{account_id}",
+            "method": "GET",
+            "path": "/accounts/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /accounts/{account_id}:403",
+            "endpoint": "PUT /accounts/{account_id}",
+            "method": "PUT",
+            "path": "/accounts/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /accounts/{account_id}:404",
+            "endpoint": "PUT /accounts/{account_id}",
+            "method": "PUT",
+            "path": "/accounts/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /accounts/{account_id}:400",
+            "endpoint": "DELETE /accounts/{account_id}",
+            "method": "DELETE",
+            "path": "/accounts/{account_id}",
+            "statusCode": 400,
+            "description": "Non-zero balance or already closed",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /accounts/{account_id}:403",
+            "endpoint": "DELETE /accounts/{account_id}",
+            "method": "DELETE",
+            "path": "/accounts/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /accounts/{account_id}:404",
+            "endpoint": "DELETE /accounts/{account_id}",
+            "method": "DELETE",
+            "path": "/accounts/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}/balance:403",
+            "endpoint": "GET /accounts/{account_id}/balance",
+            "method": "GET",
+            "path": "/accounts/{account_id}/balance",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}/balance:404",
+            "endpoint": "GET /accounts/{account_id}/balance",
+            "method": "GET",
+            "path": "/accounts/{account_id}/balance",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}/summary:403",
+            "endpoint": "GET /accounts/{account_id}/summary",
+            "method": "GET",
+            "path": "/accounts/{account_id}/summary",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /accounts/{account_id}/summary:404",
+            "endpoint": "GET /accounts/{account_id}/summary",
+            "method": "GET",
+            "path": "/accounts/{account_id}/summary",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /transactions:401",
+            "endpoint": "GET /transactions",
+            "method": "GET",
+            "path": "/transactions",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transactions:400",
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "statusCode": 400,
+            "description": "Insufficient funds",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transactions:403",
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transactions:404",
+            "endpoint": "POST /transactions",
+            "method": "POST",
+            "path": "/transactions",
+            "statusCode": 404,
+            "description": "Account not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /transactions/{transaction_id}:403",
+            "endpoint": "GET /transactions/{transaction_id}",
+            "method": "GET",
+            "path": "/transactions/{transaction_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /transactions/{transaction_id}:404",
+            "endpoint": "GET /transactions/{transaction_id}",
+            "method": "GET",
+            "path": "/transactions/{transaction_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transfers:400",
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "statusCode": 400,
+            "description": "Business rule violation",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transfers:403",
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /transfers:404",
+            "endpoint": "POST /transfers",
+            "method": "POST",
+            "path": "/transfers",
+            "statusCode": 404,
+            "description": "Account not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /transfers/{transfer_id}:403",
+            "endpoint": "GET /transfers/{transfer_id}",
+            "method": "GET",
+            "path": "/transfers/{transfer_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /transfers/{transfer_id}:404",
+            "endpoint": "GET /transfers/{transfer_id}",
+            "method": "GET",
+            "path": "/transfers/{transfer_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /limits/{account_id}:403",
+            "endpoint": "GET /limits/{account_id}",
+            "method": "GET",
+            "path": "/limits/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /limits/{account_id}:404",
+            "endpoint": "GET /limits/{account_id}",
+            "method": "GET",
+            "path": "/limits/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /limits/{account_id}:403",
+            "endpoint": "PUT /limits/{account_id}",
+            "method": "PUT",
+            "path": "/limits/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /limits/{account_id}:404",
+            "endpoint": "PUT /limits/{account_id}",
+            "method": "PUT",
+            "path": "/limits/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /statements/{account_id}:403",
+            "endpoint": "GET /statements/{account_id}",
+            "method": "GET",
+            "path": "/statements/{account_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /statements/{account_id}:404",
+            "endpoint": "GET /statements/{account_id}",
+            "method": "GET",
+            "path": "/statements/{account_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /statements/{account_id}/{month}:400",
+            "endpoint": "GET /statements/{account_id}/{month}",
+            "method": "GET",
+            "path": "/statements/{account_id}/{month}",
+            "statusCode": 400,
+            "description": "Invalid month format",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /statements/{account_id}/{month}:403",
+            "endpoint": "GET /statements/{account_id}/{month}",
+            "method": "GET",
+            "path": "/statements/{account_id}/{month}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /statements/{account_id}/{month}:404",
+            "endpoint": "GET /statements/{account_id}/{month}",
+            "method": "GET",
+            "path": "/statements/{account_id}/{month}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /cards:400",
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "statusCode": 400,
+            "description": "Cannot issue for closed account",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /cards:403",
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /cards:404",
+            "endpoint": "POST /cards",
+            "method": "POST",
+            "path": "/cards",
+            "statusCode": 404,
+            "description": "Account not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /cards/{card_id}:403",
+            "endpoint": "GET /cards/{card_id}",
+            "method": "GET",
+            "path": "/cards/{card_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /cards/{card_id}:404",
+            "endpoint": "GET /cards/{card_id}",
+            "method": "GET",
+            "path": "/cards/{card_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /cards/{card_id}:403",
+            "endpoint": "DELETE /cards/{card_id}",
+            "method": "DELETE",
+            "path": "/cards/{card_id}",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /cards/{card_id}:404",
+            "endpoint": "DELETE /cards/{card_id}",
+            "method": "DELETE",
+            "path": "/cards/{card_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /cards/{card_id}/status:400",
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "statusCode": 400,
+            "description": "Cannot modify cancelled card",
+            "categories": [
+              "missing-parameter",
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /cards/{card_id}/status:403",
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "statusCode": 403,
+            "description": "Forbidden",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /cards/{card_id}/status:404",
+            "endpoint": "PUT /cards/{card_id}/status",
+            "method": "PUT",
+            "path": "/cards/{card_id}/status",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /merchants:401",
+            "endpoint": "GET /merchants",
+            "method": "GET",
+            "path": "/merchants",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /merchants/{merchant_id}:401",
+            "endpoint": "GET /merchants/{merchant_id}",
+            "method": "GET",
+            "path": "/merchants/{merchant_id}",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /merchants/{merchant_id}:404",
+            "endpoint": "GET /merchants/{merchant_id}",
+            "method": "GET",
+            "path": "/merchants/{merchant_id}",
+            "statusCode": 404,
+            "description": "Not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:401",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/stats:401",
+            "endpoint": "GET /admin/stats",
+            "method": "GET",
+            "path": "/admin/stats",
+            "statusCode": 401,
+            "description": "Unauthorized",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/stats:403",
+            "endpoint": "GET /admin/stats",
+            "method": "GET",
+            "path": "/admin/stats",
+            "statusCode": 403,
+            "description": "Admin role required",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        }
+      ],
+      "categorySummary": {
+        "missing-parameter": {
+          "total": 5,
+          "covered": 0
+        },
+        "invalid-value": {
+          "total": 7,
+          "covered": 0
+        },
+        "unauthorized": {
+          "total": 9,
+          "covered": 0
+        },
+        "forbidden": {
+          "total": 18,
+          "covered": 0
+        },
+        "not-found": {
+          "total": 18,
+          "covered": 0
+        },
+        "conflict": {
+          "total": 0,
+          "covered": 0
+        },
+        "server-error": {
+          "total": 0,
+          "covered": 0
+        }
+      }
+    },
+    "business": {
+      "total": 8,
+      "covered": 0,
+      "percentage": 0,
+      "uncoveredRules": [
+        {
+          "id": "BR-001",
+          "name": "account-ownership",
+          "description": "Users can only read or modify their own accounts.\nAdmin users may access any account.\n",
+          "severity": "critical",
+          "endpoints": [
+            "GET /accounts/{account_id}",
+            "PUT /accounts/{account_id}",
+            "DELETE /accounts/{account_id}",
+            "GET /accounts/{account_id}/balance",
+            "GET /accounts/{account_id}/summary",
+            "GET /limits/{account_id}",
+            "PUT /limits/{account_id}",
+            "GET /statements/{account_id}",
+            "GET /statements/{account_id}/{month}"
+          ],
+          "verification": [
+            {
+              "condition": "account.owner_id == current_user.id OR 'admin' in current_user.scopes",
+              "errorCode": "FORBIDDEN",
+              "httpStatus": 403
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_accounts.py::TestGetAccount::test_get_others_account_returns_403",
+              "tests/tests-complete/test_security.py::TestCrossUserIsolation::test_alice_cannot_read_bobs_account",
+              "tests/tests-complete/test_error_scenarios.py::TestForbiddenErrors::test_alice_cannot_access_bobs_account"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-002",
+          "name": "transfer-sufficient-funds",
+          "description": "The source account must have sufficient available balance to cover\nthe full transfer amount before the transfer is approved.\n",
+          "severity": "critical",
+          "endpoints": [
+            "POST /transfers"
+          ],
+          "verification": [
+            {
+              "condition": "source_account.available_balance >= transfer.amount",
+              "errorCode": "INSUFFICIENT_FUNDS",
+              "httpStatus": 400
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_insufficient_funds_returns_400",
+              "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-003",
+          "name": "daily-transfer-limit",
+          "description": "The sum of all outgoing transfers from an account within a calendar day\nmust not exceed the account's configured daily_transfer limit.\n",
+          "severity": "high",
+          "endpoints": [
+            "POST /transfers"
+          ],
+          "verification": [
+            {
+              "condition": "limits.daily_transfer.used_today + transfer.amount <= limits.daily_transfer.amount",
+              "errorCode": "DAILY_LIMIT_EXCEEDED",
+              "httpStatus": 400
+            }
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-004",
+          "name": "card-activation-required",
+          "description": "A card must be in ACTIVE status before it can be used to process\npurchases or ATM withdrawals.  Cards start in INACTIVE state.\n",
+          "severity": "high",
+          "endpoints": [
+            "PUT /cards/{card_id}/status"
+          ],
+          "verification": [
+            {
+              "condition": "card.status != 'cancelled'",
+              "errorCode": "CARD_OPERATION_BLOCKED",
+              "httpStatus": 400
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_activate_card",
+              "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_cannot_modify_cancelled_card"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-005",
+          "name": "account-closure-zero-balance",
+          "description": "An account can only be closed (deleted) when its current_balance is\nexactly $0.00.  Any outstanding balance must be transferred or withdrawn\nbefore closure is permitted.\n",
+          "severity": "critical",
+          "endpoints": [
+            "DELETE /accounts/{account_id}"
+          ],
+          "verification": [
+            {
+              "condition": "account.current_balance == 0",
+              "errorCode": "NON_ZERO_BALANCE",
+              "httpStatus": 400
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_nonzero_balance_returns_400",
+              "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_zero_balance_returns_204",
+              "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_close_account_with_balance"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-006",
+          "name": "duplicate-transaction-prevention",
+          "description": "If a transaction is submitted with an idempotency_key that was already\nused for a previous successful transaction, the original transaction is\nreturned instead of creating a new one.\n",
+          "severity": "high",
+          "endpoints": [
+            "POST /transactions"
+          ],
+          "verification": [
+            {
+              "condition": "no existing transaction with same idempotency_key",
+              "errorCode": "DUPLICATE_TRANSACTION",
+              "httpStatus": 200
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_transactions.py::TestCreateTransaction::test_idempotency_key_prevents_duplicate"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-007",
+          "name": "minimum-transfer-amount",
+          "description": "The minimum allowed transfer amount is $1.00 USD (or equivalent in\nthe account's currency).  Transfers below this threshold are rejected.\n",
+          "severity": "medium",
+          "endpoints": [
+            "POST /transfers"
+          ],
+          "verification": [
+            {
+              "condition": "transfer.amount >= 1.00",
+              "errorCode": "BELOW_MINIMUM_TRANSFER",
+              "httpStatus": 400
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_minimum_transfer_amount_enforced",
+              "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "BR-008",
+          "name": "suspended-account-no-transactions",
+          "description": "Accounts in SUSPENDED status must reject all incoming and outgoing\ntransactions and transfers.  The account holder should be directed\nto contact support.\n",
+          "severity": "critical",
+          "endpoints": [
+            "POST /transactions",
+            "POST /transfers"
+          ],
+          "verification": [
+            {
+              "condition": "account.status != 'suspended'",
+              "errorCode": "ACCOUNT_SUSPENDED",
+              "httpStatus": 400
+            }
+          ],
+          "testCoverage": {
+            "tests-complete": [
+              "tests/tests-complete/test_transactions.py::TestCreateTransaction::test_suspended_account_returns_400",
+              "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_suspended_source_returns_400",
+              "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transaction_on_suspended_account"
+            ]
+          },
+          "keywords": [],
+          "scenarios": []
+        }
+      ],
+      "rules": [
+        {
+          "rule": {
+            "id": "BR-001",
+            "name": "account-ownership",
+            "description": "Users can only read or modify their own accounts.\nAdmin users may access any account.\n",
+            "severity": "critical",
+            "endpoints": [
+              "GET /accounts/{account_id}",
+              "PUT /accounts/{account_id}",
+              "DELETE /accounts/{account_id}",
+              "GET /accounts/{account_id}/balance",
+              "GET /accounts/{account_id}/summary",
+              "GET /limits/{account_id}",
+              "PUT /limits/{account_id}",
+              "GET /statements/{account_id}",
+              "GET /statements/{account_id}/{month}"
+            ],
+            "verification": [
+              {
+                "condition": "account.owner_id == current_user.id OR 'admin' in current_user.scopes",
+                "errorCode": "FORBIDDEN",
+                "httpStatus": 403
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_accounts.py::TestGetAccount::test_get_others_account_returns_403",
+                "tests/tests-complete/test_security.py::TestCrossUserIsolation::test_alice_cannot_read_bobs_account",
+                "tests/tests-complete/test_error_scenarios.py::TestForbiddenErrors::test_alice_cannot_access_bobs_account"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-002",
+            "name": "transfer-sufficient-funds",
+            "description": "The source account must have sufficient available balance to cover\nthe full transfer amount before the transfer is approved.\n",
+            "severity": "critical",
+            "endpoints": [
+              "POST /transfers"
+            ],
+            "verification": [
+              {
+                "condition": "source_account.available_balance >= transfer.amount",
+                "errorCode": "INSUFFICIENT_FUNDS",
+                "httpStatus": 400
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_insufficient_funds_returns_400",
+                "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-003",
+            "name": "daily-transfer-limit",
+            "description": "The sum of all outgoing transfers from an account within a calendar day\nmust not exceed the account's configured daily_transfer limit.\n",
+            "severity": "high",
+            "endpoints": [
+              "POST /transfers"
+            ],
+            "verification": [
+              {
+                "condition": "limits.daily_transfer.used_today + transfer.amount <= limits.daily_transfer.amount",
+                "errorCode": "DAILY_LIMIT_EXCEEDED",
+                "httpStatus": 400
+              }
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-004",
+            "name": "card-activation-required",
+            "description": "A card must be in ACTIVE status before it can be used to process\npurchases or ATM withdrawals.  Cards start in INACTIVE state.\n",
+            "severity": "high",
+            "endpoints": [
+              "PUT /cards/{card_id}/status"
+            ],
+            "verification": [
+              {
+                "condition": "card.status != 'cancelled'",
+                "errorCode": "CARD_OPERATION_BLOCKED",
+                "httpStatus": 400
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_activate_card",
+                "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_cannot_modify_cancelled_card"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-005",
+            "name": "account-closure-zero-balance",
+            "description": "An account can only be closed (deleted) when its current_balance is\nexactly $0.00.  Any outstanding balance must be transferred or withdrawn\nbefore closure is permitted.\n",
+            "severity": "critical",
+            "endpoints": [
+              "DELETE /accounts/{account_id}"
+            ],
+            "verification": [
+              {
+                "condition": "account.current_balance == 0",
+                "errorCode": "NON_ZERO_BALANCE",
+                "httpStatus": 400
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_nonzero_balance_returns_400",
+                "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_zero_balance_returns_204",
+                "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_close_account_with_balance"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-006",
+            "name": "duplicate-transaction-prevention",
+            "description": "If a transaction is submitted with an idempotency_key that was already\nused for a previous successful transaction, the original transaction is\nreturned instead of creating a new one.\n",
+            "severity": "high",
+            "endpoints": [
+              "POST /transactions"
+            ],
+            "verification": [
+              {
+                "condition": "no existing transaction with same idempotency_key",
+                "errorCode": "DUPLICATE_TRANSACTION",
+                "httpStatus": 200
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_transactions.py::TestCreateTransaction::test_idempotency_key_prevents_duplicate"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-007",
+            "name": "minimum-transfer-amount",
+            "description": "The minimum allowed transfer amount is $1.00 USD (or equivalent in\nthe account's currency).  Transfers below this threshold are rejected.\n",
+            "severity": "medium",
+            "endpoints": [
+              "POST /transfers"
+            ],
+            "verification": [
+              {
+                "condition": "transfer.amount >= 1.00",
+                "errorCode": "BELOW_MINIMUM_TRANSFER",
+                "httpStatus": 400
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_minimum_transfer_amount_enforced",
+                "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transfer_below_minimum"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "BR-008",
+            "name": "suspended-account-no-transactions",
+            "description": "Accounts in SUSPENDED status must reject all incoming and outgoing\ntransactions and transfers.  The account holder should be directed\nto contact support.\n",
+            "severity": "critical",
+            "endpoints": [
+              "POST /transactions",
+              "POST /transfers"
+            ],
+            "verification": [
+              {
+                "condition": "account.status != 'suspended'",
+                "errorCode": "ACCOUNT_SUSPENDED",
+                "httpStatus": 400
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_transactions.py::TestCreateTransaction::test_suspended_account_returns_400",
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_suspended_source_returns_400",
+                "tests/tests-complete/test_error_scenarios.py::TestBusinessRuleErrors::test_transaction_on_suspended_account"
+              ]
+            },
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        }
+      ]
+    },
+    "integration": {
+      "total": 5,
+      "complete": 0,
+      "partial": 0,
+      "missing": 5,
+      "percentage": 0,
+      "flows": [
+        {
+          "flow": {
+            "id": "FLOW001",
+            "name": "Account Opening and First Transaction",
+            "description": "A new user authenticates, opens a checking account, makes an initial\ndeposit via a credit transaction, then verifies their balance.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User logs in and receives a JWT access token",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "open-account",
+                "endpoint": "POST /accounts",
+                "description": "User opens a new checking account with an initial deposit",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "credit-transaction",
+                "endpoint": "POST /transactions",
+                "description": "Record the initial deposit as a credit transaction",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "verify-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm the account balance reflects the deposit",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_accounts.py::TestCreateAccount::test_create_checking_account",
+                "tests/tests-complete/test_transactions.py::TestCreateTransaction::test_create_credit_returns_201",
+                "tests/tests-complete/test_accounts.py::TestGetBalance::test_get_balance_returns_200"
+              ]
+            }
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User logs in and receives a JWT access token",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "open-account",
+                "endpoint": "POST /accounts",
+                "description": "User opens a new checking account with an initial deposit",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "credit-transaction",
+                "endpoint": "POST /transactions",
+                "description": "Record the initial deposit as a credit transaction",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "verify-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm the account balance reflects the deposit",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW002",
+            "name": "Fund Transfer Between Accounts",
+            "description": "Alice transfers funds from her checking account to her savings account,\nverifying that both balances are updated correctly.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "authenticate-alice",
+                "endpoint": "POST /auth/token",
+                "description": "Alice authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "get-checking-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Record the initial checking balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "execute-transfer",
+                "endpoint": "POST /transfers",
+                "description": "Transfer $500 from checking to savings",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-002",
+                  "BR-003",
+                  "BR-007"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "verify-source-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm checking balance decreased",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "verify-destination-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm savings balance increased",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_between_own_accounts",
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_reduces_source_balance",
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_increases_destination_balance"
+              ]
+            }
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "authenticate-alice",
+                "endpoint": "POST /auth/token",
+                "description": "Alice authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "get-checking-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Record the initial checking balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "execute-transfer",
+                "endpoint": "POST /transfers",
+                "description": "Transfer $500 from checking to savings",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-002",
+                  "BR-003",
+                  "BR-007"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "verify-source-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm checking balance decreased",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "verify-destination-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm savings balance increased",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW003",
+            "name": "Card Lifecycle Management",
+            "description": "Issue a card for an account, activate it, use it for a debit transaction,\nsuspend it, then permanently cancel it.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "issue-card",
+                "endpoint": "POST /cards",
+                "description": "Issue a debit card (card starts INACTIVE)",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "activate-card",
+                "endpoint": "PUT /cards/{card_id}/status",
+                "description": "Activate the card",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-004"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "verify-active",
+                "endpoint": "GET /cards/{card_id}",
+                "description": "Confirm card is now active",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "suspend-card",
+                "endpoint": "PUT /cards/{card_id}/status",
+                "description": "Suspend the card temporarily",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  4
+                ],
+                "keywords": []
+              },
+              {
+                "step": 6,
+                "name": "cancel-card",
+                "endpoint": "DELETE /cards/{card_id}",
+                "description": "Permanently cancel the card",
+                "expectedStatus": 204,
+                "dependsOn": [
+                  5
+                ],
+                "keywords": []
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_cards.py::TestIssueCard::test_issue_debit_card",
+                "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_activate_card",
+                "tests/tests-complete/test_cards.py::TestUpdateCardStatus::test_suspend_card",
+                "tests/tests-complete/test_cards.py::TestCancelCard::test_cancel_card_returns_204"
+              ]
+            }
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "issue-card",
+                "endpoint": "POST /cards",
+                "description": "Issue a debit card (card starts INACTIVE)",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "activate-card",
+                "endpoint": "PUT /cards/{card_id}/status",
+                "description": "Activate the card",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-004"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "verify-active",
+                "endpoint": "GET /cards/{card_id}",
+                "description": "Confirm card is now active",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "suspend-card",
+                "endpoint": "PUT /cards/{card_id}/status",
+                "description": "Suspend the card temporarily",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  4
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 6,
+                "name": "cancel-card",
+                "endpoint": "DELETE /cards/{card_id}",
+                "description": "Permanently cancel the card",
+                "expectedStatus": 204,
+                "dependsOn": [
+                  5
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW004",
+            "name": "Monthly Statement Retrieval",
+            "description": "The user lists available statement periods for their account, then\ndownloads the detailed statement for the current month.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "list-statement-periods",
+                "endpoint": "GET /statements/{account_id}",
+                "description": "List all available statement periods",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "get-current-month-statement",
+                "endpoint": "GET /statements/{account_id}/{month}",
+                "description": "Download the detailed statement for the current month",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  2
+                ],
+                "keywords": []
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_statements.py::TestListStatements::test_list_statements_returns_200",
+                "tests/tests-complete/test_statements.py::TestGetStatementByMonth::test_get_statement_for_current_month"
+              ]
+            }
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "User authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "list-statement-periods",
+                "endpoint": "GET /statements/{account_id}",
+                "description": "List all available statement periods",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "get-current-month-statement",
+                "endpoint": "GET /statements/{account_id}/{month}",
+                "description": "Download the detailed statement for the current month",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  2
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW005",
+            "name": "Account Closure Process",
+            "description": "Alice transfers all remaining funds out of a checking account, verifies\nthe zero balance, then closes the account permanently.\n",
+            "steps": [
+              {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "Alice authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "name": "check-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm remaining balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "name": "transfer-out",
+                "endpoint": "POST /transfers",
+                "description": "Transfer all funds to savings account",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-005"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "name": "verify-zero-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm account now has zero balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "name": "close-account",
+                "endpoint": "DELETE /accounts/{account_id}",
+                "description": "Close the now-empty account",
+                "expectedStatus": 204,
+                "dependsOn": [
+                  4
+                ],
+                "businessRules": [
+                  "BR-005"
+                ],
+                "keywords": []
+              }
+            ],
+            "testCoverage": {
+              "tests-complete": [
+                "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_zero_balance_returns_204",
+                "tests/tests-complete/test_accounts.py::TestDeleteAccount::test_delete_nonzero_balance_returns_400",
+                "tests/tests-complete/test_transfers.py::TestCreateTransfer::test_transfer_between_own_accounts"
+              ]
+            }
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "name": "authenticate",
+                "endpoint": "POST /auth/token",
+                "description": "Alice authenticates",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "name": "check-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm remaining balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  1
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "name": "transfer-out",
+                "endpoint": "POST /transfers",
+                "description": "Transfer all funds to savings account",
+                "expectedStatus": 201,
+                "dependsOn": [
+                  2
+                ],
+                "businessRules": [
+                  "BR-005"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "name": "verify-zero-balance",
+                "endpoint": "GET /accounts/{account_id}/balance",
+                "description": "Confirm account now has zero balance",
+                "expectedStatus": 200,
+                "dependsOn": [
+                  3
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "name": "close-account",
+                "endpoint": "DELETE /accounts/{account_id}",
+                "description": "Close the now-empty account",
+                "expectedStatus": 204,
+                "dependsOn": [
+                  4
+                ],
+                "businessRules": [
+                  "BR-005"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "observability": {
+    "metricsUrl": null,
+    "note": "Prometheus metrics export not enabled (use --metrics-port to enable)",
+    "metricNames": {
+      "total": "api_coverage_total{service=\"<name>\",coverage_type=\"<type>\"}",
+      "covered": "api_coverage_covered{service=\"<name>\",coverage_type=\"<type>\"}",
+      "ratio": "api_coverage_ratio{service=\"<name>\",coverage_type=\"<type>\"}",
+      "thresholdFailure": "api_coverage_threshold_failure{service=\"<name>\",coverage_type=\"<type>\"}"
+    },
+    "tracing": {
+      "enabled": false,
+      "otlpEndpoint": null,
+      "note": "Tracing not enabled (use --trace to enable)"
+    }
+  },
+  "discoveryInfo": {
+    "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex",
+    "analyzedAt": "2026-03-11T15:46:18.850Z",
+    "languages": [
+      "python"
+    ],
+    "frameworks": [
+      "pytest",
+      "jest"
+    ],
+    "serviceFilesCount": 18,
+    "testFilesCount": 12,
+    "specFilesCount": 1,
+    "analysisMode": "explicit-spec"
+  }
+}

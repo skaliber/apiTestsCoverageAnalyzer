@@ -47,7 +47,7 @@ FORMATS       ?= json,html,csv,junit
         self-analysis-all security-scan \
         summary pr-summary build-summary \
         dashboard \
-        examples-analyze-all examples-analyze examples-dashboard examples-test-structure \
+        examples-analyze-all examples-analyze examples-analyze-feature27 examples-dashboard examples-test-structure \
         ci
 
 # ── Default target ─────────────────────────────────────────────────────────────
@@ -97,12 +97,12 @@ reports-clean: ## Remove all generated reports and summaries from reports/
 #  TESTING
 # =============================================================================
 
-test: ## Run all test suites (unit + integration + e2e)
+test: build ## Run all test suites (unit + integration + e2e)
 	$(NPM) test -- --no-coverage
 	$(MAKE) test-e2e-docs
 	$(MAKE) test-e2e-dashboard
 
-test-unit: ## Run unit tests only (excludes integration and smoke)
+test-unit: build ## Run unit tests only (excludes integration and smoke)
 	$(NPM) test -- --no-coverage --testPathIgnorePatterns="node_modules|dist|dashboard|examples|integration|smoke"
 
 test-integration: ## Run integration tests only
@@ -436,6 +436,25 @@ examples-dashboard: build ## Run full analysis on an example then open the dashb
 	@echo "  Press Ctrl-C to stop."
 	@echo "==========================================================="
 	cd dashboard && REPORTS_OVERRIDE="$(CURDIR)/examples/$(EXAMPLE)/reports" $(NPM) run dev -- --mode real
+
+examples-analyze-feature27: build ## Run analyzer against Feature 27 realworld example projects
+	@echo "==========================================================="
+	@echo "  Running analyzer against Feature 27 example projects"
+	@echo "==========================================================="
+	@for EXAMPLE in flask-realworld spring-boot-realworld node-express-realworld \
+	    angular-realworld vue-realworld slim-php-realworld hapijs-realworld; do \
+	  if [ -d "examples/$$EXAMPLE" ] && [ -f "examples/$$EXAMPLE/openapi.yaml" ]; then \
+	    echo ""; \
+	    echo "--- $$EXAMPLE ---"; \
+	    $(MAKE) examples-analyze EXAMPLE=$$EXAMPLE || true; \
+	  else \
+	    echo "[SKIP] examples/$$EXAMPLE not found or missing openapi.yaml"; \
+	  fi; \
+	done
+	@echo ""
+	@echo "==========================================================="
+	@echo "  Feature 27 examples analyzed."
+	@echo "==========================================================="
 
 examples-analyze-all: build ## Run analyzer against all example projects
 	@echo "==========================================================="

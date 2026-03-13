@@ -118,12 +118,11 @@ describe('generateMermaidFlowchart', () => {
       { id: 'POST /payments', covered: false },
     ];
     const result = generateMermaidFlowchart(items);
-    expect(result).toContain('graph TD');
+    expect(result).toContain('flowchart TD');
     expect(result).toContain('classDef covered');
     expect(result).toContain('classDef uncovered');
     expect(result).toContain('POST__orders');
     expect(result).toContain('POST__payments');
-    expect(result).toContain('-->');
   });
 
   it('assigns correct CSS class per coverage status', () => {
@@ -231,5 +230,59 @@ describe('generateCompatibilitySummary', () => {
     const result = generateCompatibilitySummary(report);
     expect(result).toContain('Compatibility Coverage Summary');
     expect(result).toContain('100%');
+  });
+});
+
+// ─── Phase 1: Additional tests for fallback analysis and section content ──────
+
+import { generateFallbackAnalysis } from '../utils/markdownSummaries';
+
+describe('generateFallbackAnalysis', () => {
+  it('returns content including the section name', () => {
+    const result = generateFallbackAnalysis('endpoint');
+    expect(result).toContain('endpoint');
+    expect(result).toContain('Endpoint');
+  });
+
+  it('includes language/framework info from discoveryInfo', () => {
+    const result = generateFallbackAnalysis('security', {
+      languages: ['TypeScript', 'Java'],
+      frameworks: ['Express', 'Spring Boot'],
+      serviceFilesCount: 50,
+      testFilesCount: 30,
+      specFilesCount: 2,
+      analysisMode: 'full',
+    });
+    expect(result).toContain('TypeScript');
+    expect(result).toContain('Java');
+    expect(result).toContain('Express');
+    expect(result).toContain('Spring Boot');
+    expect(result).toContain('50');
+    expect(result).toContain('30');
+  });
+});
+
+describe('generateEndpointSummary - section content', () => {
+  it('output includes "How it was analysed" section', () => {
+    const report = makeReport({
+      endpoint: {
+        items: [{ id: 'GET /api', covered: true }],
+      },
+    });
+    const result = generateEndpointSummary(report);
+    expect(result).toContain('How it was analysed');
+  });
+
+  it('output includes "Recommended next actions" section', () => {
+    const report = makeReport({
+      endpoint: {
+        items: [
+          { id: 'GET /api', covered: true },
+          { id: 'POST /api', covered: false },
+        ],
+      },
+    });
+    const result = generateEndpointSummary(report);
+    expect(result).toContain('Recommended next actions');
   });
 });

@@ -1,0 +1,663 @@
+{
+  "generatedAt": "2026-03-11T15:46:18.852Z",
+  "projectName": "python-fastapi-complex",
+  "findings": [
+    {
+      "id": "ff-ep-1773243978851-1",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: POST /auth/refresh",
+      "description": "Endpoint POST /auth/refresh has no test coverage.",
+      "endpoint": {
+        "method": "POST",
+        "path": "/auth/refresh"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-2",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /accounts/{account_id}/balance",
+      "description": "Endpoint GET /accounts/{account_id}/balance has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/balance"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-3",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /accounts/{account_id}/summary",
+      "description": "Endpoint GET /accounts/{account_id}/summary has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/summary"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-4",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "HIGH",
+      "title": "Uncovered endpoint: GET /transfers/{transfer_id}",
+      "description": "Endpoint GET /transfers/{transfer_id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transfers/{transfer_id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-5",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: PUT /limits/{account_id}",
+      "description": "Endpoint PUT /limits/{account_id} has no test coverage.",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/limits/{account_id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-6",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /statements/{account_id}/{month}",
+      "description": "Endpoint GET /statements/{account_id}/{month} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/statements/{account_id}/{month}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-7",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: DELETE /cards/{card_id}",
+      "description": "Endpoint DELETE /cards/{card_id} has no test coverage.",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/cards/{card_id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-8",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: PUT /cards/{card_id}/status",
+      "description": "Endpoint PUT /cards/{card_id}/status has no test coverage.",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/cards/{card_id}/status"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-ep-1773243978851-9",
+      "source": "coverage-gap-analysis",
+      "category": "uncovered-endpoint",
+      "severity": "MEDIUM",
+      "title": "Uncovered endpoint: GET /merchants/{merchant_id}",
+      "description": "Endpoint GET /merchants/{merchant_id} has no test coverage.",
+      "endpoint": {
+        "method": "GET",
+        "path": "/merchants/{merchant_id}"
+      },
+      "missingTestTypes": [
+        "positive-api-test",
+        "negative-api-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "endpoint-coverage",
+        "zero-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-10",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-001",
+      "description": "Business rule \"BR-001\" has no test coverage.",
+      "relatedRules": [
+        "BR-001"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-19",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-002",
+      "description": "Business rule \"BR-002\" has no test coverage.",
+      "relatedRules": [
+        "BR-002"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-20",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-003",
+      "description": "Business rule \"BR-003\" has no test coverage.",
+      "relatedRules": [
+        "BR-003"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-21",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-004",
+      "description": "Business rule \"BR-004\" has no test coverage.",
+      "relatedRules": [
+        "BR-004"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-22",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-005",
+      "description": "Business rule \"BR-005\" has no test coverage.",
+      "relatedRules": [
+        "BR-005"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-23",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-006",
+      "description": "Business rule \"BR-006\" has no test coverage.",
+      "relatedRules": [
+        "BR-006"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-24",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-007",
+      "description": "Business rule \"BR-007\" has no test coverage.",
+      "relatedRules": [
+        "BR-007"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    },
+    {
+      "id": "ff-biz-1773243978851-25",
+      "source": "business-coverage",
+      "category": "missing-business-rule-test",
+      "severity": "MEDIUM",
+      "title": "Uncovered business rule: BR-008",
+      "description": "Business rule \"BR-008\" has no test coverage.",
+      "relatedRules": [
+        "BR-008"
+      ],
+      "missingTestTypes": [
+        "business-rule-test"
+      ],
+      "frameworkHints": [
+        "pytest",
+        "httpx",
+        "requests"
+      ],
+      "languageHints": [
+        "python"
+      ],
+      "tags": [
+        "business-coverage"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-1773243978851-30",
+      "priority": "P1",
+      "title": "Add positive api test for: Uncovered endpoint: GET /transfers/{transfer_id}",
+      "rationale": "Endpoint GET /transfers/{transfer_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/transfers/{transfer_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-4"
+      ],
+      "riskScore": 73,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-27",
+      "priority": "P1",
+      "title": "Add positive api test for: Uncovered endpoint: POST /auth/refresh",
+      "rationale": "Endpoint POST /auth/refresh has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "POST",
+        "path": "/auth/refresh"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-1"
+      ],
+      "riskScore": 65,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-33",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: DELETE /cards/{card_id}",
+      "rationale": "Endpoint DELETE /cards/{card_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/cards/{card_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-7"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-34",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /cards/{card_id}/status",
+      "rationale": "Endpoint PUT /cards/{card_id}/status has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/cards/{card_id}/status"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-8"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-35",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /merchants/{merchant_id}",
+      "rationale": "Endpoint GET /merchants/{merchant_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/merchants/{merchant_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-9"
+      ],
+      "riskScore": 54,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978852-36",
+      "priority": "P2",
+      "title": "Add business rule test for: Uncovered business rule: BR-001",
+      "rationale": "Business rule \"BR-001\" has no test coverage. pytest test function",
+      "recommendedTestType": "business-rule-test",
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-biz-1773243978851-10"
+      ],
+      "riskScore": 52,
+      "confidence": "medium"
+    },
+    {
+      "id": "rec-1773243978851-28",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /accounts/{account_id}/balance",
+      "rationale": "Endpoint GET /accounts/{account_id}/balance has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/balance"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-2"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-29",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /accounts/{account_id}/summary",
+      "rationale": "Endpoint GET /accounts/{account_id}/summary has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/accounts/{account_id}/summary"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-3"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-31",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: PUT /limits/{account_id}",
+      "rationale": "Endpoint PUT /limits/{account_id} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/limits/{account_id}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-5"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    },
+    {
+      "id": "rec-1773243978851-32",
+      "priority": "P2",
+      "title": "Add positive api test for: Uncovered endpoint: GET /statements/{account_id}/{month}",
+      "rationale": "Endpoint GET /statements/{account_id}/{month} has no test coverage. pytest test function",
+      "recommendedTestType": "positive-api-test",
+      "endpoint": {
+        "method": "GET",
+        "path": "/statements/{account_id}/{month}"
+      },
+      "likelyFramework": "pytest",
+      "likelyLanguage": "python",
+      "linkedFindingIds": [
+        "ff-ep-1773243978851-6"
+      ],
+      "riskScore": 51,
+      "confidence": "high"
+    }
+  ],
+  "summary": {
+    "totalFindings": 17,
+    "findingsBySeverity": {
+      "LOW": 0,
+      "MEDIUM": 16,
+      "HIGH": 1,
+      "CRITICAL": 0
+    },
+    "totalRecommendations": 10,
+    "recommendationsByPriority": {
+      "P0": 0,
+      "P1": 2,
+      "P2": 8,
+      "P3": 0
+    },
+    "maxRiskScore": 73,
+    "avgRiskScore": 56,
+    "criticalUncoveredItems": 1,
+    "unprotectedSecurityFindings": 0,
+    "topRiskAreas": [
+      "GET /transfers/{transfer_id} (score 73)",
+      "POST /auth/refresh (score 65)",
+      "DELETE /cards/{card_id} (score 54)",
+      "PUT /cards/{card_id}/status (score 54)",
+      "GET /merchants/{merchant_id} (score 54)"
+    ]
+  }
+}

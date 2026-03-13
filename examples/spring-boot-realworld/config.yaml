@@ -1,0 +1,17 @@
+version: 1
+project:
+  name: spring-boot-realworld
+  language: java
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./src/test/java/com/example/conduit
+  language: java
+
+thresholds:
+  endpoint: 80
+  parameter: 60
+
+reports:
+  outputDir: ./reports
+  formats: [json]

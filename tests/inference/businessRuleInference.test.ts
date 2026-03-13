@@ -181,3 +181,59 @@ describe('writeInferredBusinessRules', () => {
     fs.rmSync(reportsDir, { recursive: true });
   });
 });
+
+// ─── extractSpecificKeywords ──────────────────────────────────────────────────
+
+import { extractSpecificKeywords, KEYWORD_STOP_WORDS } from '../../src/inference/businessRuleInference';
+
+describe('extractSpecificKeywords', () => {
+  it('extracts field name and message from { field: ["message"] } pattern', () => {
+    const kws = extractSpecificKeywords(`throws HttpException(422, { errors: { title: ["can't be blank"] } })`);
+    expect(kws).toContain('title');
+    expect(kws).toContain('blank');
+  });
+
+  it('extracts field name from { "field name": [...] } pattern', () => {
+    const kws = extractSpecificKeywords(`throws HttpException(422, { errors: { 'email or password': ['is invalid'] } })`);
+    expect(kws).toContain('email');
+    expect(kws).toContain('password');
+    expect(kws).toContain('invalid');
+  });
+
+  it('filters out generic stop words', () => {
+    const kws = extractSpecificKeywords(`throw new HttpException(422, {})`);
+    for (const w of kws) {
+      expect(KEYWORD_STOP_WORDS.has(w)).toBe(false);
+    }
+  });
+
+  it('returns empty array for generic 404 with no field info', () => {
+    const kws = extractSpecificKeywords(`throw new HttpException(404, {})`);
+    // Should have no meaningful keywords (HttpException → http/exception are stop words, 404 is short)
+    expect(kws.every((k) => !KEYWORD_STOP_WORDS.has(k))).toBe(true);
+    expect(kws.length).toBeLessThan(3);
+  });
+
+  it('includes unique keyword set for title-must-be-unique pattern', () => {
+    const kws = extractSpecificKeywords(`throws HttpException(422, { errors: { title: ['must be unique'] } })`);
+    expect(kws).toContain('title');
+    expect(kws).toContain('unique');
+  });
+});
+
+describe('inferRulesFromFile — specificKeywords', () => {
+  it('includes specificKeywords on inferred rule', () => {
+    const fp = writeTmp('user.service.ts', `
+      if (!email.trim()) {
+        throw new HttpException(422, { errors: { email: ["can't be blank"] } });
+      }
+    `);
+    const rules = inferRulesFromFile(fp);
+    expect(rules.length).toBeGreaterThan(0);
+    const emailRule = rules.find((r) => r.condition.includes('email'));
+    expect(emailRule).toBeDefined();
+    expect(emailRule!.specificKeywords).toBeDefined();
+    expect(emailRule!.specificKeywords).toContain('email');
+    expect(emailRule!.specificKeywords).toContain('blank');
+  });
+});

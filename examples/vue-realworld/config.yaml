@@ -1,0 +1,17 @@
+version: 1
+project:
+  name: vue-realworld
+  language: javascript
+
+analysis:
+  openApiSpec: ./openapi.yaml
+  testDir: ./src/tests
+  language: javascript
+
+thresholds:
+  endpoint: 80
+  parameter: 60
+
+reports:
+  outputDir: ./reports
+  formats: [json]

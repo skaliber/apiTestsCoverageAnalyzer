@@ -18,6 +18,143 @@ import type { ResolvedHttpInteraction, SupportedLanguage, AnalysisContext } from
 import type { AstAnalysisConfig } from '../config/types';
 import { DEFAULT_DEEP_ANALYSIS_CONFIG } from '../coverage/deep-analysis/types';
 
+export type AnalysisTier = 'ast' | 'ast-heuristic-fallback' | 'regex-fallback';
+
+export interface FileAnalysisDiagnostics {
+  requestedLanguage: SupportedLanguage;
+  effectiveRegexLanguage: Exclude<SupportedLanguage, 'auto'>;
+  tierUsed: AnalysisTier;
+  astEnabled: boolean;
+  deepAnalysisEnabled: boolean;
+  fallbackHeuristicsEnabled: boolean;
+  astParseSucceeded: boolean;
+  astAnalyzerReturnedResults: boolean;
+  astInteractionCount: number;
+  fallbackInteractionCount: number;
+  usedHeuristicTagging: boolean;
+  fallbackReason?: 'ast-empty' | 'ast-disabled' | 'ast-parse-error-or-missing-analyzer';
+}
+
+export interface FileAnalysisResult {
+  interactions: ResolvedHttpInteraction[];
+  diagnostics: FileAnalysisDiagnostics;
+}
+
+/**
+ * Analyze a single source file with detailed diagnostics. Returns fully-resolved HTTP interactions and diagnostics.
+ *
+ * @param content       Raw source text
+ * @param filePath      Absolute path (used for error messages, deduplication)
+ * @param language      Detected language (or 'auto')
+ * @param context       Combined AST + deep-analysis config
+ */
+export function analyzeFileDetailed(
+  content: string,
+  filePath: string,
+  language: SupportedLanguage,
+  context: AnalysisContext,
+): FileAnalysisResult {
+  const { astConfig, deepConfig } = context;
+  const fallbackEnabled = astConfig.fallbackHeuristics !== false;
+  const astEnabled = astConfig.enabled !== false;
+  const deepAnalysisEnabled = !!deepConfig.enabled;
+  const effectiveRegexLanguage = language === 'auto' ? ('typescript' as const) : language;
+
+  const baseDiagnostics = {
+    requestedLanguage: language,
+    effectiveRegexLanguage,
+    astEnabled,
+    deepAnalysisEnabled,
+    fallbackHeuristicsEnabled: fallbackEnabled,
+  } as const;
+
+  if (astEnabled) {
+    const astResults = analyzeFileWithAst(filePath, content, language, context);
+
+    if (astResults !== null) {
+      if (astResults.length > 0) {
+        return {
+          interactions: astResults,
+          diagnostics: {
+            ...baseDiagnostics,
+            tierUsed: 'ast',
+            astParseSucceeded: true,
+            astAnalyzerReturnedResults: true,
+            astInteractionCount: astResults.length,
+            fallbackInteractionCount: 0,
+            usedHeuristicTagging: false,
+          },
+        };
+      }
+
+      if (fallbackEnabled && deepAnalysisEnabled) {
+        const heuristicResults = deepResolveFile(content, filePath, effectiveRegexLanguage, deepConfig);
+        return {
+          interactions: heuristicResults.map((interaction) => ({
+            ...interaction,
+            resolutionType: 'heuristic' as const,
+            confidence: 'low' as const,
+          })),
+          diagnostics: {
+            ...baseDiagnostics,
+            tierUsed: 'ast-heuristic-fallback',
+            astParseSucceeded: true,
+            astAnalyzerReturnedResults: false,
+            astInteractionCount: 0,
+            fallbackInteractionCount: heuristicResults.length,
+            usedHeuristicTagging: true,
+            fallbackReason: 'ast-empty',
+          },
+        };
+      }
+
+      return {
+        interactions: astResults,
+        diagnostics: {
+          ...baseDiagnostics,
+          tierUsed: 'ast',
+          astParseSucceeded: true,
+          astAnalyzerReturnedResults: false,
+          astInteractionCount: 0,
+          fallbackInteractionCount: 0,
+          usedHeuristicTagging: false,
+        },
+      };
+    }
+  }
+
+  if (!deepAnalysisEnabled) {
+    return {
+      interactions: [],
+      diagnostics: {
+        ...baseDiagnostics,
+        tierUsed: 'regex-fallback',
+        astParseSucceeded: false,
+        astAnalyzerReturnedResults: false,
+        astInteractionCount: 0,
+        fallbackInteractionCount: 0,
+        usedHeuristicTagging: false,
+        fallbackReason: astEnabled ? 'ast-parse-error-or-missing-analyzer' : 'ast-disabled',
+      },
+    };
+  }
+
+  const regexResults = deepResolveFile(content, filePath, effectiveRegexLanguage, deepConfig);
+  return {
+    interactions: regexResults,
+    diagnostics: {
+      ...baseDiagnostics,
+      tierUsed: 'regex-fallback',
+      astParseSucceeded: false,
+      astAnalyzerReturnedResults: false,
+      astInteractionCount: 0,
+      fallbackInteractionCount: regexResults.length,
+      usedHeuristicTagging: false,
+      fallbackReason: astEnabled ? 'ast-parse-error-or-missing-analyzer' : 'ast-disabled',
+    },
+  };
+}
+
 /**
  * Analyze a single source file. Returns fully-resolved HTTP interactions.
  *
@@ -32,45 +169,7 @@ export function analyzeFile(
   language: SupportedLanguage,
   context: AnalysisContext,
 ): ResolvedHttpInteraction[] {
-  const { astConfig, deepConfig } = context;
-  const fallbackEnabled = astConfig.fallbackHeuristics !== false;
-
-  // ── Tier 1: AST path ──────────────────────────────────────────────────────
-  if (astConfig.enabled !== false) {
-    const astResults = analyzeFileWithAst(filePath, content, language, context);
-
-    if (astResults !== null) {
-      // AST parsed successfully
-      if (astResults.length > 0) {
-        // Non-empty AST result — return verbatim (authoritative)
-        return astResults;
-      }
-
-      // ── Tier 2: AST found nothing — optionally run regex fallback ────────
-      if (fallbackEnabled && deepConfig.enabled) {
-        const regexLang = language === 'auto' ? ('typescript' as const) : language;
-        const heuristicResults = deepResolveFile(content, filePath, regexLang, deepConfig);
-        // Tag all fallback results as heuristic / low confidence
-        return heuristicResults.map((interaction) => ({
-          ...interaction,
-          resolutionType: 'heuristic' as const,
-          confidence: 'low' as const,
-        }));
-      }
-
-      // fallbackHeuristics: false — return the empty AST result verbatim
-      return astResults;
-    }
-    // null = parse error or no analyzer registered for this language.
-    // Fall through to Tier 3 so the file is still analysed.
-  }
-
-  // ── Tier 3: regex fallback ────────────────────────────────────────────────
-  // Only reached when AST is disabled or could not parse the file.
-  if (!deepConfig.enabled) return [];
-
-  const regexLang = language === 'auto' ? ('typescript' as const) : language;
-  return deepResolveFile(content, filePath, regexLang, deepConfig);
+  return analyzeFileDetailed(content, filePath, language, context).interactions;
 }
 
 /**

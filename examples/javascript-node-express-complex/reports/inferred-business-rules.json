@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-09T13:35:35.791Z",
+  "generated_at": "2026-03-10T09:42:19.756Z",
   "rule_source": "inferred",
   "files_analyzed": 24,
   "rule_count": 52,
@@ -12,7 +12,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/app.js:43",
-      "code_snippet": "res.status(404).json({"
+      "code_snippet": "res.status(404).json({",
+      "specificKeywords": []
     },
     {
       "id": "auth_http_401_response_23",
@@ -22,7 +23,8 @@
       "condition": "returns HTTP 401",
       "expected_behavior": "Request rejected with HTTP 401",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/auth.js:23",
-      "code_snippet": "return res.status(401).json({"
+      "code_snippet": "return res.status(401).json({",
+      "specificKeywords": []
     },
     {
       "id": "auth_http_401_response_33",
@@ -32,7 +34,8 @@
       "condition": "returns HTTP 401",
       "expected_behavior": "Request rejected with HTTP 401",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/auth.js:33",
-      "code_snippet": "return res.status(401).json({"
+      "code_snippet": "return res.status(401).json({",
+      "specificKeywords": []
     },
     {
       "id": "auth_http_401_response_50",
@@ -42,7 +45,8 @@
       "condition": "returns HTTP 401",
       "expected_behavior": "Request rejected with HTTP 401",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/auth.js:50",
-      "code_snippet": "return res.status(401).json({ error: 'Unauthorized', message: 'Not authenticated' });"
+      "code_snippet": "return res.status(401).json({ error: 'Unauthorized', message: 'Not authenticated' });",
+      "specificKeywords": []
     },
     {
       "id": "auth_http_403_response_53",
@@ -52,7 +56,8 @@
       "condition": "returns HTTP 403",
       "expected_behavior": "Request rejected with HTTP 403",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/auth.js:53",
-      "code_snippet": "return res.status(403).json({"
+      "code_snippet": "return res.status(403).json({",
+      "specificKeywords": []
     },
     {
       "id": "rate_limit_http_429_response_41",
@@ -62,7 +67,8 @@
       "condition": "returns HTTP 429",
       "expected_behavior": "Request rejected with HTTP 429",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/rateLimit.js:41",
-      "code_snippet": "return res.status(429).json({"
+      "code_snippet": "return res.status(429).json({",
+      "specificKeywords": []
     },
     {
       "id": "validation_http_422_response_9",
@@ -72,7 +78,8 @@
       "condition": "returns HTTP 422",
       "expected_behavior": "Request rejected with HTTP 422",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/validation.js:9",
-      "code_snippet": "return res.status(422).json({"
+      "code_snippet": "return res.status(422).json({",
+      "specificKeywords": []
     },
     {
       "id": "validation_http_400_response_35",
@@ -82,7 +89,8 @@
       "condition": "returns HTTP 400",
       "expected_behavior": "Request rejected with HTTP 400",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/middleware/validation.js:35",
-      "code_snippet": "return res.status(400).json({"
+      "code_snippet": "return res.status(400).json({",
+      "specificKeywords": []
     },
     {
       "id": "carriers_http_404_response_25",
@@ -92,7 +100,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/carriers.js:25",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "carriers_http_404_response_36",
@@ -102,7 +111,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/carriers.js:36",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "carriers_http_422_response_37",
@@ -112,7 +122,8 @@
       "condition": "returns HTTP 422",
       "expected_behavior": "Request rejected with HTTP 422",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/carriers.js:37",
-      "code_snippet": "if (err.code === 'SERVICE_NOT_AVAILABLE') return res.status(422).json({ error: 'ServiceNotAvailable', message: err.message });"
+      "code_snippet": "if (err.code === 'SERVICE_NOT_AVAILABLE') return res.status(422).json({ error: 'ServiceNotAvailable', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "customers_http_404_response_17",
@@ -122,7 +133,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js:17",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Customer ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Customer ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "customers_http_403_response_22",
@@ -132,7 +144,8 @@
       "condition": "returns HTTP 403",
       "expected_behavior": "Request rejected with HTTP 403",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js:22",
-      "code_snippet": "return res.status(403).json({ error: 'Forbidden', message: 'You can only access your own customer record' });"
+      "code_snippet": "return res.status(403).json({ error: 'Forbidden', message: 'You can only access your own customer record' });",
+      "specificKeywords": []
     },
     {
       "id": "customers_http_404_response_32",
@@ -142,7 +155,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js:32",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Customer ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Customer ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "customers_http_403_response_36",
@@ -152,7 +166,8 @@
       "condition": "returns HTTP 403",
       "expected_behavior": "Request rejected with HTTP 403",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js:36",
-      "code_snippet": "return res.status(403).json({ error: 'Forbidden', message: 'You can only update your own customer record' });"
+      "code_snippet": "return res.status(403).json({ error: 'Forbidden', message: 'You can only update your own customer record' });",
+      "specificKeywords": []
     },
     {
       "id": "customers_http_422_response_46",
@@ -162,7 +177,8 @@
       "condition": "returns HTTP 422",
       "expected_behavior": "Request rejected with HTTP 422",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/customers.js:46",
-      "code_snippet": "return res.status(422).json({ error: 'ValidationError', message: 'No updatable fields provided' });"
+      "code_snippet": "return res.status(422).json({ error: 'ValidationError', message: 'No updatable fields provided' });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_404_response_20",
@@ -172,7 +188,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:20",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_404_response_37",
@@ -182,7 +199,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:37",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_404_response_48",
@@ -192,7 +210,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:48",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_409_response_49",
@@ -202,7 +221,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:49",
-      "code_snippet": "if (err.code === 'INVALID_TRANSITION') return res.status(409).json({ error: 'InvalidTransition', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_TRANSITION') return res.status(409).json({ error: 'InvalidTransition', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_404_response_60",
@@ -212,7 +232,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:60",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "orders_http_409_response_61",
@@ -222,7 +243,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/orders.js:61",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_404_response_24",
@@ -232,7 +254,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:24",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Shipment ${shipmentId} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Shipment ${shipmentId} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_409_response_28",
@@ -242,7 +265,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:28",
-      "code_snippet": "return res.status(409).json({"
+      "code_snippet": "return res.status(409).json({",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_422_response_39",
@@ -252,7 +276,8 @@
       "condition": "returns HTTP 422",
       "expected_behavior": "Request rejected with HTTP 422",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:39",
-      "code_snippet": "return res.status(422).json({"
+      "code_snippet": "return res.status(422).json({",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_404_response_67",
@@ -262,7 +287,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:67",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Return ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Return ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_404_response_76",
@@ -272,7 +298,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:76",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Return ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Return ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "returns_http_409_response_79",
@@ -282,7 +309,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/returns.js:79",
-      "code_snippet": "return res.status(409).json({"
+      "code_snippet": "return res.status(409).json({",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_30",
@@ -292,7 +320,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:30",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_31",
@@ -302,7 +331,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:31",
-      "code_snippet": "if (err.code === 'CARRIER_INACTIVE') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });"
+      "code_snippet": "if (err.code === 'CARRIER_INACTIVE') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_32",
@@ -312,7 +342,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:32",
-      "code_snippet": "if (err.code === 'HAZMAT_CARRIER_REQUIRED') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });"
+      "code_snippet": "if (err.code === 'HAZMAT_CARRIER_REQUIRED') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_400_response_33",
@@ -322,7 +353,8 @@
       "condition": "returns HTTP 400",
       "expected_behavior": "Request rejected with HTTP 400",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:33",
-      "code_snippet": "if (err.code === 'WEIGHT_LIMIT_EXCEEDED') return res.status(400).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });"
+      "code_snippet": "if (err.code === 'WEIGHT_LIMIT_EXCEEDED') return res.status(400).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_51",
@@ -332,7 +364,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:51",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_68",
@@ -342,7 +375,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:68",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_69",
@@ -352,7 +386,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:69",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_70",
@@ -362,7 +397,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:70",
-      "code_snippet": "if (err.code === 'CARRIER_INACTIVE') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });"
+      "code_snippet": "if (err.code === 'CARRIER_INACTIVE') return res.status(409).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_82",
@@ -372,7 +408,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:82",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_83",
@@ -382,7 +419,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:83",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_94",
@@ -392,7 +430,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:94",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_95",
@@ -402,7 +441,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:95",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_422_response_97",
@@ -412,7 +452,8 @@
       "condition": "returns HTTP 422",
       "expected_behavior": "Request rejected with HTTP 422",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:97",
-      "code_snippet": "return res.status(422).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });"
+      "code_snippet": "return res.status(422).json({ error: 'BusinessRuleViolation', rule: err.rule, message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_109",
@@ -422,7 +463,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:109",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_110",
@@ -432,7 +474,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:110",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_121",
@@ -442,7 +485,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:121",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_409_response_122",
@@ -452,7 +496,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:122",
-      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });"
+      "code_snippet": "if (err.code === 'INVALID_STATE') return res.status(409).json({ error: 'InvalidState', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "shipments_http_404_response_133",
@@ -462,7 +507,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/shipments.js:133",
-      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });"
+      "code_snippet": "if (err.code === 'NOT_FOUND') return res.status(404).json({ error: 'NotFound', message: err.message });",
+      "specificKeywords": []
     },
     {
       "id": "tracking_null_check_events_20",
@@ -472,7 +518,11 @@
       "condition": "events == null",
       "expected_behavior": "events must not be null/empty",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/tracking.js:20",
-      "code_snippet": "if (events === undefined) {"
+      "code_snippet": "if (events === undefined) {",
+      "specificKeywords": [
+        "events",
+        "null"
+      ]
     },
     {
       "id": "tracking_http_409_response_32",
@@ -482,7 +532,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/tracking.js:32",
-      "code_snippet": "return res.status(409).json({"
+      "code_snippet": "return res.status(409).json({",
+      "specificKeywords": []
     },
     {
       "id": "tracking_http_404_response_54",
@@ -492,7 +543,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/tracking.js:54",
-      "code_snippet": "return res.status(404).json({"
+      "code_snippet": "return res.status(404).json({",
+      "specificKeywords": []
     },
     {
       "id": "warehouses_http_404_response_29",
@@ -502,7 +554,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/warehouses.js:29",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Warehouse ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Warehouse ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "warehouses_http_404_response_45",
@@ -512,7 +565,8 @@
       "condition": "returns HTTP 404",
       "expected_behavior": "Request rejected with HTTP 404",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/warehouses.js:45",
-      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Warehouse ${req.params.id} not found` });"
+      "code_snippet": "return res.status(404).json({ error: 'NotFound', message: `Warehouse ${req.params.id} not found` });",
+      "specificKeywords": []
     },
     {
       "id": "warehouses_http_409_response_55",
@@ -522,7 +576,8 @@
       "condition": "returns HTTP 409",
       "expected_behavior": "Request rejected with HTTP 409",
       "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/javascript-node-express-complex/src/routes/warehouses.js:55",
-      "code_snippet": "return res.status(409).json({"
+      "code_snippet": "return res.status(409).json({",
+      "specificKeywords": []
     }
   ]
 }

@@ -109,8 +109,44 @@ interface TestEntry {
 /**
  * Extract all test / it declarations from a file, together with their
  * description string and the surrounding code up to the next declaration.
+ *
+ * Supports:
+ *  - JS/TS: test("desc", ...) / it("desc", ...)
+ *  - Java/Kotlin: @Test public void methodName() { ... }
  */
 function extractTestEntries(filePath: string, fileContents: string): TestEntry[] {
+  const ext = path.extname(filePath).toLowerCase();
+
+  // ── Java / Kotlin ──────────────────────────────────────────────────────────
+  if (ext === '.java' || ext === '.kt' || ext === '.kts') {
+    const entries: TestEntry[] = [];
+    // Match @Test annotation followed (within a few lines) by a method declaration.
+    // Captures the method name as group 1.
+    const javaTestPattern = /@Test\b[^{]*?(?:public|protected|private|default)?\s+(?:\w+\s+)?(\w+)\s*\(\s*\)/g;
+    const positions: Array<{ start: number; desc: string }> = [];
+
+    let m: RegExpExecArray | null;
+    while ((m = javaTestPattern.exec(fileContents)) !== null) {
+      const methodName = m[1];
+      // Convert snake_case / camelCase to space-separated for readability / matching
+      const desc = methodName.replace(/_/g, ' ');
+      positions.push({ start: m.index, desc });
+    }
+
+    for (let i = 0; i < positions.length; i++) {
+      const start = positions[i].start;
+      const end = i + 1 < positions.length ? positions[i + 1].start : fileContents.length;
+      entries.push({
+        description: positions[i].desc,
+        content: fileContents.slice(start, end),
+        filePath,
+      });
+    }
+
+    return entries;
+  }
+
+  // ── JS / TS ────────────────────────────────────────────────────────────────
   const entries: TestEntry[] = [];
   const declPattern = /\b(?:test|it)\s*\(\s*(['"`])([\s\S]*?)\1/g;
   const positions: Array<{ start: number; desc: string }> = [];
@@ -138,7 +174,11 @@ function extractTestEntries(filePath: string, fileContents: string): TestEntry[]
  *
  * A match occurs when:
  *   1. The test description contains `@rule <ruleId>` (case-insensitive), OR
- *   2. The test description (lowercased) contains at least one of the keywords.
+ *   2. The test description (lowercased) contains at least one of the keywords, OR
+ *   3. For Java/Kotlin tests: the test body contains ALL "specific" keywords
+ *      (keywords with ≥ 8 chars, e.g. "authorization", "authentication").
+ *      Generic short keywords like "null", "data", "first" are excluded from
+ *      content matching to avoid false positives.
  */
 function testMatchesKeywords(
   entry: TestEntry,
@@ -146,6 +186,8 @@ function testMatchesKeywords(
   keywords: string[],
 ): boolean {
   const descLower = entry.description.toLowerCase();
+  const ext = path.extname(entry.filePath).toLowerCase();
+  const isJavaLike = ext === '.java' || ext === '.kt' || ext === '.kts';
 
   // Annotation-based match: @rule BL001
   const annotationPattern = new RegExp(`@rule\\s+${ruleId}`, 'i');
@@ -153,10 +195,25 @@ function testMatchesKeywords(
     return true;
   }
 
-  // Keyword-based match (checked against description only for precision)
+  // Keyword-based match against description
   for (const kw of keywords) {
     if (descLower.includes(kw.toLowerCase())) {
       return true;
+    }
+  }
+
+  // For Java/Kotlin: also search the test body for specific (long) keywords.
+  // Using a ≥8-char threshold avoids matching generic words like "null", "data",
+  // "first", "last", "header", "cursor" that appear in almost every test body.
+  if (isJavaLike) {
+    const specificKeywords = keywords.filter((k) => k.length >= 8);
+    if (specificKeywords.length > 0) {
+      const contentLower = entry.content.toLowerCase();
+      for (const kw of specificKeywords) {
+        if (contentLower.includes(kw.toLowerCase())) {
+          return true;
+        }
+      }
     }
   }
 

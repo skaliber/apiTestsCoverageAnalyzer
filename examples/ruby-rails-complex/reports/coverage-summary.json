@@ -1,0 +1,4186 @@
+{
+  "generatedAt": "2026-03-11T15:43:32.129Z",
+  "summary": [
+    {
+      "type": "endpoint",
+      "totalItems": 26,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "parameter",
+      "totalItems": 57,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "totalItems": 68,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    }
+  ],
+  "details": {
+    "endpoint": {
+      "total": 26,
+      "covered": 0,
+      "percentage": 0,
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/users",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "PUT",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "DELETE",
+          "path": "/users/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/subscriptions",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/subscriptions/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "PUT",
+          "path": "/subscriptions/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "DELETE",
+          "path": "/subscriptions/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/subscriptions/{id}/upgrade",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/subscriptions/{id}/cancel",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/invoices",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/invoices/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/invoices/{id}/pay",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/usage/{subscription_id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/usage/record",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "DELETE",
+          "path": "/subscriptions/{subscription_id}/seats/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/plans",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/plans/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/coupons/validate",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/audit-logs",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/webhooks",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/admin/health",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/admin/stats",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        }
+      ]
+    },
+    "parameter": {
+      "totalParameters": 57,
+      "averageCoverage": 0,
+      "fullyCoveredPercentage": 0,
+      "uncoveredParameters": [
+        {
+          "endpoint": "GET /users",
+          "method": "GET",
+          "path": "/users",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /users",
+          "method": "GET",
+          "path": "/users",
+          "name": "per_page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "email",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "password",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "first_name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "last_name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "company_name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "phone",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "timezone",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /users",
+          "method": "POST",
+          "path": "/users",
+          "name": "role_id",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /users/{id}",
+          "method": "GET",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "first_name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "last_name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "company_name",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "phone",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /users/{id}",
+          "method": "PUT",
+          "path": "/users/{id}",
+          "name": "timezone",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "DELETE /users/{id}",
+          "method": "DELETE",
+          "path": "/users/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions",
+          "method": "POST",
+          "path": "/subscriptions",
+          "name": "plan_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions",
+          "method": "POST",
+          "path": "/subscriptions",
+          "name": "coupon_code",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions",
+          "method": "POST",
+          "path": "/subscriptions",
+          "name": "payment_method_id",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions",
+          "method": "POST",
+          "path": "/subscriptions",
+          "name": "billing_cycle",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "yearly"
+            ]
+          }
+        },
+        {
+          "endpoint": "GET /subscriptions/{id}",
+          "method": "GET",
+          "path": "/subscriptions/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "PUT /subscriptions/{id}",
+          "method": "PUT",
+          "path": "/subscriptions/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "DELETE /subscriptions/{id}",
+          "method": "DELETE",
+          "path": "/subscriptions/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /subscriptions/{id}/upgrade",
+          "method": "GET",
+          "path": "/subscriptions/{id}/upgrade",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /subscriptions/{id}/upgrade",
+          "method": "GET",
+          "path": "/subscriptions/{id}/upgrade",
+          "name": "plan_id",
+          "location": "query",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions/{id}/cancel",
+          "method": "POST",
+          "path": "/subscriptions/{id}/cancel",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /invoices/{id}",
+          "method": "GET",
+          "path": "/invoices/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /invoices/{id}/pay",
+          "method": "POST",
+          "path": "/invoices/{id}/pay",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /invoices/{id}/pay",
+          "method": "POST",
+          "path": "/invoices/{id}/pay",
+          "name": "payment_method_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /usage/{subscription_id}",
+          "method": "GET",
+          "path": "/usage/{subscription_id}",
+          "name": "subscription_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /usage/{subscription_id}",
+          "method": "GET",
+          "path": "/usage/{subscription_id}",
+          "name": "period_start",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "GET /usage/{subscription_id}",
+          "method": "GET",
+          "path": "/usage/{subscription_id}",
+          "name": "period_end",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "POST /usage/record",
+          "method": "POST",
+          "path": "/usage/record",
+          "name": "subscription_id",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /usage/record",
+          "method": "POST",
+          "path": "/usage/record",
+          "name": "metric",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /usage/record",
+          "method": "POST",
+          "path": "/usage/record",
+          "name": "quantity",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /usage/record",
+          "method": "POST",
+          "path": "/usage/record",
+          "name": "timestamp",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "POST /usage/record",
+          "method": "POST",
+          "path": "/usage/record",
+          "name": "metadata",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "object"
+          }
+        },
+        {
+          "endpoint": "GET /subscriptions/{subscription_id}/seats",
+          "method": "GET",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "name": "subscription_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions/{subscription_id}/seats",
+          "method": "POST",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "name": "subscription_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions/{subscription_id}/seats",
+          "method": "POST",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "name": "email",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        {
+          "endpoint": "POST /subscriptions/{subscription_id}/seats",
+          "method": "POST",
+          "path": "/subscriptions/{subscription_id}/seats",
+          "name": "role",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+          "method": "DELETE",
+          "path": "/subscriptions/{subscription_id}/seats/{id}",
+          "name": "subscription_id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+          "method": "DELETE",
+          "path": "/subscriptions/{subscription_id}/seats/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /plans/{id}",
+          "method": "GET",
+          "path": "/plans/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /coupons/validate",
+          "method": "POST",
+          "path": "/coupons/validate",
+          "name": "code",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "user_id",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "action",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "resource_type",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "from",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "to",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "GET /audit-logs",
+          "method": "GET",
+          "path": "/audit-logs",
+          "name": "per_page",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /webhooks",
+          "method": "POST",
+          "path": "/webhooks",
+          "name": "X-Webhook-Signature",
+          "location": "header",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /webhooks",
+          "method": "POST",
+          "path": "/webhooks",
+          "name": "event",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "payment.succeeded",
+              "payment.failed",
+              "subscription.renewed",
+              "subscription.expired",
+              "invoice.created"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /webhooks",
+          "method": "POST",
+          "path": "/webhooks",
+          "name": "payload",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "object"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "parameter": {
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "name": "per_page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "email",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "password",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "first_name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "last_name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "company_name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "phone",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "timezone",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "name": "role_id",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "first_name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "last_name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "company_name",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "phone",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "name": "timezone",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "name": "plan_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "name": "coupon_code",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "name": "payment_method_id",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "name": "billing_cycle",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "monthly",
+                "yearly"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /subscriptions/{id}",
+            "method": "GET",
+            "path": "/subscriptions/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /subscriptions/{id}",
+            "method": "PUT",
+            "path": "/subscriptions/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /subscriptions/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /subscriptions/{id}/upgrade",
+            "method": "GET",
+            "path": "/subscriptions/{id}/upgrade",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /subscriptions/{id}/upgrade",
+            "method": "GET",
+            "path": "/subscriptions/{id}/upgrade",
+            "name": "plan_id",
+            "location": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions/{id}/cancel",
+            "method": "POST",
+            "path": "/subscriptions/{id}/cancel",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /invoices/{id}",
+            "method": "GET",
+            "path": "/invoices/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "name": "payment_method_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "name": "subscription_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "name": "period_start",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "name": "period_end",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "name": "subscription_id",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "name": "metric",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "name": "quantity",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "name": "timestamp",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "name": "metadata",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /subscriptions/{subscription_id}/seats",
+            "method": "GET",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "name": "subscription_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "name": "subscription_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "name": "email",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "name": "role",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{subscription_id}/seats/{id}",
+            "name": "subscription_id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{subscription_id}/seats/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /plans/{id}",
+            "method": "GET",
+            "path": "/plans/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /coupons/validate",
+            "method": "POST",
+            "path": "/coupons/validate",
+            "name": "code",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "user_id",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "action",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "resource_type",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "from",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "to",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "name": "per_page",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /webhooks",
+            "method": "POST",
+            "path": "/webhooks",
+            "name": "X-Webhook-Signature",
+            "location": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /webhooks",
+            "method": "POST",
+            "path": "/webhooks",
+            "name": "event",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "payment.succeeded",
+                "payment.failed",
+                "subscription.renewed",
+                "subscription.expired",
+                "invoice.created"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /webhooks",
+            "method": "POST",
+            "path": "/webhooks",
+            "name": "payload",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        }
+      ]
+    },
+    "error": {
+      "total": 68,
+      "covered": 0,
+      "percentage": 0,
+      "scenarios": [
+        {
+          "scenario": {
+            "id": "GET /users:401",
+            "endpoint": "GET /users",
+            "method": "GET",
+            "path": "/users",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /users:401",
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /users:422",
+            "endpoint": "POST /users",
+            "method": "POST",
+            "path": "/users",
+            "statusCode": 422,
+            "description": "Validation errors",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users/{id}:401",
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /users/{id}:404",
+            "endpoint": "GET /users/{id}",
+            "method": "GET",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:401",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:404",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /users/{id}:422",
+            "endpoint": "PUT /users/{id}",
+            "method": "PUT",
+            "path": "/users/{id}",
+            "statusCode": 422,
+            "description": "Validation errors",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:401",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:403",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /users/{id}:404",
+            "endpoint": "DELETE /users/{id}",
+            "method": "DELETE",
+            "path": "/users/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions:401",
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions:422",
+            "endpoint": "POST /subscriptions",
+            "method": "POST",
+            "path": "/subscriptions",
+            "statusCode": 422,
+            "description": "Validation errors",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}:401",
+            "endpoint": "GET /subscriptions/{id}",
+            "method": "GET",
+            "path": "/subscriptions/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}:403",
+            "endpoint": "GET /subscriptions/{id}",
+            "method": "GET",
+            "path": "/subscriptions/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}:404",
+            "endpoint": "GET /subscriptions/{id}",
+            "method": "GET",
+            "path": "/subscriptions/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /subscriptions/{id}:401",
+            "endpoint": "PUT /subscriptions/{id}",
+            "method": "PUT",
+            "path": "/subscriptions/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /subscriptions/{id}:403",
+            "endpoint": "PUT /subscriptions/{id}",
+            "method": "PUT",
+            "path": "/subscriptions/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /subscriptions/{id}:404",
+            "endpoint": "PUT /subscriptions/{id}",
+            "method": "PUT",
+            "path": "/subscriptions/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{id}:401",
+            "endpoint": "DELETE /subscriptions/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{id}:403",
+            "endpoint": "DELETE /subscriptions/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{id}:404",
+            "endpoint": "DELETE /subscriptions/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}/upgrade:401",
+            "endpoint": "GET /subscriptions/{id}/upgrade",
+            "method": "GET",
+            "path": "/subscriptions/{id}/upgrade",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}/upgrade:403",
+            "endpoint": "GET /subscriptions/{id}/upgrade",
+            "method": "GET",
+            "path": "/subscriptions/{id}/upgrade",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{id}/upgrade:404",
+            "endpoint": "GET /subscriptions/{id}/upgrade",
+            "method": "GET",
+            "path": "/subscriptions/{id}/upgrade",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{id}/cancel:401",
+            "endpoint": "POST /subscriptions/{id}/cancel",
+            "method": "POST",
+            "path": "/subscriptions/{id}/cancel",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{id}/cancel:403",
+            "endpoint": "POST /subscriptions/{id}/cancel",
+            "method": "POST",
+            "path": "/subscriptions/{id}/cancel",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{id}/cancel:404",
+            "endpoint": "POST /subscriptions/{id}/cancel",
+            "method": "POST",
+            "path": "/subscriptions/{id}/cancel",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /invoices:401",
+            "endpoint": "GET /invoices",
+            "method": "GET",
+            "path": "/invoices",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /invoices/{id}:401",
+            "endpoint": "GET /invoices/{id}",
+            "method": "GET",
+            "path": "/invoices/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /invoices/{id}:403",
+            "endpoint": "GET /invoices/{id}",
+            "method": "GET",
+            "path": "/invoices/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /invoices/{id}:404",
+            "endpoint": "GET /invoices/{id}",
+            "method": "GET",
+            "path": "/invoices/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /invoices/{id}/pay:401",
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /invoices/{id}/pay:402",
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "statusCode": 402,
+            "description": "Payment required / failed",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /invoices/{id}/pay:403",
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /invoices/{id}/pay:404",
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /invoices/{id}/pay:422",
+            "endpoint": "POST /invoices/{id}/pay",
+            "method": "POST",
+            "path": "/invoices/{id}/pay",
+            "statusCode": 422,
+            "description": "Validation errors",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /usage/{subscription_id}:401",
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /usage/{subscription_id}:402",
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "statusCode": 402,
+            "description": "Active subscription required",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /usage/{subscription_id}:403",
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /usage/{subscription_id}:404",
+            "endpoint": "GET /usage/{subscription_id}",
+            "method": "GET",
+            "path": "/usage/{subscription_id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /usage/record:401",
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /usage/record:402",
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "statusCode": 402,
+            "description": "Active subscription required",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /usage/record:422",
+            "endpoint": "POST /usage/record",
+            "method": "POST",
+            "path": "/usage/record",
+            "statusCode": 422,
+            "description": "Usage quota exceeded",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{subscription_id}/seats:401",
+            "endpoint": "GET /subscriptions/{subscription_id}/seats",
+            "method": "GET",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{subscription_id}/seats:403",
+            "endpoint": "GET /subscriptions/{subscription_id}/seats",
+            "method": "GET",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /subscriptions/{subscription_id}/seats:404",
+            "endpoint": "GET /subscriptions/{subscription_id}/seats",
+            "method": "GET",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{subscription_id}/seats:401",
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{subscription_id}/seats:403",
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{subscription_id}/seats:404",
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /subscriptions/{subscription_id}/seats:422",
+            "endpoint": "POST /subscriptions/{subscription_id}/seats",
+            "method": "POST",
+            "path": "/subscriptions/{subscription_id}/seats",
+            "statusCode": 422,
+            "description": "Seat limit reached",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{subscription_id}/seats/{id}:401",
+            "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{subscription_id}/seats/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{subscription_id}/seats/{id}:403",
+            "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{subscription_id}/seats/{id}",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /subscriptions/{subscription_id}/seats/{id}:404",
+            "endpoint": "DELETE /subscriptions/{subscription_id}/seats/{id}",
+            "method": "DELETE",
+            "path": "/subscriptions/{subscription_id}/seats/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /plans:401",
+            "endpoint": "GET /plans",
+            "method": "GET",
+            "path": "/plans",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /plans/{id}:401",
+            "endpoint": "GET /plans/{id}",
+            "method": "GET",
+            "path": "/plans/{id}",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /plans/{id}:404",
+            "endpoint": "GET /plans/{id}",
+            "method": "GET",
+            "path": "/plans/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /coupons/validate:401",
+            "endpoint": "POST /coupons/validate",
+            "method": "POST",
+            "path": "/coupons/validate",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /coupons/validate:404",
+            "endpoint": "POST /coupons/validate",
+            "method": "POST",
+            "path": "/coupons/validate",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /coupons/validate:422",
+            "endpoint": "POST /coupons/validate",
+            "method": "POST",
+            "path": "/coupons/validate",
+            "statusCode": 422,
+            "description": "Coupon is invalid or already used",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /audit-logs:401",
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /audit-logs:403",
+            "endpoint": "GET /audit-logs",
+            "method": "GET",
+            "path": "/audit-logs",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /webhooks:401",
+            "endpoint": "POST /webhooks",
+            "method": "POST",
+            "path": "/webhooks",
+            "statusCode": 401,
+            "description": "Invalid webhook signature",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:401",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:403",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/health:503",
+            "endpoint": "GET /admin/health",
+            "method": "GET",
+            "path": "/admin/health",
+            "statusCode": 503,
+            "description": "System degraded",
+            "categories": [
+              "server-error"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/stats:401",
+            "endpoint": "GET /admin/stats",
+            "method": "GET",
+            "path": "/admin/stats",
+            "statusCode": 401,
+            "description": "Unauthorized - invalid or missing authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /admin/stats:403",
+            "endpoint": "GET /admin/stats",
+            "method": "GET",
+            "path": "/admin/stats",
+            "statusCode": 403,
+            "description": "Forbidden - insufficient permissions",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        }
+      ],
+      "categorySummary": {
+        "missing-parameter": {
+          "total": 0,
+          "covered": 0
+        },
+        "invalid-value": {
+          "total": 10,
+          "covered": 0
+        },
+        "unauthorized": {
+          "total": 26,
+          "covered": 0
+        },
+        "forbidden": {
+          "total": 15,
+          "covered": 0
+        },
+        "not-found": {
+          "total": 16,
+          "covered": 0
+        },
+        "conflict": {
+          "total": 0,
+          "covered": 0
+        },
+        "server-error": {
+          "total": 1,
+          "covered": 0
+        }
+      }
+    },
+    "business": {
+      "total": 8,
+      "covered": 0,
+      "percentage": 0,
+      "uncoveredRules": [
+        {
+          "id": "user-deletion-requires-admin",
+          "name": "User Deletion Requires Admin",
+          "description": "Only users with the admin role can delete other user accounts.",
+          "severity": "critical",
+          "endpoints": [
+            "DELETE /api/v1/users/:id"
+          ],
+          "validation": "Current user must have role = 'admin'.\nAdmin cannot delete their own account.\n",
+          "error_response": {
+            "status": 403,
+            "body": {
+              "error": "Admin privileges required"
+            }
+          },
+          "tests": [
+            "non-admin attempting user deletion returns 403",
+            "admin can delete other users successfully",
+            "admin cannot delete their own account"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "active-subscription-required",
+          "name": "Active Subscription Required",
+          "description": "Certain features require the user to have an active or trialing subscription.",
+          "severity": "high",
+          "endpoints": [
+            "GET /api/v1/usage/:subscription_id",
+            "POST /api/v1/usage/record"
+          ],
+          "validation": "Subscription status must be 'active' or 'trialing'.\nCancelled, expired, and past_due subscriptions do not qualify.\n",
+          "error_response": {
+            "status": 402,
+            "body": {
+              "error": "Active subscription required"
+            }
+          },
+          "tests": [
+            "usage endpoint returns 402 when subscription is cancelled",
+            "usage endpoint returns 402 when subscription is expired",
+            "usage endpoint succeeds when subscription is active",
+            "usage endpoint succeeds when subscription is trialing"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "seat-limit-per-plan",
+          "name": "Seat Limit Per Plan",
+          "description": "The number of seats in a subscription cannot exceed the plan's defined seat limit.",
+          "severity": "high",
+          "endpoints": [
+            "POST /api/v1/subscriptions/:subscription_id/seats"
+          ],
+          "validation": "seats.active.count < plan.seat_limit must be true before adding a seat.\n",
+          "error_response": {
+            "status": 422,
+            "body": {
+              "error": "Seat limit reached",
+              "seats_used": "<current_count>",
+              "seats_limit": "<plan_limit>",
+              "upgrade_url": "/api/v1/subscriptions/:id/upgrade"
+            }
+          },
+          "tests": [
+            "adding a seat at limit returns 422 with upgrade URL",
+            "adding a seat below limit succeeds",
+            "seat count in response meta is accurate"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "invoice-payment-window",
+          "name": "Invoice Payment Window (30 Days)",
+          "description": "Invoices must be paid within 30 days of their due date. Overdue invoices cannot be paid via the standard endpoint.",
+          "severity": "high",
+          "endpoints": [
+            "POST /api/v1/invoices/:id/pay"
+          ],
+          "validation": "invoice.due_date must be >= Time.current (not overdue).\ninvoice.status must not be 'paid'.\n",
+          "error_response": {
+            "status": 422,
+            "body": {
+              "error": "Invoice is overdue and cannot be paid through this endpoint"
+            }
+          },
+          "tests": [
+            "paying an overdue invoice returns 422",
+            "paying an already-paid invoice returns 422",
+            "paying a valid pending invoice within window succeeds"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "coupon-single-use",
+          "name": "Coupon Single Use Per Account",
+          "description": "Coupons marked as single_use can only be applied once per user account.",
+          "severity": "medium",
+          "endpoints": [
+            "POST /api/v1/coupons/validate"
+          ],
+          "validation": "If coupon.single_use? is true:\n  coupon.redemptions.where(user_id: current_user.id).exists? must be false\n",
+          "error_response": {
+            "status": 422,
+            "body": {
+              "error": "Coupon has already been used by this account"
+            }
+          },
+          "tests": [
+            "single-use coupon returns 422 on second use by same user",
+            "single-use coupon can be used by a different user",
+            "non-single-use coupon can be used multiple times"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "subscription-cancellation-period",
+          "name": "Subscription Cancellation Period",
+          "description": "When a user cancels via POST /cancel, the subscription remains active until the\nend of the current billing period. Immediate cancellation is only available via DELETE.\n",
+          "severity": "medium",
+          "endpoints": [
+            "POST /api/v1/subscriptions/:id/cancel",
+            "DELETE /api/v1/subscriptions/:id"
+          ],
+          "validation": "POST /cancel: sets cancel_at_period_end = true, does not immediately change status.\nDELETE: immediately sets status = 'cancelled'.\n",
+          "tests": [
+            "POST cancel sets cancel_at_period_end to true",
+            "POST cancel returns the period_end date in the response",
+            "POST cancel does not immediately change subscription status",
+            "DELETE immediately cancels subscription"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "usage-quota-enforcement",
+          "name": "Usage Quota Enforcement",
+          "description": "Usage events cannot be recorded if they would exceed the plan's usage quota for the current billing period.",
+          "severity": "high",
+          "endpoints": [
+            "POST /api/v1/usage/record"
+          ],
+          "validation": "(current_period_usage + new_quantity) <= plan.usage_quota\n",
+          "error_response": {
+            "status": 422,
+            "body": {
+              "error": "Usage quota exceeded for {metric}",
+              "quota": "<plan_quota>",
+              "current_usage": "<current_period_total>"
+            }
+          },
+          "tests": [
+            "recording usage that would exceed quota returns 422 with quota info",
+            "recording usage within quota succeeds",
+            "quota enforcement is per billing period, not cumulative"
+          ],
+          "keywords": [],
+          "scenarios": []
+        },
+        {
+          "id": "subscription-downgrade-seats",
+          "name": "Subscription Downgrade Adjusts Seats",
+          "description": "When downgrading to a plan with a lower seat limit, if the current seat count\nexceeds the new plan's limit, the oldest seats are automatically deactivated.\n",
+          "severity": "medium",
+          "endpoints": [
+            "GET /api/v1/subscriptions/:id/upgrade"
+          ],
+          "validation": "If new_plan.seat_limit < current_seat_count:\n  Automatically deactivate (current_seat_count - new_plan.seat_limit) oldest seats.\n",
+          "tests": [
+            "downgrade with excess seats auto-removes oldest seats",
+            "downgrade without excess seats does not remove seats",
+            "upgrade does not remove any seats"
+          ],
+          "keywords": [],
+          "scenarios": []
+        }
+      ],
+      "rules": [
+        {
+          "rule": {
+            "id": "user-deletion-requires-admin",
+            "name": "User Deletion Requires Admin",
+            "description": "Only users with the admin role can delete other user accounts.",
+            "severity": "critical",
+            "endpoints": [
+              "DELETE /api/v1/users/:id"
+            ],
+            "validation": "Current user must have role = 'admin'.\nAdmin cannot delete their own account.\n",
+            "error_response": {
+              "status": 403,
+              "body": {
+                "error": "Admin privileges required"
+              }
+            },
+            "tests": [
+              "non-admin attempting user deletion returns 403",
+              "admin can delete other users successfully",
+              "admin cannot delete their own account"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "active-subscription-required",
+            "name": "Active Subscription Required",
+            "description": "Certain features require the user to have an active or trialing subscription.",
+            "severity": "high",
+            "endpoints": [
+              "GET /api/v1/usage/:subscription_id",
+              "POST /api/v1/usage/record"
+            ],
+            "validation": "Subscription status must be 'active' or 'trialing'.\nCancelled, expired, and past_due subscriptions do not qualify.\n",
+            "error_response": {
+              "status": 402,
+              "body": {
+                "error": "Active subscription required"
+              }
+            },
+            "tests": [
+              "usage endpoint returns 402 when subscription is cancelled",
+              "usage endpoint returns 402 when subscription is expired",
+              "usage endpoint succeeds when subscription is active",
+              "usage endpoint succeeds when subscription is trialing"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "seat-limit-per-plan",
+            "name": "Seat Limit Per Plan",
+            "description": "The number of seats in a subscription cannot exceed the plan's defined seat limit.",
+            "severity": "high",
+            "endpoints": [
+              "POST /api/v1/subscriptions/:subscription_id/seats"
+            ],
+            "validation": "seats.active.count < plan.seat_limit must be true before adding a seat.\n",
+            "error_response": {
+              "status": 422,
+              "body": {
+                "error": "Seat limit reached",
+                "seats_used": "<current_count>",
+                "seats_limit": "<plan_limit>",
+                "upgrade_url": "/api/v1/subscriptions/:id/upgrade"
+              }
+            },
+            "tests": [
+              "adding a seat at limit returns 422 with upgrade URL",
+              "adding a seat below limit succeeds",
+              "seat count in response meta is accurate"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "invoice-payment-window",
+            "name": "Invoice Payment Window (30 Days)",
+            "description": "Invoices must be paid within 30 days of their due date. Overdue invoices cannot be paid via the standard endpoint.",
+            "severity": "high",
+            "endpoints": [
+              "POST /api/v1/invoices/:id/pay"
+            ],
+            "validation": "invoice.due_date must be >= Time.current (not overdue).\ninvoice.status must not be 'paid'.\n",
+            "error_response": {
+              "status": 422,
+              "body": {
+                "error": "Invoice is overdue and cannot be paid through this endpoint"
+              }
+            },
+            "tests": [
+              "paying an overdue invoice returns 422",
+              "paying an already-paid invoice returns 422",
+              "paying a valid pending invoice within window succeeds"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "coupon-single-use",
+            "name": "Coupon Single Use Per Account",
+            "description": "Coupons marked as single_use can only be applied once per user account.",
+            "severity": "medium",
+            "endpoints": [
+              "POST /api/v1/coupons/validate"
+            ],
+            "validation": "If coupon.single_use? is true:\n  coupon.redemptions.where(user_id: current_user.id).exists? must be false\n",
+            "error_response": {
+              "status": 422,
+              "body": {
+                "error": "Coupon has already been used by this account"
+              }
+            },
+            "tests": [
+              "single-use coupon returns 422 on second use by same user",
+              "single-use coupon can be used by a different user",
+              "non-single-use coupon can be used multiple times"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "subscription-cancellation-period",
+            "name": "Subscription Cancellation Period",
+            "description": "When a user cancels via POST /cancel, the subscription remains active until the\nend of the current billing period. Immediate cancellation is only available via DELETE.\n",
+            "severity": "medium",
+            "endpoints": [
+              "POST /api/v1/subscriptions/:id/cancel",
+              "DELETE /api/v1/subscriptions/:id"
+            ],
+            "validation": "POST /cancel: sets cancel_at_period_end = true, does not immediately change status.\nDELETE: immediately sets status = 'cancelled'.\n",
+            "tests": [
+              "POST cancel sets cancel_at_period_end to true",
+              "POST cancel returns the period_end date in the response",
+              "POST cancel does not immediately change subscription status",
+              "DELETE immediately cancels subscription"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "usage-quota-enforcement",
+            "name": "Usage Quota Enforcement",
+            "description": "Usage events cannot be recorded if they would exceed the plan's usage quota for the current billing period.",
+            "severity": "high",
+            "endpoints": [
+              "POST /api/v1/usage/record"
+            ],
+            "validation": "(current_period_usage + new_quantity) <= plan.usage_quota\n",
+            "error_response": {
+              "status": 422,
+              "body": {
+                "error": "Usage quota exceeded for {metric}",
+                "quota": "<plan_quota>",
+                "current_usage": "<current_period_total>"
+              }
+            },
+            "tests": [
+              "recording usage that would exceed quota returns 422 with quota info",
+              "recording usage within quota succeeds",
+              "quota enforcement is per billing period, not cumulative"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        },
+        {
+          "rule": {
+            "id": "subscription-downgrade-seats",
+            "name": "Subscription Downgrade Adjusts Seats",
+            "description": "When downgrading to a plan with a lower seat limit, if the current seat count\nexceeds the new plan's limit, the oldest seats are automatically deactivated.\n",
+            "severity": "medium",
+            "endpoints": [
+              "GET /api/v1/subscriptions/:id/upgrade"
+            ],
+            "validation": "If new_plan.seat_limit < current_seat_count:\n  Automatically deactivate (current_seat_count - new_plan.seat_limit) oldest seats.\n",
+            "tests": [
+              "downgrade with excess seats auto-removes oldest seats",
+              "downgrade without excess seats does not remove seats",
+              "upgrade does not remove any seats"
+            ],
+            "keywords": [],
+            "scenarios": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": []
+        }
+      ]
+    },
+    "integration": {
+      "total": 5,
+      "complete": 0,
+      "partial": 0,
+      "missing": 5,
+      "percentage": 0,
+      "flows": [
+        {
+          "flow": {
+            "id": "FLOW001",
+            "name": "User Registration and Subscription",
+            "description": "A new user signs up, receives their account, selects a plan,\nand creates their first subscription (potentially with a free trial).\n",
+            "actor": "New User",
+            "preconditions": [
+              "Plans are available in the system"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "action": "Create user account",
+                "endpoint": "POST /api/v1/users",
+                "payload": {
+                  "email": "newuser@example.com",
+                  "password": "SecurePass123!",
+                  "first_name": "Jane",
+                  "last_name": "Doe"
+                },
+                "expected_status": 201,
+                "validates": "User is created with role=member, status=active",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "action": "Authenticate and get JWT token",
+                "endpoint": "POST /api/v1/auth/login",
+                "payload": {
+                  "email": "newuser@example.com",
+                  "password": "SecurePass123!"
+                },
+                "expected_status": 200,
+                "notes": "Token used in subsequent requests",
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "action": "Browse available plans",
+                "endpoint": "GET /api/v1/plans",
+                "expected_status": 200,
+                "validates": "Returns active plans sorted by price",
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "action": "Select and subscribe to Professional plan",
+                "endpoint": "POST /api/v1/subscriptions",
+                "payload": {
+                  "plan_id": "<professional_plan_id>",
+                  "billing_cycle": "monthly"
+                },
+                "expected_status": 201,
+                "validates": [
+                  "Subscription created with status=trialing (first subscription)",
+                  "trial_end_date set to 14 days from now",
+                  "No invoice created during trial"
+                ],
+                "keywords": []
+              }
+            ],
+            "postconditions": [
+              "User has one subscription in trialing status",
+              "Audit log entry created for user_created and subscription_created"
+            ],
+            "related_business_rules": [
+              "active-subscription-required"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "action": "Create user account",
+                "endpoint": "POST /api/v1/users",
+                "payload": {
+                  "email": "newuser@example.com",
+                  "password": "SecurePass123!",
+                  "first_name": "Jane",
+                  "last_name": "Doe"
+                },
+                "expected_status": 201,
+                "validates": "User is created with role=member, status=active",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "action": "Authenticate and get JWT token",
+                "endpoint": "POST /api/v1/auth/login",
+                "payload": {
+                  "email": "newuser@example.com",
+                  "password": "SecurePass123!"
+                },
+                "expected_status": 200,
+                "notes": "Token used in subsequent requests",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "action": "Browse available plans",
+                "endpoint": "GET /api/v1/plans",
+                "expected_status": 200,
+                "validates": "Returns active plans sorted by price",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "action": "Select and subscribe to Professional plan",
+                "endpoint": "POST /api/v1/subscriptions",
+                "payload": {
+                  "plan_id": "<professional_plan_id>",
+                  "billing_cycle": "monthly"
+                },
+                "expected_status": 201,
+                "validates": [
+                  "Subscription created with status=trialing (first subscription)",
+                  "trial_end_date set to 14 days from now",
+                  "No invoice created during trial"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW002",
+            "name": "Plan Upgrade Flow",
+            "description": "An existing subscriber upgrades from Starter to Professional plan.\nIf they have more seats than the new plan allows, excess seats are removed.\n",
+            "actor": "Subscribed User",
+            "preconditions": [
+              "User has an active subscription on Starter plan",
+              "User has already invited team members (seats)"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "action": "Check current subscription and seat usage",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": "Returns seats_used and seats_limit",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "action": "Browse available plans to find upgrade target",
+                "endpoint": "GET /api/v1/plans",
+                "expected_status": 200,
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "action": "Upgrade to Professional plan",
+                "endpoint": "GET /api/v1/subscriptions/:id/upgrade",
+                "query_params": {
+                  "plan_id": "<professional_plan_id>"
+                },
+                "expected_status": 200,
+                "validates": [
+                  "Subscription plan updated",
+                  "Pro-rated invoice created for remaining period",
+                  "If seats exceeded new limit, oldest seats auto-removed"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "action": "Verify updated subscription details",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  "plan.name = \"Professional\"",
+                  "seats_limit reflects new plan"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 5,
+                "action": "Review invoice for upgrade proration",
+                "endpoint": "GET /api/v1/invoices",
+                "expected_status": 200,
+                "validates": "New invoice created for upgrade",
+                "keywords": []
+              }
+            ],
+            "related_business_rules": [
+              "seat-limit-per-plan",
+              "subscription-downgrade-seats"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "action": "Check current subscription and seat usage",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": "Returns seats_used and seats_limit",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "action": "Browse available plans to find upgrade target",
+                "endpoint": "GET /api/v1/plans",
+                "expected_status": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "action": "Upgrade to Professional plan",
+                "endpoint": "GET /api/v1/subscriptions/:id/upgrade",
+                "query_params": {
+                  "plan_id": "<professional_plan_id>"
+                },
+                "expected_status": 200,
+                "validates": [
+                  "Subscription plan updated",
+                  "Pro-rated invoice created for remaining period",
+                  "If seats exceeded new limit, oldest seats auto-removed"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "action": "Verify updated subscription details",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  "plan.name = \"Professional\"",
+                  "seats_limit reflects new plan"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 5,
+                "action": "Review invoice for upgrade proration",
+                "endpoint": "GET /api/v1/invoices",
+                "expected_status": 200,
+                "validates": "New invoice created for upgrade",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW003",
+            "name": "Invoice Payment",
+            "description": "A user receives an invoice for their subscription renewal\nand pays it using a saved payment method.\n",
+            "actor": "Subscribed User",
+            "preconditions": [
+              "User has an active subscription",
+              "An unpaid invoice exists within the 30-day payment window"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "action": "List invoices to find pending ones",
+                "endpoint": "GET /api/v1/invoices",
+                "expected_status": 200,
+                "validates": "Returns paginated invoices, most recent first",
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "action": "View invoice details",
+                "endpoint": "GET /api/v1/invoices/:id",
+                "expected_status": 200,
+                "validates": [
+                  "Invoice status is pending",
+                  "due_date is in the future or within allowed window",
+                  "line_items are populated"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "action": "Pay the invoice",
+                "endpoint": "POST /api/v1/invoices/:id/pay",
+                "payload": {
+                  "payment_method_id": "pm_test_card_visa"
+                },
+                "expected_status": 200,
+                "validates": [
+                  "Invoice status changes to paid",
+                  "paid_at is set to current time",
+                  "Audit log entry created"
+                ],
+                "keywords": []
+              }
+            ],
+            "error_paths": [
+              {
+                "scenario": "Invoice is overdue",
+                "step": 3,
+                "expected_status": 422,
+                "expected_error": "Invoice is overdue and cannot be paid through this endpoint"
+              },
+              {
+                "scenario": "Invoice already paid",
+                "step": 3,
+                "expected_status": 422,
+                "expected_error": "Invoice is already paid"
+              }
+            ],
+            "related_business_rules": [
+              "invoice-payment-window"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "action": "List invoices to find pending ones",
+                "endpoint": "GET /api/v1/invoices",
+                "expected_status": 200,
+                "validates": "Returns paginated invoices, most recent first",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "action": "View invoice details",
+                "endpoint": "GET /api/v1/invoices/:id",
+                "expected_status": 200,
+                "validates": [
+                  "Invoice status is pending",
+                  "due_date is in the future or within allowed window",
+                  "line_items are populated"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "action": "Pay the invoice",
+                "endpoint": "POST /api/v1/invoices/:id/pay",
+                "payload": {
+                  "payment_method_id": "pm_test_card_visa"
+                },
+                "expected_status": 200,
+                "validates": [
+                  "Invoice status changes to paid",
+                  "paid_at is set to current time",
+                  "Audit log entry created"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW004",
+            "name": "Seat Management",
+            "description": "An account owner adds team members to their subscription, reaching the seat limit,\nthen attempts to add another (should fail), upgrades their plan, then adds the additional seat.\n",
+            "actor": "Account Owner (Subscribed)",
+            "preconditions": [
+              "User has active Professional plan (5 seat limit)",
+              "4 seats already in use"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "action": "View current seat usage",
+                "endpoint": "GET /api/v1/subscriptions/:subscription_id/seats",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "seats_used": 4
+                  },
+                  {
+                    "seats_available": 1
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "action": "Add a seat (within limit)",
+                "endpoint": "POST /api/v1/subscriptions/:subscription_id/seats",
+                "payload": {
+                  "email": "colleague@example.com",
+                  "role": "member"
+                },
+                "expected_status": 201,
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "action": "Attempt to add another seat (at limit now)",
+                "endpoint": "POST /api/v1/subscriptions/:subscription_id/seats",
+                "payload": {
+                  "email": "another@example.com"
+                },
+                "expected_status": 422,
+                "validates": [
+                  {
+                    "error": "Seat limit reached"
+                  },
+                  "upgrade_url is present in response"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "action": "Remove a seat to free up space",
+                "endpoint": "DELETE /api/v1/subscriptions/:subscription_id/seats/:id",
+                "expected_status": 200,
+                "validates": "Seat status changes to deactivated",
+                "keywords": []
+              }
+            ],
+            "related_business_rules": [
+              "seat-limit-per-plan",
+              "subscription-downgrade-seats"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "action": "View current seat usage",
+                "endpoint": "GET /api/v1/subscriptions/:subscription_id/seats",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "seats_used": 4
+                  },
+                  {
+                    "seats_available": 1
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "action": "Add a seat (within limit)",
+                "endpoint": "POST /api/v1/subscriptions/:subscription_id/seats",
+                "payload": {
+                  "email": "colleague@example.com",
+                  "role": "member"
+                },
+                "expected_status": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "action": "Attempt to add another seat (at limit now)",
+                "endpoint": "POST /api/v1/subscriptions/:subscription_id/seats",
+                "payload": {
+                  "email": "another@example.com"
+                },
+                "expected_status": 422,
+                "validates": [
+                  {
+                    "error": "Seat limit reached"
+                  },
+                  "upgrade_url is present in response"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "action": "Remove a seat to free up space",
+                "endpoint": "DELETE /api/v1/subscriptions/:subscription_id/seats/:id",
+                "expected_status": 200,
+                "validates": "Seat status changes to deactivated",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW005",
+            "name": "Subscription Cancellation",
+            "description": "A user decides to cancel their subscription. The cancellation is scheduled\nfor end of billing period. The subscription remains active until then.\n",
+            "actor": "Subscribed User",
+            "preconditions": [
+              "User has an active subscription"
+            ],
+            "steps": [
+              {
+                "step": 1,
+                "action": "View subscription to confirm current period end",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "cancel_at_period_end": false
+                  },
+                  "current_period_end is set"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 2,
+                "action": "Request cancellation",
+                "endpoint": "POST /api/v1/subscriptions/:id/cancel",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "cancel_at_period_end": true
+                  },
+                  "status remains active (not cancelled yet)",
+                  "Response includes period end date"
+                ],
+                "keywords": []
+              },
+              {
+                "step": 3,
+                "action": "Verify subscription still active during period",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "status": "active"
+                  },
+                  {
+                    "cancel_at_period_end": true
+                  }
+                ],
+                "keywords": []
+              },
+              {
+                "step": 4,
+                "action": "Check audit log for cancellation record",
+                "endpoint": "GET /api/v1/audit-logs",
+                "query_params": {
+                  "action": "subscription_cancellation_scheduled",
+                  "resource_type": "Subscription"
+                },
+                "expected_status": 200,
+                "validates": "Audit log entry exists for the cancellation",
+                "keywords": []
+              }
+            ],
+            "error_paths": [
+              {
+                "scenario": "Cancelling an already cancelled subscription",
+                "step": 2,
+                "expected_status": 422,
+                "expected_error": "Subscription is already cancelled"
+              }
+            ],
+            "postconditions": [
+              "Subscription cancel_at_period_end = true",
+              "Subscription will be cancelled by background job at period end",
+              "User retains access until period end"
+            ],
+            "related_business_rules": [
+              "subscription-cancellation-period",
+              "active-subscription-required"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "step": 1,
+                "action": "View subscription to confirm current period end",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "cancel_at_period_end": false
+                  },
+                  "current_period_end is set"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 2,
+                "action": "Request cancellation",
+                "endpoint": "POST /api/v1/subscriptions/:id/cancel",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "cancel_at_period_end": true
+                  },
+                  "status remains active (not cancelled yet)",
+                  "Response includes period end date"
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 3,
+                "action": "Verify subscription still active during period",
+                "endpoint": "GET /api/v1/subscriptions/:id",
+                "expected_status": 200,
+                "validates": [
+                  {
+                    "status": "active"
+                  },
+                  {
+                    "cancel_at_period_end": true
+                  }
+                ],
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "step": 4,
+                "action": "Check audit log for cancellation record",
+                "endpoint": "GET /api/v1/audit-logs",
+                "query_params": {
+                  "action": "subscription_cancellation_scheduled",
+                  "resource_type": "Subscription"
+                },
+                "expected_status": 200,
+                "validates": "Audit log entry exists for the cancellation",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "observability": {
+    "metricsUrl": null,
+    "note": "Prometheus metrics export not enabled (use --metrics-port to enable)",
+    "metricNames": {
+      "total": "api_coverage_total{service=\"<name>\",coverage_type=\"<type>\"}",
+      "covered": "api_coverage_covered{service=\"<name>\",coverage_type=\"<type>\"}",
+      "ratio": "api_coverage_ratio{service=\"<name>\",coverage_type=\"<type>\"}",
+      "thresholdFailure": "api_coverage_threshold_failure{service=\"<name>\",coverage_type=\"<type>\"}"
+    },
+    "tracing": {
+      "enabled": false,
+      "otlpEndpoint": null,
+      "note": "Tracing not enabled (use --trace to enable)"
+    }
+  },
+  "discoveryInfo": {
+    "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/ruby-rails-complex",
+    "analyzedAt": "2026-03-11T15:43:32.130Z",
+    "languages": [
+      "ruby"
+    ],
+    "frameworks": [
+      "rspec",
+      "jest"
+    ],
+    "serviceFilesCount": 30,
+    "testFilesCount": 15,
+    "specFilesCount": 1,
+    "analysisMode": "explicit-spec"
+  }
+}

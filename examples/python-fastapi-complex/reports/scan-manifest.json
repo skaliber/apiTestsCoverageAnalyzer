@@ -1,0 +1,119 @@
+{
+  "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex",
+  "analyzedAt": "2026-03-11T15:46:18.853Z",
+  "discoveredFiles": {
+    "serviceFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/__init__.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/constants.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/database.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/helpers/__init__.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/helpers/api_client.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/helpers/path_builder.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/models.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/__init__.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/admin.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/merchants.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py"
+    ],
+    "testFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_accounts.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_admin.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_cards.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_error_scenarios.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_limits.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_merchants.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_security.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_statements.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_transactions.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-complete/test_transfers.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_accounts.py",
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/tests/tests-initial/test_transactions.py"
+    ],
+    "specFiles": [
+      "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/openapi.yaml"
+    ]
+  },
+  "languages": [
+    "python"
+  ],
+  "frameworks": [
+    "pytest",
+    "jest"
+  ],
+  "scanTypes": [
+    {
+      "type": "endpoint",
+      "source": "explicit",
+      "itemsFound": 26,
+      "itemsCovered": 17,
+      "coveragePercent": 65.38
+    },
+    {
+      "type": "parameter",
+      "source": "explicit",
+      "itemsFound": 49,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "source": "explicit",
+      "itemsFound": 52,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "source": "explicit",
+      "itemsFound": 8,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "source": "explicit",
+      "itemsFound": 5,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "security",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "performance",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "resilience",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "compatibility",
+      "source": "skipped",
+      "reason": "No data available",
+      "itemsFound": 0,
+      "itemsCovered": 0,
+      "coveragePercent": 0
+    }
+  ]
+}

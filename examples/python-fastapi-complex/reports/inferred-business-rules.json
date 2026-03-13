@@ -1,0 +1,1412 @@
+{
+  "generated_at": "2026-03-11T15:46:18.749Z",
+  "rule_source": "inferred",
+  "files_analyzed": 18,
+  "rule_count": 115,
+  "rules": [
+    {
+      "id": "auth_h_t_t_p_exception_87",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:87",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "auth_h_t_t_p_exception_87",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:87",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "auth_null_check_user_id_109",
+      "name": "null_check_user_id",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "user_id == null",
+      "expected_behavior": "user_id must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:109",
+      "code_snippet": "if user_id is None:",
+      "specificKeywords": [
+        "null"
+      ]
+    },
+    {
+      "id": "auth_null_check_user_112",
+      "name": "null_check_user",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "user == null",
+      "expected_behavior": "user must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:112",
+      "code_snippet": "if user is None:",
+      "specificKeywords": [
+        "user",
+        "null"
+      ]
+    },
+    {
+      "id": "auth_h_t_t_p_exception_115",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:115",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "auth_h_t_t_p_exception_115",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:115",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "auth_h_t_t_p_exception_128",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:128",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "auth_h_t_t_p_exception_128",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/auth.py:128",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "database_null_check_limits_487",
+      "name": "null_check_limits",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "limits == null",
+      "expected_behavior": "limits must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/database.py:487",
+      "code_snippet": "if limits is None:",
+      "specificKeywords": [
+        "limits",
+        "null"
+      ]
+    },
+    {
+      "id": "main_h_t_t_p_exception_85",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:85",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "main_h_t_t_p_exception_85",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:85",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "main_h_t_t_p_exception_111",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:111",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "main_h_t_t_p_exception_111",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:111",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "main_h_t_t_p_exception_117",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:117",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "main_h_t_t_p_exception_117",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/main.py:117",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_32",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:32",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_32",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:32",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_85",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:85",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_85",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:85",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_103",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:103",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_103",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:103",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_126",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:126",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_126",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:126",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_131",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:131",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_131",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:131",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_137",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:137",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_137",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:137",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_156",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:156",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_156",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:156",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_182",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:182",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "accounts_h_t_t_p_exception_182",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/accounts.py:182",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_18",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Associated account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:18",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Associated account not found\")",
+      "specificKeywords": [
+        "associated",
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_18",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:18",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Associated account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_20",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:20",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_20",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:20",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_44",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:44",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_44",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:44",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_46",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:46",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_46",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:46",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_51",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:51",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_51",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:51",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_72",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:72",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": [
+        "card",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_72",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:72",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_95",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:95",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": [
+        "card",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_95",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:95",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_100",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:100",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_100",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:100",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "cards_h_t_t_p_exception_125",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:125",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": [
+        "card",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "cards_h_t_t_p_exception_125",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/cards.py:125",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Card not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_h_t_t_p_exception_17",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:17",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_h_t_t_p_exception_17",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:17",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_h_t_t_p_exception_35",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:35",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_35",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:35",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_null_check_limits_39",
+      "name": "null_check_limits",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "limits == null",
+      "expected_behavior": "limits must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:39",
+      "code_snippet": "if limits is None:",
+      "specificKeywords": [
+        "limits",
+        "null"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_40",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:40",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "specificKeywords": [
+        "limits",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_40",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:40",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_h_t_t_p_exception_73",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:73",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_73",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:73",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "limits_null_check_updated_limits_77",
+      "name": "null_check_updated_limits",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "updated_limits == null",
+      "expected_behavior": "updated_limits must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:77",
+      "code_snippet": "if updated_limits is None:",
+      "specificKeywords": [
+        "null"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_78",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:78",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "specificKeywords": [
+        "limits",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "limits_h_t_t_p_exception_78",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/limits.py:78",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Limits not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "merchants_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Merchant not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/merchants.py:47",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Merchant not found\")",
+      "specificKeywords": [
+        "merchant",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "merchants_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/merchants.py:47",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Merchant not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_21",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:21",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_21",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:21",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_39",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:39",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_39",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:39",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_null_check_raw_43",
+      "name": "null_check_raw",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "raw == null",
+      "expected_behavior": "raw must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:43",
+      "code_snippet": "if raw is None:",
+      "specificKeywords": [
+        "raw",
+        "null"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_44",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:44",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_44",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:44",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_76",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:76",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_76",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:76",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_h_t_t_p_exception_83",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:83",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_83",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:83",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "statements_null_check_stmt_87",
+      "name": "null_check_stmt",
+      "rule_source": "inferred",
+      "type": "validation",
+      "condition": "stmt == null",
+      "expected_behavior": "stmt must not be null/empty",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:87",
+      "code_snippet": "if stmt is None:",
+      "specificKeywords": [
+        "stmt",
+        "null"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_88",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Statement not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:88",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Statement not found\")",
+      "specificKeywords": [
+        "statement",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "statements_h_t_t_p_exception_88",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/statements.py:88",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Statement not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_43",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:43",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_43",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:43",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:47",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:47",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_51",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:51",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_51",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:51",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_57",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:57",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_57",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:57",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_66",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:66",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_66",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:66",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_90",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:90",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": [
+        "account",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_90",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:90",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Account not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_92",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:92",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_92",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:92",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_115",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transaction not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:115",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transaction not found\")",
+      "specificKeywords": [
+        "transaction",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_115",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:115",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transaction not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_118",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:118",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "detail"
+      ]
+    },
+    {
+      "id": "transactions_h_t_t_p_exception_118",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transactions.py:118",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_40",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:40",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_40",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:40",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:47",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_47",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:47",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_54",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied to source account\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:54",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied to source account\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "to",
+        "source",
+        "account",
+        "detail"
+      ]
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_54",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:54",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied to source account\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_58",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:58",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_58",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:58",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_65",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:65",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_65",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:65",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_70",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:70",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_70",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:70",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_77",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:77",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_77",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:77",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_90",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException()",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:90",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_90",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:90",
+      "code_snippet": "raise HTTPException(",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_112",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transfer not found\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:112",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transfer not found\")",
+      "specificKeywords": [
+        "transfer",
+        "found",
+        "detail"
+      ]
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_112",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:112",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=\"Transfer not found\")",
+      "specificKeywords": []
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_116",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:116",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": [
+        "access",
+        "denied",
+        "detail"
+      ]
+    },
+    {
+      "id": "transfers_h_t_t_p_exception_116",
+      "name": "h_t_t_p_exception",
+      "rule_source": "inferred",
+      "type": "business_logic",
+      "condition": "raise HTTPException",
+      "expected_behavior": "Operation rejected: HTTPException",
+      "source_location": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/python-fastapi-complex/app/routers/transfers.py:116",
+      "code_snippet": "raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=\"Access denied\")",
+      "specificKeywords": []
+    }
+  ]
+}

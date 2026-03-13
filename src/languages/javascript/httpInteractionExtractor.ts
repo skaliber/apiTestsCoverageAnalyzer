@@ -201,7 +201,13 @@ function extractMethodFromOptions(optionsNode: AstNode): string | undefined {
 
 function extractResponseVariable(callNode: AstNode): string | undefined {
   // Walk up to find assignment pattern: const response = client.get(...)
-  const parent = callNode._parent;
+  const parent: AstNode | undefined =
+    // Prefer the stable `parent` property when available
+    (callNode && (callNode.parent as AstNode | undefined)) ??
+    // Best-effort fallback for parsers that still expose a private `_parent` field.
+    // This is intentionally isolated so that future AST changes only affect this spot.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    ((callNode as any)['_parent'] as AstNode | undefined);
   if (!parent) return undefined;
 
   if (parent.type === 'VariableDeclarator' && parent.id?.name) {

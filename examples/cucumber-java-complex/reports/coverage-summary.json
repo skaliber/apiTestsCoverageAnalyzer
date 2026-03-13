@@ -1,0 +1,5248 @@
+{
+  "generatedAt": "2026-03-11T15:51:53.608Z",
+  "summary": [
+    {
+      "type": "endpoint",
+      "totalItems": 26,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "parameter",
+      "totalItems": 57,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "error",
+      "totalItems": 53,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "business",
+      "totalItems": 8,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    },
+    {
+      "type": "integration",
+      "totalItems": 5,
+      "coveredItems": 0,
+      "coveragePercent": 0
+    }
+  ],
+  "details": {
+    "endpoint": {
+      "total": 26,
+      "covered": 0,
+      "percentage": 0,
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/token",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/logout",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/accounts",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/accounts",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/accounts/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/v1/accounts/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/balance",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/statement",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/transactions",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/transactions/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/transfers/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/loans/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/loans/{id}/payment",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/savings",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/savings/{id}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/savings/{id}/interest",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/beneficiaries",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/beneficiaries",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/statements/{accountId}",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/health",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/metrics",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/admin/audit-logs",
+          "pathRegex": {},
+          "covered": false,
+          "testFiles": [],
+          "languages": [],
+          "matches": []
+        }
+      ]
+    },
+    "parameter": {
+      "totalParameters": 57,
+      "averageCoverage": 0,
+      "fullyCoveredPercentage": 0,
+      "uncoveredParameters": [
+        {
+          "endpoint": "POST /api/v1/auth/token",
+          "method": "POST",
+          "path": "/api/v1/auth/token",
+          "name": "username",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/auth/token",
+          "method": "POST",
+          "path": "/api/v1/auth/token",
+          "name": "password",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "password"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/auth/logout",
+          "method": "POST",
+          "path": "/api/v1/auth/logout",
+          "name": "token",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/accounts",
+          "method": "POST",
+          "path": "/api/v1/accounts",
+          "name": "type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/accounts",
+          "method": "POST",
+          "path": "/api/v1/accounts",
+          "name": "initialDeposit",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/accounts",
+          "method": "POST",
+          "path": "/api/v1/accounts",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/accounts",
+          "method": "POST",
+          "path": "/api/v1/accounts",
+          "name": "displayName",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/accounts/{id}",
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /api/v1/accounts/{id}",
+          "method": "PUT",
+          "path": "/api/v1/accounts/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "PUT /api/v1/accounts/{id}",
+          "method": "PUT",
+          "path": "/api/v1/accounts/{id}",
+          "name": "displayName",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "DELETE /api/v1/accounts/{id}",
+          "method": "DELETE",
+          "path": "/api/v1/accounts/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/accounts/{id}/balance",
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/balance",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/accounts/{id}/statement",
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/statement",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/accounts/{id}/statement",
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/statement",
+          "name": "from",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/accounts/{id}/statement",
+          "method": "GET",
+          "path": "/api/v1/accounts/{id}/statement",
+          "name": "to",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/transactions",
+          "method": "GET",
+          "path": "/api/v1/transactions",
+          "name": "accountId",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transactions",
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "name": "accountId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transactions",
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "name": "type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "DEPOSIT",
+              "WITHDRAWAL"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transactions",
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.01
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transactions",
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transactions",
+          "method": "POST",
+          "path": "/api/v1/transactions",
+          "name": "description",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/transactions/{id}",
+          "method": "GET",
+          "path": "/api/v1/transactions/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "sourceAccountId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "beneficiaryId",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.01
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "type",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "DOMESTIC",
+              "INTERNATIONAL_WIRE"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "swift",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/transfers",
+          "method": "POST",
+          "path": "/api/v1/transfers",
+          "name": "reference",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/transfers/{id}",
+          "method": "GET",
+          "path": "/api/v1/transfers/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "PERSONAL",
+              "MORTGAGE",
+              "AUTO",
+              "BUSINESS"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "termMonths",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "creditScore",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 300,
+            "maximum": 850
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans",
+          "method": "POST",
+          "path": "/api/v1/loans",
+          "name": "purpose",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/loans/{id}",
+          "method": "GET",
+          "path": "/api/v1/loans/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans/{id}/payment",
+          "method": "POST",
+          "path": "/api/v1/loans/{id}/payment",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans/{id}/payment",
+          "method": "POST",
+          "path": "/api/v1/loans/{id}/payment",
+          "name": "amount",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans/{id}/payment",
+          "method": "POST",
+          "path": "/api/v1/loans/{id}/payment",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/loans/{id}/payment",
+          "method": "POST",
+          "path": "/api/v1/loans/{id}/payment",
+          "name": "paymentMethod",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "ACH",
+              "DEBIT_CARD",
+              "WIRE"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings",
+          "method": "POST",
+          "path": "/api/v1/savings",
+          "name": "type",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "SAVINGS"
+            ]
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings",
+          "method": "POST",
+          "path": "/api/v1/savings",
+          "name": "minimumBalance",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings",
+          "method": "POST",
+          "path": "/api/v1/savings",
+          "name": "currency",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings",
+          "method": "POST",
+          "path": "/api/v1/savings",
+          "name": "interestRate",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/savings/{id}",
+          "method": "GET",
+          "path": "/api/v1/savings/{id}",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings/{id}/interest",
+          "method": "POST",
+          "path": "/api/v1/savings/{id}/interest",
+          "name": "id",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/savings/{id}/interest",
+          "method": "POST",
+          "path": "/api/v1/savings/{id}/interest",
+          "name": "period",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/beneficiaries",
+          "method": "POST",
+          "path": "/api/v1/beneficiaries",
+          "name": "name",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/beneficiaries",
+          "method": "POST",
+          "path": "/api/v1/beneficiaries",
+          "name": "accountNumber",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/beneficiaries",
+          "method": "POST",
+          "path": "/api/v1/beneficiaries",
+          "name": "bankCode",
+          "location": "body",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "POST /api/v1/beneficiaries",
+          "method": "POST",
+          "path": "/api/v1/beneficiaries",
+          "name": "verified",
+          "location": "body",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/statements/{accountId}",
+          "method": "GET",
+          "path": "/api/v1/statements/{accountId}",
+          "name": "accountId",
+          "location": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/statements/{accountId}",
+          "method": "GET",
+          "path": "/api/v1/statements/{accountId}",
+          "name": "month",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/admin/audit-logs",
+          "method": "GET",
+          "path": "/api/v1/admin/audit-logs",
+          "name": "from",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/admin/audit-logs",
+          "method": "GET",
+          "path": "/api/v1/admin/audit-logs",
+          "name": "to",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "endpoint": "GET /api/v1/admin/audit-logs",
+          "method": "GET",
+          "path": "/api/v1/admin/audit-logs",
+          "name": "limit",
+          "location": "query",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/auth/token",
+            "method": "POST",
+            "path": "/api/v1/auth/token",
+            "name": "username",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/auth/token",
+            "method": "POST",
+            "path": "/api/v1/auth/token",
+            "name": "password",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "password"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/auth/logout",
+            "method": "POST",
+            "path": "/api/v1/auth/logout",
+            "name": "token",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "name": "type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CHECKING",
+                "SAVINGS"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "name": "initialDeposit",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "name": "displayName",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/accounts/{id}",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /api/v1/accounts/{id}",
+            "method": "PUT",
+            "path": "/api/v1/accounts/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "PUT /api/v1/accounts/{id}",
+            "method": "PUT",
+            "path": "/api/v1/accounts/{id}",
+            "name": "displayName",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "DELETE /api/v1/accounts/{id}",
+            "method": "DELETE",
+            "path": "/api/v1/accounts/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/accounts/{id}/balance",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/balance",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/accounts/{id}/statement",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/statement",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/accounts/{id}/statement",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/statement",
+            "name": "from",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/accounts/{id}/statement",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/statement",
+            "name": "to",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/transactions",
+            "method": "GET",
+            "path": "/api/v1/transactions",
+            "name": "accountId",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "name": "accountId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "name": "type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DEPOSIT",
+                "WITHDRAWAL"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0.01
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "name": "description",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/transactions/{id}",
+            "method": "GET",
+            "path": "/api/v1/transactions/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "sourceAccountId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "beneficiaryId",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0.01
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "type",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOMESTIC",
+                "INTERNATIONAL_WIRE"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "swift",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "name": "reference",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/transfers/{id}",
+            "method": "GET",
+            "path": "/api/v1/transfers/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PERSONAL",
+                "MORTGAGE",
+                "AUTO",
+                "BUSINESS"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "termMonths",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "creditScore",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 300,
+              "maximum": 850
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "name": "purpose",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/loans/{id}",
+            "method": "GET",
+            "path": "/api/v1/loans/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "name": "amount",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "name": "paymentMethod",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACH",
+                "DEBIT_CARD",
+                "WIRE"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "name": "type",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SAVINGS"
+              ]
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "name": "minimumBalance",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "name": "currency",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "name": "interestRate",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/savings/{id}",
+            "method": "GET",
+            "path": "/api/v1/savings/{id}",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings/{id}/interest",
+            "method": "POST",
+            "path": "/api/v1/savings/{id}/interest",
+            "name": "id",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/savings/{id}/interest",
+            "method": "POST",
+            "path": "/api/v1/savings/{id}/interest",
+            "name": "period",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "name": "name",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "name": "accountNumber",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "name": "bankCode",
+            "location": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "name": "verified",
+            "location": "body",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/statements/{accountId}",
+            "method": "GET",
+            "path": "/api/v1/statements/{accountId}",
+            "name": "accountId",
+            "location": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/statements/{accountId}",
+            "method": "GET",
+            "path": "/api/v1/statements/{accountId}",
+            "name": "month",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/admin/audit-logs",
+            "method": "GET",
+            "path": "/api/v1/admin/audit-logs",
+            "name": "from",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/admin/audit-logs",
+            "method": "GET",
+            "path": "/api/v1/admin/audit-logs",
+            "name": "to",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        },
+        {
+          "parameter": {
+            "endpoint": "GET /api/v1/admin/audit-logs",
+            "method": "GET",
+            "path": "/api/v1/admin/audit-logs",
+            "name": "limit",
+            "location": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          "validValue": false,
+          "boundaryValue": false,
+          "missing": false,
+          "invalidValue": false,
+          "ratio": 0
+        }
+      ]
+    },
+    "error": {
+      "total": 53,
+      "covered": 0,
+      "percentage": 0,
+      "scenarios": [
+        {
+          "scenario": {
+            "id": "POST /api/v1/auth/token:401",
+            "endpoint": "POST /api/v1/auth/token",
+            "method": "POST",
+            "path": "/api/v1/auth/token",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/auth/logout:401",
+            "endpoint": "POST /api/v1/auth/logout",
+            "method": "POST",
+            "path": "/api/v1/auth/logout",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts:401",
+            "endpoint": "GET /api/v1/accounts",
+            "method": "GET",
+            "path": "/api/v1/accounts",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/accounts:400",
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/accounts:401",
+            "endpoint": "POST /api/v1/accounts",
+            "method": "POST",
+            "path": "/api/v1/accounts",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}:401",
+            "endpoint": "GET /api/v1/accounts/{id}",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}:404",
+            "endpoint": "GET /api/v1/accounts/{id}",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /api/v1/accounts/{id}:400",
+            "endpoint": "PUT /api/v1/accounts/{id}",
+            "method": "PUT",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /api/v1/accounts/{id}:401",
+            "endpoint": "PUT /api/v1/accounts/{id}",
+            "method": "PUT",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "PUT /api/v1/accounts/{id}:404",
+            "endpoint": "PUT /api/v1/accounts/{id}",
+            "method": "PUT",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /api/v1/accounts/{id}:401",
+            "endpoint": "DELETE /api/v1/accounts/{id}",
+            "method": "DELETE",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /api/v1/accounts/{id}:404",
+            "endpoint": "DELETE /api/v1/accounts/{id}",
+            "method": "DELETE",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "DELETE /api/v1/accounts/{id}:422",
+            "endpoint": "DELETE /api/v1/accounts/{id}",
+            "method": "DELETE",
+            "path": "/api/v1/accounts/{id}",
+            "statusCode": 422,
+            "description": "Business rule violation",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}/balance:401",
+            "endpoint": "GET /api/v1/accounts/{id}/balance",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/balance",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}/balance:404",
+            "endpoint": "GET /api/v1/accounts/{id}/balance",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/balance",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}/statement:401",
+            "endpoint": "GET /api/v1/accounts/{id}/statement",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/statement",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/accounts/{id}/statement:404",
+            "endpoint": "GET /api/v1/accounts/{id}/statement",
+            "method": "GET",
+            "path": "/api/v1/accounts/{id}/statement",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/transactions:401",
+            "endpoint": "GET /api/v1/transactions",
+            "method": "GET",
+            "path": "/api/v1/transactions",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transactions:400",
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transactions:401",
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transactions:422",
+            "endpoint": "POST /api/v1/transactions",
+            "method": "POST",
+            "path": "/api/v1/transactions",
+            "statusCode": 422,
+            "description": "Business rule violation",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/transactions/{id}:401",
+            "endpoint": "GET /api/v1/transactions/{id}",
+            "method": "GET",
+            "path": "/api/v1/transactions/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/transactions/{id}:404",
+            "endpoint": "GET /api/v1/transactions/{id}",
+            "method": "GET",
+            "path": "/api/v1/transactions/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transfers:400",
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transfers:401",
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transfers:403",
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "statusCode": 403,
+            "description": "Authenticated but not authorised for this resource",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/transfers:422",
+            "endpoint": "POST /api/v1/transfers",
+            "method": "POST",
+            "path": "/api/v1/transfers",
+            "statusCode": 422,
+            "description": "Business rule violation",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/transfers/{id}:401",
+            "endpoint": "GET /api/v1/transfers/{id}",
+            "method": "GET",
+            "path": "/api/v1/transfers/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/transfers/{id}:404",
+            "endpoint": "GET /api/v1/transfers/{id}",
+            "method": "GET",
+            "path": "/api/v1/transfers/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans:400",
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans:401",
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans:422",
+            "endpoint": "POST /api/v1/loans",
+            "method": "POST",
+            "path": "/api/v1/loans",
+            "statusCode": 422,
+            "description": "Business rule violation",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/loans/{id}:401",
+            "endpoint": "GET /api/v1/loans/{id}",
+            "method": "GET",
+            "path": "/api/v1/loans/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/loans/{id}:404",
+            "endpoint": "GET /api/v1/loans/{id}",
+            "method": "GET",
+            "path": "/api/v1/loans/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans/{id}/payment:400",
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans/{id}/payment:401",
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans/{id}/payment:404",
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/loans/{id}/payment:422",
+            "endpoint": "POST /api/v1/loans/{id}/payment",
+            "method": "POST",
+            "path": "/api/v1/loans/{id}/payment",
+            "statusCode": 422,
+            "description": "Business rule violation",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/savings:400",
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/savings:401",
+            "endpoint": "POST /api/v1/savings",
+            "method": "POST",
+            "path": "/api/v1/savings",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/savings/{id}:401",
+            "endpoint": "GET /api/v1/savings/{id}",
+            "method": "GET",
+            "path": "/api/v1/savings/{id}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/savings/{id}:404",
+            "endpoint": "GET /api/v1/savings/{id}",
+            "method": "GET",
+            "path": "/api/v1/savings/{id}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/savings/{id}/interest:401",
+            "endpoint": "POST /api/v1/savings/{id}/interest",
+            "method": "POST",
+            "path": "/api/v1/savings/{id}/interest",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/savings/{id}/interest:404",
+            "endpoint": "POST /api/v1/savings/{id}/interest",
+            "method": "POST",
+            "path": "/api/v1/savings/{id}/interest",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/beneficiaries:401",
+            "endpoint": "GET /api/v1/beneficiaries",
+            "method": "GET",
+            "path": "/api/v1/beneficiaries",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/beneficiaries:400",
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "statusCode": 400,
+            "description": "Invalid request payload",
+            "categories": [
+              "invalid-value"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "POST /api/v1/beneficiaries:401",
+            "endpoint": "POST /api/v1/beneficiaries",
+            "method": "POST",
+            "path": "/api/v1/beneficiaries",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/statements/{accountId}:401",
+            "endpoint": "GET /api/v1/statements/{accountId}",
+            "method": "GET",
+            "path": "/api/v1/statements/{accountId}",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/statements/{accountId}:404",
+            "endpoint": "GET /api/v1/statements/{accountId}",
+            "method": "GET",
+            "path": "/api/v1/statements/{accountId}",
+            "statusCode": 404,
+            "description": "Resource not found",
+            "categories": [
+              "not-found"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/admin/metrics:401",
+            "endpoint": "GET /api/v1/admin/metrics",
+            "method": "GET",
+            "path": "/api/v1/admin/metrics",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/admin/metrics:403",
+            "endpoint": "GET /api/v1/admin/metrics",
+            "method": "GET",
+            "path": "/api/v1/admin/metrics",
+            "statusCode": 403,
+            "description": "Authenticated but not authorised for this resource",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/admin/audit-logs:401",
+            "endpoint": "GET /api/v1/admin/audit-logs",
+            "method": "GET",
+            "path": "/api/v1/admin/audit-logs",
+            "statusCode": 401,
+            "description": "Missing or invalid authentication token",
+            "categories": [
+              "unauthorized"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        },
+        {
+          "scenario": {
+            "id": "GET /api/v1/admin/audit-logs:403",
+            "endpoint": "GET /api/v1/admin/audit-logs",
+            "method": "GET",
+            "path": "/api/v1/admin/audit-logs",
+            "statusCode": 403,
+            "description": "Authenticated but not authorised for this resource",
+            "categories": [
+              "forbidden"
+            ]
+          },
+          "covered": false,
+          "matchedTests": []
+        }
+      ],
+      "categorySummary": {
+        "missing-parameter": {
+          "total": 0,
+          "covered": 0
+        },
+        "invalid-value": {
+          "total": 13,
+          "covered": 0
+        },
+        "unauthorized": {
+          "total": 25,
+          "covered": 0
+        },
+        "forbidden": {
+          "total": 3,
+          "covered": 0
+        },
+        "not-found": {
+          "total": 12,
+          "covered": 0
+        },
+        "conflict": {
+          "total": 0,
+          "covered": 0
+        },
+        "server-error": {
+          "total": 0,
+          "covered": 0
+        }
+      }
+    },
+    "business": {
+      "total": 8,
+      "covered": 0,
+      "percentage": 0,
+      "uncoveredRules": [
+        {
+          "id": "BR-001",
+          "name": "account-balance-positive",
+          "description": "A bank account balance must never go below $0.00. Any transaction (withdrawal or transfer) that would result in a negative balance must be rejected with HTTP 422 and error code INSUFFICIENT_FUNDS.\n",
+          "severity": "critical",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transactions"
+            },
+            {
+              "method": "POST",
+              "path": "/api/v1/transfers"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "P",
+              "1": "r",
+              "2": "e",
+              "3": "v",
+              "4": "e",
+              "5": "n",
+              "6": "t",
+              "7": " ",
+              "8": "o",
+              "9": "v",
+              "10": "e",
+              "11": "r",
+              "12": "d",
+              "13": "r",
+              "14": "a",
+              "15": "f",
+              "16": "t",
+              "17": " ",
+              "18": "-",
+              "19": " ",
+              "20": "b",
+              "21": "a",
+              "22": "l",
+              "23": "a",
+              "24": "n",
+              "25": "c",
+              "26": "e",
+              "27": " ",
+              "28": "c",
+              "29": "a",
+              "30": "n",
+              "31": "n",
+              "32": "o",
+              "33": "t",
+              "34": " ",
+              "35": "g",
+              "36": "o",
+              "37": " ",
+              "38": "b",
+              "39": "e",
+              "40": "l",
+              "41": "o",
+              "42": "w",
+              "43": " ",
+              "44": "z",
+              "45": "e",
+              "46": "r",
+              "47": "o",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "balance",
+            "withdrawal",
+            "fraud-prevention"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-002",
+          "name": "transfer-daily-limit",
+          "description": "A customer may not transfer more than $50,000 in aggregate within a rolling 24-hour window. Attempts to exceed this limit must be rejected with HTTP 422 and error code TRANSFER_DAILY_LIMIT_EXCEEDED.\n",
+          "severity": "critical",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transfers"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "R",
+              "1": "e",
+              "2": "j",
+              "3": "e",
+              "4": "c",
+              "5": "t",
+              "6": " ",
+              "7": "t",
+              "8": "r",
+              "9": "a",
+              "10": "n",
+              "11": "s",
+              "12": "f",
+              "13": "e",
+              "14": "r",
+              "15": " ",
+              "16": "e",
+              "17": "x",
+              "18": "c",
+              "19": "e",
+              "20": "e",
+              "21": "d",
+              "22": "i",
+              "23": "n",
+              "24": "g",
+              "25": " ",
+              "26": "d",
+              "27": "a",
+              "28": "i",
+              "29": "l",
+              "30": "y",
+              "31": " ",
+              "32": "l",
+              "33": "i",
+              "34": "m",
+              "35": "i",
+              "36": "t",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "transfer",
+            "limits",
+            "compliance"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-003",
+          "name": "loan-eligibility-check",
+          "description": "Customers must have a minimum credit score of 620 to qualify for a personal loan and 680 for a mortgage. Applications below the threshold are rejected with HTTP 422, status REJECTED, and a reason containing \"credit\".\n",
+          "severity": "high",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/loans"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "R",
+              "1": "e",
+              "2": "j",
+              "3": "e",
+              "4": "c",
+              "5": "t",
+              "6": " ",
+              "7": "l",
+              "8": "o",
+              "9": "a",
+              "10": "n",
+              "11": " ",
+              "12": "a",
+              "13": "p",
+              "14": "p",
+              "15": "l",
+              "16": "i",
+              "17": "c",
+              "18": "a",
+              "19": "t",
+              "20": "i",
+              "21": "o",
+              "22": "n",
+              "23": " ",
+              "24": "f",
+              "25": "o",
+              "26": "r",
+              "27": " ",
+              "28": "p",
+              "29": "o",
+              "30": "o",
+              "31": "r",
+              "32": " ",
+              "33": "c",
+              "34": "r",
+              "35": "e",
+              "36": "d",
+              "37": "i",
+              "38": "t",
+              "39": " ",
+              "40": "s",
+              "41": "c",
+              "42": "o",
+              "43": "r",
+              "44": "e",
+              "keywords": []
+            },
+            {
+              "0": "A",
+              "1": "p",
+              "2": "p",
+              "3": "l",
+              "4": "y",
+              "5": " ",
+              "6": "f",
+              "7": "o",
+              "8": "r",
+              "9": " ",
+              "10": "a",
+              "11": " ",
+              "12": "p",
+              "13": "e",
+              "14": "r",
+              "15": "s",
+              "16": "o",
+              "17": "n",
+              "18": "a",
+              "19": "l",
+              "20": " ",
+              "21": "l",
+              "22": "o",
+              "23": "a",
+              "24": "n",
+              "25": " ",
+              "26": "w",
+              "27": "i",
+              "28": "t",
+              "29": "h",
+              "30": " ",
+              "31": "g",
+              "32": "o",
+              "33": "o",
+              "34": "d",
+              "35": " ",
+              "36": "c",
+              "37": "r",
+              "38": "e",
+              "39": "d",
+              "40": "i",
+              "41": "t",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "loan",
+            "credit",
+            "eligibility"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-004",
+          "name": "loan-payment-schedule",
+          "description": "Loan repayments must match the pre-computed amortization schedule within ±$1.00. Payments that deviate from the scheduled amount must be rejected with HTTP 422 and error code LOAN_PAYMENT_SCHEDULE_MISMATCH.\n",
+          "severity": "high",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/loans/{id}/payment"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "R",
+              "1": "e",
+              "2": "j",
+              "3": "e",
+              "4": "c",
+              "5": "t",
+              "6": " ",
+              "7": "o",
+              "8": "f",
+              "9": "f",
+              "10": "-",
+              "11": "s",
+              "12": "c",
+              "13": "h",
+              "14": "e",
+              "15": "d",
+              "16": "u",
+              "17": "l",
+              "18": "e",
+              "19": " ",
+              "20": "l",
+              "21": "o",
+              "22": "a",
+              "23": "n",
+              "24": " ",
+              "25": "p",
+              "26": "a",
+              "27": "y",
+              "28": "m",
+              "29": "e",
+              "30": "n",
+              "31": "t",
+              "keywords": []
+            },
+            {
+              "0": "M",
+              "1": "a",
+              "2": "k",
+              "3": "e",
+              "4": " ",
+              "5": "a",
+              "6": " ",
+              "7": "s",
+              "8": "c",
+              "9": "h",
+              "10": "e",
+              "11": "d",
+              "12": "u",
+              "13": "l",
+              "14": "e",
+              "15": "d",
+              "16": " ",
+              "17": "l",
+              "18": "o",
+              "19": "a",
+              "20": "n",
+              "21": " ",
+              "22": "p",
+              "23": "a",
+              "24": "y",
+              "25": "m",
+              "26": "e",
+              "27": "n",
+              "28": "t",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "loan",
+            "payment",
+            "amortization"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-005",
+          "name": "savings-minimum-balance",
+          "description": "Savings accounts have a mandatory minimum balance (defined at account opening). Withdrawal requests that would bring the balance below the minimum must be rejected with HTTP 422 and error code MINIMUM_BALANCE_VIOLATION.\n",
+          "severity": "high",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transactions"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "S",
+              "1": "a",
+              "2": "v",
+              "3": "i",
+              "4": "n",
+              "5": "g",
+              "6": "s",
+              "7": " ",
+              "8": "a",
+              "9": "c",
+              "10": "c",
+              "11": "o",
+              "12": "u",
+              "13": "n",
+              "14": "t",
+              "15": " ",
+              "16": "c",
+              "17": "a",
+              "18": "n",
+              "19": "n",
+              "20": "o",
+              "21": "t",
+              "22": " ",
+              "23": "g",
+              "24": "o",
+              "25": " ",
+              "26": "b",
+              "27": "e",
+              "28": "l",
+              "29": "o",
+              "30": "w",
+              "31": " ",
+              "32": "m",
+              "33": "i",
+              "34": "n",
+              "35": "i",
+              "36": "m",
+              "37": "u",
+              "38": "m",
+              "39": " ",
+              "40": "b",
+              "41": "a",
+              "42": "l",
+              "43": "a",
+              "44": "n",
+              "45": "c",
+              "46": "e",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "savings",
+            "balance",
+            "constraints"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-006",
+          "name": "beneficiary-verification",
+          "description": "Fund transfers can only be sent to beneficiaries whose verified flag is true. Transfers to unverified beneficiaries must be rejected with HTTP 422 and error code BENEFICIARY_NOT_VERIFIED.\n",
+          "severity": "critical",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transfers"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "R",
+              "1": "e",
+              "2": "j",
+              "3": "e",
+              "4": "c",
+              "5": "t",
+              "6": " ",
+              "7": "t",
+              "8": "r",
+              "9": "a",
+              "10": "n",
+              "11": "s",
+              "12": "f",
+              "13": "e",
+              "14": "r",
+              "15": " ",
+              "16": "t",
+              "17": "o",
+              "18": " ",
+              "19": "u",
+              "20": "n",
+              "21": "v",
+              "22": "e",
+              "23": "r",
+              "24": "i",
+              "25": "f",
+              "26": "i",
+              "27": "e",
+              "28": "d",
+              "29": " ",
+              "30": "b",
+              "31": "e",
+              "32": "n",
+              "33": "e",
+              "34": "f",
+              "35": "i",
+              "36": "c",
+              "37": "i",
+              "38": "a",
+              "39": "r",
+              "40": "y",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "transfer",
+            "beneficiary",
+            "security"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-007",
+          "name": "dormant-account-restrictions",
+          "description": "Accounts that have had no activity for 12+ months are automatically marked DORMANT. No withdrawals, transfers, or outgoing transactions may be initiated on dormant accounts. Attempts must return HTTP 422.\n",
+          "severity": "high",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transactions"
+            },
+            {
+              "method": "POST",
+              "path": "/api/v1/transfers"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "C",
+              "1": "a",
+              "2": "n",
+              "3": "n",
+              "4": "o",
+              "5": "t",
+              "6": " ",
+              "7": "w",
+              "8": "i",
+              "9": "t",
+              "10": "h",
+              "11": "d",
+              "12": "r",
+              "13": "a",
+              "14": "w",
+              "15": " ",
+              "16": "f",
+              "17": "r",
+              "18": "o",
+              "19": "m",
+              "20": " ",
+              "21": "d",
+              "22": "o",
+              "23": "r",
+              "24": "m",
+              "25": "a",
+              "26": "n",
+              "27": "t",
+              "28": " ",
+              "29": "a",
+              "30": "c",
+              "31": "c",
+              "32": "o",
+              "33": "u",
+              "34": "n",
+              "35": "t",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "account",
+            "dormant",
+            "restrictions"
+          ],
+          "keywords": []
+        },
+        {
+          "id": "BR-008",
+          "name": "two-factor-for-large-transfers",
+          "description": "Transfers exceeding $10,000 require the customer to have completed a Two-Factor Authentication challenge in the current session. Attempting such a transfer without 2FA must return HTTP 403 and error code TWO_FACTOR_REQUIRED.\n",
+          "severity": "critical",
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/v1/transfers"
+            }
+          ],
+          "scenarios": [
+            {
+              "0": "T",
+              "1": "w",
+              "2": "o",
+              "3": "-",
+              "4": "f",
+              "5": "a",
+              "6": "c",
+              "7": "t",
+              "8": "o",
+              "9": "r",
+              "10": " ",
+              "11": "a",
+              "12": "u",
+              "13": "t",
+              "14": "h",
+              "15": "e",
+              "16": "n",
+              "17": "t",
+              "18": "i",
+              "19": "c",
+              "20": "a",
+              "21": "t",
+              "22": "i",
+              "23": "o",
+              "24": "n",
+              "25": " ",
+              "26": "r",
+              "27": "e",
+              "28": "q",
+              "29": "u",
+              "30": "i",
+              "31": "r",
+              "32": "e",
+              "33": "d",
+              "34": " ",
+              "35": "f",
+              "36": "o",
+              "37": "r",
+              "38": " ",
+              "39": "l",
+              "40": "a",
+              "41": "r",
+              "42": "g",
+              "43": "e",
+              "44": " ",
+              "45": "t",
+              "46": "r",
+              "47": "a",
+              "48": "n",
+              "49": "s",
+              "50": "f",
+              "51": "e",
+              "52": "r",
+              "53": "s",
+              "keywords": []
+            }
+          ],
+          "tags": [
+            "transfer",
+            "2fa",
+            "security",
+            "high-value"
+          ],
+          "keywords": []
+        }
+      ],
+      "rules": [
+        {
+          "rule": {
+            "id": "BR-001",
+            "name": "account-balance-positive",
+            "description": "A bank account balance must never go below $0.00. Any transaction (withdrawal or transfer) that would result in a negative balance must be rejected with HTTP 422 and error code INSUFFICIENT_FUNDS.\n",
+            "severity": "critical",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transactions"
+              },
+              {
+                "method": "POST",
+                "path": "/api/v1/transfers"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "P",
+                "1": "r",
+                "2": "e",
+                "3": "v",
+                "4": "e",
+                "5": "n",
+                "6": "t",
+                "7": " ",
+                "8": "o",
+                "9": "v",
+                "10": "e",
+                "11": "r",
+                "12": "d",
+                "13": "r",
+                "14": "a",
+                "15": "f",
+                "16": "t",
+                "17": " ",
+                "18": "-",
+                "19": " ",
+                "20": "b",
+                "21": "a",
+                "22": "l",
+                "23": "a",
+                "24": "n",
+                "25": "c",
+                "26": "e",
+                "27": " ",
+                "28": "c",
+                "29": "a",
+                "30": "n",
+                "31": "n",
+                "32": "o",
+                "33": "t",
+                "34": " ",
+                "35": "g",
+                "36": "o",
+                "37": " ",
+                "38": "b",
+                "39": "e",
+                "40": "l",
+                "41": "o",
+                "42": "w",
+                "43": " ",
+                "44": "z",
+                "45": "e",
+                "46": "r",
+                "47": "o",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "balance",
+              "withdrawal",
+              "fraud-prevention"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "P",
+                "1": "r",
+                "2": "e",
+                "3": "v",
+                "4": "e",
+                "5": "n",
+                "6": "t",
+                "7": " ",
+                "8": "o",
+                "9": "v",
+                "10": "e",
+                "11": "r",
+                "12": "d",
+                "13": "r",
+                "14": "a",
+                "15": "f",
+                "16": "t",
+                "17": " ",
+                "18": "-",
+                "19": " ",
+                "20": "b",
+                "21": "a",
+                "22": "l",
+                "23": "a",
+                "24": "n",
+                "25": "c",
+                "26": "e",
+                "27": " ",
+                "28": "c",
+                "29": "a",
+                "30": "n",
+                "31": "n",
+                "32": "o",
+                "33": "t",
+                "34": " ",
+                "35": "g",
+                "36": "o",
+                "37": " ",
+                "38": "b",
+                "39": "e",
+                "40": "l",
+                "41": "o",
+                "42": "w",
+                "43": " ",
+                "44": "z",
+                "45": "e",
+                "46": "r",
+                "47": "o",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-002",
+            "name": "transfer-daily-limit",
+            "description": "A customer may not transfer more than $50,000 in aggregate within a rolling 24-hour window. Attempts to exceed this limit must be rejected with HTTP 422 and error code TRANSFER_DAILY_LIMIT_EXCEEDED.\n",
+            "severity": "critical",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transfers"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "t",
+                "8": "r",
+                "9": "a",
+                "10": "n",
+                "11": "s",
+                "12": "f",
+                "13": "e",
+                "14": "r",
+                "15": " ",
+                "16": "e",
+                "17": "x",
+                "18": "c",
+                "19": "e",
+                "20": "e",
+                "21": "d",
+                "22": "i",
+                "23": "n",
+                "24": "g",
+                "25": " ",
+                "26": "d",
+                "27": "a",
+                "28": "i",
+                "29": "l",
+                "30": "y",
+                "31": " ",
+                "32": "l",
+                "33": "i",
+                "34": "m",
+                "35": "i",
+                "36": "t",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "transfer",
+              "limits",
+              "compliance"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "t",
+                "8": "r",
+                "9": "a",
+                "10": "n",
+                "11": "s",
+                "12": "f",
+                "13": "e",
+                "14": "r",
+                "15": " ",
+                "16": "e",
+                "17": "x",
+                "18": "c",
+                "19": "e",
+                "20": "e",
+                "21": "d",
+                "22": "i",
+                "23": "n",
+                "24": "g",
+                "25": " ",
+                "26": "d",
+                "27": "a",
+                "28": "i",
+                "29": "l",
+                "30": "y",
+                "31": " ",
+                "32": "l",
+                "33": "i",
+                "34": "m",
+                "35": "i",
+                "36": "t",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-003",
+            "name": "loan-eligibility-check",
+            "description": "Customers must have a minimum credit score of 620 to qualify for a personal loan and 680 for a mortgage. Applications below the threshold are rejected with HTTP 422, status REJECTED, and a reason containing \"credit\".\n",
+            "severity": "high",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/loans"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "l",
+                "8": "o",
+                "9": "a",
+                "10": "n",
+                "11": " ",
+                "12": "a",
+                "13": "p",
+                "14": "p",
+                "15": "l",
+                "16": "i",
+                "17": "c",
+                "18": "a",
+                "19": "t",
+                "20": "i",
+                "21": "o",
+                "22": "n",
+                "23": " ",
+                "24": "f",
+                "25": "o",
+                "26": "r",
+                "27": " ",
+                "28": "p",
+                "29": "o",
+                "30": "o",
+                "31": "r",
+                "32": " ",
+                "33": "c",
+                "34": "r",
+                "35": "e",
+                "36": "d",
+                "37": "i",
+                "38": "t",
+                "39": " ",
+                "40": "s",
+                "41": "c",
+                "42": "o",
+                "43": "r",
+                "44": "e",
+                "keywords": []
+              },
+              {
+                "0": "A",
+                "1": "p",
+                "2": "p",
+                "3": "l",
+                "4": "y",
+                "5": " ",
+                "6": "f",
+                "7": "o",
+                "8": "r",
+                "9": " ",
+                "10": "a",
+                "11": " ",
+                "12": "p",
+                "13": "e",
+                "14": "r",
+                "15": "s",
+                "16": "o",
+                "17": "n",
+                "18": "a",
+                "19": "l",
+                "20": " ",
+                "21": "l",
+                "22": "o",
+                "23": "a",
+                "24": "n",
+                "25": " ",
+                "26": "w",
+                "27": "i",
+                "28": "t",
+                "29": "h",
+                "30": " ",
+                "31": "g",
+                "32": "o",
+                "33": "o",
+                "34": "d",
+                "35": " ",
+                "36": "c",
+                "37": "r",
+                "38": "e",
+                "39": "d",
+                "40": "i",
+                "41": "t",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "loan",
+              "credit",
+              "eligibility"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "l",
+                "8": "o",
+                "9": "a",
+                "10": "n",
+                "11": " ",
+                "12": "a",
+                "13": "p",
+                "14": "p",
+                "15": "l",
+                "16": "i",
+                "17": "c",
+                "18": "a",
+                "19": "t",
+                "20": "i",
+                "21": "o",
+                "22": "n",
+                "23": " ",
+                "24": "f",
+                "25": "o",
+                "26": "r",
+                "27": " ",
+                "28": "p",
+                "29": "o",
+                "30": "o",
+                "31": "r",
+                "32": " ",
+                "33": "c",
+                "34": "r",
+                "35": "e",
+                "36": "d",
+                "37": "i",
+                "38": "t",
+                "39": " ",
+                "40": "s",
+                "41": "c",
+                "42": "o",
+                "43": "r",
+                "44": "e",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "scenario": {
+                "0": "A",
+                "1": "p",
+                "2": "p",
+                "3": "l",
+                "4": "y",
+                "5": " ",
+                "6": "f",
+                "7": "o",
+                "8": "r",
+                "9": " ",
+                "10": "a",
+                "11": " ",
+                "12": "p",
+                "13": "e",
+                "14": "r",
+                "15": "s",
+                "16": "o",
+                "17": "n",
+                "18": "a",
+                "19": "l",
+                "20": " ",
+                "21": "l",
+                "22": "o",
+                "23": "a",
+                "24": "n",
+                "25": " ",
+                "26": "w",
+                "27": "i",
+                "28": "t",
+                "29": "h",
+                "30": " ",
+                "31": "g",
+                "32": "o",
+                "33": "o",
+                "34": "d",
+                "35": " ",
+                "36": "c",
+                "37": "r",
+                "38": "e",
+                "39": "d",
+                "40": "i",
+                "41": "t",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-004",
+            "name": "loan-payment-schedule",
+            "description": "Loan repayments must match the pre-computed amortization schedule within ±$1.00. Payments that deviate from the scheduled amount must be rejected with HTTP 422 and error code LOAN_PAYMENT_SCHEDULE_MISMATCH.\n",
+            "severity": "high",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/loans/{id}/payment"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "o",
+                "8": "f",
+                "9": "f",
+                "10": "-",
+                "11": "s",
+                "12": "c",
+                "13": "h",
+                "14": "e",
+                "15": "d",
+                "16": "u",
+                "17": "l",
+                "18": "e",
+                "19": " ",
+                "20": "l",
+                "21": "o",
+                "22": "a",
+                "23": "n",
+                "24": " ",
+                "25": "p",
+                "26": "a",
+                "27": "y",
+                "28": "m",
+                "29": "e",
+                "30": "n",
+                "31": "t",
+                "keywords": []
+              },
+              {
+                "0": "M",
+                "1": "a",
+                "2": "k",
+                "3": "e",
+                "4": " ",
+                "5": "a",
+                "6": " ",
+                "7": "s",
+                "8": "c",
+                "9": "h",
+                "10": "e",
+                "11": "d",
+                "12": "u",
+                "13": "l",
+                "14": "e",
+                "15": "d",
+                "16": " ",
+                "17": "l",
+                "18": "o",
+                "19": "a",
+                "20": "n",
+                "21": " ",
+                "22": "p",
+                "23": "a",
+                "24": "y",
+                "25": "m",
+                "26": "e",
+                "27": "n",
+                "28": "t",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "loan",
+              "payment",
+              "amortization"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "o",
+                "8": "f",
+                "9": "f",
+                "10": "-",
+                "11": "s",
+                "12": "c",
+                "13": "h",
+                "14": "e",
+                "15": "d",
+                "16": "u",
+                "17": "l",
+                "18": "e",
+                "19": " ",
+                "20": "l",
+                "21": "o",
+                "22": "a",
+                "23": "n",
+                "24": " ",
+                "25": "p",
+                "26": "a",
+                "27": "y",
+                "28": "m",
+                "29": "e",
+                "30": "n",
+                "31": "t",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "scenario": {
+                "0": "M",
+                "1": "a",
+                "2": "k",
+                "3": "e",
+                "4": " ",
+                "5": "a",
+                "6": " ",
+                "7": "s",
+                "8": "c",
+                "9": "h",
+                "10": "e",
+                "11": "d",
+                "12": "u",
+                "13": "l",
+                "14": "e",
+                "15": "d",
+                "16": " ",
+                "17": "l",
+                "18": "o",
+                "19": "a",
+                "20": "n",
+                "21": " ",
+                "22": "p",
+                "23": "a",
+                "24": "y",
+                "25": "m",
+                "26": "e",
+                "27": "n",
+                "28": "t",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-005",
+            "name": "savings-minimum-balance",
+            "description": "Savings accounts have a mandatory minimum balance (defined at account opening). Withdrawal requests that would bring the balance below the minimum must be rejected with HTTP 422 and error code MINIMUM_BALANCE_VIOLATION.\n",
+            "severity": "high",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transactions"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "S",
+                "1": "a",
+                "2": "v",
+                "3": "i",
+                "4": "n",
+                "5": "g",
+                "6": "s",
+                "7": " ",
+                "8": "a",
+                "9": "c",
+                "10": "c",
+                "11": "o",
+                "12": "u",
+                "13": "n",
+                "14": "t",
+                "15": " ",
+                "16": "c",
+                "17": "a",
+                "18": "n",
+                "19": "n",
+                "20": "o",
+                "21": "t",
+                "22": " ",
+                "23": "g",
+                "24": "o",
+                "25": " ",
+                "26": "b",
+                "27": "e",
+                "28": "l",
+                "29": "o",
+                "30": "w",
+                "31": " ",
+                "32": "m",
+                "33": "i",
+                "34": "n",
+                "35": "i",
+                "36": "m",
+                "37": "u",
+                "38": "m",
+                "39": " ",
+                "40": "b",
+                "41": "a",
+                "42": "l",
+                "43": "a",
+                "44": "n",
+                "45": "c",
+                "46": "e",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "savings",
+              "balance",
+              "constraints"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "S",
+                "1": "a",
+                "2": "v",
+                "3": "i",
+                "4": "n",
+                "5": "g",
+                "6": "s",
+                "7": " ",
+                "8": "a",
+                "9": "c",
+                "10": "c",
+                "11": "o",
+                "12": "u",
+                "13": "n",
+                "14": "t",
+                "15": " ",
+                "16": "c",
+                "17": "a",
+                "18": "n",
+                "19": "n",
+                "20": "o",
+                "21": "t",
+                "22": " ",
+                "23": "g",
+                "24": "o",
+                "25": " ",
+                "26": "b",
+                "27": "e",
+                "28": "l",
+                "29": "o",
+                "30": "w",
+                "31": " ",
+                "32": "m",
+                "33": "i",
+                "34": "n",
+                "35": "i",
+                "36": "m",
+                "37": "u",
+                "38": "m",
+                "39": " ",
+                "40": "b",
+                "41": "a",
+                "42": "l",
+                "43": "a",
+                "44": "n",
+                "45": "c",
+                "46": "e",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-006",
+            "name": "beneficiary-verification",
+            "description": "Fund transfers can only be sent to beneficiaries whose verified flag is true. Transfers to unverified beneficiaries must be rejected with HTTP 422 and error code BENEFICIARY_NOT_VERIFIED.\n",
+            "severity": "critical",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transfers"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "t",
+                "8": "r",
+                "9": "a",
+                "10": "n",
+                "11": "s",
+                "12": "f",
+                "13": "e",
+                "14": "r",
+                "15": " ",
+                "16": "t",
+                "17": "o",
+                "18": " ",
+                "19": "u",
+                "20": "n",
+                "21": "v",
+                "22": "e",
+                "23": "r",
+                "24": "i",
+                "25": "f",
+                "26": "i",
+                "27": "e",
+                "28": "d",
+                "29": " ",
+                "30": "b",
+                "31": "e",
+                "32": "n",
+                "33": "e",
+                "34": "f",
+                "35": "i",
+                "36": "c",
+                "37": "i",
+                "38": "a",
+                "39": "r",
+                "40": "y",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "transfer",
+              "beneficiary",
+              "security"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "R",
+                "1": "e",
+                "2": "j",
+                "3": "e",
+                "4": "c",
+                "5": "t",
+                "6": " ",
+                "7": "t",
+                "8": "r",
+                "9": "a",
+                "10": "n",
+                "11": "s",
+                "12": "f",
+                "13": "e",
+                "14": "r",
+                "15": " ",
+                "16": "t",
+                "17": "o",
+                "18": " ",
+                "19": "u",
+                "20": "n",
+                "21": "v",
+                "22": "e",
+                "23": "r",
+                "24": "i",
+                "25": "f",
+                "26": "i",
+                "27": "e",
+                "28": "d",
+                "29": " ",
+                "30": "b",
+                "31": "e",
+                "32": "n",
+                "33": "e",
+                "34": "f",
+                "35": "i",
+                "36": "c",
+                "37": "i",
+                "38": "a",
+                "39": "r",
+                "40": "y",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-007",
+            "name": "dormant-account-restrictions",
+            "description": "Accounts that have had no activity for 12+ months are automatically marked DORMANT. No withdrawals, transfers, or outgoing transactions may be initiated on dormant accounts. Attempts must return HTTP 422.\n",
+            "severity": "high",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transactions"
+              },
+              {
+                "method": "POST",
+                "path": "/api/v1/transfers"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "C",
+                "1": "a",
+                "2": "n",
+                "3": "n",
+                "4": "o",
+                "5": "t",
+                "6": " ",
+                "7": "w",
+                "8": "i",
+                "9": "t",
+                "10": "h",
+                "11": "d",
+                "12": "r",
+                "13": "a",
+                "14": "w",
+                "15": " ",
+                "16": "f",
+                "17": "r",
+                "18": "o",
+                "19": "m",
+                "20": " ",
+                "21": "d",
+                "22": "o",
+                "23": "r",
+                "24": "m",
+                "25": "a",
+                "26": "n",
+                "27": "t",
+                "28": " ",
+                "29": "a",
+                "30": "c",
+                "31": "c",
+                "32": "o",
+                "33": "u",
+                "34": "n",
+                "35": "t",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "account",
+              "dormant",
+              "restrictions"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "C",
+                "1": "a",
+                "2": "n",
+                "3": "n",
+                "4": "o",
+                "5": "t",
+                "6": " ",
+                "7": "w",
+                "8": "i",
+                "9": "t",
+                "10": "h",
+                "11": "d",
+                "12": "r",
+                "13": "a",
+                "14": "w",
+                "15": " ",
+                "16": "f",
+                "17": "r",
+                "18": "o",
+                "19": "m",
+                "20": " ",
+                "21": "d",
+                "22": "o",
+                "23": "r",
+                "24": "m",
+                "25": "a",
+                "26": "n",
+                "27": "t",
+                "28": " ",
+                "29": "a",
+                "30": "c",
+                "31": "c",
+                "32": "o",
+                "33": "u",
+                "34": "n",
+                "35": "t",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "rule": {
+            "id": "BR-008",
+            "name": "two-factor-for-large-transfers",
+            "description": "Transfers exceeding $10,000 require the customer to have completed a Two-Factor Authentication challenge in the current session. Attempting such a transfer without 2FA must return HTTP 403 and error code TWO_FACTOR_REQUIRED.\n",
+            "severity": "critical",
+            "endpoints": [
+              {
+                "method": "POST",
+                "path": "/api/v1/transfers"
+              }
+            ],
+            "scenarios": [
+              {
+                "0": "T",
+                "1": "w",
+                "2": "o",
+                "3": "-",
+                "4": "f",
+                "5": "a",
+                "6": "c",
+                "7": "t",
+                "8": "o",
+                "9": "r",
+                "10": " ",
+                "11": "a",
+                "12": "u",
+                "13": "t",
+                "14": "h",
+                "15": "e",
+                "16": "n",
+                "17": "t",
+                "18": "i",
+                "19": "c",
+                "20": "a",
+                "21": "t",
+                "22": "i",
+                "23": "o",
+                "24": "n",
+                "25": " ",
+                "26": "r",
+                "27": "e",
+                "28": "q",
+                "29": "u",
+                "30": "i",
+                "31": "r",
+                "32": "e",
+                "33": "d",
+                "34": " ",
+                "35": "f",
+                "36": "o",
+                "37": "r",
+                "38": " ",
+                "39": "l",
+                "40": "a",
+                "41": "r",
+                "42": "g",
+                "43": "e",
+                "44": " ",
+                "45": "t",
+                "46": "r",
+                "47": "a",
+                "48": "n",
+                "49": "s",
+                "50": "f",
+                "51": "e",
+                "52": "r",
+                "53": "s",
+                "keywords": []
+              }
+            ],
+            "tags": [
+              "transfer",
+              "2fa",
+              "security",
+              "high-value"
+            ],
+            "keywords": []
+          },
+          "covered": false,
+          "testFiles": [],
+          "matchedTests": [],
+          "scenarios": [
+            {
+              "scenario": {
+                "0": "T",
+                "1": "w",
+                "2": "o",
+                "3": "-",
+                "4": "f",
+                "5": "a",
+                "6": "c",
+                "7": "t",
+                "8": "o",
+                "9": "r",
+                "10": " ",
+                "11": "a",
+                "12": "u",
+                "13": "t",
+                "14": "h",
+                "15": "e",
+                "16": "n",
+                "17": "t",
+                "18": "i",
+                "19": "c",
+                "20": "a",
+                "21": "t",
+                "22": "i",
+                "23": "o",
+                "24": "n",
+                "25": " ",
+                "26": "r",
+                "27": "e",
+                "28": "q",
+                "29": "u",
+                "30": "i",
+                "31": "r",
+                "32": "e",
+                "33": "d",
+                "34": " ",
+                "35": "f",
+                "36": "o",
+                "37": "r",
+                "38": " ",
+                "39": "l",
+                "40": "a",
+                "41": "r",
+                "42": "g",
+                "43": "e",
+                "44": " ",
+                "45": "t",
+                "46": "r",
+                "47": "a",
+                "48": "n",
+                "49": "s",
+                "50": "f",
+                "51": "e",
+                "52": "r",
+                "53": "s",
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    },
+    "integration": {
+      "total": 5,
+      "complete": 0,
+      "partial": 0,
+      "missing": 5,
+      "percentage": 0,
+      "flows": [
+        {
+          "flow": {
+            "id": "FLOW001",
+            "name": "Account Opening to First Transaction",
+            "description": "A new customer opens a checking account, makes an initial deposit, and then performs the first withdrawal.  This flow validates the core account lifecycle from creation to active use.\n",
+            "steps": [
+              {
+                "order": 1,
+                "description": "Create checking account with initial deposit",
+                "method": "POST",
+                "path": "/api/v1/accounts",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 2,
+                "description": "Verify balance reflects the initial deposit",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 3,
+                "description": "Record first deposit transaction",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 4,
+                "description": "Retrieve transaction history to confirm deposit",
+                "method": "GET",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 5,
+                "description": "Make first withdrawal",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 6,
+                "description": "Verify updated balance after withdrawal",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              }
+            ],
+            "coveredBy": {
+              "feature": "account_management.feature",
+              "scenarios": [
+                "Create a new checking account",
+                "Check account balance"
+              ]
+            },
+            "tags": [
+              "onboarding",
+              "happy-path"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "order": 1,
+                "description": "Create checking account with initial deposit",
+                "method": "POST",
+                "path": "/api/v1/accounts",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 2,
+                "description": "Verify balance reflects the initial deposit",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 3,
+                "description": "Record first deposit transaction",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 4,
+                "description": "Retrieve transaction history to confirm deposit",
+                "method": "GET",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 5,
+                "description": "Make first withdrawal",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 6,
+                "description": "Verify updated balance after withdrawal",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW002",
+            "name": "Loan Application and First Payment",
+            "description": "Customer applies for a personal loan, receives an approved offer, and makes the first scheduled payment.  Validates the complete loan origination and repayment cycle.\n",
+            "steps": [
+              {
+                "order": 1,
+                "description": "Submit loan application",
+                "method": "POST",
+                "path": "/api/v1/loans",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 2,
+                "description": "Retrieve loan details and amortization schedule",
+                "method": "GET",
+                "path": "/api/v1/loans/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 3,
+                "description": "Make the first scheduled payment",
+                "method": "POST",
+                "path": "/api/v1/loans/{id}/payment",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 4,
+                "description": "Confirm reduced remaining balance",
+                "method": "GET",
+                "path": "/api/v1/loans/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              }
+            ],
+            "coveredBy": {
+              "feature": "loans.feature",
+              "scenarios": [
+                "Apply for a personal loan with good credit",
+                "Make a scheduled loan payment"
+              ]
+            },
+            "tags": [
+              "loan",
+              "payment",
+              "happy-path"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "order": 1,
+                "description": "Submit loan application",
+                "method": "POST",
+                "path": "/api/v1/loans",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 2,
+                "description": "Retrieve loan details and amortization schedule",
+                "method": "GET",
+                "path": "/api/v1/loans/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 3,
+                "description": "Make the first scheduled payment",
+                "method": "POST",
+                "path": "/api/v1/loans/{id}/payment",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 4,
+                "description": "Confirm reduced remaining balance",
+                "method": "GET",
+                "path": "/api/v1/loans/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW003",
+            "name": "International Wire Transfer",
+            "description": "Customer adds an international beneficiary, initiates a wire transfer, and tracks the transfer status through to completion.  Validates the international payment workflow including SWIFT routing.\n",
+            "steps": [
+              {
+                "order": 1,
+                "description": "Register international beneficiary",
+                "method": "POST",
+                "path": "/api/v1/beneficiaries",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 2,
+                "description": "List beneficiaries to confirm registration",
+                "method": "GET",
+                "path": "/api/v1/beneficiaries",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 3,
+                "description": "Initiate international wire transfer",
+                "method": "POST",
+                "path": "/api/v1/transfers",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 4,
+                "description": "Poll transfer status until COMPLETED or FAILED",
+                "method": "GET",
+                "path": "/api/v1/transfers/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              }
+            ],
+            "coveredBy": {
+              "feature": "transfers.feature",
+              "scenarios": [
+                "International wire transfer",
+                "Check transfer status after initiation"
+              ]
+            },
+            "tags": [
+              "transfer",
+              "international",
+              "wire"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "order": 1,
+                "description": "Register international beneficiary",
+                "method": "POST",
+                "path": "/api/v1/beneficiaries",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 2,
+                "description": "List beneficiaries to confirm registration",
+                "method": "GET",
+                "path": "/api/v1/beneficiaries",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 3,
+                "description": "Initiate international wire transfer",
+                "method": "POST",
+                "path": "/api/v1/transfers",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 4,
+                "description": "Poll transfer status until COMPLETED or FAILED",
+                "method": "GET",
+                "path": "/api/v1/transfers/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW004",
+            "name": "Savings Account Interest Calculation",
+            "description": "Opens a savings account, deposits funds, and triggers the monthly interest calculation.  Validates that interest is correctly applied and reflected in the balance.\n",
+            "steps": [
+              {
+                "order": 1,
+                "description": "Open savings account with minimum balance",
+                "method": "POST",
+                "path": "/api/v1/savings",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 2,
+                "description": "Retrieve savings account details",
+                "method": "GET",
+                "path": "/api/v1/savings/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 3,
+                "description": "Trigger monthly interest calculation",
+                "method": "POST",
+                "path": "/api/v1/savings/{id}/interest",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 4,
+                "description": "Verify balance increased after interest",
+                "method": "GET",
+                "path": "/api/v1/savings/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              }
+            ],
+            "coveredBy": {
+              "feature": "account_management.feature",
+              "scenarios": [
+                "Create a savings account with minimum balance requirement"
+              ]
+            },
+            "tags": [
+              "savings",
+              "interest",
+              "calculation"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "order": 1,
+                "description": "Open savings account with minimum balance",
+                "method": "POST",
+                "path": "/api/v1/savings",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 2,
+                "description": "Retrieve savings account details",
+                "method": "GET",
+                "path": "/api/v1/savings/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 3,
+                "description": "Trigger monthly interest calculation",
+                "method": "POST",
+                "path": "/api/v1/savings/{id}/interest",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 4,
+                "description": "Verify balance increased after interest",
+                "method": "GET",
+                "path": "/api/v1/savings/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        },
+        {
+          "flow": {
+            "id": "FLOW005",
+            "name": "Account Closure Process",
+            "description": "Customer requests to close an account.  The system validates there are no pending transfers or outstanding loans, withdraws remaining funds, and marks the account as CLOSED.\n",
+            "steps": [
+              {
+                "order": 1,
+                "description": "Retrieve account to verify it is eligible for closure",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 2,
+                "description": "Withdraw remaining balance",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              {
+                "order": 3,
+                "description": "Confirm zero balance",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 4,
+                "description": "Download final statement before closure",
+                "method": "GET",
+                "path": "/api/v1/statements/{accountId}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              {
+                "order": 5,
+                "description": "Close the account",
+                "method": "DELETE",
+                "path": "/api/v1/accounts/{id}",
+                "expectedStatus": 204,
+                "keywords": []
+              }
+            ],
+            "coveredBy": {
+              "feature": "account_management.feature",
+              "scenarios": [
+                "Close an account",
+                "Request account statement"
+              ]
+            },
+            "tags": [
+              "account",
+              "closure",
+              "offboarding"
+            ]
+          },
+          "status": "missing",
+          "testFiles": [],
+          "steps": [
+            {
+              "step": {
+                "order": 1,
+                "description": "Retrieve account to verify it is eligible for closure",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 2,
+                "description": "Withdraw remaining balance",
+                "method": "POST",
+                "path": "/api/v1/transactions",
+                "expectedStatus": 201,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 3,
+                "description": "Confirm zero balance",
+                "method": "GET",
+                "path": "/api/v1/accounts/{id}/balance",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 4,
+                "description": "Download final statement before closure",
+                "method": "GET",
+                "path": "/api/v1/statements/{accountId}",
+                "expectedStatus": 200,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            },
+            {
+              "step": {
+                "order": 5,
+                "description": "Close the account",
+                "method": "DELETE",
+                "path": "/api/v1/accounts/{id}",
+                "expectedStatus": 204,
+                "keywords": []
+              },
+              "covered": false,
+              "matchedTests": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "observability": {
+    "metricsUrl": null,
+    "note": "Prometheus metrics export not enabled (use --metrics-port to enable)",
+    "metricNames": {
+      "total": "api_coverage_total{service=\"<name>\",coverage_type=\"<type>\"}",
+      "covered": "api_coverage_covered{service=\"<name>\",coverage_type=\"<type>\"}",
+      "ratio": "api_coverage_ratio{service=\"<name>\",coverage_type=\"<type>\"}",
+      "thresholdFailure": "api_coverage_threshold_failure{service=\"<name>\",coverage_type=\"<type>\"}"
+    },
+    "tracing": {
+      "enabled": false,
+      "otlpEndpoint": null,
+      "note": "Tracing not enabled (use --trace to enable)"
+    }
+  },
+  "discoveryInfo": {
+    "projectRoot": "/Users/toaderm/workspace/apiTestsCoverageAnalyzer/examples/cucumber-java-complex",
+    "analyzedAt": "2026-03-11T15:51:53.609Z",
+    "languages": [
+      "java",
+      "kotlin"
+    ],
+    "frameworks": [
+      "cucumber"
+    ],
+    "serviceFilesCount": 12,
+    "testFilesCount": 7,
+    "specFilesCount": 1,
+    "analysisMode": "explicit-spec"
+  }
+}
